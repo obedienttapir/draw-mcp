@@ -4,6 +4,8 @@ An interactive three.js model of the basement home cinema (Room 1 on the foundat
 
 Open `index.html` in a recent desktop or mobile browser. It loads three.js r160 and the fonts from public CDNs, so it needs an internet connection. Nothing else to install.
 
+It starts in **Fast** display mode so it runs smoothly on older laptops and phones: it draws at standard resolution (lower still if frames get slow), skips the glow and area lights, and only redraws when something changes. The flame animates only while the fireplace is on screen. Switch to **High quality** (glow, soft area light, full resolution on sharp screens) under **Lighting › Display** if you have a strong graphics card. The choice is remembered per browser.
+
 ## What's modelled
 
 | Element | Value | Source |
@@ -11,11 +13,13 @@ Open `index.html` in a recent desktop or mobile browser. It loads three.js r160 
 | Fireplace wall → exterior wall | 228″ (19′-0″) | tape measure |
 | Staircase wall → TV wall | 185″ (15′-5″) | tape measure |
 | Ceiling | 108″ (9′) | owner |
-| TV alcove (bay) | 2′-7″ / 7′-9″ / 2′-7″ faces, 2′-2″ jog to the exterior wall, ~60″ deep, 84″ flat TV wall | foundation plan, photos |
+| TV alcove (bay) | 10′-9″ (129″) wide at the opening, 84″ flat TV wall with 45° corners, ~60″ deep, 2′-2″ jog to the exterior wall | tape measure, plan, photos |
 | Alcove bulkhead | follows the bay outline, 12″ deep, underside 7′-8″ | estimated from photos |
-| Fireplace-side bulkhead | over the W200 beam, 48″ from the fireplace wall, underside 7′-10″ | estimated from photos |
+| Fireplace nook | 3′-9″ (45″) deep, from the fireplace wall to the corner of the wall facing the stairs | tape measure |
+| Fireplace-side bulkhead | over the W200 beam, from the fireplace wall to the alcove's west return (73″), and out over the stair landing; underside 7′-10″ | photos |
 | Steel beam pilaster | 18″ × 10″ box on the north wall, beam line 33″ from the fireplace wall | plan + photos |
-| Stairs | along the staircase wall, rising toward the exterior wall, 11′-6″ opening, open balustrade over a knee wall | plan + photos |
+| Stairs | 40″ wide along the staircase wall, 16 risers; bottom step 3′-11″ from the wall in front; tip of the stairs 11′-6″ from the exterior wall; open on the far side with a railing over the hallway | tape measure, photos |
+| Hallway | 54″ deep behind the stairs, two doors | photos |
 | Fireplace + 2 windows | 52″ linear fireplace, two 42″ × 10″ reeded transoms above (openings already cut) | photos |
 
 Everything marked "estimated" can be changed in the **Room** tab; the room rebuilds as you drag.
@@ -30,14 +34,16 @@ Everything marked "estimated" can be changed in the **Room** tab; the room rebui
 - **Lighting**: Bright, Evening, Movie and Fireside scenes, plus dimmers for the pot lights and the 2700K LED channels, TV, flame and lamps.
 - **Finishes**: wall paint, alcove accent colour, floor, slat wood, slats on the fireplace wall and/or behind the TV.
 - **Layout code**: copy the whole design as text to keep versions, paste one back to restore it. The latest layout is also saved in the browser.
+- **Hide menus** (`H`): hides every bar and panel so a phone shows only the 3D room. In this mode touches only move the camera (one finger turns, two fingers zoom and pan), so furniture can't be bumped by accident. Tap **Show menus** (or press `H` or `Esc`) to bring them back.
 
 ## Design options
 
 The design review in [`presentation/`](presentation/) is built into the planner:
 
 - **Furnish › Design option**: switch between the **Original plan** and the **Recommended** version (Undo goes back).
-- **Finishes › Windows above the fireplace**: *As built*, *Slats across + glow band* (slats run over both windows with one LED band behind them) or *One black frame* (a steel surround and mullion that make the pair read as one window). The window openings themselves never move; they are already cut.
-- **Finishes › Under or over the fireplace**: a mantel ledge or a full-width floating walnut bench.
+- **Finishes › Fireplace wall looks**: five one-click fixes for the "robot face": *Glow band + bench*, *Black frame + ledge*, *Hidden windows + stone*, *Black band + art* and *Linen shade + shelves*.
+- **Finishes › Windows above the fireplace**: *As built*, *Slats across + glow band*, *One black frame* (a steel surround and mullion that make the pair read as one window), *Hidden behind slats* (slats and felt close over both), *Black band, wall to wall* or *One linen shade*. The window openings themselves never move; they are already cut.
+- **Finishes › Around the fireplace**: a mantel ledge, a full-width floating walnut bench, a picture ledge with art, a stone slab surround, or open shelves either side.
 - **TV details**: a 100–120″ drop-down screen in the alcove bulkhead with a ceiling projector; the viewing report switches to the screen when it is down and warns if it is too wide for the alcove.
 - **Lighting**: a *Game night* scene, a 6500K bias light behind the TV, stair step lights, and a switch for the two pot lights over the TV.
 - **Room › Overlays › Speaker pre-wire plan (5.1.2)**: where to run speaker wire while the ceiling is open, placed from the prime seat.

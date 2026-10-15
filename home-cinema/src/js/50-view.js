@@ -3,7 +3,11 @@
 // ===================================================================
 const stage = $('#stage');
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+function pixelRatio() {
+  const d = window.devicePixelRatio || 1;
+  return isFast() ? Math.min(d, 1) * dprScale : Math.min(d, 2);
+}
+renderer.setPixelRatio(pixelRatio());
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -56,9 +60,10 @@ function goPreset(name, instant = false) {
   if (name === 'overview' && aspect < 1.25) pos.sub(target).multiplyScalar(Math.min(2.2, Math.pow(1.25 / aspect, 0.7))).add(target);
   $$('#presets button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.preset === name)));
   if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    camera.position.copy(pos); controls.target.copy(target); controls.update(); return;
+    camera.position.copy(pos); controls.target.copy(target); controls.update(); invalidate(2); return;
   }
   tween = { t: 0, p0: camera.position.clone(), t0: controls.target.clone(), p1: pos, t1: target };
+  invalidate(2);
 }
 function stepTween(dt) {
   if (!tween) return;
@@ -121,7 +126,7 @@ function safeRect() {
 }
 function fitPlan() {
   const r = state.room, S = safeRect();
-  const minX = -60, maxX = r.width + 60, minY = -r.stairWidth - 60, maxY = r.depth + 50;
+  const minX = -60, maxX = r.width + 60, minY = geom().hallY - 56, maxY = r.depth + 50;
   const scale = Math.max((maxX - minX) / (S.r - S.l), (maxY - minY) / (S.b - S.t));   // inches per px
   const sx = (S.l + S.r) / 2, sy = (S.t + S.b) / 2;
   ortho.left = -sx * scale; ortho.right = (S.W - sx) * scale; ortho.top = sy * scale; ortho.bottom = -(S.H - sy) * scale;
@@ -149,6 +154,7 @@ function setMode(m) {
   labelsGroup.visible = true;
   updateLighting();
   updateLabels();
+  invalidate(3);
   $('#walkpad').hidden = m !== 'walk';
   $('#hint').textContent = m === 'walk'
     ? 'Drag to look around · W A S D or arrow keys to walk · Shift to move faster'
@@ -223,26 +229,30 @@ function viewingStats() {
 
 let sightline = null;
 function updateLabels() {
-  disposeGroup(labelsGroup); sightline = null;
+  disposeGroup(labelsGroup); sightline = null; invalidate(2);
   const r = state.room, G = geom();
   if (mode === 'plan') {
     const zz = r.ceiling + 2;
-    dimLine([0, -r.stairWidth - 22], [r.width, -r.stairWidth - 22], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
+    dimLine([0, G.hallY - 24], [r.width, G.hallY - 24], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
+    dimLine([r.boxX, -r.stairWidth / 2], [r.stairStart, -r.stairWidth / 2], zz, ftin(r.stairStart - r.boxX));
+    label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 14, zz), 'tag');
     dimLine([r.width + 24, 0], [r.width + 24, r.depth], zz, `${ftin(r.depth)}  stairs → TV wall`);
     dimLine([-24, 0], [-24, G.mainY], zz, ftin(G.mainY));
+    dimLine([0, 9], [r.boxX, 9], zz, ftin(r.boxX));
     dimLine([G.bay[2][0], r.depth + 16], [G.bay[3][0], r.depth + 16], zz, `TV wall ${ftin(G.bay[3][0] - G.bay[2][0])}`);
-    dimLine([r.bayLeft, r.depth + 34], [r.bayRight, r.depth + 34], zz, `bay ${ftin(r.bayRight - r.bayLeft)}`);
+    dimLine([r.bayLeft, r.depth + 34], [r.bayRight, r.depth + 34], zz, `alcove ${ftin(r.bayRight - r.bayLeft)} · bulkhead at ${ftin(r.soffitBottom)}`);
     line([P(r.beamX, 0, zz), P(r.beamX, G.mainY, zz)], dimMat, true);
     label('Steel beam W200', P(r.beamX, G.mainY * 0.5, zz), 'tag', -90);
     label('TV alcove', P(G.tvX, G.mainY + r.bayDepth * 0.55, zz), 'tag');
-    label(`Alcove bulkhead ${ftin(r.soffitBottom)}`, P(r.bayRight - 7, G.mainY + G.ret * 0.45, zz), 'tag', 90);
-    label(`Bulkhead ${ftin(r.beamBottom)}`, P(r.beamDepth / 2 + 2, 10, zz), 'tag');
-    label('Stairs ↑', P((r.stairStart + r.width) / 2, -r.stairWidth / 2, zz), 'tag');
+    label(`Bulkhead ${ftin(r.beamBottom)}`, P(r.beamDepth / 2 + 2, G.mainY - 9, zz), 'tag');
+    label('Stairs ↑', P((r.stairStart + r.width) / 2, -r.stairWidth * 0.3, zz), 'tag');
+    dimLine([r.stairStart - 2, -r.stairWidth + 8], [r.width, -r.stairWidth + 8], zz, `tip of stairs ${ftin(r.width - r.stairStart + 2)}`);
     label('Exterior wall', P(r.width - 10, G.mainY / 2, zz), 'tag', 90);
     label('Fireplace', P(10, state.fireplace.center, zz), 'tag', -90);
   }
   const v = viewingStats();
-  if (v && state.showSightline && mode !== 'walk') {
+  const overlays = mode === 'plan' || !viewOnly();
+  if (v && state.showSightline && mode !== 'walk' && overlays) {
     const a = P(v.seat.x, v.seat.y, v.eye), b = P(v.tv.x, v.tv.y, v.tv.z);
     const sl = [line([a, b], lineMat, true)];
     const dot = new THREE.Mesh(new THREE.SphereGeometry(1.6, 16, 12), new THREE.MeshBasicMaterial({ color: '#d6a463', depthTest: false }));
@@ -250,7 +260,7 @@ function updateLabels() {
     sl.push(label(`${ftin(v.dist)} · ${v.hAngle.toFixed(0)}° wide`, a.clone().lerp(b, 0.62), 'dim brass'));
     sightline = { objs: sl, eye: a };
   }
-  if (state.showSpeakers) drawSpeakerPlan();
+  if (state.showSpeakers && overlays) drawSpeakerPlan();
   updateMeasureLabels();
 }
 

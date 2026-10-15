@@ -202,7 +202,7 @@ function makeFloorLamp(p, item) {
 }
 function setLamp(id, on) {
   const l = FX.lamps && FX.lamps[id]; if (!l) return;
-  l.light.intensity = on ? LAMP_CD : 0; l.shadeMat.emissiveIntensity = on ? 0.45 : 0;
+  l.light.intensity = on ? LAMP_CD : 0; l.light.visible = on; l.shadeMat.emissiveIntensity = on ? 0.45 : 0;
 }
 
 /** Instanced leaf cloud: n leaves in a sphere of radius rad. */

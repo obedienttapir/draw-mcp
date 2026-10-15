@@ -112,23 +112,64 @@ function renderLighting() {
     toggle('stepsOn', 'Stair step lights', L.steps, (v) => { L.steps = v; updateLighting(); }),
     toggle('bayPotsOn', 'Pot lights over the TV', L.bayPots, (v) => { L.bayPots = v; queue(() => { buildLights(); updateLighting(); }); }),
     state.tv.screen ? toggle('screenDownOn', 'Projector screen down', L.screenDown, (v) => { L.screenDown = v; updateLighting(); updateLabels(); renderInspector(); }) : null,
-    toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; }),
+    isFast() ? null : toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; invalidate(3); }),
     h('p', { class: 'note' }, 'Movie dims the pots and leaves a little LED glow around the TV alcove to ease eye strain.')));
+  // display quality is a device preference, kept out of layouts and undo
+  const q = h('div', { class: 'chips', role: 'group', 'aria-label': 'Display quality' });
+  for (const [val, text] of [['fast', 'Fast'], ['high', 'High quality']]) {
+    q.append(h('button', { class: 'chip', 'aria-pressed': String(quality === val), onclick: () => { if (quality !== val) setQuality(val); } }, text));
+  }
+  root.append(group('Display', q, h('p', { class: 'note' }, isFast()
+    ? 'Fast runs smoothly on any laptop or phone. High quality adds glow and soft area light, for a strong graphics card.'
+    : 'High quality adds glow and soft area light. Switch back to Fast if moving around feels slow.')));
 }
 
+// one-click fireplace wall combinations: windows + surround + slats
+const FIRE_LOOKS = {
+  glow: { label: 'Glow band + bench', transoms: 'slatted', mantel: 'bench', slats: true, note: 'Slats run across both windows with one LED band behind; the bench draws a long low line under the fire.' },
+  frame: { label: 'Black frame + ledge', transoms: 'framed', mantel: 'ledge', slats: true, note: 'One steel frame makes the pair a single window; the mantel splits the eyes from the mouth.' },
+  stone: { label: 'Hidden windows + stone', transoms: 'hidden', mantel: 'slab', slats: true, note: 'Slats close over both windows and a tall stone panel makes the fireplace the one feature.' },
+  band: { label: 'Black band + art', transoms: 'band', mantel: 'picture', slats: true, note: 'A wall-to-wall black band turns the windows into slots; a picture ledge below breaks the symmetry.' },
+  shade: { label: 'Linen shade + shelves', transoms: 'shade', mantel: 'shelves', slats: false, note: 'One wide shade reads as a single soft window; shelves either side widen the fireplace into a wall of storage.' },
+};
+const TRANSOM_NOTES = {
+  windows: 'As cut: two equal windows over the fireplace read as eyes over a mouth.',
+  slatted: 'Slats run straight across both windows with one LED band behind; light still shows through the gaps.',
+  hidden: 'Slats and black felt close over both windows: from the room they are gone. Add privacy film so no light leaks from the next room.',
+  framed: 'One 2″ black steel frame around both panes, with a black mullion over the wall between: one window, not two eyes.',
+  band: 'A matte-black band runs wall to wall at window height, with tinted film on the glass: the windows become two slots in one stripe.',
+  shade: 'One linen roller shade covers both windows: a single soft rectangle, and privacy from the next room.',
+};
+const MANTEL_NOTES = {
+  none: 'Just the fireplace.',
+  ledge: 'A floating walnut ledge between the windows and the fire splits the face in two.',
+  bench: 'A full-width floating bench under the fire: extra seats and one long horizontal line.',
+  picture: 'A full-width picture ledge between the fire and the windows; art leaned off-centre stops the wall being symmetric. Check your fireplace’s mantel clearance.',
+  slab: 'A tall porcelain or stone panel around the fireplace, up to the windows: the fire becomes the one feature.',
+  shelves: 'Open shelves either side make the fireplace part of a wider built-in wall.',
+};
 function renderFinishes() {
   const root = $('#tab-finish'), f = state.finish; root.replaceChildren();
   root.append(group('Wall paint', swatches('Wall paint', WALL_COLORS, f.wall, (c) => { f.wall = c; applyFinishes(); queue(rebuildRoomOnly); })));
   root.append(group('TV alcove walls', chips('TV alcove walls', [['paint-dark', 'Charcoal'], ['paint-navy', 'Navy'], ['paint-green', 'Forest'], ['paint-wall', 'Same as walls']], f.bayAccent,
     (v) => { f.bayAccent = v; applyFinishes(); queue(rebuildRoomOnly); }),
   h('p', { class: 'note' }, 'A dark alcove cuts screen reflections and makes the picture look deeper.')));
+  root.append(group('Fireplace wall looks',
+    h('div', { class: 'chips', role: 'group', 'aria-label': 'Fireplace wall looks' },
+      ...Object.entries(FIRE_LOOKS).map(([k, lk]) => h('button', { class: 'chip', title: lk.note,
+        'aria-pressed': String(f.transoms === lk.transoms && f.mantel === lk.mantel && f.fireplaceSlats === lk.slats),
+        onclick: () => { pushHistory(); f.transoms = lk.transoms; f.mantel = lk.mantel; f.fireplaceSlats = lk.slats; rebuildAll(); renderFinishes(); commit(false); toast(lk.label + ' · Undo goes back'); } }, lk.label))),
+    h('p', { class: 'note' }, 'Two equal windows over a centred fireplace read as a face. Every look keeps the openings as cut; each one either joins the windows into one shape, hides them, or gives the eye something off-centre to land on.')));
   root.append(group('Windows above the fireplace',
-    chips('Windows above the fireplace', [['windows', 'As built'], ['slatted', 'Slats across + glow band'], ['framed', 'One black frame']], f.transoms,
-      (v) => { f.transoms = v; queue(rebuildAll); }),
-    h('p', { class: 'note' }, 'Two equal windows over a centred fireplace read as a face. Both fixes keep the openings as cut: slats run across them with one LED band behind, or one steel frame turns the pair into a single window.')));
-  root.append(group('Under or over the fireplace',
-    chips('Fireplace ledge', [['none', 'Nothing'], ['ledge', 'Mantel ledge'], ['bench', 'Floating bench']], f.mantel,
-      (v) => { f.mantel = v; queue(rebuildFixturesAndLights); })));
+    chips('Windows above the fireplace', [['windows', 'As built'], ['slatted', 'Slats across + glow band'], ['framed', 'One black frame'],
+      ['hidden', 'Hidden behind slats'], ['band', 'Black band, wall to wall'], ['shade', 'One linen shade']], f.transoms,
+    (v) => { f.transoms = v; if (v === 'slatted' || v === 'hidden') f.fireplaceSlats = true; queue(rebuildAll); renderFinishes(); }),
+    h('p', { class: 'note' }, TRANSOM_NOTES[f.transoms] || '')));
+  root.append(group('Around the fireplace',
+    chips('Around the fireplace', [['none', 'Nothing'], ['ledge', 'Mantel ledge'], ['bench', 'Floating bench'],
+      ['picture', 'Picture ledge + art'], ['slab', 'Stone slab surround'], ['shelves', 'Shelves either side']], f.mantel,
+    (v) => { f.mantel = v; queue(rebuildFixturesAndLights); renderFinishes(); }),
+    h('p', { class: 'note' }, MANTEL_NOTES[f.mantel] || '')));
   root.append(group('Floor', chips('Floor', Object.entries(FLOORS).map(([k, d]) => [k, d.label]), f.floor, (v) => { f.floor = v; applyFinishes(); })));
   root.append(group('Wood slats', chips('Slat finish', Object.entries(SLATS).map(([k, d]) => [k, d.label]), f.slat, (v) => { f.slat = v; applyFinishes(); }),
     toggle('slatFire', 'Slats on fireplace wall', f.fireplaceSlats, (v) => { f.fireplaceSlats = v; queue(rebuildFixturesAndLights); }),

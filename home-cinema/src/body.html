@@ -17,6 +17,7 @@
     <button class="iconbtn" id="toggleLeft" aria-expanded="true" aria-controls="leftPanel" title="Show or hide the design panel">Design</button>
     <button class="iconbtn" id="toggleRight" aria-expanded="true" aria-controls="rightPanel" title="Show or hide the details panel">Details</button>
     <button class="iconbtn" id="undoBtn" title="Undo (Ctrl+Z)" disabled>Undo</button>
+    <button class="iconbtn" id="focusBtn" title="Hide the menus and see only the 3D view (H)">Hide menus</button>
     <button class="iconbtn wide-only" id="codeBtn" title="Copy or paste a layout">Layout code</button>
   </header>
 
@@ -56,6 +57,7 @@
   </div>
   <div class="hint" id="hint">Click furniture to select · drag to move · Q / E rotate · Del removes</div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <button class="restore" id="restoreBtn" hidden title="Show the menus again (H)">Show menus</button>
 
   <div class="modal" id="codeModal" hidden>
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="codeTitle">

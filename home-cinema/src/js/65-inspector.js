@@ -156,7 +156,19 @@ function openPanel(which) {
   $('#toggleLeft').setAttribute('aria-expanded', String(which === 'left'));
   $('#toggleRight').setAttribute('aria-expanded', String(which === 'right'));
 }
+/** View-only mode: every menu hidden so a phone shows just the 3D room; touches only move the camera. */
+function viewOnly() { return $('#app').classList.contains('focus'); }
+function setFocus(on) {
+  if (on) { select(null); if (measure.on) setMeasure(false); }
+  $('#app').classList.toggle('focus', on);
+  $('#restoreBtn').hidden = !on;
+  if (mode === 'plan') fitPlan();
+  updateLabels();
+  invalidate(3);
+}
 function initPanels() {
+  $('#focusBtn').addEventListener('click', () => setFocus(true));
+  $('#restoreBtn').addEventListener('click', () => setFocus(false));
   const apply = () => {
     const open = !isNarrow();
     for (const [p, b] of [['#leftPanel', '#toggleLeft'], ['#rightPanel', '#toggleRight']]) {

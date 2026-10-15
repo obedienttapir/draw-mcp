@@ -114,13 +114,15 @@ function buildRoom() {
     const mat = inBay && state.finish.bayAccent !== 'paint-wall' ? M.accent : M.wall;
     const segs = [[p, q]];
     // walls bordering the stairwell rise into it
-    if (p[1] === -r.stairWidth && q[1] === -r.stairWidth) segs.splice(0, 1, [p, [stairOpenX, p[1]]], [[stairOpenX, p[1]], q]);
+    const onStairSide = Math.abs(p[1] + r.stairWidth) < 0.01 && Math.abs(q[1] + r.stairWidth) < 0.01;
+    if (onStairSide && stairOpenX > Math.min(p[0], q[0]) && stairOpenX < Math.max(p[0], q[0])) segs.splice(0, 1, [p, [stairOpenX, p[1]]], [[stairOpenX, p[1]], q]);
     if (p[0] === r.width && q[0] === r.width) segs.splice(0, 1, [p, [r.width, 0]], [[r.width, 0], q]);
+    const inStrip = (pt) => pt[1] <= 0.01 && pt[1] >= -r.stairWidth - 0.01;
     for (const [a, b] of segs) {
       const quad = wallQuad(a, b, 0, H, mat);
       if (inBay) quad.userData.bay = true;
       roomGroup.add(quad);
-      if (a[1] <= 0 && b[1] <= 0 && Math.min(a[0], b[0]) >= stairOpenX - 0.01) stairwell.add(wallQuad(a, b, H, H + 110, M.wall));
+      if (inStrip(a) && inStrip(b) && Math.min(a[0], b[0]) >= stairOpenX - 0.01) stairwell.add(wallQuad(a, b, H, H + 110, M.wall));
     }
     roomGroup.add(wallCap(p, q, H + 0.2));
   }
@@ -147,6 +149,8 @@ function buildRoom() {
   const top = H + 110;
   stairwell.add(wallQuad([r.width, 0], [stairOpenX, 0], H, top, M.wall));
   stairwell.add(wallQuad([stairOpenX, 0], [stairOpenX, -r.stairWidth], H, top, M.wall));
+  // where the hallway is open below, the stairwell still has its south wall above the ceiling
+  if (G.hallEnd > stairOpenX) stairwell.add(wallQuad([stairOpenX, -r.stairWidth], [Math.min(G.hallEnd, r.width), -r.stairWidth], H, top, M.wall));
   const lid = new THREE.Mesh(new THREE.PlaneGeometry(r.width - stairOpenX, r.stairWidth), M.ceiling);
   lid.rotation.x = Math.PI / 2; lid.position.copy(P((stairOpenX + r.width) / 2, -r.stairWidth / 2, top));
   stairwell.add(lid);
@@ -171,7 +175,18 @@ function buildRoom() {
     const b = new THREE.Mesh(new THREE.BoxGeometry(r.beamDepth, bh, G.mainY), M.bulkhead);
     b.position.copy(P(r.beamDepth / 2, G.mainY / 2, r.beamBottom + bh / 2)); b.name = 'beam bulkhead';
     roomGroup.add(b); FX.bulkheads.push(b);
+    // it carries on over the landing and the hallway, out to the same line
+    if (r.beamDepth > r.boxX + 1) {
+      const w = r.beamDepth - r.boxX, d = -G.hallY;
+      const b2 = new THREE.Mesh(new THREE.BoxGeometry(w, bh, d), M.bulkhead);
+      b2.position.copy(P(r.boxX + w / 2, G.hallY / 2, r.beamBottom + bh / 2)); b2.name = 'beam bulkhead (landing)';
+      roomGroup.add(b2); FX.bulkheads.push(b2);
+    }
   }
+  // two doors on the hallway's far wall, as on site
+  const hallLen = G.hallEnd - r.boxX;
+  const doors = hallLen >= 120 ? [r.boxX + hallLen * 0.27, r.boxX + hallLen * 0.67] : hallLen >= 40 ? [r.boxX + hallLen / 2] : [];
+  for (const x of doors) roomGroup.add(makeDoor(x, G.hallY));
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
   pil.position.copy(P(r.beamX, G.mainY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
@@ -193,4 +208,21 @@ function addReveal(h, mat) {
   const north = new THREE.Mesh(new THREE.PlaneGeometry(T, ht), mat);
   north.position.copy(P(-T / 2, h.u1, vc));                                        // faces south
   roomGroup.add(head, sill, south, north);
+}
+
+/** White two-panel door with casing on a wall facing north (into the hallway). */
+function makeDoor(x, y) {
+  const g = new THREE.Group(), w = 30, h = 80;
+  const white = cached('door-white', () => new THREE.MeshStandardMaterial({ color: '#f1eee8', roughness: 0.55 }));
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(w, h, 1.4), white); slab.position.set(0, h / 2, 0.7); g.add(slab);
+  for (const py of [h * 0.72, h * 0.3]) {
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(w - 9, h * 0.36, 0.3), white); panel.position.set(0, py, 1.5); g.add(panel);
+  }
+  for (const [sx, sy, px, py] of [[2.6, h + 2.6, -w / 2 - 1.3, (h + 2.6) / 2], [2.6, h + 2.6, w / 2 + 1.3, (h + 2.6) / 2], [w + 5.2, 2.6, 0, h + 1.3]]) {
+    const c = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, 0.8), white); c.position.set(px, py, 0.4); g.add(c);
+  }
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 8), M.metal); knob.position.set(w / 2 - 3, 36, 2.2); g.add(knob);
+  g.rotation.y = Math.PI;                       // face north (world -Z)
+  g.position.copy(P(x, y + 0.05, 0));
+  return g;
 }

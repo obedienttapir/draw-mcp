@@ -13,6 +13,7 @@ const OUTLINE_MAT = new THREE.LineBasicMaterial({ color: '#d6a463', depthTest: f
 function setRay(e) {
   const r = renderer.domElement.getBoundingClientRect();
   ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  activeCam.updateMatrixWorld();                     // the camera may have moved since the last drawn frame
   ray.setFromCamera(ndc, activeCam);
 }
 function pick() {
@@ -38,7 +39,7 @@ function select(sel) {
   if (selected && isNarrow()) openPanel('right');
 }
 function drawOutline() {
-  disposeGroup(outline);
+  disposeGroup(outline); invalidate(2);
   if (!selected) return;
   if (selected.kind === 'item') {
     const it = itemById(selected.id), obj = itemObjects.get(selected.id); if (!it || !obj) { selected = null; return; }
@@ -97,7 +98,7 @@ el.addEventListener('pointerdown', (e) => {
   el.focus({ preventScroll: true });
   down = { x: e.clientX, y: e.clientY, button: e.button, id: e.pointerId };
   if (mode === 'walk') { walk.dragging = true; walk.lx = e.clientX; walk.ly = e.clientY; el.setPointerCapture(e.pointerId); return; }
-  if (e.button !== 0 || measure.on) return;
+  if (e.button !== 0 || measure.on || viewOnly()) return;             // menus hidden: every touch just moves the camera
   setRay(e);
   const hit = pick();
   if (hit && hit.kind === 'item') {
@@ -133,7 +134,7 @@ el.addEventListener('pointerup', (e) => {
     if (drag.moved) { history.push(drag.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; commit(false); }
     drag = null;
     controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
-  } else if (click) {
+  } else if (click && !viewOnly()) {
     setRay(e);
     const hit = pick();
     if (measure.on) {
@@ -209,8 +210,9 @@ window.addEventListener('keydown', (e) => {
     case '1': setMode('orbit'); break;
     case '2': setMode('plan'); break;
     case '3': setMode('walk'); break;
-    case 'm': case 'M': setMeasure(!measure.on); break;
-    case 'Escape': if ($('#codeModal').hidden === false) closeCode(); else if (measure.on) setMeasure(false); else select(null); break;
+    case 'm': case 'M': if (!viewOnly()) setMeasure(!measure.on); break;
+    case 'h': case 'H': setFocus(!viewOnly()); break;
+    case 'Escape': if ($('#codeModal').hidden === false) closeCode(); else if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else select(null); break;
     case 'q': case 'Q': rotateSelected(e.shiftKey ? 45 : 15); break;
     case 'e': case 'E': rotateSelected(e.shiftKey ? -45 : -15); break;
     case 'r': case 'R': rotateSelected(90); break;

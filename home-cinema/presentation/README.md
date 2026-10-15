@@ -4,6 +4,8 @@ What to keep, what to fix, and what to do while the ceiling is still open. Every
 
 The slide deck version lives on claude.ai (Basement Cinema Design Review). Its slide sources are in `deck/`: `deck.json` plus one HTML file per slide; their images point at the deck's uploaded copies of the renders in `renders/`.
 
+The renders use the corrected site measurements: a 10′-9″ TV alcove, a 3′-9″ deep fireplace nook, 3′-11″ from the bottom step to the wall in front, 11′-6″ from the tip of the stairs to the exterior wall, the fireplace bulkhead running out over the stair landing, and the stairs open on the far side to the hallway.
+
 ## Where the room stands
 
 ![Recommended design, cut-away view](renders/overview-recommended.jpg)
@@ -21,7 +23,7 @@ The slide deck version lives on claude.ai (Basement Cinema Design Review). Its s
 
 ![The two windows and the fireplace form two eyes and a mouth](renders/fire-face.jpg)
 
-Two equal windows side by side, with a wide fireplace centred below, give the eye two eyes and a mouth. Tall, jagged flames read as teeth, and the LED edges frame it like a head. The openings are already cut, so both fixes keep them.
+Two equal windows side by side, with a wide fireplace centred below, give the eye two eyes and a mouth. Tall, jagged flames read as teeth, and the LED edges frame it like a head. The openings are already cut, so every fix keeps them: join the two eyes into one shape, hide them, or break the symmetry.
 
 **Fix A, recommended: slats across, one glow band.** The slats continue over both windows. A 2700K strip behind them, along the window line, makes one band of light, and the windows still borrow light from next door. A floating walnut bench under the fireplace adds perch seating. Set the flame effect low and even.
 
@@ -32,6 +34,15 @@ Two equal windows side by side, with a wide fireplace centred below, give the ey
 **Fix B: one black frame and a ledge.** A 2″ black steel surround goes around both windows, with the strip between them clad black, so they read as one long window. A walnut ledge between the windows and the fireplace separates the eyes from the mouth.
 
 ![Fix B](renders/fire-framed.jpg)
+
+**Three more looks for the same wall.** All five are one click in the planner under **Finishes › Fireplace wall looks**, and each piece can be mixed and matched under *Windows above the fireplace* and *Around the fireplace*.
+
+| C · Hidden windows + stone | D · Black band + art | E · Linen shade + shelves |
+| --- | --- | --- |
+| ![Slats closed over both windows and a tall stone panel around the fireplace](renders/fire-stone.jpg) | ![A matte-black band wall to wall at window height, and a picture ledge with art leaned off-centre](renders/fire-band.jpg) | ![One linen shade over both windows and open shelves either side of the fireplace, on a painted wall](renders/fire-shade.jpg) |
+| Slats and black felt close over both windows, and a tall porcelain or stone panel frames the fire. No eyes left at all. | A matte-black band runs wall to wall at window height, so the windows become two slots in one stripe. Art leaned off-centre on a ledge breaks the symmetry. | One linen shade covers both windows as a single soft panel. Open shelves either side make the fireplace part of a wider wall. Works without the slats. |
+
+C and D need privacy film or tinted glass so no light leaks from the next room. For the picture ledge, check the fireplace's clearance to combustibles above the opening.
 
 **The TV wall has a face too.** The two pots in front of the bulkhead paint two bright scallops over the screen and glare on it. Drop them, or aim adjustable trims at the angled walls. Let the LED cove and a bias light do the rest.
 
@@ -80,7 +91,7 @@ Order the sectional's back leg 1′ shorter (124″ instead of 136″) and pull 
 
 ## Next steps
 
-1. Pick the window fix: A, slats across with a glow band, or B, one black frame and a ledge.
+1. Pick the fireplace wall look: A, slats across with a glow band; B, one black frame and a ledge; or one of C to E.
 2. Before drywall: soundproof, pre-wire 5.1.2, run conduit, frame the screen pocket and the TV blocking, set the dimmer zones.
 3. Order the 85″ TV, and a sectional with a 124″ back leg.
 4. Add the screen and projector whenever you like; the pocket and wiring will be waiting.

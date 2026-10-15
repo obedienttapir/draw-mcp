@@ -104,6 +104,18 @@ function rugCanvas(color, pattern, seed = 11) {
   return cv;
 }
 
+/** Dark porcelain slab with soft white veining. */
+function stoneCanvas() {
+  const size = 512, cv = noiseCanvas(size, { base: '#2c2926', amp: 14, seed: 61 }), g = cv.getContext('2d'), r = rng(62);
+  for (let i = 0; i < 16; i++) {
+    g.strokeStyle = `rgba(232,226,214,${0.08 + r() * 0.22})`; g.lineWidth = 0.6 + r() * 2.4;
+    g.beginPath(); let x = -20, y = r() * size; g.moveTo(x, y);
+    while (x < size + 20) { const nx = x + 40 + r() * 70, ny = y + (r() - 0.45) * 60; g.quadraticCurveTo((x + nx) / 2 + (r() - 0.5) * 40, (y + ny) / 2 + (r() - 0.5) * 40, nx, ny); x = nx; y = ny; }
+    g.stroke();
+  }
+  return cv;
+}
+
 function reededCanvas() {
   const cv = mkCanvas(256, 64), g = cv.getContext('2d');
   for (let x = 0; x < 256; x += 8) {
@@ -179,7 +191,7 @@ function initMaterials() {
   M.brass = new THREE.MeshStandardMaterial({ color: '#b48a52', roughness: 0.3, metalness: 0.9 });
   M.trim = new THREE.MeshStandardMaterial({ color: '#f4f1ea', roughness: 0.6 });
   M.stairWood = new THREE.MeshStandardMaterial({ color: '#2e2019', roughness: 0.45 });
-  M.glassDark = new THREE.MeshStandardMaterial({ color: '#050505', roughness: 0.05, metalness: 0.9, transparent: true, opacity: 0.55 });
+  M.glassDark = new THREE.MeshStandardMaterial({ color: '#050505', roughness: 0.05, metalness: 0.9, transparent: true, opacity: 0.55, depthWrite: false });
   M.reeded = new THREE.MeshStandardMaterial({ map: TEX.reeded, roughness: 0.2, metalness: 0.1, transparent: true, opacity: 0.88,
     emissive: '#b8c6d4', emissiveMap: TEX.reeded, emissiveIntensity: 0.25 });
   M.shadow = new THREE.MeshBasicMaterial({ map: TEX.shadow, transparent: true, depthWrite: false, opacity: 0.8 });
@@ -187,6 +199,9 @@ function initMaterials() {
   M.potOn = new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff1dc').multiplyScalar(4), toneMapped: false });
   M.potOff = new THREE.MeshStandardMaterial({ color: '#d9d4cc', roughness: 0.4 });
   M.stepLight = new THREE.MeshBasicMaterial({ color: '#3a342c', toneMapped: false });
+  M.smoked = new THREE.MeshStandardMaterial({ color: '#17110d', roughness: 0.1, metalness: 0.55 });
+  M.matteBlack = new THREE.MeshStandardMaterial({ color: '#141210', roughness: 0.75, metalness: 0.1 });
+  M.slab = new THREE.MeshStandardMaterial({ map: canvasTex(stoneCanvas(), true), roughness: 0.35 });
   M.bandGlow = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffc890').multiplyScalar(1.4), toneMapped: false });
   M.stone = new THREE.MeshStandardMaterial({ color: '#3a3733', roughness: 0.85 });
   applyFinishes();

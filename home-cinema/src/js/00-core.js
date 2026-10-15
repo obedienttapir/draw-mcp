@@ -17,6 +17,16 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 const DEG = Math.PI / 180;
 const LUX = 1550;            // candela scale: physical lights tuned in metres, world is in inches
 const STORE_KEY = 'basement-cinema-layout-v1';
+const QUALITY_KEY = 'basement-cinema-quality';
+
+// Display quality is a per-device preference (not part of a layout). Fast is the default:
+// 1x pixel ratio with adaptive scaling, no glow pass, no area lights, a few zone lights.
+let quality = (() => { try { return localStorage.getItem(QUALITY_KEY) === 'high' ? 'high' : 'fast'; } catch (e) { return 'fast'; } })();
+const isFast = () => quality !== 'high';
+let dprScale = 1;                       // adaptive resolution factor in fast mode
+// Render on demand: frames are drawn only while something changes or animates.
+let dirty = 3;
+function invalidate(n = 2) { dirty = Math.max(dirty, n); }
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -51,30 +61,32 @@ const DEFAULT_STATE = {
     depth: 185,            // staircase wall -> TV wall (back of bay)
     ceiling: 108,          // 9'
     bayDepth: 60,          // main north wall line -> TV wall
-    bayLeft: 69,           // x of bay's west return
+    bayLeft: 73,           // x of bay's west return: alcove measures 10'-9" across
     bayRight: 202,         // x of bay's east return (2'-2" jog to exterior wall)
     bayFace: 84,           // flat TV wall inside the bay
     soffitDepth: 12,       // bay bulkhead projection from the bay walls
     soffitBottom: 92,      // bay bulkhead underside
     beamX: 33,             // steel beam centre line (W200) from fireplace wall
-    beamDepth: 48,         // fireplace-side bulkhead depth from fireplace wall
+    beamDepth: 73,         // fireplace-side bulkhead: runs out to the line of the TV alcove's west return
     beamBottom: 94,        // bulkhead underside over fireplace lounge
     pilasterW: 18, pilasterD: 10,
-    boxX: 50,              // drywall box south of the fireplace (east face)
-    stairWidth: 40, stairStart: 90, risers: 16, floorToFloor: 122,
+    boxX: 45,              // wall the stairs face: fireplace alcove is 3'-9" deep from its corner
+    stairWidth: 40, stairStart: 92, risers: 16, floorToFloor: 122,   // 3'-11" landing, tip 11'-6" from the exterior wall
+    hallDepth: 54, hallEnd: 176,   // open hallway behind the stairs (two doors), railing along that side
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },
   finish: {
     wall: '#cbc2b3', floor: 'walnut', slat: 'walnut',
     fireplaceSlats: true, tvSlats: false, bayAccent: 'paint-dark',
     fabric: '#8f877c', boucle: '#e6dccb',
-    transoms: 'windows',   // windows | slatted | framed  (the two openings are already cut)
-    mantel: 'none',        // none | ledge | bench
+    transoms: 'windows',   // windows | slatted | hidden | framed | band | shade  (the two openings are already cut)
+    mantel: 'none',        // none | ledge | bench | picture | slab | shelves
   },
   tv: { size: 75, center: 44, offset: 0, screen: false, screenSize: 110 },
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
+  rev: 2,                 // room-measurement revision; older saved layouts get the corrected room
   option: 'original',
   showSightline: true,
   showSpeakers: false,
@@ -83,7 +95,7 @@ const DEFAULT_STATE = {
       p: { back: 136, ret: 104, depth: 38, side: 'right', color: '#8f877c' } },
     { id: 'rug-main', type: 'rug', x: 140, y: 78, rot: 0, p: { w: 120, d: 96, color: '#6e6559', pattern: 'weave' } },
     { id: 'ottoman', type: 'ottoman', x: 136, y: 82, rot: 0, p: { w: 40, d: 30, color: '#5b4636' } },
-    { id: 'console', type: 'console', x: 135.5, y: 177, rot: 180, p: { w: 70, color: '#4a3424' } },
+    { id: 'console', type: 'console', x: 137.5, y: 177, rot: 180, p: { w: 70, color: '#4a3424' } },
     { id: 'rug-lounge', type: 'rug', x: 54, y: 64, rot: 90, p: { w: 96, d: 72, color: '#7d7466', pattern: 'border' } },
     { id: 'chair-a', type: 'loungeChair', x: 50, y: 30, rot: 35, p: { color: '#e6dccb' } },
     { id: 'chair-b', type: 'loungeChair', x: 50, y: 98, rot: 145, p: { color: '#e6dccb' } },
@@ -140,14 +152,16 @@ function geom(r = state.room) {
   ];
   const tvX = (bay[2][0] + bay[3][0]) / 2;
   // floor outline, counter-clockwise (interior on the left of each edge)
+  // the landing and the open hallway behind the stairs are part of the floor
+  const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallEnd, r.boxX + 24, r.width - 1);
   const outline = [
-    [0, 0], [r.boxX, 0], [r.boxX, -r.stairWidth], [r.width, -r.stairWidth], [r.width, mainY],
-    [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, mainY],
+    [0, 0], [r.boxX, 0], [r.boxX, hallY], [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
+    [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, mainY],
   ];
   const riserH = r.floorToFloor / r.risers;
   const treads = r.risers - 1;
   const run = Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, a, ret, bay, tvX, outline, riserH, treads, run };
+  return { mainY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd };
 }
 
 // ---------------- persistence + history ----------------
@@ -173,9 +187,11 @@ function applyState(obj, record = true) {
   if (!obj || typeof obj !== 'object' || !Array.isArray(obj.items)) return false;
   if (record) pushHistory();
   const d = clone(DEFAULT_STATE);
+  const stale = (obj.rev || 1) < d.rev;
+  if (stale) setTimeout(() => toast('Room updated to the new measurements; your furniture and finishes were kept'), 600);
   state = {
-    ...d, ...obj,
-    room: { ...d.room, ...(obj.room || {}) },
+    ...d, ...obj, rev: d.rev,
+    room: stale ? d.room : { ...d.room, ...(obj.room || {}) },
     finish: { ...d.finish, ...(obj.finish || {}) },
     tv: { ...d.tv, ...(obj.tv || {}) },
     fireplace: { ...d.fireplace, ...(obj.fireplace || {}) },
