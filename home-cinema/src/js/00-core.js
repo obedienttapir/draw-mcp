@@ -60,7 +60,7 @@ const DEFAULT_STATE = {
     width: 228,            // fireplace wall -> exterior wall
     depth: 185,            // staircase wall -> TV wall (back of bay)
     ceiling: 108,          // 9'
-    bayDepth: 60,          // main north wall line -> TV wall
+    bayDepth: 55,          // north wall line -> TV wall: the alcove notch on the exterior side is 10'-10" from the stair-side line
     bayLeft: 73,           // x of bay's west return: alcove measures 10'-9" across
     bayRight: 202,         // x of bay's east return (2'-2" jog to exterior wall)
     bayFace: 84,           // flat TV wall inside the bay
@@ -68,8 +68,9 @@ const DEFAULT_STATE = {
     soffitBottom: 92,      // bay bulkhead underside
     beamX: 33,             // steel beam centre line (W200) from fireplace wall
     beamDepth: 73,         // fireplace-side bulkhead: runs out to the line of the TV alcove's west return
+    fireWall: 131,         // fireplace wall length (10'-11"): on this side the north wall sits 1" further back
     beamBottom: 94,        // bulkhead underside over fireplace lounge
-    pilasterW: 18, pilasterD: 10,
+    pilasterW: 18, pilasterD: 12,   // steel-beam bump: its face is 9'-11" from the south end of the fireplace pocket
     boxX: 45,              // wall the stairs face: fireplace alcove is 3'-9" deep from its corner
     stairWidth: 40, stairStart: 92, risers: 16, floorToFloor: 122,   // 3'-11" landing, tip 11'-6" from the exterior wall
     hallDepth: 54, hallEnd: 176,   // open hallway behind the stairs (two doors), railing along that side
@@ -86,7 +87,7 @@ const DEFAULT_STATE = {
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
-  rev: 2,                 // room-measurement revision; older saved layouts get the corrected room
+  rev: 3,                 // room-measurement revision; older saved layouts get the corrected room
   option: 'original',
   showSightline: true,
   showSpeakers: false,
@@ -146,8 +147,10 @@ function geom(r = state.room) {
   const mainY = r.depth - r.bayDepth;
   const a = Math.max(0, (r.bayRight - r.bayLeft - r.bayFace) / 2);
   const ret = Math.max(0, r.bayDepth - a);
+  // the north wall on the fireplace side of the alcove (the fireplace wall's length) can sit off the exterior side's line
+  const westY = clamp(r.fireWall || mainY, mainY - 24, mainY + ret - 1);
   const bay = [
-    [r.bayLeft, mainY], [r.bayLeft, mainY + ret], [r.bayLeft + a, r.depth],
+    [r.bayLeft, westY], [r.bayLeft, mainY + ret], [r.bayLeft + a, r.depth],
     [r.bayRight - a, r.depth], [r.bayRight, mainY + ret], [r.bayRight, mainY],
   ];
   const tvX = (bay[2][0] + bay[3][0]) / 2;
@@ -156,12 +159,12 @@ function geom(r = state.room) {
   const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallEnd, r.boxX + 24, r.width - 1);
   const outline = [
     [0, 0], [r.boxX, 0], [r.boxX, hallY], [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
-    [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, mainY],
+    [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, westY],
   ];
   const riserH = r.floorToFloor / r.risers;
   const treads = r.risers - 1;
   const run = Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd };
+  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd };
 }
 
 // ---------------- persistence + history ----------------

@@ -63,7 +63,7 @@ function buildLights() {
       FX.zones.push({ light: l, pots, led });
     };
     const bb = Math.min(r.beamBottom, H);
-    zone(Math.max(r.beamDepth, 30) / 2, G.mainY / 2, bb - 10, 2, 1.1, '#ffd2a0');                            // fireplace lounge
+    zone(Math.max(r.beamDepth, 30) / 2, G.westY / 2, bb - 10, 2, 1.1, '#ffd2a0');                            // fireplace lounge
     zone((Math.max(r.beamDepth, 0) + r.width) / 2, G.mainY / 2, H - 12, 6, 0.35);                               // main room
     zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a');  // TV alcove
     zone((r.boxX + G.hallEnd) / 2, (G.hallY - r.stairWidth) / 2 + 12, H - 12, 2, 0.1);                         // landing + hallway
@@ -100,15 +100,15 @@ function buildLights() {
   // vertical LED channels at both ends of the fireplace slat wall
   const top = r.beamDepth > 1 ? r.beamBottom : H;
   const face = state.finish.fireplaceSlats ? SLAT_FACE : 0;
-  for (const [u, dir] of [[0.9, 1], [G.mainY - 0.9, -1]]) {
+  for (const [u, dir] of [[0.9, 1], [G.westY - 0.9, -1]]) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(0.5, top - 1, 0.5), M.led);
     m.position.copy(P(face * 0.5 + 0.4, u, top / 2)); lightsGroup.add(m); FX.ledMeshes.push(m);
     rectLight(2, top - 4, P(face + 2.5, u, top / 2), P(face + 2.5, u + dir * 20, top / 2), lightsGroup);
   }
   // cove along the edge of the fireplace bulkhead
   if (r.beamDepth > 1 && r.beamBottom < H) {
-    ledStrip([r.beamDepth - 1.2, 2], [r.beamDepth - 1.2, G.mainY - 2], r.beamBottom - 0.3, lightsGroup);
-    rectLight(G.mainY - 8, 3, P(r.beamDepth - 2, G.mainY / 2, r.beamBottom - 0.6), P(r.beamDepth - 14, G.mainY / 2, 0), lightsGroup);
+    ledStrip([r.beamDepth - 1.2, 2], [r.beamDepth - 1.2, G.westY - 2], r.beamBottom - 0.3, lightsGroup);
+    rectLight(G.westY - 8, 3, P(r.beamDepth - 2, G.westY / 2, r.beamBottom - 0.6), P(r.beamDepth - 14, G.westY / 2, 0), lightsGroup);
   }
   updateLighting();
 }

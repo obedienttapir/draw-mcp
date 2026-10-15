@@ -13,16 +13,17 @@ It starts in **Fast** display mode so it runs smoothly on older laptops and phon
 | Fireplace wall → exterior wall | 228″ (19′-0″) | tape measure |
 | Staircase wall → TV wall | 185″ (15′-5″) | tape measure |
 | Ceiling | 108″ (9′) | owner |
-| TV alcove (bay) | 10′-9″ (129″) wide at the opening, 84″ flat TV wall with 45° corners, ~60″ deep, 2′-2″ jog to the exterior wall | tape measure, plan, photos |
+| TV alcove (bay) | 10′-9″ (129″) wide at the opening, 84″ flat TV wall with 45° corners, 4′-7″ (55″) deep; its notch on the exterior side is 10′-10″ from the stair-side line, with a 2′-2″ jog to the exterior wall | tape measure, plan, photos |
 | Alcove bulkhead | follows the bay outline, 12″ deep, underside 7′-8″ | estimated from photos |
+| Fireplace wall | 10′-11″ (131″) long: on this side of the alcove the north wall sits 1″ further back than at the notch | tape measure |
 | Fireplace nook | 3′-9″ (45″) deep, from the fireplace wall to the corner of the wall facing the stairs | tape measure |
 | Fireplace-side bulkhead | over the W200 beam, from the fireplace wall to the alcove's west return (73″), and out over the stair landing; underside 7′-10″ | photos |
-| Steel beam pilaster | 18″ × 10″ box on the north wall, beam line 33″ from the fireplace wall | plan + photos |
+| Steel beam bump | 18″ wide and 12″ deep on the north wall of the fireplace pocket: its face is 9′-11″ from the pocket's south wall; beam line 33″ from the fireplace wall | tape measure, plan, photos |
 | Stairs | 40″ wide along the staircase wall, 16 risers; bottom step 3′-11″ from the wall in front; tip of the stairs 11′-6″ from the exterior wall; open on the far side with a railing over the hallway | tape measure, photos |
 | Hallway | 54″ deep behind the stairs, two doors | photos |
 | Fireplace + 2 windows | 52″ linear fireplace, two 42″ × 10″ reeded transoms above (openings already cut) | photos |
 
-Everything marked "estimated" can be changed in the **Room** tab; the room rebuilds as you drag.
+Your tape measurements are sliders under **Room › Measured**, and Plan view shows each one as a dimension. The values marked as estimated can be changed in the same tab; the room rebuilds as you drag.
 
 ## Using it
 

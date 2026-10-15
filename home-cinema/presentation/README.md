@@ -4,7 +4,7 @@ What to keep, what to fix, and what to do while the ceiling is still open. Every
 
 The slide deck version lives on claude.ai (Basement Cinema Design Review). Its slide sources are in `deck/`: `deck.json` plus one HTML file per slide; their images point at the deck's uploaded copies of the renders in `renders/`.
 
-The renders use the corrected site measurements: a 10′-9″ TV alcove, a 3′-9″ deep fireplace nook, 3′-11″ from the bottom step to the wall in front, 11′-6″ from the tip of the stairs to the exterior wall, the fireplace bulkhead running out over the stair landing, and the stairs open on the far side to the hallway.
+The renders use the corrected site measurements: a 10′-9″ TV alcove whose notch is 10′-10″ from the stair-side line, a 10′-11″ fireplace wall with the steel-beam bump's face at 9′-11″, a 3′-9″ deep fireplace nook, 3′-11″ from the bottom step to the wall in front, 11′-6″ from the tip of the stairs to the exterior wall, the fireplace bulkhead running out over the stair landing, and the stairs open on the far side to the hallway.
 
 ## Where the room stands
 

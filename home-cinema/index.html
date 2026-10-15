@@ -160,6 +160,9 @@ select { width: 100%; background: var(--panel-solid); border: 1px solid var(--li
 .dim.spk { color: #10202b; background: #7fb3d5; border-color: #7fb3d5; font-weight: 500; }
 .tag { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap;
   background: rgba(18,15,12,0.6); padding: 1px 6px; border-radius: 4px; }
+/* small plan (phone): room names step aside and dimensions shrink until you pinch in */
+#labels.compact .tag { display: none; }
+#labels.compact .dim { font-size: 8.5px; padding: 0 3px; border-radius: 4px; }
 
 /* ---------- modal ---------- */
 .modal { position: absolute; inset: 0; z-index: 20; background: rgba(8,6,5,0.6); display: grid; place-items: center;
@@ -343,7 +346,7 @@ const DEFAULT_STATE = {
     width: 228,            // fireplace wall -> exterior wall
     depth: 185,            // staircase wall -> TV wall (back of bay)
     ceiling: 108,          // 9'
-    bayDepth: 60,          // main north wall line -> TV wall
+    bayDepth: 55,          // north wall line -> TV wall: the alcove notch on the exterior side is 10'-10" from the stair-side line
     bayLeft: 73,           // x of bay's west return: alcove measures 10'-9" across
     bayRight: 202,         // x of bay's east return (2'-2" jog to exterior wall)
     bayFace: 84,           // flat TV wall inside the bay
@@ -351,8 +354,9 @@ const DEFAULT_STATE = {
     soffitBottom: 92,      // bay bulkhead underside
     beamX: 33,             // steel beam centre line (W200) from fireplace wall
     beamDepth: 73,         // fireplace-side bulkhead: runs out to the line of the TV alcove's west return
+    fireWall: 131,         // fireplace wall length (10'-11"): on this side the north wall sits 1" further back
     beamBottom: 94,        // bulkhead underside over fireplace lounge
-    pilasterW: 18, pilasterD: 10,
+    pilasterW: 18, pilasterD: 12,   // steel-beam bump: its face is 9'-11" from the south end of the fireplace pocket
     boxX: 45,              // wall the stairs face: fireplace alcove is 3'-9" deep from its corner
     stairWidth: 40, stairStart: 92, risers: 16, floorToFloor: 122,   // 3'-11" landing, tip 11'-6" from the exterior wall
     hallDepth: 54, hallEnd: 176,   // open hallway behind the stairs (two doors), railing along that side
@@ -369,7 +373,7 @@ const DEFAULT_STATE = {
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
-  rev: 2,                 // room-measurement revision; older saved layouts get the corrected room
+  rev: 3,                 // room-measurement revision; older saved layouts get the corrected room
   option: 'original',
   showSightline: true,
   showSpeakers: false,
@@ -429,8 +433,10 @@ function geom(r = state.room) {
   const mainY = r.depth - r.bayDepth;
   const a = Math.max(0, (r.bayRight - r.bayLeft - r.bayFace) / 2);
   const ret = Math.max(0, r.bayDepth - a);
+  // the north wall on the fireplace side of the alcove (the fireplace wall's length) can sit off the exterior side's line
+  const westY = clamp(r.fireWall || mainY, mainY - 24, mainY + ret - 1);
   const bay = [
-    [r.bayLeft, mainY], [r.bayLeft, mainY + ret], [r.bayLeft + a, r.depth],
+    [r.bayLeft, westY], [r.bayLeft, mainY + ret], [r.bayLeft + a, r.depth],
     [r.bayRight - a, r.depth], [r.bayRight, mainY + ret], [r.bayRight, mainY],
   ];
   const tvX = (bay[2][0] + bay[3][0]) / 2;
@@ -439,12 +445,12 @@ function geom(r = state.room) {
   const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallEnd, r.boxX + 24, r.width - 1);
   const outline = [
     [0, 0], [r.boxX, 0], [r.boxX, hallY], [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
-    [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, mainY],
+    [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, westY],
   ];
   const riserH = r.floorToFloor / r.risers;
   const treads = r.risers - 1;
   const run = Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd };
+  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd };
 }
 
 // ---------------- persistence + history ----------------
@@ -877,12 +883,12 @@ function buildRoom() {
   // ---- fireplace wall with fireplace + two transom openings ----
   const { fp, tr } = fireplaceOpenings();
   const holes = [rect(fp.u0, fp.v0, fp.u1, fp.v1), ...tr.map((t) => rect(t.u0, t.v0, t.u1, t.v1))];
-  const fwGeo = new THREE.ShapeGeometry(shapeFrom(rect(0, 0, G.mainY, H), holes));
+  const fwGeo = new THREE.ShapeGeometry(shapeFrom(rect(0, 0, G.westY, H), holes));
   const fw = new THREE.Mesh(fwGeo, M.wall);
   // shape u (plan y) -> world -Z, v -> world Y, normal (+Z) -> world +X (into the room)
   fw.rotation.y = Math.PI / 2;
   roomGroup.add(fw);
-  roomGroup.add(wallCap([0, G.mainY], [0, 0], H + 0.2));
+  roomGroup.add(wallCap([0, G.westY], [0, 0], H + 0.2));
   // reveals (jambs) through the wall thickness
   for (const h of [fp, ...tr]) addReveal(h, M.wall);
 
@@ -919,8 +925,8 @@ function buildRoom() {
   // ---- fireplace-side bulkhead over the steel beam ----
   const bh = H - r.beamBottom;
   if (bh > 0.5 && r.beamDepth > 1) {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(r.beamDepth, bh, G.mainY), M.bulkhead);
-    b.position.copy(P(r.beamDepth / 2, G.mainY / 2, r.beamBottom + bh / 2)); b.name = 'beam bulkhead';
+    const b = new THREE.Mesh(new THREE.BoxGeometry(r.beamDepth, bh, G.westY), M.bulkhead);
+    b.position.copy(P(r.beamDepth / 2, G.westY / 2, r.beamBottom + bh / 2)); b.name = 'beam bulkhead';
     roomGroup.add(b); FX.bulkheads.push(b);
     // it carries on over the landing and the hallway, out to the same line
     if (r.beamDepth > r.boxX + 1) {
@@ -936,10 +942,10 @@ function buildRoom() {
   for (const x of doors) roomGroup.add(makeDoor(x, G.hallY));
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
-  pil.position.copy(P(r.beamX, G.mainY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
+  pil.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
   roomGroup.add(pil);
   const pilCap = new THREE.Mesh(new THREE.PlaneGeometry(r.pilasterW, r.pilasterD), CAP_MAT);
-  pilCap.rotation.x = -Math.PI / 2; pilCap.position.copy(P(r.beamX, G.mainY - r.pilasterD / 2, H + 0.25));
+  pilCap.rotation.x = -Math.PI / 2; pilCap.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, H + 0.25));
   roomGroup.add(pilCap);
 }
 
@@ -1140,7 +1146,7 @@ function buildTransoms() {
   if (mode === 'band' && union) {
     // continuous matte-black band across the whole wall; the windows become slots in it
     const G = geom(), bv0 = union.v0 - 4, bv1 = union.v1 + 4;
-    const shape = shapeFrom(rect(1.5, bv0, G.mainY - 1.5, bv1), tr.map((t) => rect(t.u0, t.v0, t.u1, t.v1)));
+    const shape = shapeFrom(rect(1.5, bv0, G.westY - 1.5, bv1), tr.map((t) => rect(t.u0, t.v0, t.u1, t.v1)));
     const geo = new THREE.ExtrudeGeometry(shape, { depth: face + 0.8, bevelEnabled: false });
     const band = new THREE.Mesh(geo, M.matteBlack); band.rotation.y = Math.PI / 2; fixturesGroup.add(band);
   }
@@ -1287,15 +1293,15 @@ function buildFixtures() {
     const tmode = state.finish.transoms, uMin = Math.min(...tr.map((t) => t.u0)), uMax = Math.max(...tr.map((t) => t.u1));
     const pad = { framed: 2.5, shade: 1 }[tmode] ?? 0.5;
     // framed / shade: slats stop at the pair, not at each window; band: slats stop above and below one full-width strip
-    const winHoles = tmode === 'band' ? [{ u0: 0, u1: G.mainY, v0: tr[0].v0 - 4, v1: tr[0].v1 + 4 }]
+    const winHoles = tmode === 'band' ? [{ u0: 0, u1: G.westY, v0: tr[0].v0 - 4, v1: tr[0].v1 + 4 }]
       : tmode === 'framed' || tmode === 'shade' ? [{ u0: uMin - pad, u1: uMax + pad, v0: tr[0].v0 - pad, v1: tr[0].v1 + pad }]
         : tr.map((t) => ({ u0: t.u0 - pad, u1: t.u1 + pad, v0: t.v0 - pad, v1: t.v1 + pad }));
     if (state.finish.mantel === 'slab') { const sl = slabRect(); fireHole.u0 = sl.u0; fireHole.u1 = sl.u1; fireHole.v0 = sl.v0; fireHole.v1 = sl.v1; }
     // 'slatted' / 'hidden': slats run straight across the windows
     const across = (tmode === 'slatted' || tmode === 'hidden') && tr.length;
     // slatted: one continuous backlit band behind the slats swallows both windows; hidden: felt behind, no light at all
-    const band = across && tmode === 'slatted' ? { u0: 10, u1: G.mainY - 10, v0: tr[0].v0 - 1, v1: tr[0].v1 + 1 } : null;
-    const s = buildSlats(1.5, G.mainY - 1.5, 0.4, top - 0.2, across ? [fireHole] : [fireHole, ...winHoles], band ? [fireHole, band] : across ? [fireHole] : [fireHole, ...winHoles]);
+    const band = across && tmode === 'slatted' ? { u0: 10, u1: G.westY - 10, v0: tr[0].v0 - 1, v1: tr[0].v1 + 1 } : null;
+    const s = buildSlats(1.5, G.westY - 1.5, 0.4, top - 0.2, across ? [fireHole] : [fireHole, ...winHoles], band ? [fireHole, band] : across ? [fireHole] : [fireHole, ...winHoles]);
     if (band) {
       const glow = new THREE.Mesh(new THREE.PlaneGeometry(band.u1 - band.u0, band.v1 - band.v0), M.bandGlow);
       glow.position.set((band.u0 + band.u1) / 2, (band.v0 + band.v1) / 2, 0.15); s.add(glow); FX.fixtureLeds.push(glow);
@@ -1322,11 +1328,11 @@ function buildMantel() {
     // full-width picture ledge between the fire and the windows: art leaned off-centre breaks the symmetry
     const r = state.room, v = fp.v1 + 6, c = (fp.u0 + fp.u1) / 2;
     const room = r.transomBottom - (state.finish.transoms === 'band' ? 5 : 2) - (v + 1.4);   // stay clear of the windows
-    span(g, wood, 6, G.mainY - 6, v, v + 1.4, face, face + 5, 0.3);
-    span(g, wood, 6, G.mainY - 6, v + 1.4, v + 2.6, face + 4.2, face + 5, 0.2);
+    span(g, wood, 6, G.westY - 6, v, v + 1.4, face, face + 5, 0.3);
+    span(g, wood, 6, G.westY - 6, v + 1.4, v + 2.6, face + 4.2, face + 5, 0.2);
     for (const [du, aw, k, col, dz] of [[-17, 24, 1, '#b4573a', 0], [1, 13, 0.7, '#d9cdb8', 0.9], [33, 14, 0.85, '#2f3a40', 0]]) {
       const u = c + du, ah = Math.max(6, room * k - 2);
-      if (u - aw / 2 < 7 || u + aw / 2 > G.mainY - 7) continue;
+      if (u - aw / 2 < 7 || u + aw / 2 > G.westY - 7) continue;
       const fr = meshAt(new THREE.BoxGeometry(aw + 2, ah + 2, 0.8), M.matteBlack, u, v + 1.4 + (ah + 2) / 2, face + 2.2 + dz, g); fr.rotation.x = -0.1;
       meshAt(new THREE.PlaneGeometry(aw, ah), new THREE.MeshStandardMaterial({ color: col, roughness: 0.9 }), 0, 0, 0.45, fr);
     }
@@ -1341,7 +1347,7 @@ function buildMantel() {
     g.add(new THREE.Mesh(geo, M.slab));
   } else if (kind === 'shelves') {
     // open walnut shelves either side of the fireplace, each with a book stack or a vase
-    const sides = [[6, fp.u0 - 7], [fp.u1 + 7, G.mainY - 6]].filter(([a, b]) => b - a >= 14);
+    const sides = [[6, fp.u0 - 7], [fp.u1 + 7, G.westY - 6]].filter(([a, b]) => b - a >= 14);
     const r = rng(81);
     for (const [a, b] of sides) for (const v of [30, 48, 66]) {
       span(g, wood, a, b, v, v + 1.6, face, face + 10, 0.3);
@@ -1355,9 +1361,9 @@ function buildMantel() {
     }
   } else {
     // full-width floating bench: extra perch seating, grounds the fireplace as one horizontal band
-    span(g, wood, 6, G.mainY - 6, 13, 17, face, face + 17, 0.6);
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(G.mainY - 16, 0.35, 0.35), M.led);
-    strip.position.set(G.mainY / 2, 12.6, face + 13); g.add(strip); FX.fixtureLeds.push(strip);
+    span(g, wood, 6, G.westY - 6, 13, 17, face, face + 17, 0.6);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(G.westY - 16, 0.35, 0.35), M.led);
+    strip.position.set(G.westY / 2, 12.6, face + 13); g.add(strip); FX.fixtureLeds.push(strip);
   }
   g.rotation.y = Math.PI / 2;                          // wall frame: u -> plan y, +Z -> into the room
   fixturesGroup.add(g);
@@ -1483,7 +1489,7 @@ function buildLights() {
       FX.zones.push({ light: l, pots, led });
     };
     const bb = Math.min(r.beamBottom, H);
-    zone(Math.max(r.beamDepth, 30) / 2, G.mainY / 2, bb - 10, 2, 1.1, '#ffd2a0');                            // fireplace lounge
+    zone(Math.max(r.beamDepth, 30) / 2, G.westY / 2, bb - 10, 2, 1.1, '#ffd2a0');                            // fireplace lounge
     zone((Math.max(r.beamDepth, 0) + r.width) / 2, G.mainY / 2, H - 12, 6, 0.35);                               // main room
     zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a');  // TV alcove
     zone((r.boxX + G.hallEnd) / 2, (G.hallY - r.stairWidth) / 2 + 12, H - 12, 2, 0.1);                         // landing + hallway
@@ -1520,15 +1526,15 @@ function buildLights() {
   // vertical LED channels at both ends of the fireplace slat wall
   const top = r.beamDepth > 1 ? r.beamBottom : H;
   const face = state.finish.fireplaceSlats ? SLAT_FACE : 0;
-  for (const [u, dir] of [[0.9, 1], [G.mainY - 0.9, -1]]) {
+  for (const [u, dir] of [[0.9, 1], [G.westY - 0.9, -1]]) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(0.5, top - 1, 0.5), M.led);
     m.position.copy(P(face * 0.5 + 0.4, u, top / 2)); lightsGroup.add(m); FX.ledMeshes.push(m);
     rectLight(2, top - 4, P(face + 2.5, u, top / 2), P(face + 2.5, u + dir * 20, top / 2), lightsGroup);
   }
   // cove along the edge of the fireplace bulkhead
   if (r.beamDepth > 1 && r.beamBottom < H) {
-    ledStrip([r.beamDepth - 1.2, 2], [r.beamDepth - 1.2, G.mainY - 2], r.beamBottom - 0.3, lightsGroup);
-    rectLight(G.mainY - 8, 3, P(r.beamDepth - 2, G.mainY / 2, r.beamBottom - 0.6), P(r.beamDepth - 14, G.mainY / 2, 0), lightsGroup);
+    ledStrip([r.beamDepth - 1.2, 2], [r.beamDepth - 1.2, G.westY - 2], r.beamBottom - 0.3, lightsGroup);
+    rectLight(G.westY - 8, 3, P(r.beamDepth - 2, G.westY / 2, r.beamBottom - 0.6), P(r.beamDepth - 14, G.westY / 2, 0), lightsGroup);
   }
   updateLighting();
 }
@@ -1960,6 +1966,12 @@ function initControls() {
   planControls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN };
   planControls.minZoom = 0.4; planControls.maxZoom = 6;
   planControls.enabled = false;
+  planControls.addEventListener('change', updatePlanDensity);
+}
+let planFit = 0.5;                                     // inches per pixel of the fitted plan
+/** A small plan (a phone) hides the room-name tags and shrinks the dimension text until it is zoomed in. */
+function updatePlanDensity() {
+  $('#labels').classList.toggle('compact', mode === 'plan' && ortho.zoom / planFit < 1.6);
 }
 
 // ---------------- presets ----------------
@@ -2037,6 +2049,7 @@ function stepWalk(dt) {
 function safeRect() {
   const W = stage.clientWidth, H = stage.clientHeight, s = stage.getBoundingClientRect();
   let l = 0, r = W, t = 74, b = H - 70;
+  if (viewOnly()) { t = 56; b = H - 16; }                         // menus hidden: only the Show menus button
   const L = $('#leftPanel'), R = $('#rightPanel');
   if (!isNarrow()) {
     if (L && !L.classList.contains('collapsed') && L.offsetParent) l = L.getBoundingClientRect().right - s.left + 8;
@@ -2047,16 +2060,21 @@ function safeRect() {
 }
 function fitPlan() {
   const r = state.room, S = safeRect();
-  const minX = -60, maxX = r.width + 60, minY = geom().hallY - 56, maxY = r.depth + 50;
-  const scale = Math.max((maxX - minX) / (S.r - S.l), (maxY - minY) / (S.b - S.t));   // inches per px
+  // the room out to its outermost dimension lines (inches; see updateLabels), plus pixel margins for their labels,
+  // which keep their screen size however small the plan gets
+  const minX = -46, maxX = r.width + 48, minY = geom().hallY - 24, maxY = r.depth + 34;
+  const pl = 36, pr = 74, pt = 18, pb = 18;
+  const scale = Math.max((maxX - minX) / Math.max(60, S.r - S.l - pl - pr), (maxY - minY) / Math.max(60, S.b - S.t - pt - pb));   // inches per px
+  const cx = (minX - pl * scale + maxX + pr * scale) / 2, cy = (minY - pb * scale + maxY + pt * scale) / 2;
   const sx = (S.l + S.r) / 2, sy = (S.t + S.b) / 2;
   ortho.left = -sx * scale; ortho.right = (S.W - sx) * scale; ortho.top = sy * scale; ortho.bottom = -(S.H - sy) * scale;
-  ortho.position.copy(P((minX + maxX) / 2, (minY + maxY) / 2, 1500));
+  ortho.position.copy(P(cx, cy, 1500));
   ortho.up.set(0, 0, -1);
-  ortho.lookAt(P((minX + maxX) / 2, (minY + maxY) / 2, 0));
+  ortho.lookAt(P(cx, cy, 0));
   ortho.zoom = 1; ortho.updateProjectionMatrix();
-  planControls.target.copy(P((minX + maxX) / 2, (minY + maxY) / 2, 0));
+  planControls.target.copy(P(cx, cy, 0));
   planControls.update();
+  planFit = scale; updatePlanDensity();
 }
 
 function setMode(m) {
@@ -2067,7 +2085,7 @@ function setMode(m) {
   controls.enabled = m === 'orbit';
   planControls.enabled = m === 'plan';
   activeCam = m === 'plan' ? ortho : camera;
-  if (m === 'plan') fitPlan();
+  if (m === 'plan') fitPlan(); else updatePlanDensity();
   if (m === 'walk') { enterWalk(); toast(matchMedia('(pointer: coarse)').matches ? 'Drag to look · hold ▲ to walk' : 'Drag to look · W A S D to walk · Shift to hurry'); }
   if (m === 'orbit') { camera.up.set(0, 1, 0); if (camera.position.y < 30 || prevWalk) goPreset('overview'); }
   prevWalk = m === 'walk';
@@ -2102,13 +2120,13 @@ function line(points, mat = dimMat, dashed = false) {
   const l = new THREE.Line(geo, m); if (dashed) l.computeLineDistances();
   l.renderOrder = 10; labelsGroup.add(l); return l;
 }
-function dimLine(a, b, z, text) {
+function dimLine(a, b, z, text, at = 0.5) {         // at: where along the line the label sits
   const pa = P(a[0], a[1], z), pb = P(b[0], b[1], z);
   line([pa, pb]);
   const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), nx = -dy / len * 4, ny = dx / len * 4;
   line([P(a[0] - nx, a[1] - ny, z), P(a[0] + nx, a[1] + ny, z)]);
   line([P(b[0] - nx, b[1] - ny, z), P(b[0] + nx, b[1] + ny, z)]);
-  label(text, pa.clone().lerp(pb, 0.5));
+  label(text, pa.clone().lerp(pb, at));
 }
 
 /** The eye point of the prime seat (plan x, y) on the main sofa, or null. */
@@ -2157,15 +2175,19 @@ function updateLabels() {
     dimLine([0, G.hallY - 24], [r.width, G.hallY - 24], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
     dimLine([r.boxX, -r.stairWidth / 2], [r.stairStart, -r.stairWidth / 2], zz, ftin(r.stairStart - r.boxX));
     label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 14, zz), 'tag');
-    dimLine([r.width + 24, 0], [r.width + 24, r.depth], zz, `${ftin(r.depth)}  stairs → TV wall`);
-    dimLine([-24, 0], [-24, G.mainY], zz, ftin(G.mainY));
+    // measured from the stair-side line: exterior wall to the alcove notch, then the whole depth to the TV wall
+    dimLine([r.width + 20, 0], [r.width + 20, G.mainY], zz, ftin(G.mainY), 0.32);   // staggered from the outer label
+    dimLine([r.width + 48, 0], [r.width + 48, r.depth], zz, `${ftin(r.depth)} to TV wall`);
+    // fireplace pocket: to the face of the steel-beam bump, then the whole fireplace wall
+    dimLine([-18, 0], [-18, G.westY - r.pilasterD], zz, ftin(G.westY - r.pilasterD), 0.32);
+    dimLine([-46, 0], [-46, G.westY], zz, ftin(G.westY));
     dimLine([0, 9], [r.boxX, 9], zz, ftin(r.boxX));
     dimLine([G.bay[2][0], r.depth + 16], [G.bay[3][0], r.depth + 16], zz, `TV wall ${ftin(G.bay[3][0] - G.bay[2][0])}`);
     dimLine([r.bayLeft, r.depth + 34], [r.bayRight, r.depth + 34], zz, `alcove ${ftin(r.bayRight - r.bayLeft)} · bulkhead at ${ftin(r.soffitBottom)}`);
-    line([P(r.beamX, 0, zz), P(r.beamX, G.mainY, zz)], dimMat, true);
-    label('Steel beam W200', P(r.beamX, G.mainY * 0.5, zz), 'tag', -90);
+    line([P(r.beamX, 0, zz), P(r.beamX, G.westY - r.pilasterD, zz)], dimMat, true);
+    label('Steel beam W200', P(r.beamX, G.westY * 0.5, zz), 'tag', -90);
     label('TV alcove', P(G.tvX, G.mainY + r.bayDepth * 0.55, zz), 'tag');
-    label(`Bulkhead ${ftin(r.beamBottom)}`, P(r.beamDepth / 2 + 2, G.mainY - 9, zz), 'tag');
+    if (r.beamDepth > 1) dimLine([0, G.westY + 14], [r.beamDepth, G.westY + 14], zz, `bulkhead at ${ftin(r.beamBottom)}`);
     label('Stairs ↑', P((r.stairStart + r.width) / 2, -r.stairWidth * 0.3, zz), 'tag');
     dimLine([r.stairStart - 2, -r.stairWidth + 8], [r.width, -r.stairWidth + 8], zz, `tip of stairs ${ftin(r.width - r.stairStart + 2)}`);
     label('Exterior wall', P(r.width - 10, G.mainY / 2, zz), 'tag', 90);
@@ -2640,11 +2662,22 @@ function renderRoomTab() {
     slider('room-width', 'Fireplace wall → exterior wall', 180, 280, 1, r.width, ftin, (v) => {
       const d = v - r.width; r.width = v; r.bayLeft += d; r.bayRight += d; queue(rebuildAll);   // keep the 2′-2″ jog
     }),
-    rs('depth', 'Stairs → TV wall', 150, 230),
+    slider('room-depth', 'Stairs → TV wall', 150, 230, 1, r.depth, ftin, (v) => {
+      const notch = r.depth - r.bayDepth; r.depth = v; r.bayDepth = Math.max(24, v - notch); queue(rebuildAll);   // keep the notch
+    }),
     rs('ceiling', 'Ceiling height', 90, 120),
-    h('p', { class: 'note' }, 'Your tape numbers: 228″, 185″ and a 9′ ceiling.')));
+    slider('room-notch', 'Stairs → TV alcove notch', 80, Math.round(r.depth - 30), 1, r.depth - r.bayDepth, ftin, (v) => {
+      r.bayDepth = Math.max(24, r.depth - v); queue(rebuildAll);
+    }),
+    rs('fireWall', 'Fireplace wall', 90, 170),
+    rs('pilasterD', 'Steel-beam bump depth', 0, 30),
+    slider('room-alcove', 'TV alcove opening', 96, 160, 1, r.bayRight - r.bayLeft, ftin, (v) => {
+      if (r.beamDepth === r.bayLeft) r.beamDepth = r.bayRight - v;                    // the bulkhead stops at the alcove's edge
+      r.bayLeft = r.bayRight - v; queue(rebuildAll);
+    }),
+    rs('boxX', 'Fireplace nook depth', 24, 72),
+    h('p', { class: 'note' }, 'Your tape numbers. Plan view shows each one as a dimension, with the bottom step and the tip of the stairs.')));
   root.append(group('From the plan and photos',
-    rs('bayDepth', 'TV alcove depth', 36, 80),
     rs('bayFace', 'TV wall width', 60, 110),
     rs('soffitBottom', 'Alcove bulkhead height', 80, r.ceiling),
     rs('soffitDepth', 'Alcove bulkhead depth', 0, 24),
@@ -2653,7 +2686,7 @@ function renderRoomTab() {
     rs('beamX', 'Steel beam from fireplace wall', 12, 60),
     h('p', { class: 'note' }, 'These are estimates. Set them to your measurements and everything rebuilds.')));
   root.append(group('Fireplace + windows',
-    fs('center', 'Centre along wall', 30, Math.round(geom().mainY - 30)),
+    fs('center', 'Centre along wall', 30, Math.round(geom().westY - 30)),
     fs('width', 'Fireplace width', 36, 74),
     fs('bottom', 'Fireplace height off floor', 12, 48),
     rs('transomBottom', 'Window sill height', 60, Math.max(61, r.beamBottom - r.transomH - 1)),
@@ -2767,7 +2800,7 @@ function renderInspector() {
     body.append(group('Fireplace',
       slider('f-width', 'Width', 36, 74, 1, f.width, inch, (v) => { f.width = v; queue(rebuildAll); }),
       slider('f-bottom', 'Height off floor', 12, 48, 1, f.bottom, ftin, (v) => { f.bottom = v; queue(rebuildAll); }),
-      slider('f-center', 'Centre along wall', 30, Math.round(geom().mainY - 30), 1, f.center, ftin, (v) => { f.center = v; queue(rebuildAll); }),
+      slider('f-center', 'Centre along wall', 30, Math.round(geom().westY - 30), 1, f.center, ftin, (v) => { f.center = v; queue(rebuildAll); }),
       toggle('f-on', 'Flame on', state.light.fire, (v) => { state.light.fire = v; updateLighting(); renderLighting(); }),
       h('p', { class: 'note' }, 'The two windows above stay centred on the fireplace.')));
     return;

@@ -82,7 +82,7 @@ function renderInspector() {
     body.append(group('Fireplace',
       slider('f-width', 'Width', 36, 74, 1, f.width, inch, (v) => { f.width = v; queue(rebuildAll); }),
       slider('f-bottom', 'Height off floor', 12, 48, 1, f.bottom, ftin, (v) => { f.bottom = v; queue(rebuildAll); }),
-      slider('f-center', 'Centre along wall', 30, Math.round(geom().mainY - 30), 1, f.center, ftin, (v) => { f.center = v; queue(rebuildAll); }),
+      slider('f-center', 'Centre along wall', 30, Math.round(geom().westY - 30), 1, f.center, ftin, (v) => { f.center = v; queue(rebuildAll); }),
       toggle('f-on', 'Flame on', state.light.fire, (v) => { state.light.fire = v; updateLighting(); renderLighting(); }),
       h('p', { class: 'note' }, 'The two windows above stay centred on the fireplace.')));
     return;

@@ -184,11 +184,22 @@ function renderRoomTab() {
     slider('room-width', 'Fireplace wall → exterior wall', 180, 280, 1, r.width, ftin, (v) => {
       const d = v - r.width; r.width = v; r.bayLeft += d; r.bayRight += d; queue(rebuildAll);   // keep the 2′-2″ jog
     }),
-    rs('depth', 'Stairs → TV wall', 150, 230),
+    slider('room-depth', 'Stairs → TV wall', 150, 230, 1, r.depth, ftin, (v) => {
+      const notch = r.depth - r.bayDepth; r.depth = v; r.bayDepth = Math.max(24, v - notch); queue(rebuildAll);   // keep the notch
+    }),
     rs('ceiling', 'Ceiling height', 90, 120),
-    h('p', { class: 'note' }, 'Your tape numbers: 228″, 185″ and a 9′ ceiling.')));
+    slider('room-notch', 'Stairs → TV alcove notch', 80, Math.round(r.depth - 30), 1, r.depth - r.bayDepth, ftin, (v) => {
+      r.bayDepth = Math.max(24, r.depth - v); queue(rebuildAll);
+    }),
+    rs('fireWall', 'Fireplace wall', 90, 170),
+    rs('pilasterD', 'Steel-beam bump depth', 0, 30),
+    slider('room-alcove', 'TV alcove opening', 96, 160, 1, r.bayRight - r.bayLeft, ftin, (v) => {
+      if (r.beamDepth === r.bayLeft) r.beamDepth = r.bayRight - v;                    // the bulkhead stops at the alcove's edge
+      r.bayLeft = r.bayRight - v; queue(rebuildAll);
+    }),
+    rs('boxX', 'Fireplace nook depth', 24, 72),
+    h('p', { class: 'note' }, 'Your tape numbers. Plan view shows each one as a dimension, with the bottom step and the tip of the stairs.')));
   root.append(group('From the plan and photos',
-    rs('bayDepth', 'TV alcove depth', 36, 80),
     rs('bayFace', 'TV wall width', 60, 110),
     rs('soffitBottom', 'Alcove bulkhead height', 80, r.ceiling),
     rs('soffitDepth', 'Alcove bulkhead depth', 0, 24),
@@ -197,7 +208,7 @@ function renderRoomTab() {
     rs('beamX', 'Steel beam from fireplace wall', 12, 60),
     h('p', { class: 'note' }, 'These are estimates. Set them to your measurements and everything rebuilds.')));
   root.append(group('Fireplace + windows',
-    fs('center', 'Centre along wall', 30, Math.round(geom().mainY - 30)),
+    fs('center', 'Centre along wall', 30, Math.round(geom().westY - 30)),
     fs('width', 'Fireplace width', 36, 74),
     fs('bottom', 'Fireplace height off floor', 12, 48),
     rs('transomBottom', 'Window sill height', 60, Math.max(61, r.beamBottom - r.transomH - 1)),

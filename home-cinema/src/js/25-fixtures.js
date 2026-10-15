@@ -163,7 +163,7 @@ function buildTransoms() {
   if (mode === 'band' && union) {
     // continuous matte-black band across the whole wall; the windows become slots in it
     const G = geom(), bv0 = union.v0 - 4, bv1 = union.v1 + 4;
-    const shape = shapeFrom(rect(1.5, bv0, G.mainY - 1.5, bv1), tr.map((t) => rect(t.u0, t.v0, t.u1, t.v1)));
+    const shape = shapeFrom(rect(1.5, bv0, G.westY - 1.5, bv1), tr.map((t) => rect(t.u0, t.v0, t.u1, t.v1)));
     const geo = new THREE.ExtrudeGeometry(shape, { depth: face + 0.8, bevelEnabled: false });
     const band = new THREE.Mesh(geo, M.matteBlack); band.rotation.y = Math.PI / 2; fixturesGroup.add(band);
   }
@@ -310,15 +310,15 @@ function buildFixtures() {
     const tmode = state.finish.transoms, uMin = Math.min(...tr.map((t) => t.u0)), uMax = Math.max(...tr.map((t) => t.u1));
     const pad = { framed: 2.5, shade: 1 }[tmode] ?? 0.5;
     // framed / shade: slats stop at the pair, not at each window; band: slats stop above and below one full-width strip
-    const winHoles = tmode === 'band' ? [{ u0: 0, u1: G.mainY, v0: tr[0].v0 - 4, v1: tr[0].v1 + 4 }]
+    const winHoles = tmode === 'band' ? [{ u0: 0, u1: G.westY, v0: tr[0].v0 - 4, v1: tr[0].v1 + 4 }]
       : tmode === 'framed' || tmode === 'shade' ? [{ u0: uMin - pad, u1: uMax + pad, v0: tr[0].v0 - pad, v1: tr[0].v1 + pad }]
         : tr.map((t) => ({ u0: t.u0 - pad, u1: t.u1 + pad, v0: t.v0 - pad, v1: t.v1 + pad }));
     if (state.finish.mantel === 'slab') { const sl = slabRect(); fireHole.u0 = sl.u0; fireHole.u1 = sl.u1; fireHole.v0 = sl.v0; fireHole.v1 = sl.v1; }
     // 'slatted' / 'hidden': slats run straight across the windows
     const across = (tmode === 'slatted' || tmode === 'hidden') && tr.length;
     // slatted: one continuous backlit band behind the slats swallows both windows; hidden: felt behind, no light at all
-    const band = across && tmode === 'slatted' ? { u0: 10, u1: G.mainY - 10, v0: tr[0].v0 - 1, v1: tr[0].v1 + 1 } : null;
-    const s = buildSlats(1.5, G.mainY - 1.5, 0.4, top - 0.2, across ? [fireHole] : [fireHole, ...winHoles], band ? [fireHole, band] : across ? [fireHole] : [fireHole, ...winHoles]);
+    const band = across && tmode === 'slatted' ? { u0: 10, u1: G.westY - 10, v0: tr[0].v0 - 1, v1: tr[0].v1 + 1 } : null;
+    const s = buildSlats(1.5, G.westY - 1.5, 0.4, top - 0.2, across ? [fireHole] : [fireHole, ...winHoles], band ? [fireHole, band] : across ? [fireHole] : [fireHole, ...winHoles]);
     if (band) {
       const glow = new THREE.Mesh(new THREE.PlaneGeometry(band.u1 - band.u0, band.v1 - band.v0), M.bandGlow);
       glow.position.set((band.u0 + band.u1) / 2, (band.v0 + band.v1) / 2, 0.15); s.add(glow); FX.fixtureLeds.push(glow);
@@ -345,11 +345,11 @@ function buildMantel() {
     // full-width picture ledge between the fire and the windows: art leaned off-centre breaks the symmetry
     const r = state.room, v = fp.v1 + 6, c = (fp.u0 + fp.u1) / 2;
     const room = r.transomBottom - (state.finish.transoms === 'band' ? 5 : 2) - (v + 1.4);   // stay clear of the windows
-    span(g, wood, 6, G.mainY - 6, v, v + 1.4, face, face + 5, 0.3);
-    span(g, wood, 6, G.mainY - 6, v + 1.4, v + 2.6, face + 4.2, face + 5, 0.2);
+    span(g, wood, 6, G.westY - 6, v, v + 1.4, face, face + 5, 0.3);
+    span(g, wood, 6, G.westY - 6, v + 1.4, v + 2.6, face + 4.2, face + 5, 0.2);
     for (const [du, aw, k, col, dz] of [[-17, 24, 1, '#b4573a', 0], [1, 13, 0.7, '#d9cdb8', 0.9], [33, 14, 0.85, '#2f3a40', 0]]) {
       const u = c + du, ah = Math.max(6, room * k - 2);
-      if (u - aw / 2 < 7 || u + aw / 2 > G.mainY - 7) continue;
+      if (u - aw / 2 < 7 || u + aw / 2 > G.westY - 7) continue;
       const fr = meshAt(new THREE.BoxGeometry(aw + 2, ah + 2, 0.8), M.matteBlack, u, v + 1.4 + (ah + 2) / 2, face + 2.2 + dz, g); fr.rotation.x = -0.1;
       meshAt(new THREE.PlaneGeometry(aw, ah), new THREE.MeshStandardMaterial({ color: col, roughness: 0.9 }), 0, 0, 0.45, fr);
     }
@@ -364,7 +364,7 @@ function buildMantel() {
     g.add(new THREE.Mesh(geo, M.slab));
   } else if (kind === 'shelves') {
     // open walnut shelves either side of the fireplace, each with a book stack or a vase
-    const sides = [[6, fp.u0 - 7], [fp.u1 + 7, G.mainY - 6]].filter(([a, b]) => b - a >= 14);
+    const sides = [[6, fp.u0 - 7], [fp.u1 + 7, G.westY - 6]].filter(([a, b]) => b - a >= 14);
     const r = rng(81);
     for (const [a, b] of sides) for (const v of [30, 48, 66]) {
       span(g, wood, a, b, v, v + 1.6, face, face + 10, 0.3);
@@ -378,9 +378,9 @@ function buildMantel() {
     }
   } else {
     // full-width floating bench: extra perch seating, grounds the fireplace as one horizontal band
-    span(g, wood, 6, G.mainY - 6, 13, 17, face, face + 17, 0.6);
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(G.mainY - 16, 0.35, 0.35), M.led);
-    strip.position.set(G.mainY / 2, 12.6, face + 13); g.add(strip); FX.fixtureLeds.push(strip);
+    span(g, wood, 6, G.westY - 6, 13, 17, face, face + 17, 0.6);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(G.westY - 16, 0.35, 0.35), M.led);
+    strip.position.set(G.westY / 2, 12.6, face + 13); g.add(strip); FX.fixtureLeds.push(strip);
   }
   g.rotation.y = Math.PI / 2;                          // wall frame: u -> plan y, +Z -> into the room
   fixturesGroup.add(g);

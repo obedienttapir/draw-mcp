@@ -130,12 +130,12 @@ function buildRoom() {
   // ---- fireplace wall with fireplace + two transom openings ----
   const { fp, tr } = fireplaceOpenings();
   const holes = [rect(fp.u0, fp.v0, fp.u1, fp.v1), ...tr.map((t) => rect(t.u0, t.v0, t.u1, t.v1))];
-  const fwGeo = new THREE.ShapeGeometry(shapeFrom(rect(0, 0, G.mainY, H), holes));
+  const fwGeo = new THREE.ShapeGeometry(shapeFrom(rect(0, 0, G.westY, H), holes));
   const fw = new THREE.Mesh(fwGeo, M.wall);
   // shape u (plan y) -> world -Z, v -> world Y, normal (+Z) -> world +X (into the room)
   fw.rotation.y = Math.PI / 2;
   roomGroup.add(fw);
-  roomGroup.add(wallCap([0, G.mainY], [0, 0], H + 0.2));
+  roomGroup.add(wallCap([0, G.westY], [0, 0], H + 0.2));
   // reveals (jambs) through the wall thickness
   for (const h of [fp, ...tr]) addReveal(h, M.wall);
 
@@ -172,8 +172,8 @@ function buildRoom() {
   // ---- fireplace-side bulkhead over the steel beam ----
   const bh = H - r.beamBottom;
   if (bh > 0.5 && r.beamDepth > 1) {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(r.beamDepth, bh, G.mainY), M.bulkhead);
-    b.position.copy(P(r.beamDepth / 2, G.mainY / 2, r.beamBottom + bh / 2)); b.name = 'beam bulkhead';
+    const b = new THREE.Mesh(new THREE.BoxGeometry(r.beamDepth, bh, G.westY), M.bulkhead);
+    b.position.copy(P(r.beamDepth / 2, G.westY / 2, r.beamBottom + bh / 2)); b.name = 'beam bulkhead';
     roomGroup.add(b); FX.bulkheads.push(b);
     // it carries on over the landing and the hallway, out to the same line
     if (r.beamDepth > r.boxX + 1) {
@@ -189,10 +189,10 @@ function buildRoom() {
   for (const x of doors) roomGroup.add(makeDoor(x, G.hallY));
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
-  pil.position.copy(P(r.beamX, G.mainY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
+  pil.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
   roomGroup.add(pil);
   const pilCap = new THREE.Mesh(new THREE.PlaneGeometry(r.pilasterW, r.pilasterD), CAP_MAT);
-  pilCap.rotation.x = -Math.PI / 2; pilCap.position.copy(P(r.beamX, G.mainY - r.pilasterD / 2, H + 0.25));
+  pilCap.rotation.x = -Math.PI / 2; pilCap.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, H + 0.25));
   roomGroup.add(pilCap);
 }
 

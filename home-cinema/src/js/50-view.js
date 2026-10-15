@@ -39,6 +39,12 @@ function initControls() {
   planControls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN };
   planControls.minZoom = 0.4; planControls.maxZoom = 6;
   planControls.enabled = false;
+  planControls.addEventListener('change', updatePlanDensity);
+}
+let planFit = 0.5;                                     // inches per pixel of the fitted plan
+/** A small plan (a phone) hides the room-name tags and shrinks the dimension text until it is zoomed in. */
+function updatePlanDensity() {
+  $('#labels').classList.toggle('compact', mode === 'plan' && ortho.zoom / planFit < 1.6);
 }
 
 // ---------------- presets ----------------
@@ -116,6 +122,7 @@ function stepWalk(dt) {
 function safeRect() {
   const W = stage.clientWidth, H = stage.clientHeight, s = stage.getBoundingClientRect();
   let l = 0, r = W, t = 74, b = H - 70;
+  if (viewOnly()) { t = 56; b = H - 16; }                         // menus hidden: only the Show menus button
   const L = $('#leftPanel'), R = $('#rightPanel');
   if (!isNarrow()) {
     if (L && !L.classList.contains('collapsed') && L.offsetParent) l = L.getBoundingClientRect().right - s.left + 8;
@@ -126,16 +133,21 @@ function safeRect() {
 }
 function fitPlan() {
   const r = state.room, S = safeRect();
-  const minX = -60, maxX = r.width + 60, minY = geom().hallY - 56, maxY = r.depth + 50;
-  const scale = Math.max((maxX - minX) / (S.r - S.l), (maxY - minY) / (S.b - S.t));   // inches per px
+  // the room out to its outermost dimension lines (inches; see updateLabels), plus pixel margins for their labels,
+  // which keep their screen size however small the plan gets
+  const minX = -46, maxX = r.width + 48, minY = geom().hallY - 24, maxY = r.depth + 34;
+  const pl = 36, pr = 74, pt = 18, pb = 18;
+  const scale = Math.max((maxX - minX) / Math.max(60, S.r - S.l - pl - pr), (maxY - minY) / Math.max(60, S.b - S.t - pt - pb));   // inches per px
+  const cx = (minX - pl * scale + maxX + pr * scale) / 2, cy = (minY - pb * scale + maxY + pt * scale) / 2;
   const sx = (S.l + S.r) / 2, sy = (S.t + S.b) / 2;
   ortho.left = -sx * scale; ortho.right = (S.W - sx) * scale; ortho.top = sy * scale; ortho.bottom = -(S.H - sy) * scale;
-  ortho.position.copy(P((minX + maxX) / 2, (minY + maxY) / 2, 1500));
+  ortho.position.copy(P(cx, cy, 1500));
   ortho.up.set(0, 0, -1);
-  ortho.lookAt(P((minX + maxX) / 2, (minY + maxY) / 2, 0));
+  ortho.lookAt(P(cx, cy, 0));
   ortho.zoom = 1; ortho.updateProjectionMatrix();
-  planControls.target.copy(P((minX + maxX) / 2, (minY + maxY) / 2, 0));
+  planControls.target.copy(P(cx, cy, 0));
   planControls.update();
+  planFit = scale; updatePlanDensity();
 }
 
 function setMode(m) {
@@ -146,7 +158,7 @@ function setMode(m) {
   controls.enabled = m === 'orbit';
   planControls.enabled = m === 'plan';
   activeCam = m === 'plan' ? ortho : camera;
-  if (m === 'plan') fitPlan();
+  if (m === 'plan') fitPlan(); else updatePlanDensity();
   if (m === 'walk') { enterWalk(); toast(matchMedia('(pointer: coarse)').matches ? 'Drag to look · hold ▲ to walk' : 'Drag to look · W A S D to walk · Shift to hurry'); }
   if (m === 'orbit') { camera.up.set(0, 1, 0); if (camera.position.y < 30 || prevWalk) goPreset('overview'); }
   prevWalk = m === 'walk';
@@ -181,13 +193,13 @@ function line(points, mat = dimMat, dashed = false) {
   const l = new THREE.Line(geo, m); if (dashed) l.computeLineDistances();
   l.renderOrder = 10; labelsGroup.add(l); return l;
 }
-function dimLine(a, b, z, text) {
+function dimLine(a, b, z, text, at = 0.5) {         // at: where along the line the label sits
   const pa = P(a[0], a[1], z), pb = P(b[0], b[1], z);
   line([pa, pb]);
   const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), nx = -dy / len * 4, ny = dx / len * 4;
   line([P(a[0] - nx, a[1] - ny, z), P(a[0] + nx, a[1] + ny, z)]);
   line([P(b[0] - nx, b[1] - ny, z), P(b[0] + nx, b[1] + ny, z)]);
-  label(text, pa.clone().lerp(pb, 0.5));
+  label(text, pa.clone().lerp(pb, at));
 }
 
 /** The eye point of the prime seat (plan x, y) on the main sofa, or null. */
@@ -236,15 +248,19 @@ function updateLabels() {
     dimLine([0, G.hallY - 24], [r.width, G.hallY - 24], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
     dimLine([r.boxX, -r.stairWidth / 2], [r.stairStart, -r.stairWidth / 2], zz, ftin(r.stairStart - r.boxX));
     label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 14, zz), 'tag');
-    dimLine([r.width + 24, 0], [r.width + 24, r.depth], zz, `${ftin(r.depth)}  stairs → TV wall`);
-    dimLine([-24, 0], [-24, G.mainY], zz, ftin(G.mainY));
+    // measured from the stair-side line: exterior wall to the alcove notch, then the whole depth to the TV wall
+    dimLine([r.width + 20, 0], [r.width + 20, G.mainY], zz, ftin(G.mainY), 0.32);   // staggered from the outer label
+    dimLine([r.width + 48, 0], [r.width + 48, r.depth], zz, `${ftin(r.depth)} to TV wall`);
+    // fireplace pocket: to the face of the steel-beam bump, then the whole fireplace wall
+    dimLine([-18, 0], [-18, G.westY - r.pilasterD], zz, ftin(G.westY - r.pilasterD), 0.32);
+    dimLine([-46, 0], [-46, G.westY], zz, ftin(G.westY));
     dimLine([0, 9], [r.boxX, 9], zz, ftin(r.boxX));
     dimLine([G.bay[2][0], r.depth + 16], [G.bay[3][0], r.depth + 16], zz, `TV wall ${ftin(G.bay[3][0] - G.bay[2][0])}`);
     dimLine([r.bayLeft, r.depth + 34], [r.bayRight, r.depth + 34], zz, `alcove ${ftin(r.bayRight - r.bayLeft)} · bulkhead at ${ftin(r.soffitBottom)}`);
-    line([P(r.beamX, 0, zz), P(r.beamX, G.mainY, zz)], dimMat, true);
-    label('Steel beam W200', P(r.beamX, G.mainY * 0.5, zz), 'tag', -90);
+    line([P(r.beamX, 0, zz), P(r.beamX, G.westY - r.pilasterD, zz)], dimMat, true);
+    label('Steel beam W200', P(r.beamX, G.westY * 0.5, zz), 'tag', -90);
     label('TV alcove', P(G.tvX, G.mainY + r.bayDepth * 0.55, zz), 'tag');
-    label(`Bulkhead ${ftin(r.beamBottom)}`, P(r.beamDepth / 2 + 2, G.mainY - 9, zz), 'tag');
+    if (r.beamDepth > 1) dimLine([0, G.westY + 14], [r.beamDepth, G.westY + 14], zz, `bulkhead at ${ftin(r.beamBottom)}`);
     label('Stairs ↑', P((r.stairStart + r.width) / 2, -r.stairWidth * 0.3, zz), 'tag');
     dimLine([r.stairStart - 2, -r.stairWidth + 8], [r.width, -r.stairWidth + 8], zz, `tip of stairs ${ftin(r.width - r.stairStart + 2)}`);
     label('Exterior wall', P(r.width - 10, G.mainY / 2, zz), 'tag', 90);

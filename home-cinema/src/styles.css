@@ -149,6 +149,9 @@ select { width: 100%; background: var(--panel-solid); border: 1px solid var(--li
 .dim.spk { color: #10202b; background: #7fb3d5; border-color: #7fb3d5; font-weight: 500; }
 .tag { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap;
   background: rgba(18,15,12,0.6); padding: 1px 6px; border-radius: 4px; }
+/* small plan (phone): room names step aside and dimensions shrink until you pinch in */
+#labels.compact .tag { display: none; }
+#labels.compact .dim { font-size: 8.5px; padding: 0 3px; border-radius: 4px; }
 
 /* ---------- modal ---------- */
 .modal { position: absolute; inset: 0; z-index: 20; background: rgba(8,6,5,0.6); display: grid; place-items: center;
