@@ -193,9 +193,11 @@ function undo() {
 
 // ---------------- keyboard ----------------
 window.addEventListener('keydown', (e) => {
-  const tag = (e.target && e.target.tagName) || '';
-  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) && e.target.type !== 'range') return;
-  if (e.target.type === 'range' && e.key.startsWith('Arrow')) return;
+  const t = e.target || {}, tag = t.tagName || '';
+  // only text entry keeps its own keys; switches, sliders and buttons still get Ctrl+Z, Q/E, etc.
+  const typing = tag === 'TEXTAREA' || tag === 'SELECT' || (tag === 'INPUT' && !['checkbox', 'radio', 'range', 'button'].includes(t.type));
+  if (typing) return;
+  if (t.type === 'range' && e.key.startsWith('Arrow')) return;
   const mod = e.ctrlKey || e.metaKey;
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); duplicateSelected(); return; }

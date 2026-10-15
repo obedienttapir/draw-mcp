@@ -71,8 +71,18 @@ function initTabs() {
   }));
 }
 
+function loadOption(which) {
+  applyState(clone(which === 'recommended' ? RECOMMENDED_STATE : DEFAULT_STATE), true);
+  select(null); rebuildAll(); refreshPanels(); save();
+  toast(which === 'recommended' ? 'Recommended design loaded · Undo goes back' : 'Original plan loaded · Undo goes back');
+}
 function renderFurnish() {
   const root = $('#tab-furnish'); root.replaceChildren();
+  root.append(group('Design option',
+    h('div', { class: 'chips' },
+      h('button', { class: 'chip', 'aria-pressed': String(state.option !== 'recommended'), onclick: () => loadOption('original') }, 'Original plan'),
+      h('button', { class: 'chip', 'aria-pressed': String(state.option === 'recommended'), onclick: () => loadOption('recommended') }, 'Recommended')),
+    h('p', { class: 'note' }, 'Recommended: slats across the fireplace windows, floating hearth bench, 85″ TV with a 110″ drop-down screen, bias and step lights, and a clear path from the stairs.')));
   const grid = h('div', { class: 'catalog' });
   for (const [type, def] of Object.entries(CATALOG)) {
     grid.append(h('button', { onclick: () => addItem(type), title: 'Add ' + def.label }, h('b', {}, def.label), h('small', {}, def.note)));
@@ -98,6 +108,10 @@ function renderLighting() {
     toggle('tvOn', 'TV playing', L.tv, (v) => { L.tv = v; updateLighting(); }),
     toggle('fireOn', 'Fireplace flame', L.fire, (v) => { L.fire = v; updateLighting(); }),
     toggle('lampOn', 'Floor lamps', L.lamp, (v) => { L.lamp = v; updateLighting(); }),
+    toggle('biasOn', 'Bias light behind TV (6500K)', L.bias, (v) => { L.bias = v; updateLighting(); }),
+    toggle('stepsOn', 'Stair step lights', L.steps, (v) => { L.steps = v; updateLighting(); }),
+    toggle('bayPotsOn', 'Pot lights over the TV', L.bayPots, (v) => { L.bayPots = v; queue(() => { buildLights(); updateLighting(); }); }),
+    state.tv.screen ? toggle('screenDownOn', 'Projector screen down', L.screenDown, (v) => { L.screenDown = v; updateLighting(); updateLabels(); renderInspector(); }) : null,
     toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; }),
     h('p', { class: 'note' }, 'Movie dims the pots and leaves a little LED glow around the TV alcove to ease eye strain.')));
 }
@@ -108,6 +122,13 @@ function renderFinishes() {
   root.append(group('TV alcove walls', chips('TV alcove walls', [['paint-dark', 'Charcoal'], ['paint-navy', 'Navy'], ['paint-green', 'Forest'], ['paint-wall', 'Same as walls']], f.bayAccent,
     (v) => { f.bayAccent = v; applyFinishes(); queue(rebuildRoomOnly); }),
   h('p', { class: 'note' }, 'A dark alcove cuts screen reflections and makes the picture look deeper.')));
+  root.append(group('Windows above the fireplace',
+    chips('Windows above the fireplace', [['windows', 'As built'], ['slatted', 'Slats across + glow band'], ['framed', 'One black frame']], f.transoms,
+      (v) => { f.transoms = v; queue(rebuildAll); }),
+    h('p', { class: 'note' }, 'Two equal windows over a centred fireplace read as a face. Both fixes keep the openings as cut: slats run across them with one LED band behind, or one steel frame turns the pair into a single window.')));
+  root.append(group('Under or over the fireplace',
+    chips('Fireplace ledge', [['none', 'Nothing'], ['ledge', 'Mantel ledge'], ['bench', 'Floating bench']], f.mantel,
+      (v) => { f.mantel = v; queue(rebuildFixturesAndLights); })));
   root.append(group('Floor', chips('Floor', Object.entries(FLOORS).map(([k, d]) => [k, d.label]), f.floor, (v) => { f.floor = v; applyFinishes(); })));
   root.append(group('Wood slats', chips('Slat finish', Object.entries(SLATS).map(([k, d]) => [k, d.label]), f.slat, (v) => { f.slat = v; applyFinishes(); }),
     toggle('slatFire', 'Slats on fireplace wall', f.fireplaceSlats, (v) => { f.fireplaceSlats = v; queue(rebuildFixturesAndLights); }),
@@ -140,7 +161,10 @@ function renderRoomTab() {
     fs('bottom', 'Fireplace height off floor', 12, 48),
     rs('transomBottom', 'Window sill height', 60, Math.max(61, r.beamBottom - r.transomH - 1)),
     rs('transomW', 'Window width', 24, 54)));
-  root.append(group('Overlays', toggle('sightOn', 'Sightline from the sofa', state.showSightline, (v) => { state.showSightline = v; updateLabels(); })));
+  root.append(group('Overlays',
+    toggle('sightOn', 'Sightline from the sofa', state.showSightline, (v) => { state.showSightline = v; updateLabels(); }),
+    toggle('spkOn', 'Speaker pre-wire plan (5.1.2)', state.showSpeakers, (v) => { state.showSpeakers = v; updateLabels(); }),
+    h('p', { class: 'note' }, 'Blue dots show where to run speaker wire while the ceiling is open. Hover a dot for its role.')));
   root.append(group('Save or share', h('p', { class: 'note' }, 'Your layout is kept in this browser. Copy the layout code to keep versions or move it to another device.'),
     h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => openCode() }, 'Layout code'))));
 }

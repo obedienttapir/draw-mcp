@@ -8,7 +8,7 @@ const SLAT_FACE = SLAT_D + FELT_D;          // how far a slat wall stands off th
  * Slat panel in a local wall frame: u along the wall, v up, +Z into the room.
  * holes: [{u0,u1,v0,v1}] that slats stop around.
  */
-function buildSlats(u0, u1, v0, v1, holes) {
+function buildSlats(u0, u1, v0, v1, holes, feltHoles = holes) {
   const g = new THREE.Group();
   const pitch = SLAT_W + SLAT_GAP, n = Math.floor((u1 - u0 + SLAT_GAP) / pitch);
   const start = u0 + ((u1 - u0) - (n * pitch - SLAT_GAP)) / 2;
@@ -36,9 +36,9 @@ function buildSlats(u0, u1, v0, v1, holes) {
   });
   inst.userData.slats = true;
   g.add(inst);
-  // black acoustic felt behind, with the same openings
+  // black acoustic felt behind; it can stay open where slats run across a window
   const felt = new THREE.Mesh(new THREE.ShapeGeometry(shapeFrom(rect(u0, v0, u1, v1),
-    holes.map((h) => rect(h.u0, h.v0, h.u1, h.v1)))), M.felt);
+    feltHoles.map((h) => rect(h.u0, h.v0, h.u1, h.v1)))), M.felt);
   felt.position.z = FELT_D;
   g.add(felt);
   return g;
@@ -58,14 +58,18 @@ function flameMaterial(seed) {
         return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
       void main(){
         vec2 uv = vUv;
-        float n = noise(vec2(uv.x*9.0 + uSeed, uv.y*2.5 - uTime*1.8))*0.65 + noise(vec2(uv.x*23.0 - uSeed, uv.y*5.0 - uTime*3.1))*0.35;
-        float tongue = 0.5 + 0.5*sin(uv.x*48.0 + uSeed*3.0 + n*4.0 + uTime*0.7);
-        float h = (0.25 + 0.7*n) * (0.35 + 0.65*tongue);
-        float f = smoothstep(h, h*0.35, uv.y) * smoothstep(0.0, 0.06, uv.y);
+        // flame height wanders along the burner; turbulence bends it, so no regular 'teeth'
+        float n1 = noise(vec2(uv.x*5.0 + uSeed, uTime*0.8));
+        float n2 = noise(vec2(uv.x*13.0 - uSeed, uTime*1.6));
+        float h = 0.22 + 0.5*n1 + 0.22*n2;
+        float turb = noise(vec2(uv.x*9.0 + uSeed, uv.y*3.5 - uTime*2.4)) - 0.5;
+        float y = uv.y + turb * 0.22 * uv.y;
+        float f = smoothstep(h + 0.08, h * 0.3, y) * smoothstep(0.0, 0.07, uv.y);
+        float n = n1;
         f *= smoothstep(0.0, 0.05, uv.x) * smoothstep(1.0, 0.95, uv.x);
         float core = smoothstep(0.55, 0.0, uv.y / max(h, 0.02));
         vec3 col = mix(vec3(1.0, 0.32, 0.04), vec3(1.0, 0.82, 0.42), core);
-        gl_FragColor = vec4(col * f * uIntensity * 2.2, f * uIntensity);
+        gl_FragColor = vec4(col * f * uIntensity * 1.6, f * uIntensity);
       }`,
   });
 }
@@ -122,6 +126,20 @@ function buildFireplace() {
 function buildTransoms() {
   const { tr } = fireplaceOpenings();
   FX.transomGlow = [];
+  if (state.finish.transoms === 'framed' && tr.length === 2) {
+    // one 2″ black steel surround + a black mullion where the wall shows between the panes: one window, not two eyes
+    const face = state.finish.fireplaceSlats ? SLAT_FACE : 0, b = 2;
+    const u0 = Math.min(tr[0].u0, tr[1].u0), u1 = Math.max(tr[0].u1, tr[1].u1), v0 = tr[0].v0, v1 = tr[0].v1;
+    const g = new THREE.Group(), W = u1 - u0, Hh = v1 - v0;
+    for (const [sx, sy, px, py] of [[W + 2 * b, b, 0, Hh / 2 + b / 2], [W + 2 * b, b, 0, -Hh / 2 - b / 2], [b, Hh, -W / 2 - b / 2, 0], [b, Hh, W / 2 + b / 2, 0]]) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, 1.2), M.metal); m.position.set(px, py, face + 0.6); g.add(m);
+    }
+    const gapU0 = Math.min(tr[0].u1, tr[1].u1), gapU1 = Math.max(tr[0].u0, tr[1].u0);
+    const mull = new THREE.Mesh(new THREE.BoxGeometry(gapU1 - gapU0, Hh, 0.8), M.metal);
+    mull.position.set((gapU0 + gapU1) / 2 - (u0 + u1) / 2, 0, 0.4); g.add(mull);
+    g.rotation.y = Math.PI / 2; g.position.copy(P(0, (u0 + u1) / 2, (v0 + v1) / 2));
+    fixturesGroup.add(g);
+  }
   for (const t of tr) {
     const w = t.u1 - t.u0, h = t.v1 - t.v0, g = new THREE.Group();
     const glass = new THREE.Mesh(new THREE.PlaneGeometry(w, h), M.reeded);
@@ -142,6 +160,7 @@ function buildTransoms() {
 
 function buildStairs() {
   const r = state.room, G = geom(), g = new THREE.Group(); g.name = 'stairs';
+  FX.stepLights = [];
   const y0 = -r.stairWidth, y1 = 0, wid = y1 - y0;
   const steps = [];
   for (let i = 0; i < G.treads; i++) {
@@ -156,6 +175,10 @@ function buildStairs() {
     const fill = new THREE.Mesh(new THREE.BoxGeometry(G.run, Math.max(0.1, top - 1.25 - (G.riserH - 1.25)), wid - 0.2), M.wall);
     fill.position.copy(P(x0 + G.run / 2 + 0.75, (y0 + y1) / 2, (top - 1.25 - (G.riserH - 1.25)) / 2)); g.add(fill);
     steps.push({ x0, top });
+    if (top < r.ceiling + 20) {
+      const lens = new THREE.Mesh(new THREE.BoxGeometry(4, 1.4, 0.3), M.stepLight);
+      lens.position.copy(P(x0 + G.run / 2, y0 + 0.4, top + 7)); g.add(lens); FX.stepLights.push(lens);
+    }
   }
   // knee wall + dark stringer on the room side (y = 0), following the pitch
   const slope = G.riserH / G.run, H = r.ceiling;
@@ -220,21 +243,38 @@ function buildTV() {
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(w, h), screenMat); screen.position.z = 0.56; g.add(screen);
   const glow = new THREE.RectAreaLight('#9fb4ff', 0, w, h); glow.position.set(0, 0, 0.7);
   glow.lookAt(new THREE.Vector3(0, 0, 10)); g.add(glow);
+  // 6500K bias light: an LED strip on the back of the TV washing the wall (RectAreaLight emits along -Z = toward the wall)
+  const bias = new THREE.RectAreaLight('#dfe8ff', 0, w * 0.9, h * 0.85); bias.position.set(0, 0, -0.7); g.add(bias);
+  const haloMat = new THREE.MeshBasicMaterial({ map: TEX.halo, color: '#dfe8ff', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.45, h * 1.7), haloMat); halo.position.z = -0.75; g.add(halo);
   g.position.copy(P(G.tvX + t.offset, state.room.depth - face - 1.6, t.center));
   fixturesGroup.add(g);
-  FX.tv = { group: g, screenMat, glow, w, h };
+  FX.tv = { group: g, screenMat, glow, bias, halo, w, h };
 }
 
 function buildFixtures() {
   disposeGroup(fixturesGroup);
+  FX.fixtureLeds = [];
   const r = state.room, G = geom();
-  buildStairs(); buildFireplace(); buildTransoms(); buildTV();
+  buildStairs(); buildFireplace(); buildTransoms(); buildTV(); buildMantel(); buildScreen();
   const { fp, tr } = fireplaceOpenings();
   if (state.finish.fireplaceSlats) {
     const top = r.beamDepth > 1 ? r.beamBottom : r.ceiling;
-    const holes = [{ u0: fp.u0 - 1.6, u1: fp.u1 + 1.6, v0: fp.v0 - 1.6, v1: fp.v1 + 1.6 },
-      ...tr.map((t) => ({ u0: t.u0 - 0.5, u1: t.u1 + 0.5, v0: t.v0 - 0.5, v1: t.v1 + 0.5 }))];
-    const s = buildSlats(1.5, G.mainY - 1.5, 0.4, top - 0.2, holes);
+    const fireHole = { u0: fp.u0 - 1.6, u1: fp.u1 + 1.6, v0: fp.v0 - 1.6, v1: fp.v1 + 1.6 };
+    const framed = state.finish.transoms === 'framed';
+    // 'framed': one black surround around both windows, so slats stop at the pair, not at each window
+    const winHoles = framed
+      ? [{ u0: Math.min(...tr.map((t) => t.u0)) - 2.5, u1: Math.max(...tr.map((t) => t.u1)) + 2.5, v0: tr[0].v0 - 2.5, v1: tr[0].v1 + 2.5 }]
+      : tr.map((t) => ({ u0: t.u0 - 0.5, u1: t.u1 + 0.5, v0: t.v0 - 0.5, v1: t.v1 + 0.5 }));
+    // 'slatted': slats run straight across the windows; light still glows through the gaps
+    const across = state.finish.transoms === 'slatted' && tr.length;
+    // slats across: one continuous backlit band behind the slats swallows both windows
+    const band = across ? { u0: 10, u1: G.mainY - 10, v0: tr[0].v0 - 1, v1: tr[0].v1 + 1 } : null;
+    const s = buildSlats(1.5, G.mainY - 1.5, 0.4, top - 0.2, across ? [fireHole] : [fireHole, ...winHoles], across ? [fireHole, band] : [fireHole, ...winHoles]);
+    if (band) {
+      const glow = new THREE.Mesh(new THREE.PlaneGeometry(band.u1 - band.u0, band.v1 - band.v0), M.bandGlow);
+      glow.position.set((band.u0 + band.u1) / 2, (band.v0 + band.v1) / 2, 0.15); s.add(glow); FX.fixtureLeds.push(glow);
+    }
     s.rotation.y = Math.PI / 2;                       // u -> plan y, +Z -> into the room
     fixturesGroup.add(s);
   }
@@ -243,4 +283,70 @@ function buildFixtures() {
     const s = buildSlats(0.6, b[0] - a[0] - 0.6, 0.4, r.soffitBottom - 0.2, []);
     s.position.copy(P(a[0], r.depth)); fixturesGroup.add(s);
   }
+}
+
+// ---------------- fireplace ledge / floating hearth bench ----------------
+function buildMantel() {
+  const kind = state.finish.mantel; if (!kind || kind === 'none') return;
+  const { fp } = fireplaceOpenings(), G = geom(), face = state.finish.fireplaceSlats ? SLAT_FACE : 0;
+  const wood = woodMat('#4a3020'), g = new THREE.Group(); g.name = 'mantel';
+  if (kind === 'ledge') {
+    // floating walnut shelf: splits the 'eyes' from the 'mouth'
+    span(g, wood, fp.u0 - 14, fp.u1 + 14, fp.v1 + 6, fp.v1 + 8.5, face, face + 9, 0.4);
+  } else {
+    // full-width floating bench: extra perch seating, grounds the fireplace as one horizontal band
+    span(g, wood, 6, G.mainY - 6, 13, 17, face, face + 17, 0.6);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(G.mainY - 16, 0.35, 0.35), M.led);
+    strip.position.set(G.mainY / 2, 12.6, face + 13); g.add(strip); FX.fixtureLeds.push(strip);
+  }
+  g.rotation.y = Math.PI / 2;                          // wall frame: u -> plan y, +Z -> into the room
+  fixturesGroup.add(g);
+}
+
+// ---------------- drop-down projector screen in the alcove bulkhead ----------------
+const SCREEN_OFF = 9;                                  // screen plane, inches in front of the TV wall
+function screenDims() {
+  const s = tvDims(state.tv.screenSize || 110), r = state.room, G = geom();
+  const avail = r.bayFace + 2 * Math.min(SCREEN_OFF, G.a);  // alcove width at the screen plane (45° walls)
+  const centre = 50;                                   // image centre height
+  return { ...s, centre, avail, fits: s.w + 6 <= avail, y: r.depth - SCREEN_OFF };
+}
+function buildScreen() {
+  FX.screen = null;
+  if (!state.tv.screen) return;
+  const r = state.room, G = geom(), d = screenDims();
+  const g = new THREE.Group(); g.name = 'screen';
+  const top = r.soffitBottom;
+  // slot in the bulkhead underside + housing
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(d.w + 6, 1, 5), M.black);
+  slot.position.copy(P(G.tvX, d.y, top - 0.45)); g.add(slot);
+  // rolling sheet: black drop above the image, matte white image area
+  const imgTop = d.centre + d.h / 2, imgBot = d.centre - d.h / 2;
+  const sheet = new THREE.Group(); sheet.position.copy(P(G.tvX, d.y, top - 0.9));
+  const drop = new THREE.Mesh(new THREE.PlaneGeometry(d.w + 4, top - 0.9 - imgTop), M.black);
+  drop.position.y = -(top - 0.9 - imgTop) / 2; sheet.add(drop);
+  const mat = new THREE.MeshStandardMaterial({ color: '#d9d9d6', roughness: 0.9, emissiveMap: _still || (_still = movieStill()), emissive: '#000000' });
+  const img = new THREE.Mesh(new THREE.PlaneGeometry(d.w, d.h), mat);
+  img.position.y = -(top - 0.9 - d.centre); sheet.add(img);
+  const border = new THREE.Mesh(new THREE.PlaneGeometry(d.w + 4, d.h + 4), M.black);
+  border.position.set(0, img.position.y, -0.05); sheet.add(border);
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(d.w + 5, 1.2, 1), M.black);
+  bar.position.y = -(top - 0.9 - imgBot) - 3; sheet.add(bar);
+  g.add(sheet);
+  const glow = new THREE.RectAreaLight('#ffd7b0', 0, d.w, d.h);
+  glow.position.copy(P(G.tvX, d.y - 0.5, d.centre)); g.add(glow);
+  glow.lookAt(P(G.tvX, d.y - 20, d.centre));
+  // ceiling projector, roughly 1.4 x image width away
+  const throwY = d.y - 1.4 * d.w;
+  const proj = new THREE.Mesh(new RoundedBoxGeometry(14, 5, 13, 2, 1.2), new THREE.MeshStandardMaterial({ color: '#1d1c1b', roughness: 0.4 }));
+  const ceilingKit = new THREE.Group(); g.add(ceilingKit);              // hidden with the ceiling in cut-away views
+  proj.position.copy(P(G.tvX, throwY, r.ceiling - 6.5)); ceilingKit.add(proj);
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 4, 8), M.metal);
+  rod.position.copy(P(G.tvX, throwY, r.ceiling - 2)); ceilingKit.add(rod);
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(1.6, 20), new THREE.MeshBasicMaterial({ color: '#2c3440' }));
+  lens.rotation.y = Math.PI; lens.position.copy(P(G.tvX + 3, throwY + 6.6, r.ceiling - 6.5)); ceilingKit.add(lens);
+  fixturesGroup.add(g);
+  const down = state.light.screenDown ? 1 : 0.02;
+  sheet.scale.y = down;
+  FX.screen = { group: g, sheet, mat, glow, cur: down, ceilingKit };
 }

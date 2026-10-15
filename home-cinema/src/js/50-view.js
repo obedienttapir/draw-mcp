@@ -204,9 +204,12 @@ function mainSeat() {
 
 function viewingStats() {
   const seat = mainSeat(); if (!seat) return null;
-  const r = state.room, G = geom(), t = state.tv, { w, h } = tvDims(t.size);
+  const r = state.room, G = geom(), t = state.tv;
   const face = state.finish.tvSlats ? SLAT_FACE : 0;
-  const tv = { x: G.tvX + t.offset, y: r.depth - face - 1, z: t.center };
+  const onScreen = !!(t.screen && state.light.screenDown);
+  const sd = onScreen ? screenDims() : null;
+  const { w, h } = onScreen ? sd : tvDims(t.size);
+  const tv = onScreen ? { x: G.tvX, y: sd.y, z: sd.centre } : { x: G.tvX + t.offset, y: r.depth - face - 1, z: t.center };
   const eye = 40;
   const dist = Math.hypot(tv.x - seat.x, tv.y - seat.y);
   const hAngle = 2 * Math.atan(w / 2 / dist) / DEG;
@@ -214,8 +217,8 @@ function viewingStats() {
   const sizeFor = (deg) => 2 * dist * Math.tan(deg / 2 * DEG) * Math.hypot(16, 9) / 16;
   // a console standing under the TV (close to the TV wall and overlapping it sideways)
   const con = state.items.find((i) => i.type === 'console' && Math.abs(i.y - r.depth) < 30 && Math.abs(i.x - tv.x) < (i.p.w || 70) / 2 + w / 2);
-  const clearance = con ? (t.center - h / 2) - (CONSOLE_Y0 + CONSOLE_H + SOUNDBAR_H) : null;
-  return { seat, tv, dist, hAngle, tilt, w, h, eye, fit: G.bay[3][0] - G.bay[2][0] - w, size30: sizeFor(30), size40: sizeFor(40), clearance };
+  const clearance = con && !onScreen ? (t.center - h / 2) - (CONSOLE_Y0 + CONSOLE_H + SOUNDBAR_H) : null;
+  return { seat, tv, dist, hAngle, tilt, w, h, eye, fit: G.bay[3][0] - G.bay[2][0] - w, size30: sizeFor(30), size40: sizeFor(40), clearance, onScreen, screenFits: sd ? sd.fits : true };
 }
 
 let sightline = null;
@@ -247,5 +250,42 @@ function updateLabels() {
     sl.push(label(`${ftin(v.dist)} · ${v.hAngle.toFixed(0)}° wide`, a.clone().lerp(b, 0.62), 'dim brass'));
     sightline = { objs: sl, eye: a };
   }
+  if (state.showSpeakers) drawSpeakerPlan();
   updateMeasureLabels();
+}
+
+/**
+ * 5.1.2 pre-wire plan from the prime seat, after Dolby's placement angles:
+ * fronts ~22° off axis, surrounds 90–110°, top-middle pair just ahead of the seat.
+ */
+function speakerPlan() {
+  const seat = mainSeat(); if (!seat) return [];
+  const r = state.room, G = geom(), H = r.ceiling, ear = 40;
+  const T = [G.tvX, r.depth], f = [T[0] - seat.x, T[1] - seat.y], fl = Math.hypot(f[0], f[1]);
+  f[0] /= fl; f[1] /= fl;
+  const rt = [f[1], -f[0]];                               // listener's right
+  const at = (along, side) => [seat.x + f[0] * along + rt[0] * side, seat.y + f[1] * along + rt[1] * side];
+  const frontY = G.mainY + G.ret - 4, along = frontY - seat.y, lat = along * Math.tan(22 * DEG);
+  const clampBay = ([x, y]) => [clamp(x, r.bayLeft + 8, r.bayRight - 8), y];
+  const sideR = r.width - 2 - seat.x, back = -8;
+  return [
+    { k: 'L', name: 'Front left', p: clampBay(at(along, -lat)), z: ear, how: 'tower or in-wall' },
+    { k: 'C', name: 'Centre', p: [G.tvX, r.depth - 10], z: 16, how: 'under the screen' },
+    { k: 'R', name: 'Front right', p: clampBay(at(along, lat)), z: ear, how: 'tower or in-wall' },
+    { k: 'SW', name: 'Subwoofer', p: [r.bayRight - 12, G.mainY + 10], z: 8, how: 'floor, front corner' },
+    { k: 'SR', name: 'Surround right', p: at(back, sideR), z: ear + 22, how: 'exterior wall, 2 ft above ears' },
+    { k: 'SL', name: 'Surround left', p: at(back, -Math.min(sideR, seat.x - r.boxX)), z: H, how: 'in-ceiling, angled (no wall there)' },
+    { k: 'TL', name: 'Top left', p: at(26, -lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
+    { k: 'TR', name: 'Top right', p: at(26, lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
+  ];
+}
+function drawSpeakerPlan() {
+  const disc = new THREE.MeshBasicMaterial({ color: '#7fb3d5', depthTest: false, transparent: true, opacity: 0.9 });
+  const seat = mainSeat();
+  for (const s of speakerPlan()) {
+    const pos = P(s.p[0], s.p[1], mode === 'plan' ? state.room.ceiling + 3 : s.z);
+    const m = new THREE.Mesh(new THREE.SphereGeometry(3, 16, 12), disc); m.position.copy(pos); m.renderOrder = 12; labelsGroup.add(m);
+    if (seat) line([P(seat.x, seat.y, mode === 'plan' ? state.room.ceiling + 3 : 40), pos], new THREE.LineBasicMaterial({ color: '#7fb3d5', transparent: true, opacity: 0.35, depthTest: false }));
+    const o = label(s.k, pos, 'dim spk'); o.element.title = `${s.name}: ${s.how}`;
+  }
 }

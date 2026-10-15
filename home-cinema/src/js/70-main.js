@@ -54,6 +54,14 @@ function frame() {
   flameUniforms.uTime.value = t;
   if (FX.fire && state.light.fire) FX.fire.light.intensity = FIRE_CD * (0.85 + 0.18 * Math.sin(t * 7.3) + 0.1 * Math.sin(t * 13.7 + 1.3));
   if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && activeCam.position.y < state.room.ceiling + 1;
+  if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && activeCam.position.y < state.room.ceiling + 1;
+  if (FX.screen) {                                    // motorised screen rolls down / up
+    const target = state.light.screenDown ? 1 : 0.02;
+    if (Math.abs(FX.screen.cur - target) > 0.001) {
+      FX.screen.cur += Math.sign(target - FX.screen.cur) * Math.min(Math.abs(target - FX.screen.cur), dt * 0.5);
+      FX.screen.sheet.scale.y = FX.screen.cur;
+    }
+  }
   ghostBulkheads(mode === 'plan' || activeCam.position.y > state.room.ceiling + 1);
   if (sightline) { const far = activeCam.position.distanceTo(sightline.eye) > 30; for (const o of sightline.objs) o.visible = far; }
   if (state.light.bloom && mode !== 'plan') { renderPass.camera = activeCam; composer.render(dt); }
@@ -66,7 +74,10 @@ $('#loading').classList.add('done');
 if (restored) toast('Restored your last layout from this browser');
 // handy for debugging and automated checks
 window.__cinema = {
-  state: () => state, setMode, goPreset, applyScene, select, scene, selected: () => selected, mode: () => mode,
+  state: () => state, setMode, goPreset, applyScene, select, scene, selected: () => selected, mode: () => mode, loadOption,
+  rebuild() { rebuildAll(); refreshPanels(); },
+  view(px, py, pz, tx, ty, tz) { tween = null; camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); },
+  settle() { if (FX.screen) { FX.screen.cur = state.light.screenDown ? 1 : 0.02; FX.screen.sheet.scale.y = FX.screen.cur; } },
   screenOf(x, y, z = 10) {
     const v = P(x, y, z).project(activeCam), r = renderer.domElement.getBoundingClientRect();
     return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };

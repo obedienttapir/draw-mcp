@@ -68,11 +68,16 @@ const DEFAULT_STATE = {
     wall: '#cbc2b3', floor: 'walnut', slat: 'walnut',
     fireplaceSlats: true, tvSlats: false, bayAccent: 'paint-dark',
     fabric: '#8f877c', boucle: '#e6dccb',
+    transoms: 'windows',   // windows | slatted | framed  (the two openings are already cut)
+    mantel: 'none',        // none | ledge | bench
   },
-  tv: { size: 75, center: 44, offset: 0 },
+  tv: { size: 75, center: 44, offset: 0, screen: false, screenSize: 110 },
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
-  light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true },
+  light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
+    bayPots: true, bias: false, steps: false, screenDown: false },
+  option: 'original',
   showSightline: true,
+  showSpeakers: false,
   items: [
     { id: 'sectional', type: 'sectional', x: 160, y: 52, rot: 0,
       p: { back: 136, ret: 104, depth: 38, side: 'right', color: '#8f877c' } },
@@ -89,6 +94,39 @@ const DEFAULT_STATE = {
 };
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
+
+/**
+ * The design review's recommendation, layered on the original plan:
+ * - fireplace wall: slats run across the two windows and a floating walnut
+ *   bench sits under a lower fireplace, so the wall stops reading as a face
+ * - TV alcove: largest TV that fits the 84″ wall, 6500K bias light, no pot
+ *   lights scalloping the bulkhead, 110″ drop-down screen in the bulkhead
+ * - stair step lights, lounge chairs moved off the path from the stairs,
+ *   two poufs and a bar cart for hangout nights, 5.1.2 speaker pre-wire plan
+ */
+const RECOMMENDED_STATE = (() => {
+  const s = clone(DEFAULT_STATE);
+  s.option = 'recommended';
+  Object.assign(s.finish, { transoms: 'slatted', mantel: 'bench' });
+  Object.assign(s.tv, { size: 85, center: 46, screen: true, screenSize: 110 });
+  Object.assign(s.light, { bayPots: false, bias: true, steps: true });
+  const at = (id) => s.items.find((i) => i.id === id);
+  // a 1′ shorter sectional and a lounge pulled north leave a 30″ path from the foot of the stairs
+  Object.assign(at('sectional'), { x: 166, p: { ...at('sectional').p, back: 124 } });
+  Object.assign(at('chair-a'), { x: 54, y: 48, rot: 25 });
+  Object.assign(at('chair-b'), { x: 54, y: 104, rot: 155 });
+  Object.assign(at('table'), { x: 58, y: 76 });
+  Object.assign(at('rug-lounge'), { x: 56, y: 76 });
+  s.items = s.items.filter((i) => i.id !== 'lamp');
+  s.items.push(
+    { id: 'pouf-a', type: 'pouf', x: 33, y: 76, rot: 0, p: { color: '#c9bba5' } },
+    { id: 'pouf-b', type: 'pouf', x: 86, y: 94, rot: 0, p: { color: '#7a5f48' } },
+    { id: 'bar', type: 'barCart', x: 215, y: 116, rot: 180, p: {} },
+    { id: 'spk-l', type: 'towerSpeaker', x: 80, y: 157, rot: 200, p: {} },
+    { id: 'spk-r', type: 'towerSpeaker', x: 191, y: 157, rot: 160, p: {} },
+  );
+  return s;
+})();
 let state = clone(DEFAULT_STATE);
 
 /** Everything the scene needs that is derived from the editable room numbers. */

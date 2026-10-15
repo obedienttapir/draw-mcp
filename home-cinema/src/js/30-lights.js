@@ -9,10 +9,11 @@ const LED_NITS = 2.2;
 const FIRE_CD = 0.7 * LUX;
 const LAMP_CD = 0.8 * LUX;
 const SCENES = {
-  work:     { label: 'Bright',   pots: 1,    leds: 0.4, tv: false, fire: false, lamp: false },
-  evening:  { label: 'Evening',  pots: 0.35, leds: 1,   tv: false, fire: true,  lamp: true },
-  movie:    { label: 'Movie',    pots: 0,    leds: 0.18, tv: true, fire: false, lamp: false },
-  fireside: { label: 'Fireside', pots: 0.08, leds: 0.7, tv: false, fire: true,  lamp: true },
+  work:     { label: 'Bright',   pots: 1,    leds: 0.4, tv: false, fire: false, lamp: false, steps: false, screenDown: false },
+  evening:  { label: 'Evening',  pots: 0.35, leds: 1,   tv: false, fire: true,  lamp: true,  steps: true,  screenDown: false },
+  movie:    { label: 'Movie',    pots: 0,    leds: 0.18, tv: true, fire: false, lamp: false, steps: true,  screenDown: true },
+  game:     { label: 'Game night', pots: 0.25, leds: 0.8, tv: true, fire: true,  lamp: true,  steps: true,  screenDown: false },
+  fireside: { label: 'Fireside', pots: 0.08, leds: 0.7, tv: false, fire: true,  lamp: true,  steps: true,  screenDown: false },
 };
 
 function addPot(x, y, z, group) {
@@ -51,8 +52,9 @@ function buildLights() {
   lightsGroup.updateMatrixWorld(true);
 
   // bay: two pots in front of the bulkhead face, washing the TV wall
+  // two pots in front of the bulkhead face: they scallop the bulkhead like a pair of eyes and glare on the screen
   const bayPotY = r.depth - r.soffitDepth - 7;
-  for (const dx of [-24, 24]) addPot(G.tvX + dx, bayPotY, H, lightsGroup);
+  if (state.light.bayPots) for (const dx of [-24, 24]) addPot(G.tvX + dx, bayPotY, H, lightsGroup);
   // main ceiling grid (clear of the fireplace bulkhead)
   const x0 = Math.max(r.beamDepth, 0) + 8, x1 = r.width - 22;
   for (const fx of [0, 0.5, 1]) for (const fy of [0.24, 0.74]) addPot(lerp(x0 + 14, x1, fx), G.mainY * fy, H, lightsGroup);
@@ -98,11 +100,22 @@ function updateLighting() {
   M.potOn.color.set('#fff1dc').multiplyScalar(1 + 3 * L.pots);
   for (const l of FX.leds) l.intensity = LED_NITS * L.leds;
   M.led.color.set('#ffb46b').multiplyScalar(0.15 + 2.6 * L.leds);
-  for (const m of FX.ledMeshes) m.visible = L.leds > 0.01;
+  M.bandGlow.color.set('#ffc890').multiplyScalar(0.25 + 1.3 * L.leds);
+  for (const m of [...FX.ledMeshes, ...(FX.fixtureLeds || [])]) m.visible = L.leds > 0.01;
+  M.stepLight.color.set(L.steps ? '#ffc58a' : '#3a342c').multiplyScalar(L.steps ? 2.2 : 1);
+  const screenDown = !!(FX.screen && L.screenDown);
+  if (FX.screen) {
+    FX.screen.mat.emissive.set(screenDown && L.tv ? '#ffffff' : '#000000');
+    FX.screen.mat.emissiveIntensity = screenDown && L.tv ? 0.95 : 0;
+    FX.screen.glow.intensity = screenDown && L.tv ? 2.4 : 0;
+  }
   if (FX.tv) {
-    FX.tv.screenMat.emissive.set(L.tv ? '#ffffff' : '#000000');
-    FX.tv.screenMat.emissiveIntensity = L.tv ? 1.15 : 0;
-    FX.tv.glow.intensity = L.tv ? 3.5 : 0;
+    const tvOn = L.tv && !screenDown;                   // the projector takes over when the screen is down
+    FX.tv.screenMat.emissive.set(tvOn ? '#ffffff' : '#000000');
+    FX.tv.screenMat.emissiveIntensity = tvOn ? 1.15 : 0;
+    FX.tv.glow.intensity = tvOn ? 3.5 : 0;
+    FX.tv.bias.intensity = L.bias && L.tv ? 4 : L.bias ? 1.2 : 0;
+    FX.tv.halo.material.opacity = L.bias ? (L.tv && !screenDown ? 0.32 : L.tv ? 0 : 0.16) : 0;
   }
   if (FX.fire) {
     FX.fire.flames.forEach((f) => (f.visible = L.fire));
@@ -123,6 +136,6 @@ function updateLighting() {
 
 function applyScene(name) {
   const s = SCENES[name]; if (!s) return;
-  Object.assign(state.light, { scene: name, pots: s.pots, leds: s.leds, tv: s.tv, fire: s.fire, lamp: s.lamp });
+  Object.assign(state.light, { scene: name, pots: s.pots, leds: s.leds, tv: s.tv, fire: s.fire, lamp: s.lamp, steps: s.steps, screenDown: s.screenDown });
   updateLighting();
 }

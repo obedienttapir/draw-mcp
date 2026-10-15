@@ -81,11 +81,11 @@ const rect = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
 function fireplaceOpenings() {
   const r = state.room, f = state.fireplace;
   const fp = { u0: f.center - f.width / 2, u1: f.center + f.width / 2, v0: f.bottom, v1: f.bottom + f.height };
-  const tr = [];
-  const half = r.transomGap / 2;
+  // the two openings are already cut on site; treatments dress them, never move them
+  const tr = [], v0 = r.transomBottom, v1 = r.transomBottom + r.transomH, half = r.transomGap / 2;
   for (const s of [-1, 1]) {
     const uA = f.center + s * half, uB = f.center + s * (half + r.transomW);
-    tr.push({ u0: Math.min(uA, uB), u1: Math.max(uA, uB), v0: r.transomBottom, v1: r.transomBottom + r.transomH });
+    tr.push({ u0: Math.min(uA, uB), u1: Math.max(uA, uB), v0, v1 });
   }
   return { fp, tr };
 }

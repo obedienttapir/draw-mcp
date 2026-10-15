@@ -150,6 +150,18 @@ const M = {};               // shared materials, rebuilt by applyFinishes()
 const TEX = {};
 function initMaterials() {
   TEX.shadow = canvasTex(radialCanvas(), false);
+  TEX.halo = (() => {                       // soft rounded-rectangle glow for TV bias lighting
+    // bright at the TV's edge, fading to nothing at the plane's edge (TV covers the inner 69% x 59%)
+    const W = 256, Hh = 160, cv = mkCanvas(W, Hh), g = cv.getContext('2d'), img = g.createImageData(W, Hh);
+    for (let y = 0; y < Hh; y++) for (let x = 0; x < W; x++) {
+      const u = Math.abs((x + 0.5) / W * 2 - 1), v = Math.abs((y + 0.5) / Hh * 2 - 1);
+      const du = Math.max(0, u - 0.69) / 0.31, dv = Math.max(0, v - 0.59) / 0.41;
+      const a = Math.pow(Math.max(0, 1 - Math.hypot(du, dv)), 2.2);
+      const i = (y * W + x) * 4; img.data[i] = img.data[i + 1] = img.data[i + 2] = 255; img.data[i + 3] = Math.round(a * 255);
+    }
+    g.putImageData(img, 0, 0);
+    return new THREE.CanvasTexture(cv);
+  })();
   TEX.reeded = canvasTex(reededCanvas(), true, [6, 1]);
   TEX.boucle = canvasTex(noiseCanvas(256, { base: '#808080', amp: 50, dots: 1400, seed: 21 }), false, [3, 3]);
   TEX.linen = canvasTex(noiseCanvas(256, { base: '#808080', amp: 34, seed: 5 }), false, [4, 4]);
@@ -174,6 +186,8 @@ function initMaterials() {
   M.led = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffb46b').multiplyScalar(3), toneMapped: false });
   M.potOn = new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff1dc').multiplyScalar(4), toneMapped: false });
   M.potOff = new THREE.MeshStandardMaterial({ color: '#d9d4cc', roughness: 0.4 });
+  M.stepLight = new THREE.MeshBasicMaterial({ color: '#3a342c', toneMapped: false });
+  M.bandGlow = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffc890').multiplyScalar(1.4), toneMapped: false });
   M.stone = new THREE.MeshStandardMaterial({ color: '#3a3733', roughness: 0.85 });
   applyFinishes();
 }

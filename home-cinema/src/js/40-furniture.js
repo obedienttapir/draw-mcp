@@ -50,6 +50,8 @@ const CATALOG = {
     label: 'Cinema recliner', note: 'Power recline, 36″ wide', fabric: true,
     defaults: { color: '#2f2c2a' }, params: [], colors: FABRICS,
   },
+  pouf: { label: 'Pouf', note: '20″ extra seat or footrest', defaults: { color: '#c9bba5' }, params: [], colors: FABRICS },
+  barCart: { label: 'Bar cart', note: '24″ × 16″, two shelves', defaults: {}, params: [] },
 };
 
 function makeSectional(p) {
@@ -262,11 +264,33 @@ function makeRecliner(p) {
   return { group: g, w: 36, d: 38, shadows: [[0, 0, 36, 38]] };
 }
 
+function makePouf(p) {
+  const g = new THREE.Group();
+  meshAt(new THREE.CylinderGeometry(10, 10, 15, 40), fabricMat(p.color, 'boucle'), 0, 8, 0, g);
+  meshAt(new THREE.TorusGeometry(9.2, 1.4, 12, 40), fabricMat(p.color, 'boucle'), 0, 15.4, 0, g).rotation.x = Math.PI / 2;
+  meshAt(new THREE.CircleGeometry(9.3, 40), fabricMat(p.color, 'boucle'), 0, 16.6, 0, g).rotation.x = -Math.PI / 2;
+  return { group: g, w: 20, d: 20, shadows: [[0, 0, 20, 20]] };
+}
+function makeBarCart() {
+  const g = new THREE.Group(), w = 24, d = 16;
+  for (const [x, z] of [[-w / 2 + 0.6, -d / 2 + 0.6], [w / 2 - 0.6, -d / 2 + 0.6], [-w / 2 + 0.6, d / 2 - 0.6], [w / 2 - 0.6, d / 2 - 0.6]]) {
+    meshAt(new THREE.CylinderGeometry(0.45, 0.45, 32, 10), M.brass, x, 16, z, g);
+  }
+  for (const y of [6, 30]) meshAt(new THREE.BoxGeometry(w - 0.4, 0.8, d - 0.4), woodMat('#3b281b'), 0, y, 0, g);
+  const glass = new THREE.MeshStandardMaterial({ color: '#c9d3cf', roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.45 });
+  const amber = new THREE.MeshStandardMaterial({ color: '#8a4b16', roughness: 0.1, transparent: true, opacity: 0.8 });
+  for (const [x, z, hgt, mat] of [[-7, -2, 11, amber], [-3, 3, 9, glass], [5, -3, 12, glass], [8, 3, 4, amber]]) {
+    meshAt(new THREE.CylinderGeometry(1.4, 1.6, hgt, 16), mat, x, 30.4 + hgt / 2, z, g);
+  }
+  meshAt(new THREE.CylinderGeometry(2.2, 1.8, 4, 20), M.metal, 2, 8.4, 0, g);   // ice bucket
+  return { group: g, w, d, shadows: [[0, 0, w, d]] };
+}
+
 const CONSOLE_Y0 = 6, CONSOLE_H = 13, SOUNDBAR_H = 2.6;
 const FACTORIES = {
   sectional: makeSectional, sofa: makeSofa, loungeChair: makeLoungeChair, roundTable: makeRoundTable, ottoman: makeOttoman,
   rug: makeRug, console: makeConsole, sideTable: makeSideTable, floorLamp: makeFloorLamp, plant: makePlant,
-  towerSpeaker: makeTower, subwoofer: makeSub, recliner: makeRecliner,
+  towerSpeaker: makeTower, subwoofer: makeSub, recliner: makeRecliner, pouf: makePouf, barCart: makeBarCart,
 };
 
 const itemObjects = new Map();      // id -> { group, w, d }

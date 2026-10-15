@@ -151,6 +151,7 @@ select { width: 100%; background: var(--panel-solid); border: 1px solid var(--li
 .dim { font-family: var(--font-num); font-size: 11px; color: var(--fg); background: rgba(18,15,12,0.78); border: 1px solid var(--line-strong);
   padding: 1px 6px; border-radius: 5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .dim.brass { color: #1c1612; background: var(--brass); border-color: var(--brass); }
+.dim.spk { color: #10202b; background: #7fb3d5; border-color: #7fb3d5; font-weight: 500; }
 .tag { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap;
   background: rgba(18,15,12,0.6); padding: 1px 6px; border-radius: 4px; }
 
@@ -342,11 +343,16 @@ const DEFAULT_STATE = {
     wall: '#cbc2b3', floor: 'walnut', slat: 'walnut',
     fireplaceSlats: true, tvSlats: false, bayAccent: 'paint-dark',
     fabric: '#8f877c', boucle: '#e6dccb',
+    transoms: 'windows',   // windows | slatted | framed  (the two openings are already cut)
+    mantel: 'none',        // none | ledge | bench
   },
-  tv: { size: 75, center: 44, offset: 0 },
+  tv: { size: 75, center: 44, offset: 0, screen: false, screenSize: 110 },
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
-  light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true },
+  light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
+    bayPots: true, bias: false, steps: false, screenDown: false },
+  option: 'original',
   showSightline: true,
+  showSpeakers: false,
   items: [
     { id: 'sectional', type: 'sectional', x: 160, y: 52, rot: 0,
       p: { back: 136, ret: 104, depth: 38, side: 'right', color: '#8f877c' } },
@@ -363,6 +369,39 @@ const DEFAULT_STATE = {
 };
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
+
+/**
+ * The design review's recommendation, layered on the original plan:
+ * - fireplace wall: slats run across the two windows and a floating walnut
+ *   bench sits under a lower fireplace, so the wall stops reading as a face
+ * - TV alcove: largest TV that fits the 84″ wall, 6500K bias light, no pot
+ *   lights scalloping the bulkhead, 110″ drop-down screen in the bulkhead
+ * - stair step lights, lounge chairs moved off the path from the stairs,
+ *   two poufs and a bar cart for hangout nights, 5.1.2 speaker pre-wire plan
+ */
+const RECOMMENDED_STATE = (() => {
+  const s = clone(DEFAULT_STATE);
+  s.option = 'recommended';
+  Object.assign(s.finish, { transoms: 'slatted', mantel: 'bench' });
+  Object.assign(s.tv, { size: 85, center: 46, screen: true, screenSize: 110 });
+  Object.assign(s.light, { bayPots: false, bias: true, steps: true });
+  const at = (id) => s.items.find((i) => i.id === id);
+  // a 1′ shorter sectional and a lounge pulled north leave a 30″ path from the foot of the stairs
+  Object.assign(at('sectional'), { x: 166, p: { ...at('sectional').p, back: 124 } });
+  Object.assign(at('chair-a'), { x: 54, y: 48, rot: 25 });
+  Object.assign(at('chair-b'), { x: 54, y: 104, rot: 155 });
+  Object.assign(at('table'), { x: 58, y: 76 });
+  Object.assign(at('rug-lounge'), { x: 56, y: 76 });
+  s.items = s.items.filter((i) => i.id !== 'lamp');
+  s.items.push(
+    { id: 'pouf-a', type: 'pouf', x: 33, y: 76, rot: 0, p: { color: '#c9bba5' } },
+    { id: 'pouf-b', type: 'pouf', x: 86, y: 94, rot: 0, p: { color: '#7a5f48' } },
+    { id: 'bar', type: 'barCart', x: 215, y: 116, rot: 180, p: {} },
+    { id: 'spk-l', type: 'towerSpeaker', x: 80, y: 157, rot: 200, p: {} },
+    { id: 'spk-r', type: 'towerSpeaker', x: 191, y: 157, rot: 160, p: {} },
+  );
+  return s;
+})();
 let state = clone(DEFAULT_STATE);
 
 /** Everything the scene needs that is derived from the editable room numbers. */
@@ -581,6 +620,18 @@ const M = {};               // shared materials, rebuilt by applyFinishes()
 const TEX = {};
 function initMaterials() {
   TEX.shadow = canvasTex(radialCanvas(), false);
+  TEX.halo = (() => {                       // soft rounded-rectangle glow for TV bias lighting
+    // bright at the TV's edge, fading to nothing at the plane's edge (TV covers the inner 69% x 59%)
+    const W = 256, Hh = 160, cv = mkCanvas(W, Hh), g = cv.getContext('2d'), img = g.createImageData(W, Hh);
+    for (let y = 0; y < Hh; y++) for (let x = 0; x < W; x++) {
+      const u = Math.abs((x + 0.5) / W * 2 - 1), v = Math.abs((y + 0.5) / Hh * 2 - 1);
+      const du = Math.max(0, u - 0.69) / 0.31, dv = Math.max(0, v - 0.59) / 0.41;
+      const a = Math.pow(Math.max(0, 1 - Math.hypot(du, dv)), 2.2);
+      const i = (y * W + x) * 4; img.data[i] = img.data[i + 1] = img.data[i + 2] = 255; img.data[i + 3] = Math.round(a * 255);
+    }
+    g.putImageData(img, 0, 0);
+    return new THREE.CanvasTexture(cv);
+  })();
   TEX.reeded = canvasTex(reededCanvas(), true, [6, 1]);
   TEX.boucle = canvasTex(noiseCanvas(256, { base: '#808080', amp: 50, dots: 1400, seed: 21 }), false, [3, 3]);
   TEX.linen = canvasTex(noiseCanvas(256, { base: '#808080', amp: 34, seed: 5 }), false, [4, 4]);
@@ -605,6 +656,8 @@ function initMaterials() {
   M.led = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffb46b').multiplyScalar(3), toneMapped: false });
   M.potOn = new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff1dc').multiplyScalar(4), toneMapped: false });
   M.potOff = new THREE.MeshStandardMaterial({ color: '#d9d4cc', roughness: 0.4 });
+  M.stepLight = new THREE.MeshBasicMaterial({ color: '#3a342c', toneMapped: false });
+  M.bandGlow = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffc890').multiplyScalar(1.4), toneMapped: false });
   M.stone = new THREE.MeshStandardMaterial({ color: '#3a3733', roughness: 0.85 });
   applyFinishes();
 }
@@ -736,11 +789,11 @@ const rect = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
 function fireplaceOpenings() {
   const r = state.room, f = state.fireplace;
   const fp = { u0: f.center - f.width / 2, u1: f.center + f.width / 2, v0: f.bottom, v1: f.bottom + f.height };
-  const tr = [];
-  const half = r.transomGap / 2;
+  // the two openings are already cut on site; treatments dress them, never move them
+  const tr = [], v0 = r.transomBottom, v1 = r.transomBottom + r.transomH, half = r.transomGap / 2;
   for (const s of [-1, 1]) {
     const uA = f.center + s * half, uB = f.center + s * (half + r.transomW);
-    tr.push({ u0: Math.min(uA, uB), u1: Math.max(uA, uB), v0: r.transomBottom, v1: r.transomBottom + r.transomH });
+    tr.push({ u0: Math.min(uA, uB), u1: Math.max(uA, uB), v0, v1 });
   }
   return { fp, tr };
 }
@@ -861,7 +914,7 @@ const SLAT_FACE = SLAT_D + FELT_D;          // how far a slat wall stands off th
  * Slat panel in a local wall frame: u along the wall, v up, +Z into the room.
  * holes: [{u0,u1,v0,v1}] that slats stop around.
  */
-function buildSlats(u0, u1, v0, v1, holes) {
+function buildSlats(u0, u1, v0, v1, holes, feltHoles = holes) {
   const g = new THREE.Group();
   const pitch = SLAT_W + SLAT_GAP, n = Math.floor((u1 - u0 + SLAT_GAP) / pitch);
   const start = u0 + ((u1 - u0) - (n * pitch - SLAT_GAP)) / 2;
@@ -889,9 +942,9 @@ function buildSlats(u0, u1, v0, v1, holes) {
   });
   inst.userData.slats = true;
   g.add(inst);
-  // black acoustic felt behind, with the same openings
+  // black acoustic felt behind; it can stay open where slats run across a window
   const felt = new THREE.Mesh(new THREE.ShapeGeometry(shapeFrom(rect(u0, v0, u1, v1),
-    holes.map((h) => rect(h.u0, h.v0, h.u1, h.v1)))), M.felt);
+    feltHoles.map((h) => rect(h.u0, h.v0, h.u1, h.v1)))), M.felt);
   felt.position.z = FELT_D;
   g.add(felt);
   return g;
@@ -911,14 +964,18 @@ function flameMaterial(seed) {
         return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
       void main(){
         vec2 uv = vUv;
-        float n = noise(vec2(uv.x*9.0 + uSeed, uv.y*2.5 - uTime*1.8))*0.65 + noise(vec2(uv.x*23.0 - uSeed, uv.y*5.0 - uTime*3.1))*0.35;
-        float tongue = 0.5 + 0.5*sin(uv.x*48.0 + uSeed*3.0 + n*4.0 + uTime*0.7);
-        float h = (0.25 + 0.7*n) * (0.35 + 0.65*tongue);
-        float f = smoothstep(h, h*0.35, uv.y) * smoothstep(0.0, 0.06, uv.y);
+        // flame height wanders along the burner; turbulence bends it, so no regular 'teeth'
+        float n1 = noise(vec2(uv.x*5.0 + uSeed, uTime*0.8));
+        float n2 = noise(vec2(uv.x*13.0 - uSeed, uTime*1.6));
+        float h = 0.22 + 0.5*n1 + 0.22*n2;
+        float turb = noise(vec2(uv.x*9.0 + uSeed, uv.y*3.5 - uTime*2.4)) - 0.5;
+        float y = uv.y + turb * 0.22 * uv.y;
+        float f = smoothstep(h + 0.08, h * 0.3, y) * smoothstep(0.0, 0.07, uv.y);
+        float n = n1;
         f *= smoothstep(0.0, 0.05, uv.x) * smoothstep(1.0, 0.95, uv.x);
         float core = smoothstep(0.55, 0.0, uv.y / max(h, 0.02));
         vec3 col = mix(vec3(1.0, 0.32, 0.04), vec3(1.0, 0.82, 0.42), core);
-        gl_FragColor = vec4(col * f * uIntensity * 2.2, f * uIntensity);
+        gl_FragColor = vec4(col * f * uIntensity * 1.6, f * uIntensity);
       }`,
   });
 }
@@ -975,6 +1032,20 @@ function buildFireplace() {
 function buildTransoms() {
   const { tr } = fireplaceOpenings();
   FX.transomGlow = [];
+  if (state.finish.transoms === 'framed' && tr.length === 2) {
+    // one 2″ black steel surround + a black mullion where the wall shows between the panes: one window, not two eyes
+    const face = state.finish.fireplaceSlats ? SLAT_FACE : 0, b = 2;
+    const u0 = Math.min(tr[0].u0, tr[1].u0), u1 = Math.max(tr[0].u1, tr[1].u1), v0 = tr[0].v0, v1 = tr[0].v1;
+    const g = new THREE.Group(), W = u1 - u0, Hh = v1 - v0;
+    for (const [sx, sy, px, py] of [[W + 2 * b, b, 0, Hh / 2 + b / 2], [W + 2 * b, b, 0, -Hh / 2 - b / 2], [b, Hh, -W / 2 - b / 2, 0], [b, Hh, W / 2 + b / 2, 0]]) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, 1.2), M.metal); m.position.set(px, py, face + 0.6); g.add(m);
+    }
+    const gapU0 = Math.min(tr[0].u1, tr[1].u1), gapU1 = Math.max(tr[0].u0, tr[1].u0);
+    const mull = new THREE.Mesh(new THREE.BoxGeometry(gapU1 - gapU0, Hh, 0.8), M.metal);
+    mull.position.set((gapU0 + gapU1) / 2 - (u0 + u1) / 2, 0, 0.4); g.add(mull);
+    g.rotation.y = Math.PI / 2; g.position.copy(P(0, (u0 + u1) / 2, (v0 + v1) / 2));
+    fixturesGroup.add(g);
+  }
   for (const t of tr) {
     const w = t.u1 - t.u0, h = t.v1 - t.v0, g = new THREE.Group();
     const glass = new THREE.Mesh(new THREE.PlaneGeometry(w, h), M.reeded);
@@ -995,6 +1066,7 @@ function buildTransoms() {
 
 function buildStairs() {
   const r = state.room, G = geom(), g = new THREE.Group(); g.name = 'stairs';
+  FX.stepLights = [];
   const y0 = -r.stairWidth, y1 = 0, wid = y1 - y0;
   const steps = [];
   for (let i = 0; i < G.treads; i++) {
@@ -1009,6 +1081,10 @@ function buildStairs() {
     const fill = new THREE.Mesh(new THREE.BoxGeometry(G.run, Math.max(0.1, top - 1.25 - (G.riserH - 1.25)), wid - 0.2), M.wall);
     fill.position.copy(P(x0 + G.run / 2 + 0.75, (y0 + y1) / 2, (top - 1.25 - (G.riserH - 1.25)) / 2)); g.add(fill);
     steps.push({ x0, top });
+    if (top < r.ceiling + 20) {
+      const lens = new THREE.Mesh(new THREE.BoxGeometry(4, 1.4, 0.3), M.stepLight);
+      lens.position.copy(P(x0 + G.run / 2, y0 + 0.4, top + 7)); g.add(lens); FX.stepLights.push(lens);
+    }
   }
   // knee wall + dark stringer on the room side (y = 0), following the pitch
   const slope = G.riserH / G.run, H = r.ceiling;
@@ -1073,21 +1149,38 @@ function buildTV() {
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(w, h), screenMat); screen.position.z = 0.56; g.add(screen);
   const glow = new THREE.RectAreaLight('#9fb4ff', 0, w, h); glow.position.set(0, 0, 0.7);
   glow.lookAt(new THREE.Vector3(0, 0, 10)); g.add(glow);
+  // 6500K bias light: an LED strip on the back of the TV washing the wall (RectAreaLight emits along -Z = toward the wall)
+  const bias = new THREE.RectAreaLight('#dfe8ff', 0, w * 0.9, h * 0.85); bias.position.set(0, 0, -0.7); g.add(bias);
+  const haloMat = new THREE.MeshBasicMaterial({ map: TEX.halo, color: '#dfe8ff', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.45, h * 1.7), haloMat); halo.position.z = -0.75; g.add(halo);
   g.position.copy(P(G.tvX + t.offset, state.room.depth - face - 1.6, t.center));
   fixturesGroup.add(g);
-  FX.tv = { group: g, screenMat, glow, w, h };
+  FX.tv = { group: g, screenMat, glow, bias, halo, w, h };
 }
 
 function buildFixtures() {
   disposeGroup(fixturesGroup);
+  FX.fixtureLeds = [];
   const r = state.room, G = geom();
-  buildStairs(); buildFireplace(); buildTransoms(); buildTV();
+  buildStairs(); buildFireplace(); buildTransoms(); buildTV(); buildMantel(); buildScreen();
   const { fp, tr } = fireplaceOpenings();
   if (state.finish.fireplaceSlats) {
     const top = r.beamDepth > 1 ? r.beamBottom : r.ceiling;
-    const holes = [{ u0: fp.u0 - 1.6, u1: fp.u1 + 1.6, v0: fp.v0 - 1.6, v1: fp.v1 + 1.6 },
-      ...tr.map((t) => ({ u0: t.u0 - 0.5, u1: t.u1 + 0.5, v0: t.v0 - 0.5, v1: t.v1 + 0.5 }))];
-    const s = buildSlats(1.5, G.mainY - 1.5, 0.4, top - 0.2, holes);
+    const fireHole = { u0: fp.u0 - 1.6, u1: fp.u1 + 1.6, v0: fp.v0 - 1.6, v1: fp.v1 + 1.6 };
+    const framed = state.finish.transoms === 'framed';
+    // 'framed': one black surround around both windows, so slats stop at the pair, not at each window
+    const winHoles = framed
+      ? [{ u0: Math.min(...tr.map((t) => t.u0)) - 2.5, u1: Math.max(...tr.map((t) => t.u1)) + 2.5, v0: tr[0].v0 - 2.5, v1: tr[0].v1 + 2.5 }]
+      : tr.map((t) => ({ u0: t.u0 - 0.5, u1: t.u1 + 0.5, v0: t.v0 - 0.5, v1: t.v1 + 0.5 }));
+    // 'slatted': slats run straight across the windows; light still glows through the gaps
+    const across = state.finish.transoms === 'slatted' && tr.length;
+    // slats across: one continuous backlit band behind the slats swallows both windows
+    const band = across ? { u0: 10, u1: G.mainY - 10, v0: tr[0].v0 - 1, v1: tr[0].v1 + 1 } : null;
+    const s = buildSlats(1.5, G.mainY - 1.5, 0.4, top - 0.2, across ? [fireHole] : [fireHole, ...winHoles], across ? [fireHole, band] : [fireHole, ...winHoles]);
+    if (band) {
+      const glow = new THREE.Mesh(new THREE.PlaneGeometry(band.u1 - band.u0, band.v1 - band.v0), M.bandGlow);
+      glow.position.set((band.u0 + band.u1) / 2, (band.v0 + band.v1) / 2, 0.15); s.add(glow); FX.fixtureLeds.push(glow);
+    }
     s.rotation.y = Math.PI / 2;                       // u -> plan y, +Z -> into the room
     fixturesGroup.add(s);
   }
@@ -1096,6 +1189,72 @@ function buildFixtures() {
     const s = buildSlats(0.6, b[0] - a[0] - 0.6, 0.4, r.soffitBottom - 0.2, []);
     s.position.copy(P(a[0], r.depth)); fixturesGroup.add(s);
   }
+}
+
+// ---------------- fireplace ledge / floating hearth bench ----------------
+function buildMantel() {
+  const kind = state.finish.mantel; if (!kind || kind === 'none') return;
+  const { fp } = fireplaceOpenings(), G = geom(), face = state.finish.fireplaceSlats ? SLAT_FACE : 0;
+  const wood = woodMat('#4a3020'), g = new THREE.Group(); g.name = 'mantel';
+  if (kind === 'ledge') {
+    // floating walnut shelf: splits the 'eyes' from the 'mouth'
+    span(g, wood, fp.u0 - 14, fp.u1 + 14, fp.v1 + 6, fp.v1 + 8.5, face, face + 9, 0.4);
+  } else {
+    // full-width floating bench: extra perch seating, grounds the fireplace as one horizontal band
+    span(g, wood, 6, G.mainY - 6, 13, 17, face, face + 17, 0.6);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(G.mainY - 16, 0.35, 0.35), M.led);
+    strip.position.set(G.mainY / 2, 12.6, face + 13); g.add(strip); FX.fixtureLeds.push(strip);
+  }
+  g.rotation.y = Math.PI / 2;                          // wall frame: u -> plan y, +Z -> into the room
+  fixturesGroup.add(g);
+}
+
+// ---------------- drop-down projector screen in the alcove bulkhead ----------------
+const SCREEN_OFF = 9;                                  // screen plane, inches in front of the TV wall
+function screenDims() {
+  const s = tvDims(state.tv.screenSize || 110), r = state.room, G = geom();
+  const avail = r.bayFace + 2 * Math.min(SCREEN_OFF, G.a);  // alcove width at the screen plane (45° walls)
+  const centre = 50;                                   // image centre height
+  return { ...s, centre, avail, fits: s.w + 6 <= avail, y: r.depth - SCREEN_OFF };
+}
+function buildScreen() {
+  FX.screen = null;
+  if (!state.tv.screen) return;
+  const r = state.room, G = geom(), d = screenDims();
+  const g = new THREE.Group(); g.name = 'screen';
+  const top = r.soffitBottom;
+  // slot in the bulkhead underside + housing
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(d.w + 6, 1, 5), M.black);
+  slot.position.copy(P(G.tvX, d.y, top - 0.45)); g.add(slot);
+  // rolling sheet: black drop above the image, matte white image area
+  const imgTop = d.centre + d.h / 2, imgBot = d.centre - d.h / 2;
+  const sheet = new THREE.Group(); sheet.position.copy(P(G.tvX, d.y, top - 0.9));
+  const drop = new THREE.Mesh(new THREE.PlaneGeometry(d.w + 4, top - 0.9 - imgTop), M.black);
+  drop.position.y = -(top - 0.9 - imgTop) / 2; sheet.add(drop);
+  const mat = new THREE.MeshStandardMaterial({ color: '#d9d9d6', roughness: 0.9, emissiveMap: _still || (_still = movieStill()), emissive: '#000000' });
+  const img = new THREE.Mesh(new THREE.PlaneGeometry(d.w, d.h), mat);
+  img.position.y = -(top - 0.9 - d.centre); sheet.add(img);
+  const border = new THREE.Mesh(new THREE.PlaneGeometry(d.w + 4, d.h + 4), M.black);
+  border.position.set(0, img.position.y, -0.05); sheet.add(border);
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(d.w + 5, 1.2, 1), M.black);
+  bar.position.y = -(top - 0.9 - imgBot) - 3; sheet.add(bar);
+  g.add(sheet);
+  const glow = new THREE.RectAreaLight('#ffd7b0', 0, d.w, d.h);
+  glow.position.copy(P(G.tvX, d.y - 0.5, d.centre)); g.add(glow);
+  glow.lookAt(P(G.tvX, d.y - 20, d.centre));
+  // ceiling projector, roughly 1.4 x image width away
+  const throwY = d.y - 1.4 * d.w;
+  const proj = new THREE.Mesh(new RoundedBoxGeometry(14, 5, 13, 2, 1.2), new THREE.MeshStandardMaterial({ color: '#1d1c1b', roughness: 0.4 }));
+  const ceilingKit = new THREE.Group(); g.add(ceilingKit);              // hidden with the ceiling in cut-away views
+  proj.position.copy(P(G.tvX, throwY, r.ceiling - 6.5)); ceilingKit.add(proj);
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 4, 8), M.metal);
+  rod.position.copy(P(G.tvX, throwY, r.ceiling - 2)); ceilingKit.add(rod);
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(1.6, 20), new THREE.MeshBasicMaterial({ color: '#2c3440' }));
+  lens.rotation.y = Math.PI; lens.position.copy(P(G.tvX + 3, throwY + 6.6, r.ceiling - 6.5)); ceilingKit.add(lens);
+  fixturesGroup.add(g);
+  const down = state.light.screenDown ? 1 : 0.02;
+  sheet.scale.y = down;
+  FX.screen = { group: g, sheet, mat, glow, cur: down, ceilingKit };
 }
 
 // ---- 30-lights.js ----
@@ -1110,10 +1269,11 @@ const LED_NITS = 2.2;
 const FIRE_CD = 0.7 * LUX;
 const LAMP_CD = 0.8 * LUX;
 const SCENES = {
-  work:     { label: 'Bright',   pots: 1,    leds: 0.4, tv: false, fire: false, lamp: false },
-  evening:  { label: 'Evening',  pots: 0.35, leds: 1,   tv: false, fire: true,  lamp: true },
-  movie:    { label: 'Movie',    pots: 0,    leds: 0.18, tv: true, fire: false, lamp: false },
-  fireside: { label: 'Fireside', pots: 0.08, leds: 0.7, tv: false, fire: true,  lamp: true },
+  work:     { label: 'Bright',   pots: 1,    leds: 0.4, tv: false, fire: false, lamp: false, steps: false, screenDown: false },
+  evening:  { label: 'Evening',  pots: 0.35, leds: 1,   tv: false, fire: true,  lamp: true,  steps: true,  screenDown: false },
+  movie:    { label: 'Movie',    pots: 0,    leds: 0.18, tv: true, fire: false, lamp: false, steps: true,  screenDown: true },
+  game:     { label: 'Game night', pots: 0.25, leds: 0.8, tv: true, fire: true,  lamp: true,  steps: true,  screenDown: false },
+  fireside: { label: 'Fireside', pots: 0.08, leds: 0.7, tv: false, fire: true,  lamp: true,  steps: true,  screenDown: false },
 };
 
 function addPot(x, y, z, group) {
@@ -1152,8 +1312,9 @@ function buildLights() {
   lightsGroup.updateMatrixWorld(true);
 
   // bay: two pots in front of the bulkhead face, washing the TV wall
+  // two pots in front of the bulkhead face: they scallop the bulkhead like a pair of eyes and glare on the screen
   const bayPotY = r.depth - r.soffitDepth - 7;
-  for (const dx of [-24, 24]) addPot(G.tvX + dx, bayPotY, H, lightsGroup);
+  if (state.light.bayPots) for (const dx of [-24, 24]) addPot(G.tvX + dx, bayPotY, H, lightsGroup);
   // main ceiling grid (clear of the fireplace bulkhead)
   const x0 = Math.max(r.beamDepth, 0) + 8, x1 = r.width - 22;
   for (const fx of [0, 0.5, 1]) for (const fy of [0.24, 0.74]) addPot(lerp(x0 + 14, x1, fx), G.mainY * fy, H, lightsGroup);
@@ -1199,11 +1360,22 @@ function updateLighting() {
   M.potOn.color.set('#fff1dc').multiplyScalar(1 + 3 * L.pots);
   for (const l of FX.leds) l.intensity = LED_NITS * L.leds;
   M.led.color.set('#ffb46b').multiplyScalar(0.15 + 2.6 * L.leds);
-  for (const m of FX.ledMeshes) m.visible = L.leds > 0.01;
+  M.bandGlow.color.set('#ffc890').multiplyScalar(0.25 + 1.3 * L.leds);
+  for (const m of [...FX.ledMeshes, ...(FX.fixtureLeds || [])]) m.visible = L.leds > 0.01;
+  M.stepLight.color.set(L.steps ? '#ffc58a' : '#3a342c').multiplyScalar(L.steps ? 2.2 : 1);
+  const screenDown = !!(FX.screen && L.screenDown);
+  if (FX.screen) {
+    FX.screen.mat.emissive.set(screenDown && L.tv ? '#ffffff' : '#000000');
+    FX.screen.mat.emissiveIntensity = screenDown && L.tv ? 0.95 : 0;
+    FX.screen.glow.intensity = screenDown && L.tv ? 2.4 : 0;
+  }
   if (FX.tv) {
-    FX.tv.screenMat.emissive.set(L.tv ? '#ffffff' : '#000000');
-    FX.tv.screenMat.emissiveIntensity = L.tv ? 1.15 : 0;
-    FX.tv.glow.intensity = L.tv ? 3.5 : 0;
+    const tvOn = L.tv && !screenDown;                   // the projector takes over when the screen is down
+    FX.tv.screenMat.emissive.set(tvOn ? '#ffffff' : '#000000');
+    FX.tv.screenMat.emissiveIntensity = tvOn ? 1.15 : 0;
+    FX.tv.glow.intensity = tvOn ? 3.5 : 0;
+    FX.tv.bias.intensity = L.bias && L.tv ? 4 : L.bias ? 1.2 : 0;
+    FX.tv.halo.material.opacity = L.bias ? (L.tv && !screenDown ? 0.32 : L.tv ? 0 : 0.16) : 0;
   }
   if (FX.fire) {
     FX.fire.flames.forEach((f) => (f.visible = L.fire));
@@ -1224,7 +1396,7 @@ function updateLighting() {
 
 function applyScene(name) {
   const s = SCENES[name]; if (!s) return;
-  Object.assign(state.light, { scene: name, pots: s.pots, leds: s.leds, tv: s.tv, fire: s.fire, lamp: s.lamp });
+  Object.assign(state.light, { scene: name, pots: s.pots, leds: s.leds, tv: s.tv, fire: s.fire, lamp: s.lamp, steps: s.steps, screenDown: s.screenDown });
   updateLighting();
 }
 
@@ -1281,6 +1453,8 @@ const CATALOG = {
     label: 'Cinema recliner', note: 'Power recline, 36″ wide', fabric: true,
     defaults: { color: '#2f2c2a' }, params: [], colors: FABRICS,
   },
+  pouf: { label: 'Pouf', note: '20″ extra seat or footrest', defaults: { color: '#c9bba5' }, params: [], colors: FABRICS },
+  barCart: { label: 'Bar cart', note: '24″ × 16″, two shelves', defaults: {}, params: [] },
 };
 
 function makeSectional(p) {
@@ -1493,11 +1667,33 @@ function makeRecliner(p) {
   return { group: g, w: 36, d: 38, shadows: [[0, 0, 36, 38]] };
 }
 
+function makePouf(p) {
+  const g = new THREE.Group();
+  meshAt(new THREE.CylinderGeometry(10, 10, 15, 40), fabricMat(p.color, 'boucle'), 0, 8, 0, g);
+  meshAt(new THREE.TorusGeometry(9.2, 1.4, 12, 40), fabricMat(p.color, 'boucle'), 0, 15.4, 0, g).rotation.x = Math.PI / 2;
+  meshAt(new THREE.CircleGeometry(9.3, 40), fabricMat(p.color, 'boucle'), 0, 16.6, 0, g).rotation.x = -Math.PI / 2;
+  return { group: g, w: 20, d: 20, shadows: [[0, 0, 20, 20]] };
+}
+function makeBarCart() {
+  const g = new THREE.Group(), w = 24, d = 16;
+  for (const [x, z] of [[-w / 2 + 0.6, -d / 2 + 0.6], [w / 2 - 0.6, -d / 2 + 0.6], [-w / 2 + 0.6, d / 2 - 0.6], [w / 2 - 0.6, d / 2 - 0.6]]) {
+    meshAt(new THREE.CylinderGeometry(0.45, 0.45, 32, 10), M.brass, x, 16, z, g);
+  }
+  for (const y of [6, 30]) meshAt(new THREE.BoxGeometry(w - 0.4, 0.8, d - 0.4), woodMat('#3b281b'), 0, y, 0, g);
+  const glass = new THREE.MeshStandardMaterial({ color: '#c9d3cf', roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.45 });
+  const amber = new THREE.MeshStandardMaterial({ color: '#8a4b16', roughness: 0.1, transparent: true, opacity: 0.8 });
+  for (const [x, z, hgt, mat] of [[-7, -2, 11, amber], [-3, 3, 9, glass], [5, -3, 12, glass], [8, 3, 4, amber]]) {
+    meshAt(new THREE.CylinderGeometry(1.4, 1.6, hgt, 16), mat, x, 30.4 + hgt / 2, z, g);
+  }
+  meshAt(new THREE.CylinderGeometry(2.2, 1.8, 4, 20), M.metal, 2, 8.4, 0, g);   // ice bucket
+  return { group: g, w, d, shadows: [[0, 0, w, d]] };
+}
+
 const CONSOLE_Y0 = 6, CONSOLE_H = 13, SOUNDBAR_H = 2.6;
 const FACTORIES = {
   sectional: makeSectional, sofa: makeSofa, loungeChair: makeLoungeChair, roundTable: makeRoundTable, ottoman: makeOttoman,
   rug: makeRug, console: makeConsole, sideTable: makeSideTable, floorLamp: makeFloorLamp, plant: makePlant,
-  towerSpeaker: makeTower, subwoofer: makeSub, recliner: makeRecliner,
+  towerSpeaker: makeTower, subwoofer: makeSub, recliner: makeRecliner, pouf: makePouf, barCart: makeBarCart,
 };
 
 const itemObjects = new Map();      // id -> { group, w, d }
@@ -1737,9 +1933,12 @@ function mainSeat() {
 
 function viewingStats() {
   const seat = mainSeat(); if (!seat) return null;
-  const r = state.room, G = geom(), t = state.tv, { w, h } = tvDims(t.size);
+  const r = state.room, G = geom(), t = state.tv;
   const face = state.finish.tvSlats ? SLAT_FACE : 0;
-  const tv = { x: G.tvX + t.offset, y: r.depth - face - 1, z: t.center };
+  const onScreen = !!(t.screen && state.light.screenDown);
+  const sd = onScreen ? screenDims() : null;
+  const { w, h } = onScreen ? sd : tvDims(t.size);
+  const tv = onScreen ? { x: G.tvX, y: sd.y, z: sd.centre } : { x: G.tvX + t.offset, y: r.depth - face - 1, z: t.center };
   const eye = 40;
   const dist = Math.hypot(tv.x - seat.x, tv.y - seat.y);
   const hAngle = 2 * Math.atan(w / 2 / dist) / DEG;
@@ -1747,8 +1946,8 @@ function viewingStats() {
   const sizeFor = (deg) => 2 * dist * Math.tan(deg / 2 * DEG) * Math.hypot(16, 9) / 16;
   // a console standing under the TV (close to the TV wall and overlapping it sideways)
   const con = state.items.find((i) => i.type === 'console' && Math.abs(i.y - r.depth) < 30 && Math.abs(i.x - tv.x) < (i.p.w || 70) / 2 + w / 2);
-  const clearance = con ? (t.center - h / 2) - (CONSOLE_Y0 + CONSOLE_H + SOUNDBAR_H) : null;
-  return { seat, tv, dist, hAngle, tilt, w, h, eye, fit: G.bay[3][0] - G.bay[2][0] - w, size30: sizeFor(30), size40: sizeFor(40), clearance };
+  const clearance = con && !onScreen ? (t.center - h / 2) - (CONSOLE_Y0 + CONSOLE_H + SOUNDBAR_H) : null;
+  return { seat, tv, dist, hAngle, tilt, w, h, eye, fit: G.bay[3][0] - G.bay[2][0] - w, size30: sizeFor(30), size40: sizeFor(40), clearance, onScreen, screenFits: sd ? sd.fits : true };
 }
 
 let sightline = null;
@@ -1780,7 +1979,44 @@ function updateLabels() {
     sl.push(label(`${ftin(v.dist)} · ${v.hAngle.toFixed(0)}° wide`, a.clone().lerp(b, 0.62), 'dim brass'));
     sightline = { objs: sl, eye: a };
   }
+  if (state.showSpeakers) drawSpeakerPlan();
   updateMeasureLabels();
+}
+
+/**
+ * 5.1.2 pre-wire plan from the prime seat, after Dolby's placement angles:
+ * fronts ~22° off axis, surrounds 90–110°, top-middle pair just ahead of the seat.
+ */
+function speakerPlan() {
+  const seat = mainSeat(); if (!seat) return [];
+  const r = state.room, G = geom(), H = r.ceiling, ear = 40;
+  const T = [G.tvX, r.depth], f = [T[0] - seat.x, T[1] - seat.y], fl = Math.hypot(f[0], f[1]);
+  f[0] /= fl; f[1] /= fl;
+  const rt = [f[1], -f[0]];                               // listener's right
+  const at = (along, side) => [seat.x + f[0] * along + rt[0] * side, seat.y + f[1] * along + rt[1] * side];
+  const frontY = G.mainY + G.ret - 4, along = frontY - seat.y, lat = along * Math.tan(22 * DEG);
+  const clampBay = ([x, y]) => [clamp(x, r.bayLeft + 8, r.bayRight - 8), y];
+  const sideR = r.width - 2 - seat.x, back = -8;
+  return [
+    { k: 'L', name: 'Front left', p: clampBay(at(along, -lat)), z: ear, how: 'tower or in-wall' },
+    { k: 'C', name: 'Centre', p: [G.tvX, r.depth - 10], z: 16, how: 'under the screen' },
+    { k: 'R', name: 'Front right', p: clampBay(at(along, lat)), z: ear, how: 'tower or in-wall' },
+    { k: 'SW', name: 'Subwoofer', p: [r.bayRight - 12, G.mainY + 10], z: 8, how: 'floor, front corner' },
+    { k: 'SR', name: 'Surround right', p: at(back, sideR), z: ear + 22, how: 'exterior wall, 2 ft above ears' },
+    { k: 'SL', name: 'Surround left', p: at(back, -Math.min(sideR, seat.x - r.boxX)), z: H, how: 'in-ceiling, angled (no wall there)' },
+    { k: 'TL', name: 'Top left', p: at(26, -lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
+    { k: 'TR', name: 'Top right', p: at(26, lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
+  ];
+}
+function drawSpeakerPlan() {
+  const disc = new THREE.MeshBasicMaterial({ color: '#7fb3d5', depthTest: false, transparent: true, opacity: 0.9 });
+  const seat = mainSeat();
+  for (const s of speakerPlan()) {
+    const pos = P(s.p[0], s.p[1], mode === 'plan' ? state.room.ceiling + 3 : s.z);
+    const m = new THREE.Mesh(new THREE.SphereGeometry(3, 16, 12), disc); m.position.copy(pos); m.renderOrder = 12; labelsGroup.add(m);
+    if (seat) line([P(seat.x, seat.y, mode === 'plan' ? state.room.ceiling + 3 : 40), pos], new THREE.LineBasicMaterial({ color: '#7fb3d5', transparent: true, opacity: 0.35, depthTest: false }));
+    const o = label(s.k, pos, 'dim spk'); o.element.title = `${s.name}: ${s.how}`;
+  }
 }
 
 // ---- 55-edit.js ----
@@ -1979,9 +2215,11 @@ function undo() {
 
 // ---------------- keyboard ----------------
 window.addEventListener('keydown', (e) => {
-  const tag = (e.target && e.target.tagName) || '';
-  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) && e.target.type !== 'range') return;
-  if (e.target.type === 'range' && e.key.startsWith('Arrow')) return;
+  const t = e.target || {}, tag = t.tagName || '';
+  // only text entry keeps its own keys; switches, sliders and buttons still get Ctrl+Z, Q/E, etc.
+  const typing = tag === 'TEXTAREA' || tag === 'SELECT' || (tag === 'INPUT' && !['checkbox', 'radio', 'range', 'button'].includes(t.type));
+  if (typing) return;
+  if (t.type === 'range' && e.key.startsWith('Arrow')) return;
   const mod = e.ctrlKey || e.metaKey;
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); duplicateSelected(); return; }
@@ -2085,8 +2323,18 @@ function initTabs() {
   }));
 }
 
+function loadOption(which) {
+  applyState(clone(which === 'recommended' ? RECOMMENDED_STATE : DEFAULT_STATE), true);
+  select(null); rebuildAll(); refreshPanels(); save();
+  toast(which === 'recommended' ? 'Recommended design loaded · Undo goes back' : 'Original plan loaded · Undo goes back');
+}
 function renderFurnish() {
   const root = $('#tab-furnish'); root.replaceChildren();
+  root.append(group('Design option',
+    h('div', { class: 'chips' },
+      h('button', { class: 'chip', 'aria-pressed': String(state.option !== 'recommended'), onclick: () => loadOption('original') }, 'Original plan'),
+      h('button', { class: 'chip', 'aria-pressed': String(state.option === 'recommended'), onclick: () => loadOption('recommended') }, 'Recommended')),
+    h('p', { class: 'note' }, 'Recommended: slats across the fireplace windows, floating hearth bench, 85″ TV with a 110″ drop-down screen, bias and step lights, and a clear path from the stairs.')));
   const grid = h('div', { class: 'catalog' });
   for (const [type, def] of Object.entries(CATALOG)) {
     grid.append(h('button', { onclick: () => addItem(type), title: 'Add ' + def.label }, h('b', {}, def.label), h('small', {}, def.note)));
@@ -2112,6 +2360,10 @@ function renderLighting() {
     toggle('tvOn', 'TV playing', L.tv, (v) => { L.tv = v; updateLighting(); }),
     toggle('fireOn', 'Fireplace flame', L.fire, (v) => { L.fire = v; updateLighting(); }),
     toggle('lampOn', 'Floor lamps', L.lamp, (v) => { L.lamp = v; updateLighting(); }),
+    toggle('biasOn', 'Bias light behind TV (6500K)', L.bias, (v) => { L.bias = v; updateLighting(); }),
+    toggle('stepsOn', 'Stair step lights', L.steps, (v) => { L.steps = v; updateLighting(); }),
+    toggle('bayPotsOn', 'Pot lights over the TV', L.bayPots, (v) => { L.bayPots = v; queue(() => { buildLights(); updateLighting(); }); }),
+    state.tv.screen ? toggle('screenDownOn', 'Projector screen down', L.screenDown, (v) => { L.screenDown = v; updateLighting(); updateLabels(); renderInspector(); }) : null,
     toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; }),
     h('p', { class: 'note' }, 'Movie dims the pots and leaves a little LED glow around the TV alcove to ease eye strain.')));
 }
@@ -2122,6 +2374,13 @@ function renderFinishes() {
   root.append(group('TV alcove walls', chips('TV alcove walls', [['paint-dark', 'Charcoal'], ['paint-navy', 'Navy'], ['paint-green', 'Forest'], ['paint-wall', 'Same as walls']], f.bayAccent,
     (v) => { f.bayAccent = v; applyFinishes(); queue(rebuildRoomOnly); }),
   h('p', { class: 'note' }, 'A dark alcove cuts screen reflections and makes the picture look deeper.')));
+  root.append(group('Windows above the fireplace',
+    chips('Windows above the fireplace', [['windows', 'As built'], ['slatted', 'Slats across + glow band'], ['framed', 'One black frame']], f.transoms,
+      (v) => { f.transoms = v; queue(rebuildAll); }),
+    h('p', { class: 'note' }, 'Two equal windows over a centred fireplace read as a face. Both fixes keep the openings as cut: slats run across them with one LED band behind, or one steel frame turns the pair into a single window.')));
+  root.append(group('Under or over the fireplace',
+    chips('Fireplace ledge', [['none', 'Nothing'], ['ledge', 'Mantel ledge'], ['bench', 'Floating bench']], f.mantel,
+      (v) => { f.mantel = v; queue(rebuildFixturesAndLights); })));
   root.append(group('Floor', chips('Floor', Object.entries(FLOORS).map(([k, d]) => [k, d.label]), f.floor, (v) => { f.floor = v; applyFinishes(); })));
   root.append(group('Wood slats', chips('Slat finish', Object.entries(SLATS).map(([k, d]) => [k, d.label]), f.slat, (v) => { f.slat = v; applyFinishes(); }),
     toggle('slatFire', 'Slats on fireplace wall', f.fireplaceSlats, (v) => { f.fireplaceSlats = v; queue(rebuildFixturesAndLights); }),
@@ -2154,7 +2413,10 @@ function renderRoomTab() {
     fs('bottom', 'Fireplace height off floor', 12, 48),
     rs('transomBottom', 'Window sill height', 60, Math.max(61, r.beamBottom - r.transomH - 1)),
     rs('transomW', 'Window width', 24, 54)));
-  root.append(group('Overlays', toggle('sightOn', 'Sightline from the sofa', state.showSightline, (v) => { state.showSightline = v; updateLabels(); })));
+  root.append(group('Overlays',
+    toggle('sightOn', 'Sightline from the sofa', state.showSightline, (v) => { state.showSightline = v; updateLabels(); }),
+    toggle('spkOn', 'Speaker pre-wire plan (5.1.2)', state.showSpeakers, (v) => { state.showSpeakers = v; updateLabels(); }),
+    h('p', { class: 'note' }, 'Blue dots show where to run speaker wire while the ceiling is open. Hover a dot for its role.')));
   root.append(group('Save or share', h('p', { class: 'note' }, 'Your layout is kept in this browser. Copy the layout code to keep versions or move it to another device.'),
     h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => openCode() }, 'Layout code'))));
 }
@@ -2187,7 +2449,7 @@ function viewingReport() {
   if (!v) return group('Viewing', h('p', { class: 'empty' }, 'Add a sofa, sectional or recliner to see viewing distance and angle.'));
   const pct = clamp(v.hAngle / 50, 0, 1) * 100;
   const verdict = v.hAngle >= 36 ? ['ok', 'Cinema immersion (THX 36°+)'] : v.hAngle >= 30 ? ['ok', 'Meets SMPTE 30° minimum'] : v.hAngle >= 24 ? ['warn', 'Comfortable, a bit small for cinema'] : ['bad', 'Small for this distance'];
-  const fits = v.fit >= 4 ? ['ok', `Fits the alcove with ${inch(v.fit / 2)} each side`] : v.fit >= 0 ? ['warn', `Tight: ${inch(v.fit / 2)} each side`] : ['bad', `${inch(-v.fit)} wider than the TV wall`];
+  const fits = v.onScreen ? (v.screenFits ? ['ok', 'Screen fits inside the alcove'] : ['bad', 'Screen is wider than the alcove at the bulkhead']) : v.fit >= 4 ? ['ok', `Fits the alcove with ${inch(v.fit / 2)} each side`] : v.fit >= 0 ? ['warn', `Tight: ${inch(v.fit / 2)} each side`] : ['bad', `${inch(-v.fit)} wider than the TV wall`];
   const tilt = Math.abs(v.tilt) <= 15 ? ['ok', `Eyes ${v.tilt >= 0 ? 'look up' : 'look down'} ${Math.abs(v.tilt).toFixed(0)}° to centre`] : ['warn', `Neck tilt ${v.tilt.toFixed(0)}° (aim under 15°)`];
   const stat = (k, val) => h('div', { class: 'stat' }, h('span', { class: 'k' }, k), h('span', { class: 'v' }, val));
   const meter = h('div', { class: 'meter', title: 'Horizontal field of view, 0–50°' }, h('i', { style: `width:${pct}%` }),
@@ -2196,12 +2458,12 @@ function viewingReport() {
   for (const s of TV_SIZES) {
     sizes.append(h('button', { class: 'chip', 'aria-pressed': String(state.tv.size === s), onclick: () => { pushHistory(); state.tv.size = s; rebuildTV(); commit(false); } }, `${s}″`));
   }
-  return group(`Viewing from the prime seat`,
+  return group(v.onScreen ? `Viewing the ${state.tv.screenSize}″ screen` : `Viewing from the prime seat`,
     stat('Eye to screen', ftin(v.dist)),
     stat(`Screen fills`, `${v.hAngle.toFixed(1)}° of view`),
     meter,
     h('span', { class: 'badge ' + verdict[0] }, verdict[1]),
-    stat('TV picture', `${inch(v.w)} × ${inch(v.h)}`),
+    stat(v.onScreen ? 'Screen picture' : 'TV picture', `${inch(v.w)} × ${inch(v.h)}`),
     h('span', { class: 'badge ' + fits[0] }, fits[1]),
     h('span', { class: 'badge ' + tilt[0] }, tilt[1]),
     v.clearance == null ? null : v.clearance >= 1.5
@@ -2247,6 +2509,10 @@ function renderInspector() {
       slider('tv-center', 'Centre height', 30, 64, 0.5, t.center, ftin, (v) => { t.center = v; queue(rebuildTV); }),
       slider('tv-offset', 'Shift along wall', -12, 12, 0.5, t.offset, (v) => `${v > 0 ? '+' : ''}${v}″`, (v) => { t.offset = v; queue(rebuildTV); }),
       toggle('tv-on', 'Playing', state.light.tv, (v) => { state.light.tv = v; updateLighting(); renderLighting(); }),
+      toggle('tv-screen', 'Drop-down screen in the bulkhead', t.screen, (v) => { t.screen = v; if (!v) state.light.screenDown = false; queue(() => { buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); renderLighting(); renderInspector(); }); }),
+      t.screen ? chips('Screen size', [[100, '100″'], [110, '110″'], [120, '120″']], t.screenSize, (v) => { t.screenSize = v; queue(() => { buildFixtures(); buildLights(); updateLighting(); updateLabels(); renderInspector(); }); }) : null,
+      t.screen ? toggle('tv-screen-down', 'Screen down', state.light.screenDown, (v) => { state.light.screenDown = v; updateLighting(); updateLabels(); renderLighting(); renderInspector(); }) : null,
+      t.screen ? (() => { const d = screenDims(); return h('span', { class: 'badge ' + (d.fits ? 'ok' : 'bad') }, d.fits ? `${t.screenSize}″ screen fits the alcove (${inch(d.avail - d.w)} spare)` : `${t.screenSize}″ screen is ${inch(d.w + 6 - d.avail)} too wide for the alcove`); })() : null,
       h('p', { class: 'note' }, 'Seated eyes sit about 40″ off the floor; a centre near 42–46″ keeps the neck relaxed.')), viewingReport());
     return;
   }
@@ -2406,6 +2672,14 @@ function frame() {
   flameUniforms.uTime.value = t;
   if (FX.fire && state.light.fire) FX.fire.light.intensity = FIRE_CD * (0.85 + 0.18 * Math.sin(t * 7.3) + 0.1 * Math.sin(t * 13.7 + 1.3));
   if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && activeCam.position.y < state.room.ceiling + 1;
+  if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && activeCam.position.y < state.room.ceiling + 1;
+  if (FX.screen) {                                    // motorised screen rolls down / up
+    const target = state.light.screenDown ? 1 : 0.02;
+    if (Math.abs(FX.screen.cur - target) > 0.001) {
+      FX.screen.cur += Math.sign(target - FX.screen.cur) * Math.min(Math.abs(target - FX.screen.cur), dt * 0.5);
+      FX.screen.sheet.scale.y = FX.screen.cur;
+    }
+  }
   ghostBulkheads(mode === 'plan' || activeCam.position.y > state.room.ceiling + 1);
   if (sightline) { const far = activeCam.position.distanceTo(sightline.eye) > 30; for (const o of sightline.objs) o.visible = far; }
   if (state.light.bloom && mode !== 'plan') { renderPass.camera = activeCam; composer.render(dt); }
@@ -2418,7 +2692,10 @@ $('#loading').classList.add('done');
 if (restored) toast('Restored your last layout from this browser');
 // handy for debugging and automated checks
 window.__cinema = {
-  state: () => state, setMode, goPreset, applyScene, select, scene, selected: () => selected, mode: () => mode,
+  state: () => state, setMode, goPreset, applyScene, select, scene, selected: () => selected, mode: () => mode, loadOption,
+  rebuild() { rebuildAll(); refreshPanels(); },
+  view(px, py, pz, tx, ty, tz) { tween = null; camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); },
+  settle() { if (FX.screen) { FX.screen.cur = state.light.screenDown ? 1 : 0.02; FX.screen.sheet.scale.y = FX.screen.cur; } },
   screenOf(x, y, z = 10) {
     const v = P(x, y, z).project(activeCam), r = renderer.domElement.getBoundingClientRect();
     return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };

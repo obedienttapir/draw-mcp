@@ -16,7 +16,7 @@ Open `index.html` in a recent desktop or mobile browser. It loads three.js r160 
 | Fireplace-side bulkhead | over the W200 beam, 48″ from the fireplace wall, underside 7′-10″ | estimated from photos |
 | Steel beam pilaster | 18″ × 10″ box on the north wall, beam line 33″ from the fireplace wall | plan + photos |
 | Stairs | along the staircase wall, rising toward the exterior wall, 11′-6″ opening, open balustrade over a knee wall | plan + photos |
-| Fireplace + 2 windows | 52″ linear fireplace, two 42″ × 10″ reeded transoms above | photos |
+| Fireplace + 2 windows | 52″ linear fireplace, two 42″ × 10″ reeded transoms above (openings already cut) | photos |
 
 Everything marked "estimated" can be changed in the **Room** tab; the room rebuilds as you drag.
 
@@ -30,6 +30,18 @@ Everything marked "estimated" can be changed in the **Room** tab; the room rebui
 - **Lighting**: Bright, Evening, Movie and Fireside scenes, plus dimmers for the pot lights and the 2700K LED channels, TV, flame and lamps.
 - **Finishes**: wall paint, alcove accent colour, floor, slat wood, slats on the fireplace wall and/or behind the TV.
 - **Layout code**: copy the whole design as text to keep versions, paste one back to restore it. The latest layout is also saved in the browser.
+
+## Design options
+
+The design review in [`presentation/`](presentation/) is built into the planner:
+
+- **Furnish › Design option**: switch between the **Original plan** and the **Recommended** version (Undo goes back).
+- **Finishes › Windows above the fireplace**: *As built*, *Slats across + glow band* (slats run over both windows with one LED band behind them) or *One black frame* (a steel surround and mullion that make the pair read as one window). The window openings themselves never move; they are already cut.
+- **Finishes › Under or over the fireplace**: a mantel ledge or a full-width floating walnut bench.
+- **TV details**: a 100–120″ drop-down screen in the alcove bulkhead with a ceiling projector; the viewing report switches to the screen when it is down and warns if it is too wide for the alcove.
+- **Lighting**: a *Game night* scene, a 6500K bias light behind the TV, stair step lights, and a switch for the two pot lights over the TV.
+- **Room › Overlays › Speaker pre-wire plan (5.1.2)**: where to run speaker wire while the ceiling is open, placed from the prime seat.
+- New catalogue pieces: pouf and bar cart.
 
 ## Editing the code
 
@@ -49,6 +61,7 @@ src/js/55-edit.js     picking, dragging, measuring, keyboard
 src/js/60-ui.js       design panel tabs
 src/js/65-inspector.js details panel, layout code dialog
 src/js/70-main.js     boot and render loop
+presentation/         design review: renders, slide sources and a readable README
 ```
 
 The JS files are fragments of one ES module and are concatenated in name order. After editing, rebuild `index.html`:

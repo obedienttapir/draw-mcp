@@ -9,7 +9,7 @@ function viewingReport() {
   if (!v) return group('Viewing', h('p', { class: 'empty' }, 'Add a sofa, sectional or recliner to see viewing distance and angle.'));
   const pct = clamp(v.hAngle / 50, 0, 1) * 100;
   const verdict = v.hAngle >= 36 ? ['ok', 'Cinema immersion (THX 36°+)'] : v.hAngle >= 30 ? ['ok', 'Meets SMPTE 30° minimum'] : v.hAngle >= 24 ? ['warn', 'Comfortable, a bit small for cinema'] : ['bad', 'Small for this distance'];
-  const fits = v.fit >= 4 ? ['ok', `Fits the alcove with ${inch(v.fit / 2)} each side`] : v.fit >= 0 ? ['warn', `Tight: ${inch(v.fit / 2)} each side`] : ['bad', `${inch(-v.fit)} wider than the TV wall`];
+  const fits = v.onScreen ? (v.screenFits ? ['ok', 'Screen fits inside the alcove'] : ['bad', 'Screen is wider than the alcove at the bulkhead']) : v.fit >= 4 ? ['ok', `Fits the alcove with ${inch(v.fit / 2)} each side`] : v.fit >= 0 ? ['warn', `Tight: ${inch(v.fit / 2)} each side`] : ['bad', `${inch(-v.fit)} wider than the TV wall`];
   const tilt = Math.abs(v.tilt) <= 15 ? ['ok', `Eyes ${v.tilt >= 0 ? 'look up' : 'look down'} ${Math.abs(v.tilt).toFixed(0)}° to centre`] : ['warn', `Neck tilt ${v.tilt.toFixed(0)}° (aim under 15°)`];
   const stat = (k, val) => h('div', { class: 'stat' }, h('span', { class: 'k' }, k), h('span', { class: 'v' }, val));
   const meter = h('div', { class: 'meter', title: 'Horizontal field of view, 0–50°' }, h('i', { style: `width:${pct}%` }),
@@ -18,12 +18,12 @@ function viewingReport() {
   for (const s of TV_SIZES) {
     sizes.append(h('button', { class: 'chip', 'aria-pressed': String(state.tv.size === s), onclick: () => { pushHistory(); state.tv.size = s; rebuildTV(); commit(false); } }, `${s}″`));
   }
-  return group(`Viewing from the prime seat`,
+  return group(v.onScreen ? `Viewing the ${state.tv.screenSize}″ screen` : `Viewing from the prime seat`,
     stat('Eye to screen', ftin(v.dist)),
     stat(`Screen fills`, `${v.hAngle.toFixed(1)}° of view`),
     meter,
     h('span', { class: 'badge ' + verdict[0] }, verdict[1]),
-    stat('TV picture', `${inch(v.w)} × ${inch(v.h)}`),
+    stat(v.onScreen ? 'Screen picture' : 'TV picture', `${inch(v.w)} × ${inch(v.h)}`),
     h('span', { class: 'badge ' + fits[0] }, fits[1]),
     h('span', { class: 'badge ' + tilt[0] }, tilt[1]),
     v.clearance == null ? null : v.clearance >= 1.5
@@ -69,6 +69,10 @@ function renderInspector() {
       slider('tv-center', 'Centre height', 30, 64, 0.5, t.center, ftin, (v) => { t.center = v; queue(rebuildTV); }),
       slider('tv-offset', 'Shift along wall', -12, 12, 0.5, t.offset, (v) => `${v > 0 ? '+' : ''}${v}″`, (v) => { t.offset = v; queue(rebuildTV); }),
       toggle('tv-on', 'Playing', state.light.tv, (v) => { state.light.tv = v; updateLighting(); renderLighting(); }),
+      toggle('tv-screen', 'Drop-down screen in the bulkhead', t.screen, (v) => { t.screen = v; if (!v) state.light.screenDown = false; queue(() => { buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); renderLighting(); renderInspector(); }); }),
+      t.screen ? chips('Screen size', [[100, '100″'], [110, '110″'], [120, '120″']], t.screenSize, (v) => { t.screenSize = v; queue(() => { buildFixtures(); buildLights(); updateLighting(); updateLabels(); renderInspector(); }); }) : null,
+      t.screen ? toggle('tv-screen-down', 'Screen down', state.light.screenDown, (v) => { state.light.screenDown = v; updateLighting(); updateLabels(); renderLighting(); renderInspector(); }) : null,
+      t.screen ? (() => { const d = screenDims(); return h('span', { class: 'badge ' + (d.fits ? 'ok' : 'bad') }, d.fits ? `${t.screenSize}″ screen fits the alcove (${inch(d.avail - d.w)} spare)` : `${t.screenSize}″ screen is ${inch(d.w + 6 - d.avail)} too wide for the alcove`); })() : null,
       h('p', { class: 'note' }, 'Seated eyes sit about 40″ off the floor; a centre near 42–46″ keeps the neck relaxed.')), viewingReport());
     return;
   }
