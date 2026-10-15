@@ -1,0 +1,74 @@
+<div id="app">
+  <div id="stage"></div>
+  <div id="labels"></div>
+  <div class="loading" id="loading">Loading 3D room…</div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark">Basement Cinema</span>
+      <span class="sub" id="roomSub">Room 1 · 228″ × 185″ · 9′ ceiling</span>
+    </div>
+    <div class="seg" role="group" aria-label="View mode">
+      <button id="mode-orbit" aria-pressed="true" title="Orbit around the room (1)">3D</button>
+      <button id="mode-plan" aria-pressed="false" title="Top-down plan with dimensions (2)">Plan</button>
+      <button id="mode-walk" aria-pressed="false" title="Walk at eye height: WASD + drag (3)">Walk</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="toggleLeft" aria-expanded="true" aria-controls="leftPanel" title="Show or hide the design panel">Design</button>
+    <button class="iconbtn" id="toggleRight" aria-expanded="true" aria-controls="rightPanel" title="Show or hide the details panel">Details</button>
+    <button class="iconbtn" id="undoBtn" title="Undo (Ctrl+Z)" disabled>Undo</button>
+    <button class="iconbtn wide-only" id="codeBtn" title="Copy or paste a layout">Layout code</button>
+  </header>
+
+  <aside class="panel left" id="leftPanel" aria-label="Design panel">
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="furnish" aria-selected="true">Furnish</button>
+      <button role="tab" data-tab="light" aria-selected="false">Lighting</button>
+      <button role="tab" data-tab="finish" aria-selected="false">Finishes</button>
+      <button role="tab" data-tab="room" aria-selected="false">Room</button>
+    </nav>
+    <div class="scroll" id="tab-furnish" role="tabpanel"></div>
+    <div class="scroll" id="tab-light" role="tabpanel" hidden></div>
+    <div class="scroll" id="tab-finish" role="tabpanel" hidden></div>
+    <div class="scroll" id="tab-room" role="tabpanel" hidden></div>
+  </aside>
+
+  <aside class="panel right" id="rightPanel" aria-label="Details panel">
+    <div class="insp-head" id="inspHead"></div>
+    <div class="scroll" id="inspBody"></div>
+  </aside>
+
+  <div class="dock">
+    <div class="seg" role="group" aria-label="Camera presets" id="presets">
+      <button data-preset="overview">Overview</button>
+      <button data-preset="sofa">From sofa</button>
+      <button data-preset="tvwall">TV wall</button>
+      <button data-preset="lounge">Fireplace</button>
+      <button data-preset="stairs">From stairs</button>
+    </div>
+    <div class="seg" role="group" aria-label="Walk" id="walkpad" hidden>
+      <button data-walk="1" title="Hold to walk forward">▲ Walk</button>
+      <button data-walk="-1" title="Hold to step back">▼</button>
+    </div>
+    <div class="seg" role="group" aria-label="Tools">
+      <button id="measureBtn" aria-pressed="false" title="Tape measure: click two points (M)">Measure</button>
+    </div>
+  </div>
+  <div class="hint" id="hint">Click furniture to select · drag to move · Q / E rotate · Del removes</div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="modal" id="codeModal" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
+      <h2 id="codeTitle">Layout code</h2>
+      <p>Copy this to keep a version of the design, or paste a code you saved earlier and apply it. Your latest layout is also kept in this browser.</p>
+      <textarea id="codeText" spellcheck="false" aria-label="Layout code"></textarea>
+      <div class="btnrow">
+        <button class="btn primary" id="codeCopy">Copy</button>
+        <button class="btn" id="codeApply">Apply pasted code</button>
+        <span class="spacer"></span>
+        <button class="btn danger" id="codeReset">Reset to starting layout</button>
+        <button class="btn" id="codeClose">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
