@@ -37,6 +37,27 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
 - **Layout code**: copy the whole design as text to keep versions, paste one back to restore it. The latest layout is also saved in the browser.
 - **Hide menus** (`H`): hides every bar and panel so a phone shows only the 3D room. In this mode touches only move the camera (one finger turns, two fingers zoom and pan), so furniture can't be bumped by accident. Tap **Show menus** (or press `H` or `Esc`) to bring them back.
 
+## Furniture style study (phase two)
+
+The **Style** tab dresses the whole room in one of six curated furniture sets and helps you pick the best one:
+
+| Set | Character |
+| --- | --- |
+| Warm Modern | Walnut, soft taupe and ivory bouclé: the original plan |
+| Mid-century Modern | Walnut on tapered legs, rust tweed, mustard and teal |
+| Japandi | Low modular seating, oatmeal linen, white oak, jute and paper light |
+| Industrial Loft | Cognac leather, black steel, reclaimed timber, vintage rug |
+| Luxe Lounge | Forest velvet, travertine and brass |
+| Performance Theatre | Graphite performance fabric, power-reclining seats, matte black |
+
+- **Real geometry, not just colour**: six sectional styles (track arm, low modular, tufted on tapered legs, slope-arm leather, channel-tufted velvet, power-reclining with headrests), five lounge chairs, five coffee tables, three ottomans, three poufs, six rugs, six media consoles, four side tables, five floor lamps and three plants, in leather, velvet, bouclé, tweed, linen, knit, walnut, oak, travertine, marble and brass.
+- **Scores out of 100** on eight criteria: movie comfort, screen contrast, acoustics, durability and care, hangout flexibility, budget, lead time and fit with the room. They are computed from the pieces actually in your layout (cover performance, surface tone and sheen facing the screen, absorption by area, prices, lead times) and weighted by **your priorities** (sliders, or the Balanced / Cinema first / Hangout first / Budget first presets).
+- **Compare all six**: a full-screen view with each set rendered from the same camera (fireplace lounge, sofa to screen, sectional or whole room), score bars, indicative budget, longest lead time, strengths and watch-outs, plus your own star rating, notes, a shortlist and a final pick. A scorecard table puts every criterion side by side.
+- **Mix and match**: select any piece to change its style, cover, colour, wood, metal or stone on its own; the Style tab then shows "Your mix" with its own score and budget, and *Reset to set* puts it back.
+- **Spec sheet**: a furniture schedule (FF&E) for the current layout or any set, with tags, specifications, cover performance, sizes, quantities, indicative CAD prices and lead times; copy it as CSV or print it.
+
+Ratings, notes, the shortlist and your pick are saved in the browser and travel with the layout code; Undo never erases them. Prices are indicative 2026 CAD mid-market ranges, and scores are a planning aid, not lab measurements.
+
 ## Design options
 
 The design review in [`presentation/`](presentation/) is built into the planner:
@@ -62,10 +83,12 @@ src/js/10-materials.js procedural textures (wood, bouclé, rugs, reeded glass) a
 src/js/20-room.js     floor, walls with openings, ceiling, bulkheads, pilaster
 src/js/25-fixtures.js stairs, slat walls, fireplace with animated flames, transoms, TV
 src/js/30-lights.js   pot lights, LED channels, lighting scenes
-src/js/40-furniture.js furniture catalogue and factories
+src/js/40-furniture.js furniture catalogue and factories (every style variant)
+src/js/45-styles.js    style sets, upholstery library, prices, lead times, scoring, spec sheet rows
 src/js/50-view.js     renderer, cameras, presets, walk mode, plan dimensions, viewing maths
 src/js/55-edit.js     picking, dragging, measuring, keyboard
 src/js/60-ui.js       design panel tabs
+src/js/62-style-ui.js  Style tab, per-piece style controls, compare view, spec sheet
 src/js/65-inspector.js details panel, layout code dialog
 src/js/70-main.js     boot and render loop
 presentation/         design review: renders, slide sources and a readable README

@@ -117,6 +117,103 @@ select { width: 100%; background: var(--panel-solid); border: 1px solid var(--li
 .btn.primary { background: var(--brass); color: #1c1612; border-color: var(--brass); font-weight: 600; }
 .btn.danger:hover { border-color: var(--bad); color: var(--bad); }
 
+/* ---------- style study ---------- */
+.tabs button { padding-left: 2px; padding-right: 2px; font-size: 12.5px; }
+.setlist { display: grid; gap: 6px; }
+.setcard { text-align: left; border: 1px solid var(--line); background: rgba(255,255,255,0.03); border-radius: 10px; padding: 9px 10px;
+  display: grid; gap: 4px; width: 100%; }
+.setcard:hover { border-color: var(--line-strong); }
+.setcard.on { border-color: var(--brass); background: var(--brass-dim); }
+.setcard.custom { border-style: dashed; }
+.setcard .row { display: flex; align-items: center; gap: 6px; }
+.setcard .row b { font-weight: 600; flex: 1; min-width: 0; }
+.setcard .sub { color: var(--muted); font-size: 12px; display: block; }
+.setcard .meta { font-family: var(--font-num); font-size: 10.5px; color: var(--muted); display: block; }
+.setcard .stars, .stars { color: var(--brass); letter-spacing: 0.08em; }
+.score { font-family: var(--font-num); font-size: 13px; font-weight: 600; color: var(--brass); min-width: 26px; text-align: right; }
+.pill { font-size: 10.5px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--muted); white-space: nowrap; }
+.pill.pick { border-color: var(--brass); color: #1c1612; background: var(--brass); font-weight: 600; }
+.palette { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
+.palette i { flex: 1; }
+.prio { display: grid; gap: 4px; }
+.prow { display: grid; grid-template-columns: 118px minmax(0, 1fr) 14px; align-items: center; gap: 8px; font-size: 12px; }
+.prow .val { font-family: var(--font-num); color: var(--brass); text-align: right; }
+.crit { display: grid; gap: 3px; }
+.crow { display: grid; grid-template-columns: 118px minmax(0, 1fr) 26px; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.crow .num { font-family: var(--font-num); font-size: 11px; color: var(--fg); text-align: right; }
+.sbar { height: 6px; border-radius: 6px; background: rgba(255,255,255,0.08); overflow: hidden; display: block; }
+.sbar i { display: block; height: 100%; background: var(--brass); border-radius: 6px; }
+.proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; }
+.proscons b { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--faint); }
+.proscons ul { margin: 4px 0 0; padding-left: 16px; color: var(--muted); display: grid; gap: 2px; }
+.fine { color: var(--faint); font-size: 11.5px; margin: 0; }
+
+/* compare view and spec sheet: full-screen sheets */
+.modal.wide { place-items: stretch; padding: 14px var(--gutter-r) 14px var(--gutter-l); }
+.modal .card.sheet { width: 100%; max-width: 1480px; margin: 0 auto; padding: 0; gap: 0; display: flex; flex-direction: column; overflow: hidden; height: 100%; box-sizing: border-box; }
+.sheethead { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.sheethead > div:first-child { flex: 1 1 260px; min-width: 0; display: grid; gap: 2px; }
+.sheethead h2 { font-size: 17px; }
+.sheethead .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.sheethead .tools select { width: auto; }
+.sheethead .tools .seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.sheetbody { overflow: auto; padding: 14px 16px 18px; display: grid; gap: 14px; align-content: start; overscroll-behavior: contain; }
+.cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.ccard { border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02); display: grid; gap: 10px; padding: 0 0 12px; overflow: hidden; align-content: start; }
+.ccard > *:not(.thumb) { margin: 0 12px; }
+.ccard.picked { border-color: var(--brass); box-shadow: 0 0 0 1px var(--brass); }
+.thumb { position: relative; aspect-ratio: 16 / 9; background: #0d0b09; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb .rank { position: absolute; left: 8px; top: 8px; font-family: var(--font-num); font-size: 11px; background: rgba(18,15,12,0.8); padding: 2px 7px; border-radius: 6px; }
+.thumb .pill { position: absolute; right: 8px; top: 8px; }
+.shimmer { width: 100%; height: 100%; display: grid; place-items: center; color: var(--faint); font-family: var(--font-num); font-size: 11px;
+  background: linear-gradient(100deg, #15120f 30%, #221d18 50%, #15120f 70%) 0 0 / 300% 100%; animation: shimmer 1.4s linear infinite; }
+@keyframes shimmer { to { background-position: -150% 0; } }
+.chead { display: flex; align-items: flex-start; gap: 10px; }
+.chead > div:first-child { flex: 1; min-width: 0; }
+.chead h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.chead p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+.total { text-align: right; line-height: 1; }
+.total b { font-family: var(--font-num); font-size: 26px; color: var(--brass); }
+.total small { display: block; color: var(--faint); font-family: var(--font-num); font-size: 10px; margin-top: 2px; }
+.facts { display: flex; gap: 16px; font-family: var(--font-num); font-size: 12px; }
+.facts small { display: block; font-family: var(--font-ui); color: var(--faint); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; }
+.rate { display: flex; gap: 2px; }
+.rate button { border: 0; background: none; font-size: 18px; line-height: 1; padding: 2px; color: var(--faint); }
+.rate button[aria-pressed="true"] { color: var(--brass); }
+.ccard textarea { background: #0f0d0b; border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; resize: vertical; font-size: 12px; min-height: 38px; }
+.ccard .btn[aria-pressed="true"] { border-color: var(--brass); color: var(--brass); }
+.tablewrap { overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+table.scorecard, table.spec { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+table.scorecard th, table.scorecard td, table.spec th, table.spec td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.scorecard thead th, table.spec thead th { position: sticky; top: 0; background: var(--panel-solid); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--faint); font-weight: 600; z-index: 1; }
+table.scorecard tbody th { font-weight: 500; white-space: nowrap; }
+table.scorecard td { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+table.scorecard td.hi { color: var(--ok); } table.scorecard td.mid { color: var(--warn); } table.scorecard td.lo { color: var(--bad); }
+table.scorecard td.w, table.scorecard th.w { color: var(--faint); text-align: center; }
+table.scorecard tr.sum th, table.scorecard tr.sum td { background: rgba(255,255,255,0.025); }
+table.spec td.tag { font-family: var(--font-num); color: var(--brass); white-space: nowrap; }
+table.spec td.n { font-family: var(--font-num); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+table.spec .spec { color: var(--muted); margin-top: 2px; }
+table.spec .care { color: var(--faint); font-size: 11.5px; margin-top: 2px; }
+table.spec tfoot td { border-bottom: 0; background: rgba(255,255,255,0.025); }
+@media (max-width: 700px) {
+  .cgrid { grid-template-columns: 1fr; }
+  .modal.wide { padding: 0; }
+  .modal .card.sheet { border-radius: 0; border: 0; }
+  .prow, .crow { grid-template-columns: 104px minmax(0, 1fr) 24px; }
+}
+@media print {
+  body * { visibility: hidden; }
+  #specModal, #specModal * { visibility: visible; }
+  #specModal { position: absolute; inset: 0; background: #fff; padding: 0; display: block; }
+  #specModal .card { background: #fff; color: #111; border: 0; max-width: none; height: auto; overflow: visible; }
+  #specModal .tools, #specModal #specClose { display: none; }
+  #specModal .sheetbody, #specModal .tablewrap { overflow: visible; border-color: #ccc; }
+  #specModal table th, #specModal table td { color: #111 !important; background: #fff !important; border-color: #ccc; }
+  #specModal p { color: #444; }
+}
+
 /* ---------- inspector ---------- */
 .insp-head { padding: 14px 14px 10px; border-bottom: 1px solid var(--line); display: grid; gap: 2px; flex: none; }
 .insp-head .eyebrow { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--faint); }
@@ -231,11 +328,13 @@ select { width: 100%; background: var(--panel-solid); border: 1px solid var(--li
   <aside class="panel left" id="leftPanel" aria-label="Design panel">
     <nav class="tabs" role="tablist">
       <button role="tab" data-tab="furnish" aria-selected="true">Furnish</button>
+      <button role="tab" data-tab="style" aria-selected="false">Style</button>
       <button role="tab" data-tab="light" aria-selected="false">Lighting</button>
       <button role="tab" data-tab="finish" aria-selected="false">Finishes</button>
       <button role="tab" data-tab="room" aria-selected="false">Room</button>
     </nav>
     <div class="scroll" id="tab-furnish" role="tabpanel"></div>
+    <div class="scroll" id="tab-style" role="tabpanel" hidden></div>
     <div class="scroll" id="tab-light" role="tabpanel" hidden></div>
     <div class="scroll" id="tab-finish" role="tabpanel" hidden></div>
     <div class="scroll" id="tab-room" role="tabpanel" hidden></div>
@@ -265,6 +364,28 @@ select { width: 100%; background: var(--panel-solid); border: 1px solid var(--li
   <div class="hint" id="hint">Click furniture to select · drag to move · Q / E rotate · Del removes</div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <button class="restore" id="restoreBtn" hidden title="Show the menus again (H)">Show menus</button>
+
+  <div class="modal wide" id="compareModal" hidden>
+    <div class="card sheet" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+      <header class="sheethead">
+        <div><h2 id="compareTitle">Compare furniture sets</h2><p>Same room, same layout, six ways to furnish it. Scores use your priorities from the Style tab.</p></div>
+        <div class="tools" id="compareTools"></div>
+        <button class="btn" id="compareClose" aria-label="Close">Close</button>
+      </header>
+      <div class="sheetbody" id="compareBody"></div>
+    </div>
+  </div>
+
+  <div class="modal wide" id="specModal" hidden>
+    <div class="card sheet" role="dialog" aria-modal="true" aria-labelledby="specTitle">
+      <header class="sheethead">
+        <div><h2 id="specTitle">Spec sheet</h2><p>Furniture schedule for the pieces in this layout, with indicative prices and lead times.</p></div>
+        <div class="tools" id="specTools"></div>
+        <button class="btn" id="specClose" aria-label="Close">Close</button>
+      </header>
+      <div class="sheetbody" id="specBody"></div>
+    </div>
+  </div>
 
   <div class="modal" id="codeModal" hidden>
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
@@ -341,6 +462,8 @@ const uid = (p = 'it') => `${p}${Date.now().toString(36)}${(_uid++).toString(36)
 // wall, 185″ stairs → TV wall, 9′ ceiling); bay geometry from the
 // foundation plan (2′-7″ / 7′-9″ / 2′-7″ bay, 2′-2″ jog, steel beam W200).
 // -------------------------------------------------------------------
+// how much each criterion counts when the furniture sets are scored (0–5, see 45-styles)
+const DEFAULT_WEIGHTS = { comfort: 4, picture: 3, acoustics: 2, care: 3, hangout: 3, budget: 3, lead: 1, fit: 3 };
 const DEFAULT_STATE = {
   room: {
     width: 228,            // fireplace wall -> exterior wall
@@ -374,19 +497,22 @@ const DEFAULT_STATE = {
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
   rev: 3,                 // room-measurement revision; older saved layouts get the corrected room
+  style: { set: 'warm-modern' },                          // furniture style set (pieces can override it in item.s)
+  // the owner's evaluation of the sets: kept out of undo, travels with the layout code
+  study: { weights: { ...DEFAULT_WEIGHTS }, ratings: {}, notes: {}, shortlist: [], pick: null },
   option: 'original',
   showSightline: true,
   showSpeakers: false,
   items: [
     { id: 'sectional', type: 'sectional', x: 160, y: 52, rot: 0,
-      p: { back: 136, ret: 104, depth: 38, side: 'right', color: '#8f877c' } },
-    { id: 'rug-main', type: 'rug', x: 140, y: 78, rot: 0, p: { w: 120, d: 96, color: '#6e6559', pattern: 'weave' } },
-    { id: 'ottoman', type: 'ottoman', x: 136, y: 82, rot: 0, p: { w: 40, d: 30, color: '#5b4636' } },
-    { id: 'console', type: 'console', x: 137.5, y: 177, rot: 180, p: { w: 70, color: '#4a3424' } },
-    { id: 'rug-lounge', type: 'rug', x: 54, y: 64, rot: 90, p: { w: 96, d: 72, color: '#7d7466', pattern: 'border' } },
-    { id: 'chair-a', type: 'loungeChair', x: 50, y: 30, rot: 35, p: { color: '#e6dccb' } },
-    { id: 'chair-b', type: 'loungeChair', x: 50, y: 98, rot: 145, p: { color: '#e6dccb' } },
-    { id: 'table', type: 'roundTable', x: 62, y: 64, rot: 0, p: { dia: 34, color: '#3b281b' } },
+      p: { back: 136, ret: 104, depth: 38, side: 'right' } },
+    { id: 'rug-main', type: 'rug', x: 140, y: 78, rot: 0, p: { w: 120, d: 96 } },
+    { id: 'ottoman', type: 'ottoman', x: 136, y: 82, rot: 0, p: { w: 40, d: 30 } },
+    { id: 'console', type: 'console', x: 137.5, y: 177, rot: 180, p: { w: 70 } },
+    { id: 'rug-lounge', type: 'rug', x: 54, y: 64, rot: 90, p: { w: 96, d: 72 } },
+    { id: 'chair-a', type: 'loungeChair', x: 50, y: 30, rot: 35, p: {} },
+    { id: 'chair-b', type: 'loungeChair', x: 50, y: 98, rot: 145, p: {} },
+    { id: 'table', type: 'roundTable', x: 62, y: 64, rot: 0, p: { dia: 34 } },
     { id: 'olive', type: 'plant', x: 12, y: 106, rot: 0, p: { h: 70 } },
     { id: 'lamp', type: 'floorLamp', x: 210, y: 112, rot: 0, p: {} },
   ],
@@ -418,8 +544,8 @@ const RECOMMENDED_STATE = (() => {
   Object.assign(at('rug-lounge'), { x: 56, y: 76 });
   s.items = s.items.filter((i) => i.id !== 'lamp');
   s.items.push(
-    { id: 'pouf-a', type: 'pouf', x: 33, y: 76, rot: 0, p: { color: '#c9bba5' } },
-    { id: 'pouf-b', type: 'pouf', x: 86, y: 94, rot: 0, p: { color: '#7a5f48' } },
+    { id: 'pouf-a', type: 'pouf', x: 33, y: 76, rot: 0, p: {} },
+    { id: 'pouf-b', type: 'pouf', x: 86, y: 94, rot: 0, p: {} },
     { id: 'bar', type: 'barCart', x: 215, y: 116, rot: 180, p: {} },
     { id: 'spk-l', type: 'towerSpeaker', x: 80, y: 157, rot: 200, p: {} },
     { id: 'spk-r', type: 'towerSpeaker', x: 191, y: 157, rot: 160, p: {} },
@@ -486,8 +612,25 @@ function applyState(obj, record = true) {
     fireplace: { ...d.fireplace, ...(obj.fireplace || {}) },
     light: { ...d.light, ...(obj.light || {}) },
     items: obj.items.filter((it) => it && it.type).map((it) => ({ id: it.id || uid(), rot: 0, p: {}, ...it })),
+    style: { ...d.style, ...(obj.style || {}) },
+    study: { ...d.study, ...(obj.study || {}), weights: { ...d.study.weights, ...((obj.study || {}).weights || {}) } },
   };
+  if (!obj.style) migrateLegacyStyle();
   return true;
+}
+
+/** Layouts saved before style sets kept a colour on each piece: keep only what differs from Warm Modern (the old look). */
+function migrateLegacyStyle() {
+  const woodKey = (hex) => Object.keys(WOOD_FINISHES).find((k) => WOOD_FINISHES[k].color.toLowerCase() === String(hex).toLowerCase());
+  for (const it of state.items) {
+    const legacy = {};
+    if (it.p.color) { if (UPHOLSTERED[it.type] || it.type === 'rug') legacy.color = it.p.color; else if (woodKey(it.p.color)) legacy.wood = woodKey(it.p.color); }
+    if (it.p.pattern) legacy.variant = it.p.pattern;
+    delete it.p.color; delete it.p.pattern;
+    const base = resolveSpec(it, 'warm-modern', false), keep = {};
+    for (const k of Object.keys(legacy)) if (legacy[k] !== base[k]) keep[k] = legacy[k];
+    if (Object.keys(keep).length) it.s = { ...(it.s || {}), ...keep };
+  }
 }
 
 let toastTimer = 0;
@@ -585,10 +728,47 @@ function noiseCanvas(size, { base = '#808080', amp = 40, blobs = 0, seed = 3, do
   return cv;
 }
 
-function rugCanvas(color, pattern, seed = 11) {
-  const size = 512, cv = noiseCanvas(size, { base: color, amp: 26, seed }), g = cv.getContext('2d');
-  const r = rng(seed + 1), light = css(shade(color, 0.22)), dark = css(shade(color, -0.25));
-  if (pattern === 'border') {
+function rugCanvas(color, pattern, seed = 11, color2 = null) {
+  const size = 512, shag = pattern === 'shag', jute = pattern === 'jute';
+  const cv = noiseCanvas(size, { base: color, amp: shag ? 60 : jute ? 46 : 26, seed }), g = cv.getContext('2d');
+  const r = rng(seed + 1), light = css(shade(color, 0.22)), dark = css(shade(color, -0.25)), second = color2 || css(shade(color, -0.4));
+  if (pattern === 'vintage') {
+    // distressed medallion: field, layered borders, central medallion, then wear
+    g.strokeStyle = second; g.lineWidth = 22; g.strokeRect(24, 24, size - 48, size - 48);
+    g.strokeStyle = light; g.lineWidth = 4; g.strokeRect(46, 46, size - 92, size - 92);
+    g.fillStyle = second; g.globalAlpha = 0.85;
+    for (const [rx, ry] of [[150, 110], [92, 70]]) {
+      g.beginPath(); g.moveTo(size / 2, size / 2 - ry); g.lineTo(size / 2 + rx, size / 2); g.lineTo(size / 2, size / 2 + ry); g.lineTo(size / 2 - rx, size / 2); g.closePath(); g.fill();
+      g.fillStyle = light;
+    }
+    g.fillStyle = color; g.beginPath(); g.arc(size / 2, size / 2, 26, 0, Math.PI * 2); g.fill();
+    g.globalAlpha = 0.5; g.fillStyle = second;
+    for (const [x, y] of [[90, 90], [size - 90, 90], [90, size - 90], [size - 90, size - 90]]) { g.beginPath(); g.arc(x, y, 30, 0, Math.PI * 2); g.fill(); }
+    g.globalAlpha = 0.22;                                // worn patches
+    for (let i = 0; i < 260; i++) { g.fillStyle = r() < 0.5 ? light : css(shade(color, 0.4)); g.fillRect(r() * size, r() * size, 6 + r() * 26, 1 + r() * 3); }
+    g.globalAlpha = 1;
+  } else if (jute) {
+    g.globalAlpha = 0.35;                                // chunky braided rows
+    for (let y = 0; y < size; y += 12) for (let x = (y / 12) % 2 ? 0 : 8; x < size; x += 16) {
+      g.fillStyle = (x + y) % 32 ? dark : light; g.beginPath(); g.ellipse(x, y + 6, 7, 4.5, 0.5, 0, Math.PI * 2); g.fill();
+    }
+    g.globalAlpha = 1;
+  } else if (pattern === 'geometric') {
+    g.fillStyle = second;                               // mid-century: offset ovals and lines on a plain field
+    for (let y = 40; y < size; y += 86) for (let x = (y / 86) % 2 ? 40 : 83; x < size; x += 86) {
+      g.globalAlpha = 0.9; g.beginPath(); g.ellipse(x, y, 22, 12, 0, 0, Math.PI * 2); g.fill();
+      g.globalAlpha = 0.5; g.fillRect(x - 40, y + 30, 80, 3);
+    }
+    g.globalAlpha = 1; g.strokeStyle = dark; g.lineWidth = 6; g.strokeRect(14, 14, size - 28, size - 28);
+  } else if (shag) {
+    g.globalAlpha = 0.25;                               // long fibres catching light
+    for (let i = 0; i < 2600; i++) {
+      g.strokeStyle = r() < 0.5 ? light : dark; g.lineWidth = 1 + r() * 1.5;
+      const x = r() * size, y = r() * size, a = r() * Math.PI * 2, l = 4 + r() * 10;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke();
+    }
+    g.globalAlpha = 1;
+  } else if (pattern === 'border') {
     g.strokeStyle = light; g.lineWidth = 10; g.strokeRect(30, 30, size - 60, size - 60);
     g.strokeStyle = dark; g.lineWidth = 3; g.strokeRect(52, 52, size - 104, size - 104);
   } else {
@@ -612,6 +792,54 @@ function stoneCanvas() {
     g.beginPath(); let x = -20, y = r() * size; g.moveTo(x, y);
     while (x < size + 20) { const nx = x + 40 + r() * 70, ny = y + (r() - 0.45) * 60; g.quadraticCurveTo((x + nx) / 2 + (r() - 0.5) * 40, (y + ny) / 2 + (r() - 0.5) * 40, nx, ny); x = nx; y = ny; }
     g.stroke();
+  }
+  return cv;
+}
+
+/** Light natural stone: travertine (pitted, banded) or marble (soft grey veins). */
+function lightStoneCanvas(kind) {
+  const size = 512, trav = kind === 'travertine';
+  const cv = noiseCanvas(size, { base: trav ? '#d8c7ad' : '#ebe7df', amp: trav ? 18 : 8, seed: trav ? 71 : 73 }), g = cv.getContext('2d'), r = rng(trav ? 72 : 74);
+  if (trav) {
+    for (let y = 0; y < size; y += 3) { g.fillStyle = `rgba(150,120,85,${0.02 + r() * 0.08})`; g.fillRect(0, y, size, 1 + r() * 3); }
+    for (let i = 0; i < 380; i++) { g.fillStyle = `rgba(120,95,65,${0.25 + r() * 0.35})`; g.beginPath(); g.ellipse(r() * size, r() * size, 1 + r() * 4, 0.6 + r() * 1.4, 0, 0, Math.PI * 2); g.fill(); }
+  } else {
+    for (let i = 0; i < 12; i++) {
+      g.strokeStyle = `rgba(120,118,112,${0.12 + r() * 0.3})`; g.lineWidth = 0.5 + r() * 2;
+      g.beginPath(); let x = -20, y = r() * size; g.moveTo(x, y);
+      while (x < size + 20) { const nx = x + 30 + r() * 60, ny = y + (r() - 0.5) * 70; g.quadraticCurveTo((x + nx) / 2, (y + ny) / 2 + (r() - 0.5) * 30, nx, ny); x = nx; y = ny; }
+      g.stroke();
+    }
+  }
+  return cv;
+}
+/** Woven cane: octagonal openings on a dark ground, read as a light lattice. */
+function caneCanvas() {
+  const cv = mkCanvas(256, 256), g = cv.getContext('2d');
+  g.fillStyle = '#2a211a'; g.fillRect(0, 0, 256, 256);
+  g.strokeStyle = '#d6bf94'; g.lineWidth = 2.4;
+  for (let k = -256; k < 512; k += 16) {
+    for (const [dx, dy] of [[1, 1], [1, -1]]) { g.beginPath(); g.moveTo(k, dy > 0 ? 0 : 256); g.lineTo(k + 256 * dx, dy > 0 ? 256 : 0); g.stroke(); }
+    g.beginPath(); g.moveTo(k, 0); g.lineTo(k, 256); g.stroke();
+  }
+  return cv;
+}
+/** Bump maps (grey): diagonal twill for tweed, pebbled grain for leather, chunky chevron for knit. */
+function bumpCanvas(kind) {
+  const size = 256, cv = noiseCanvas(size, { base: '#808080', amp: kind === 'leather' ? 26 : 30, seed: kind.length * 7 }), g = cv.getContext('2d'), r = rng(kind.length * 13);
+  if (kind === 'tweed') {
+    g.lineWidth = 2;
+    for (let k = -size; k < size * 2; k += 5) { g.strokeStyle = (k / 5) % 2 ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.28)'; g.beginPath(); g.moveTo(k, 0); g.lineTo(k + size, size); g.stroke(); }
+    for (let i = 0; i < 500; i++) { g.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'; g.fillRect(r() * size, r() * size, 1 + r() * 3, 1); }
+  } else if (kind === 'leather') {
+    for (let i = 0; i < 1800; i++) { g.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.2)'; g.beginPath(); g.arc(r() * size, r() * size, 0.8 + r() * 2.2, 0, Math.PI * 2); g.fill(); }
+    g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 0.8;
+    for (let i = 0; i < 14; i++) { g.beginPath(); const x = r() * size, y = r() * size; g.moveTo(x, y); g.quadraticCurveTo(x + (r() - 0.5) * 40, y + (r() - 0.5) * 40, x + (r() - 0.5) * 70, y + (r() - 0.5) * 70); g.stroke(); }
+  } else if (kind === 'knit') {
+    for (let y = 0; y < size; y += 16) for (let x = 0; x < size; x += 16) {
+      for (const sx of [-1, 1]) { g.fillStyle = 'rgba(255,255,255,0.4)'; g.beginPath(); g.ellipse(x + 8 + sx * 3.5, y + 8, 3.4, 7, sx * 0.55, 0, Math.PI * 2); g.fill(); }
+      g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(x + 7.4, y, 1.2, 16);
+    }
   }
   return cv;
 }
@@ -678,6 +906,9 @@ function initMaterials() {
   TEX.boucle = canvasTex(noiseCanvas(256, { base: '#808080', amp: 50, dots: 1400, seed: 21 }), false, [3, 3]);
   TEX.linen = canvasTex(noiseCanvas(256, { base: '#808080', amp: 34, seed: 5 }), false, [4, 4]);
   TEX.paint = canvasTex(noiseCanvas(256, { base: '#808080', amp: 10, seed: 9 }), false, [8, 8]);
+  TEX.tweed = canvasTex(bumpCanvas('tweed'), false, [3, 3]);
+  TEX.leather = canvasTex(bumpCanvas('leather'), false, [2, 2]);
+  TEX.knit = canvasTex(bumpCanvas('knit'), false, [2, 2]);
 
   M.wall = new THREE.MeshStandardMaterial({ color: state.finish.wall, roughness: 0.92, bumpMap: TEX.paint, bumpScale: 0.02 });
   M.accent = new THREE.MeshStandardMaterial({ color: '#2f2b28', roughness: 0.9 });
@@ -744,10 +975,37 @@ function woodMat(color) {
     return new THREE.MeshStandardMaterial({ map, roughness: 0.5 });
   });
 }
-function rugMat(color, pattern) {
-  return cached(`rug-${color}-${pattern}`, () => new THREE.MeshStandardMaterial({
-    map: canvasTex(rugCanvas(color, pattern), true), roughness: 1,
+function rugMat(color, pattern, color2 = null) {
+  return cached(`rug-${color}-${pattern}-${color2}`, () => new THREE.MeshStandardMaterial({
+    map: canvasTex(rugCanvas(color, pattern, 11, color2), true), roughness: 1,
   }));
+}
+/** Upholstery by cover type (see COVERS in 45-styles). */
+function coverMat(cover, color) {
+  const kind = (COVERS[cover] || COVERS.linen).kind;
+  return cached(`cover-${kind}-${color}`, () => {
+    if (kind === 'velvet') return new THREE.MeshPhysicalMaterial({ color, roughness: 0.8, sheen: 0.6, sheenRoughness: 0.5,
+      sheenColor: shade(color, 0.18), bumpMap: TEX.linen, bumpScale: 0.06 });
+    if (kind === 'leather') return new THREE.MeshStandardMaterial({ color, roughness: 0.46, bumpMap: TEX.leather, bumpScale: 0.12 });
+    if (kind === 'tweed') return new THREE.MeshStandardMaterial({ color, roughness: 0.96, bumpMap: TEX.tweed, bumpScale: 0.4 });
+    if (kind === 'knit') return new THREE.MeshStandardMaterial({ color, roughness: 1, bumpMap: TEX.knit, bumpScale: 1.1 });
+    if (kind === 'weave') return new THREE.MeshStandardMaterial({ color, roughness: 0.97, bumpMap: TEX.linen, bumpScale: 0.16 });
+    return fabricMat(color, kind === 'boucle' ? 'boucle' : 'linen');
+  });
+}
+const woodFinish = (key) => woodMat((WOOD_FINISHES[key] || WOOD_FINISHES.walnut).color);
+function metalFinish(key) {
+  if (key === 'brass') return M.brass;
+  if (key === 'nickel') return cached('metal-nickel', () => new THREE.MeshStandardMaterial({ color: '#b9b6ae', roughness: 0.3, metalness: 1 }));
+  return cached('metal-black', () => new THREE.MeshStandardMaterial({ color: '#1d1c1a', roughness: 0.5, metalness: 0.6 }));
+}
+function stoneFinish(key) {
+  if (key === 'nero') return M.slab;
+  return cached('stone-' + key, () => new THREE.MeshStandardMaterial({ map: canvasTex(lightStoneCanvas(key), true), roughness: key === 'marble' ? 0.22 : 0.6 }));
+}
+function avFinish(key) {
+  if (key === 'walnut' || key === 'oak') return woodFinish(key);
+  return M.black;
 }
 
 // ---- 20-room.js ----
@@ -1602,7 +1860,9 @@ function applyScene(name) {
 // ===================================================================
 // 40 · Furniture. Each factory builds in a local frame: origin = centre
 // of the footprint on the floor, +Z = the side people face, inches.
-// It returns { group, w, d, shadows: [[x, z, w, d]] }.
+// It gets the geometry params p, the item, and its resolved style s
+// (variant, cover, colour, wood, metal, stone: see 45-styles.js) and
+// returns { group, w, d, shadows: [[x, z, w, d]] }.
 // ===================================================================
 const rbox = (w, h, d, r = 1.5, seg = 3) => new RoundedBoxGeometry(w, h, d, seg, Math.min(r, w / 2 - 0.01, h / 2 - 0.01, d / 2 - 0.01));
 function meshAt(geo, mat, x, y, z, parent) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; }
@@ -1610,122 +1870,228 @@ function meshAt(geo, mat, x, y, z, parent) { const m = new THREE.Mesh(geo, mat);
 function span(parent, mat, x0, x1, y0, y1, z0, z1, r = 1.5) {
   return meshAt(rbox(x1 - x0, y1 - y0, z1 - z0, r), mat, (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2, parent);
 }
+/** Cylinder between two points (legs, tubes, struts). */
+function strut(parent, mat, a, b, r0, r1 = r0, seg = 10) {
+  const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), len = A.distanceTo(B);
+  const m = meshAt(new THREE.CylinderGeometry(r1, r0, len, seg), mat, (A.x + B.x) / 2, (A.y + B.y) / 2, (A.z + B.z) / 2, parent);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize());
+  return m;
+}
+/** Instanced copies of one geometry at [x, y, z, rotY] positions. */
+function instances(parent, geo, mat, list) {
+  const inst = new THREE.InstancedMesh(geo, mat, Math.max(1, list.length)), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), one = new THREE.Vector3(1, 1, 1);
+  list.forEach(([x, y, z, ry = 0], i) => inst.setMatrixAt(i, m4.compose(new THREE.Vector3(x, y, z), q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry), one)));
+  inst.count = list.length; parent.add(inst); return inst;
+}
 
+// style sets dress every piece, so the catalogue only carries geometry
 const CATALOG = {
   sectional: {
-    label: 'L-sectional', note: 'Modular, return on either side', fabric: true,
-    defaults: { back: 136, ret: 104, depth: 38, side: 'right', color: '#8f877c' },
+    label: 'L-sectional', note: 'Six styles, return on either side', defaults: { back: 136, ret: 104, depth: 38, side: 'right' },
     params: [['back', 'Back length', 84, 180], ['ret', 'Return length', 60, 140], ['depth', 'Seat depth', 32, 44]],
     options: [['side', 'Return side', [['right', 'Right'], ['left', 'Left']]]],
-    colors: FABRICS,
   },
-  sofa: {
-    label: 'Sofa', note: 'Straight 3-seat', fabric: true,
-    defaults: { w: 90, depth: 38, color: '#5f5a54' }, params: [['w', 'Length', 60, 120], ['depth', 'Seat depth', 32, 44]], colors: FABRICS,
-  },
-  loungeChair: { label: 'Bouclé chair', note: '31″ curved tub chair', defaults: { color: '#e6dccb' }, params: [], colors: FABRICS },
-  roundTable: {
-    label: 'Round coffee table', note: 'Sculpted pedestal', defaults: { dia: 34, color: '#3b281b' },
-    params: [['dia', 'Diameter', 24, 48]], colors: WOODS,
-  },
-  ottoman: {
-    label: 'Ottoman', note: 'Upholstered, doubles as table', defaults: { w: 40, d: 30, color: '#5b4636' },
-    params: [['w', 'Width', 18, 60], ['d', 'Depth', 18, 48]], colors: [...FABRICS, ['#5b4636', 'Leather']],
-  },
-  rug: {
-    label: 'Rug', note: 'Low pile', defaults: { w: 120, d: 96, color: '#6e6559', pattern: 'weave' },
-    params: [['w', 'Length', 36, 168], ['d', 'Width', 24, 144]],
-    options: [['pattern', 'Pattern', [['weave', 'Tonal weave'], ['border', 'Bordered']]]],
-    colors: [['#6e6559', 'Taupe'], ['#7d7466', 'Sand'], ['#3d3833', 'Charcoal'], ['#8a7a64', 'Wheat'], ['#4b4f55', 'Slate'], ['#5e4a3a', 'Rust brown']],
-  },
-  console: {
-    label: 'Media console', note: 'Wall-hung, slatted front', defaults: { w: 70, color: '#4a3424' },
-    params: [['w', 'Length', 40, 84]], colors: WOODS,
-  },
-  sideTable: { label: 'Side table', note: '18″ drum', defaults: { color: '#3b281b' }, params: [], colors: WOODS },
-  floorLamp: { label: 'Floor lamp', note: 'Linen drum, warm bulb', defaults: {}, params: [] },
-  plant: { label: 'Olive tree', note: 'In stone planter', defaults: { h: 70 }, params: [['h', 'Height', 36, 90]] },
+  sofa: { label: 'Sofa', note: 'Straight, six styles', defaults: { w: 90, depth: 38 }, params: [['w', 'Length', 60, 120], ['depth', 'Seat depth', 32, 44]] },
+  loungeChair: { label: 'Lounge chair', note: 'Tub, frame, sling, swivel or low', defaults: {}, params: [] },
+  roundTable: { label: 'Coffee table', note: 'Pedestal, slab, tulip, drum or steel', defaults: { dia: 34 }, params: [['dia', 'Size', 24, 48]] },
+  ottoman: { label: 'Ottoman', note: 'Block, tufted or tray', defaults: { w: 40, d: 30 }, params: [['w', 'Width', 18, 60], ['d', 'Depth', 18, 48]] },
+  rug: { label: 'Rug', note: 'Six weaves', defaults: { w: 120, d: 96 }, params: [['w', 'Length', 36, 168], ['d', 'Width', 24, 144]] },
+  console: { label: 'Media console', note: 'Wall-hung or on legs', defaults: { w: 70 }, params: [['w', 'Length', 40, 84]] },
+  sideTable: { label: 'Side table', note: 'Drum, C-table, stump or stone', defaults: {}, params: [] },
+  floorLamp: { label: 'Floor lamp', note: 'Drum, arc, tripod, lantern or globe', defaults: {}, params: [] },
+  plant: { label: 'Plant', note: 'Olive, fiddle-leaf fig or snake plant', defaults: { h: 70 }, params: [['h', 'Height', 36, 90]] },
   towerSpeaker: { label: 'Tower speaker', note: 'Front L / R', defaults: {}, params: [] },
   subwoofer: { label: 'Subwoofer', note: '15″ cube', defaults: {}, params: [] },
-  recliner: {
-    label: 'Cinema recliner', note: 'Power recline, 36″ wide', fabric: true,
-    defaults: { color: '#2f2c2a' }, params: [], colors: FABRICS,
-  },
-  pouf: { label: 'Pouf', note: '20″ extra seat or footrest', defaults: { color: '#c9bba5' }, params: [], colors: FABRICS },
+  recliner: { label: 'Cinema recliner', note: 'Power recline, 36″ wide', defaults: {}, params: [] },
+  pouf: { label: 'Pouf', note: '20″ extra seat or footrest', defaults: {}, params: [] },
   barCart: { label: 'Bar cart', note: '24″ × 16″, two shelves', defaults: {}, params: [] },
 };
 
-function makeSectional(p) {
+// ---------------- sectional and sofa ----------------
+// base: plinth | taper (wood legs) | steel (legs) | brass (plinth with a brass kick)
+// back: loose cushions | bolster | tufted (buttons) | rolls (two stacked) | channels (vertical) | headrest (recliner modules)
+const SEAT_STYLES = {
+  track:    { base: 'plinth', baseH: 3.5, deck: 12, seat: 18.5, frameH: 30, bt: 8, armH: 24, armW: 6, arm: 'track', back: 'loose', cr: 2.6, cw: 30 },
+  modular:  { base: 'plinth', baseH: 2.5, deck: 9.5, seat: 16, frameH: 21, bt: 7, armH: 0, armW: 0, arm: 'none', back: 'bolster', cr: 4, cw: 36 },
+  tufted:   { base: 'taper', baseH: 6.5, deck: 13, seat: 18, frameH: 31, bt: 7, armH: 24, armW: 4.5, arm: 'track', back: 'tufted', cr: 1.6, cw: 0 },
+  slope:    { base: 'steel', baseH: 4.5, deck: 12, seat: 18.5, frameH: 26, bt: 7, armH: 25, armW: 7, arm: 'slope', back: 'rolls', cr: 3.4, cw: 30 },
+  channel:  { base: 'brass', baseH: 3, deck: 12, seat: 18, frameH: 31, bt: 4.5, armH: 25, armW: 7, arm: 'pillow', back: 'channels', cr: 2.2, cw: 0 },
+  recliner: { base: 'plinth', baseH: 3, deck: 12.5, seat: 19.5, frameH: 26, bt: 6, armH: 25, armW: 7.5, arm: 'track', back: 'headrest', cr: 2.8, cw: 34 },
+};
+function makeSeating(p, s, isL) {
+  const st = SEAT_STYLES[s.variant] || SEAT_STYLES.track;
   const g = new THREE.Group(), inner = new THREE.Group(); g.add(inner);
-  const B = p.back, R = p.ret, d = p.depth, arm = 6, bt = 8, base = 3.5, seatTop = 18.5, deck = 12;
-  const fab = fabricMat(p.color, 'linen'), dark = M.black;
-  const x0 = -B / 2, x1 = B / 2, z0 = -R / 2, z1 = R / 2;
-  // recessed plinth
-  span(inner, dark, x0 + 2, x1 - 2, 0, base, z0 + 2, z0 + d - 2, 0.3);
-  span(inner, dark, x0 + 2, x0 + d - 2, 0, base, z0 + d - 2, z1 - 2, 0.3);
-  // backrests, arms, decks
-  span(inner, fab, x0, x1 - arm, base, 30, z0, z0 + bt, 2.5);
-  span(inner, fab, x0, x0 + bt, base, 30, z0 + bt, z1 - arm, 2.5);
-  span(inner, fab, x1 - arm, x1, base, 24, z0, z0 + d, 2.5);
-  span(inner, fab, x0, x0 + d, base, 24, z1 - arm, z1, 2.5);
-  span(inner, fab, x0 + bt, x1 - arm, base, deck, z0 + bt, z0 + d, 1.5);
-  span(inner, fab, x0 + bt, x0 + d, base, deck, z0 + d, z1 - arm, 1.5);
-  // seat cushions: corner + back leg + return
-  const gap = 0.4;
-  span(inner, fab, x0 + bt + gap, x0 + d, deck, seatTop, z0 + bt + gap, z0 + d, 2.6);
-  const runB = x1 - arm - (x0 + d), nB = Math.max(1, Math.round(runB / 30));
-  for (let i = 0; i < nB; i++) {
-    const a = x0 + d + (runB * i) / nB + gap, b = x0 + d + (runB * (i + 1)) / nB - gap;
-    span(inner, fab, a, b, deck, seatTop, z0 + bt + gap, z0 + d, 2.6);
-  }
-  const runR = z1 - arm - (z0 + d), nR = Math.max(1, Math.round(runR / 30));
-  for (let i = 0; i < nR; i++) {
-    const a = z0 + d + (runR * i) / nR + gap, b = z0 + d + (runR * (i + 1)) / nR - gap;
-    span(inner, fab, x0 + bt + gap, x0 + d, deck, seatTop, a, b, 2.6);
-  }
-  // loose back cushions, slightly reclined
-  const backC = (cx, cz, w, rotY) => {
-    const m = meshAt(rbox(w, 17, 6.5, 3), fab, cx, seatTop + 8, cz, inner);
-    m.rotation.y = rotY; m.rotateX(-0.16);
+  const fab = coverMat(s.cover, s.color), d = p.depth, B = isL ? p.back : p.w, R = isL ? p.ret : d;
+  const { baseH: base, deck, seat: seatTop, frameH, bt, armH, cr } = st, arm = st.arm === 'none' ? 0 : st.armW;
+  const x0 = -B / 2, x1 = B / 2, z0 = -R / 2, z1 = z0 + R, zf = z0 + d;
+  const box = (mat, xa, xb, ya, yb, za, zb, r) => span(inner, mat, xa, xb, ya, yb, za, zb, r);
+  // runs: u along the seat row, v from the back (vb) to the front (vf); 'x' rows face +z, 'z' rows face +x
+  const runs = isL
+    ? [{ axis: 'x', u0: x0 + bt, u1: x1 - arm, vb: z0 + bt, vf: zf, corner: d - bt }, { axis: 'z', u0: zf, u1: z1 - arm, vb: x0 + bt, vf: x0 + d, corner: 0 }]
+    : [{ axis: 'x', u0: x0 + arm, u1: x1 - arm, vb: z0 + bt, vf: zf, corner: 0 }];
+  const inRun = (run, mat, ua, ub, ya, yb, va, vb, r) => (run.axis === 'x' ? box(mat, ua, ub, ya, yb, va, vb, r) : box(mat, va, vb, ya, yb, ua, ub, r));
+  const placeRot = (run, m, u, y, v, tilt) => {
+    if (run.axis === 'x') m.position.set(u, y, v); else { m.position.set(v, y, u); m.rotation.y = Math.PI / 2; }
+    if (tilt) m.rotateX(-tilt); inner.add(m); return m;
   };
-  for (let i = 0; i < nB; i++) {
-    const a = x0 + d + (runB * i) / nB, b = x0 + d + (runB * (i + 1)) / nB;
-    backC((a + b) / 2, z0 + bt + 3, b - a - 1, 0);
+  // ---- base ----
+  const feet = [[x0, x1, z0, zf]]; if (isL) feet.push([x0, x0 + d, zf, z1]);
+  if (st.base === 'taper' || st.base === 'steel') {
+    const wood = woodFinish('walnut'), steel = metalFinish('black'), pts = [];
+    for (const [xa, xb, za, zb] of feet) {
+      const nx = Math.max(1, Math.ceil((xb - xa) / 64)), nz = Math.max(1, Math.ceil((zb - za) / 64));
+      for (let i = 0; i <= nx; i++) for (const z of [za + 2.5, zb - 2.5]) pts.push([lerp(xa + 2.5, xb - 2.5, i / nx), z]);
+      for (let k = 1; k < nz; k++) for (const x of [xa + 2.5, xb - 2.5]) pts.push([x, lerp(za + 2.5, zb - 2.5, k / nz)]);
+    }
+    const seen = new Set();
+    for (const [x, z] of pts) {
+      const key = `${Math.round(x)},${Math.round(z)}`; if (seen.has(key)) continue; seen.add(key);
+      if (st.base === 'taper') strut(inner, wood, [x * 1.004, 0, z * 1.004 + 0.3], [x, base, z], 0.45, 0.85, 10);
+      else meshAt(new THREE.BoxGeometry(1.3, base, 1.3), steel, x, base / 2, z, inner);
+    }
+  } else {
+    for (const [xa, xb, za, zb] of feet) box(M.black, xa + 2, xb - 2, 0, base, za + 2, zb - 2, 0.3);
+    if (st.base === 'brass') {
+      box(M.brass, x0 + 2, x1 - 2, 0.4, 1.0, zf - 2.2, zf - 1.9, 0.1);
+      if (isL) box(M.brass, x0 + d - 2.2, x0 + d - 1.9, 0.4, 1.0, zf, z1 - 2, 0.1);
+    }
   }
-  backC(x0 + bt + (d - bt) / 2 + 2, z0 + bt + 3, d - bt - 3, 0);
-  for (let i = 0; i < nR; i++) {
-    const a = z0 + d + (runR * i) / nR, b = z0 + d + (runR * (i + 1)) / nR;
-    backC(x0 + bt + 3, (a + b) / 2, b - a - 1, Math.PI / 2);
+  // ---- back frame and arms ----
+  const backs = isL ? [[x0, x1 - arm, z0, z0 + bt], [x0, x0 + bt, z0 + bt, z1 - arm]] : [[x0, x1, z0, z0 + bt]];
+  for (const [xa, xb, za, zb] of backs) box(fab, xa, xb, base, frameH, za, zb, st.back === 'tufted' ? 1.6 : 2.5);
+  const arms = isL ? [[x1 - arm, x1, z0, zf, 'z'], [x0, x0 + d, z1 - arm, z1, 'x']] : [[x0, x0 + arm, z0, zf, 'z'], [x1 - arm, x1, z0, zf, 'z']];
+  if (arm) for (const [xa, xb, za, zb, along] of arms) {
+    if (st.arm === 'slope') {
+      // sloping arm: high at the back, low at the front (profile extruded across the arm's width)
+      const len = along === 'z' ? zb - za : xb - xa, wd = along === 'z' ? xb - xa : zb - za;
+      const sh = new THREE.Shape([[0.8, base], [len - 0.8, base], [len - 0.8, armH - 5.5], [len - 3.5, armH - 4], [2.5, armH], [0.8, armH - 1.5]].map(([a, b]) => new THREE.Vector2(a, b)));
+      const geo = new THREE.ExtrudeGeometry(sh, { depth: wd - 1.6, bevelEnabled: true, bevelThickness: 0.8, bevelSize: 0.8, bevelSegments: 3 });
+      const m = new THREE.Mesh(geo, fab);
+      if (along === 'z') { m.rotation.y = -Math.PI / 2; m.position.set(xb - 0.8, 0, za); } else { m.position.set(xa, 0, za + 0.8); }
+      inner.add(m);
+    } else box(fab, xa, xb, base, armH, za, zb, st.arm === 'pillow' ? Math.min(xb - xa, zb - za) / 2 - 0.2 : 2.5);
   }
-  // accent pillows
-  const pil = fabricMat('#d8cdbb', 'boucle');
-  for (const [x, z, ry] of [[x0 + bt + 9, z0 + bt + 9, Math.PI / 4], [x1 - arm - 10, z0 + bt + 7, -0.15]]) {
-    const m = meshAt(rbox(18, 17, 5, 2.5), pil, x, seatTop + 8, z, inner); m.rotation.y = ry; m.rotateX(-0.25);
+  // ---- deck ----
+  for (const run of runs) inRun(run, fab, run.u0 - run.corner, run.u1, base, deck, run.vb, run.vf, 1.5);
+  // ---- seats and backs per run ----
+  const gap = 0.4, darker = coverMat(s.cover, css(shade(s.color, -0.35)));
+  const buttons = [], channels = [];
+  for (const run of runs) {
+    const len = run.u1 - run.u0, depth = run.vf - run.vb;
+    // seat cushions (bench styles get one long cushion per run)
+    const cells = [];
+    if (run.corner) cells.push([run.u0 - run.corner, run.u0, true]);
+    const n = st.cw ? Math.max(1, Math.round(len / st.cw)) : 1;
+    for (let i = 0; i < n; i++) cells.push([run.u0 + (len * i) / n, run.u0 + (len * (i + 1)) / n, false]);
+    if (!st.cw && run.corner) { cells.length = 0; cells.push([run.u0 - run.corner, run.u1, false]); }
+    for (const [ua, ub, corner] of cells) {
+      inRun(run, fab, ua + gap, ub - gap, deck, seatTop, run.vb + gap, run.vf, cr);
+      const w = ub - ua;
+      if (st.back === 'loose') placeRot(run, new THREE.Mesh(rbox(w - 1, 17, 6.5, 3), fab), (ua + ub) / 2, seatTop + 8, run.vb + 3, 0.16);
+      else if (st.back === 'bolster') placeRot(run, new THREE.Mesh(rbox(w - 1.2, 11, 8.5, 4.2), fab), (ua + ub) / 2, seatTop + 5.5, run.vb + 4.2, 0.1);
+      else if (st.back === 'rolls') {
+        placeRot(run, new THREE.Mesh(rbox(w - 1, 8, 7.5, 3.6), fab), (ua + ub) / 2, seatTop + 4.6, run.vb + 3.9, 0.1);
+        placeRot(run, new THREE.Mesh(rbox(w - 1, 8, 7.5, 3.6), fab), (ua + ub) / 2, seatTop + 12.2, run.vb + 3.1, 0.14);
+      } else if (st.back === 'headrest') {
+        // reclining module: tall back with a headrest, and the footrest seam on the front
+        placeRot(run, new THREE.Mesh(rbox(w - 1.2, 20, 7, 3), fab), (ua + ub) / 2, seatTop + 9.8, run.vb + 3.4, 0.1);
+        if (!corner) placeRot(run, new THREE.Mesh(rbox(w - 5, 7.5, 4.5, 2.4), fab), (ua + ub) / 2, seatTop + 18.5, run.vb + 5.6, 0.1);
+        if (!corner) inRun(run, M.black, ua + 1, ub - 1, deck - 2.4, deck - 2, run.vf - 0.05, run.vf + 0.15, 0.05);
+      }
+    }
+    // tight backs: button grid or vertical channels across the back face
+    const ua = run.u0 - run.corner, ub = run.u1;
+    if (st.back === 'tufted') {
+      for (let y = seatTop + 3.5, row = 0; y < frameH - 2.5; y += 5, row++) {
+        for (let u = ua + 3 + (row % 2) * 3.5; u < ub - 2; u += 7) buttons.push(run.axis === 'x' ? [u, y, run.vb + 0.05] : [run.vb + 0.05, y, u, Math.PI / 2]);
+      }
+    } else if (st.back === 'channels') {
+      const k = Math.max(1, Math.floor((ub - ua) / 6.2));
+      for (let i = 0; i < k; i++) {
+        const u = ua + ((ub - ua) * (i + 0.5)) / k;
+        channels.push(run.axis === 'x' ? [u, (seatTop - 1 + frameH) / 2, run.vb + 2.2] : [run.vb + 2.2, (seatTop - 1 + frameH) / 2, u, Math.PI / 2]);
+      }
+    }
   }
-  if (p.side === 'left') inner.scale.x = -1;
-  const s = p.side === 'left' ? -1 : 1;
-  return { group: g, w: B, d: R, shadows: [[0, z0 + d / 2, B, d], [s * (x0 + d / 2), (z0 + d + z1) / 2, d, R - d]] };
+  if (buttons.length) instances(inner, new THREE.SphereGeometry(0.6, 10, 6).scale(1, 1, 0.55), darker, buttons);
+  if (channels.length) instances(inner, rbox(5.7, frameH - seatTop + 1, 4.4, 2), fab, channels);   // ~6.2″ channels
+  // accent pillows from the set
+  const pil = (STYLE_SETS[activeSetId()].pieces.pillow);
+  if (pil && st.back !== 'headrest') {
+    const pm = coverMat(pil.cover, pil.color), spots = isL ? [[x0 + bt + 9, z0 + bt + 9, Math.PI / 4], [x1 - arm - 10, z0 + bt + 7, -0.15]] : [[x0 + arm + 9, z0 + bt + 7, 0.2], [x1 - arm - 9, z0 + bt + 7, -0.2]];
+    for (const [x, z, ry] of spots) { const m = meshAt(rbox(18, 17, 5, 2.5), pm, x, seatTop + 8, z, inner); m.rotation.y = ry; m.rotateX(-0.25); }
+  }
+  if (isL && p.side === 'left') inner.scale.x = -1;
+  const sx = isL && p.side === 'left' ? -1 : 1;
+  return { group: g, w: B, d: R, shadows: isL ? [[0, z0 + d / 2, B, d], [sx * (x0 + d / 2), (zf + z1) / 2, d, R - d]] : [[0, 0, B, d]] };
 }
+const makeSectional = (p, item, s) => makeSeating(p, s, true);
+const makeSofa = (p, item, s) => makeSeating(p, s, false);
 
-function makeSofa(p) {
-  const g = new THREE.Group(), W = p.w, d = p.depth, arm = 6, bt = 8, fab = fabricMat(p.color, 'linen');
-  const x0 = -W / 2, x1 = W / 2, z0 = -d / 2, z1 = d / 2;
-  span(g, M.black, x0 + 2, x1 - 2, 0, 3.5, z0 + 2, z1 - 2, 0.3);
-  span(g, fab, x0, x1, 3.5, 30, z0, z0 + bt, 2.5);
-  span(g, fab, x0, x0 + arm, 3.5, 24, z0, z1, 2.5);
-  span(g, fab, x1 - arm, x1, 3.5, 24, z0, z1, 2.5);
-  span(g, fab, x0 + arm, x1 - arm, 3.5, 12, z0 + bt, z1, 1.5);
-  const n = Math.max(1, Math.round((W - 2 * arm) / 30)), run = W - 2 * arm;
-  for (let i = 0; i < n; i++) {
-    const a = x0 + arm + (run * i) / n + 0.4, b = x0 + arm + (run * (i + 1)) / n - 0.4;
-    span(g, fab, a, b, 12, 18.5, z0 + bt + 0.4, z1, 2.6);
-    const m = meshAt(rbox(b - a - 0.6, 17, 6.5, 3), fab, (a + b) / 2, 26.5, z0 + bt + 3, g); m.rotateX(-0.16);
+// ---------------- lounge chairs ----------------
+function makeLoungeChair(p, item, s) {
+  const g = new THREE.Group(), fab = coverMat(s.cover, s.color), v = s.variant;
+  const pillowMat = coverMat('linen', css(shade(s.color, -0.3)));
+  if (v === 'frame') {                                    // mid-century: solid wood frame, loose cushions
+    const wood = woodFinish(s.wood || 'walnut');
+    for (const sx of [-1, 1]) {
+      const x = sx * 13.5;
+      strut(g, wood, [x, 0, 12], [x, 22.4, 11], 0.6, 0.8);
+      strut(g, wood, [x, 0, -13], [x, 22.4, -9], 0.6, 0.8);
+      span(g, wood, x - 1.3, x + 1.3, 21.8, 23.1, -13, 15, 0.5);
+      span(g, wood, x - 0.7, x + 0.7, 8, 9.6, -11, 11, 0.3);
+    }
+    for (const z of [10.5, -10.5]) span(g, wood, -13, 13, 8, 9.6, z - 0.8, z + 0.8, 0.3);
+    span(g, fab, -12.5, 12.5, 10, 15.5, -10.5, 13, 2.2);
+    const back = meshAt(rbox(25, 19, 5, 2.2), fab, 0, 24.5, -11, g); back.rotation.x = -0.3;
+    const rail = meshAt(rbox(27.4, 1.6, 1.4, 0.4), wood, 0, 32.5, -15, g); rail.rotation.x = -0.3;
+    return { group: g, w: 30, d: 33, shadows: [[0, 0, 30, 32]] };
   }
-  return { group: g, w: W, d, shadows: [[0, 0, W, d]] };
-}
-
-function makeLoungeChair(p) {
-  const g = new THREE.Group(), fab = fabricMat(p.color, 'boucle');
+  if (v === 'sling') {                                    // black steel frame, slung seat and back
+    const steel = metalFinish(s.metal || 'black');
+    for (const sx of [-1, 1]) {
+      const x = sx * 13;
+      strut(g, steel, [x, 0, 12], [x, 22, 12], 0.5);
+      strut(g, steel, [x, 22, 12], [x, 22, -9], 0.5);
+      strut(g, steel, [x, 22, -9], [x, 31, -15], 0.5);
+      strut(g, steel, [x, 0, -13], [x, 22, -9], 0.5);
+      span(g, fab, x - 1.2, x + 1.2, 22.2, 23.3, -8, 11, 0.4);               // leather arm pad
+    }
+    strut(g, steel, [-13, 14, 11], [13, 14, 11], 0.45); strut(g, steel, [-13, 9, -10], [13, 9, -10], 0.45);
+    strut(g, steel, [-13, 31, -15], [13, 31, -15], 0.45);
+    const sag = (w, h, depth) => { const geo = new THREE.PlaneGeometry(w, h, 8, 8), pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) { const x = pos.getX(i) / (w / 2), y = pos.getY(i) / (h / 2); pos.setZ(i, -depth * (1 - x * x * 0.25) * (1 - y * y)); }
+      geo.computeVertexNormals(); return geo; };
+    const leather = cached(`sling-${s.cover}-${s.color}`, () => { const m = coverMat(s.cover, s.color).clone(); m.side = THREE.DoubleSide; return m; });
+    const seat = meshAt(sag(25, 22, 2.4), leather, 0, 11.5, 0.5, g); seat.rotation.x = -Math.PI / 2 + 0.22;
+    const back = meshAt(sag(25, 21, 1.6), leather, 0, 21.5, -12.5, g); back.rotation.x = -0.45;
+    return { group: g, w: 28, d: 32, shadows: [[0, 0, 28, 30]] };
+  }
+  if (v === 'swivel') {                                   // barrel back on a swivel base
+    const metal = metalFinish(s.metal || 'black');
+    meshAt(new THREE.CylinderGeometry(9, 9.5, 0.8, 40), metal, 0, 0.4, 0, g);
+    meshAt(new THREE.CylinderGeometry(1.8, 1.8, 5, 16), metal, 0, 3.2, 0, g);
+    meshAt(new THREE.CylinderGeometry(13.5, 13, 6, 40), fab, 0, 8.5, 0, g);
+    const shape = new THREE.Shape(), a0 = -40 * DEG, a1 = 220 * DEG, N = 40;
+    for (let i = 0; i <= N; i++) { const t = lerp(a0, a1, i / N), x = Math.cos(t) * 14.6, y = Math.sin(t) * 14.6; i ? shape.lineTo(x, y) : shape.moveTo(x, y); }
+    for (let i = N; i >= 0; i--) { const t = lerp(a0, a1, i / N); shape.lineTo(Math.cos(t) * 11.2, Math.sin(t) * 11.2); }
+    const shell = new THREE.ExtrudeGeometry(shape, { depth: 15.5, bevelEnabled: true, bevelThickness: 1.6, bevelSize: 1.4, bevelSegments: 4, curveSegments: 24 });
+    shell.rotateX(-Math.PI / 2); shell.translate(0, 11.6, 0);
+    meshAt(shell, fab, 0, 0, 0, g);
+    const seat = meshAt(new THREE.CylinderGeometry(11.6, 12, 5, 40), fab, 0, 14, 1, g); seat.scale.set(1, 1, 0.95);
+    return { group: g, w: 30, d: 30, shadows: [[0, 0, 30, 30]] };
+  }
+  if (v === 'low') {                                      // Japandi: low oak sides, deep cushions
+    const wood = woodFinish(s.wood || 'oak');
+    for (const sx of [-1, 1]) span(g, wood, sx * 14.5 - 0.8, sx * 14.5 + 0.8, 0, 19, -14, 15, 0.7);
+    span(g, wood, -13.7, 13.7, 4, 6.5, -13, 13, 0.4);
+    span(g, wood, -13.7, 13.7, 6.5, 24, -14.5, -12.8, 0.4);
+    span(g, fab, -13.6, 13.6, 6.5, 13.5, -12.5, 14, 2.8);
+    const back = meshAt(rbox(27, 15, 6, 2.6), fab, 0, 20, -10.4, g); back.rotation.x = -0.22;
+    const pil = meshAt(rbox(14, 11, 4, 2), pillowMat, 4, 18, -6.8, g); pil.rotation.x = -0.3; pil.rotation.z = -0.1;
+    return { group: g, w: 30, d: 30, shadows: [[0, 0, 31, 31]] };
+  }
+  // curved tub shell (the original bouclé chair)
   const shape = new THREE.Shape();
   const a0 = -18 * DEG, a1 = 198 * DEG, ro = [15, 15.5], ri = [10.2, 10.6], cy = 0.5, N = 40;
   for (let i = 0; i <= N; i++) { const t = lerp(a0, a1, i / N); const x = Math.cos(t) * ro[0], y = cy + Math.sin(t) * ro[1]; i ? shape.lineTo(x, y) : shape.moveTo(x, y); }
@@ -1735,101 +2101,282 @@ function makeLoungeChair(p) {
   meshAt(shell, fab, 0, 0, 0, g);
   meshAt(rbox(24, 13, 25, 4), fab, 0, 6.5, 2.5, g);                     // seat block
   meshAt(rbox(22.5, 5.5, 22, 2.6), fab, 0, 15.2, 3.4, g);                // cushion
-  const pillow = meshAt(rbox(16, 13, 4.5, 2.2), fabricMat('#8a7764', 'linen'), 0, 23, -6.5, g); pillow.rotateX(-0.3);
+  const pillow = meshAt(rbox(16, 13, 4.5, 2.2), pillowMat, 0, 23, -6.5, g); pillow.rotateX(-0.3);
   return { group: g, w: 31, d: 32, shadows: [[0, 0, 32, 32]] };
 }
 
-function makeRoundTable(p) {
-  const g = new THREE.Group(), r = p.dia / 2, wood = woodMat(p.color);
-  const prof = [[r * 0.5, 0], [r * 0.48, 1.2], [r * 0.3, 4], [r * 0.22, 8], [r * 0.26, 11.5], [r * 0.42, 14.2], [r * 0.45, 14.6], [0, 14.6]]
-    .map(([x, y]) => new THREE.Vector2(x, y));
-  meshAt(new THREE.LatheGeometry(prof, 48), wood, 0, 0, 0, g);
-  meshAt(new THREE.CylinderGeometry(r, r - 0.4, 1.8, 64), wood, 0, 15.5, 0, g);
-  // styling: stacked books, bowl, small vase with greenery
-  meshAt(new THREE.BoxGeometry(10, 1.2, 7.5), fabricMat('#d8d0c2', 'linen'), r * 0.25, 17.0, r * 0.2, g).rotation.y = 0.3;
-  meshAt(new THREE.BoxGeometry(9, 1, 6.5), fabricMat('#3d3833', 'linen'), r * 0.25, 18.1, r * 0.2, g).rotation.y = 0.15;
+// ---------------- coffee tables ----------------
+function makeRoundTable(p, item, s) {
+  const g = new THREE.Group(), D = p.dia, v = s.variant;
+  const wood = woodFinish(s.wood || 'walnut');
+  let top = 16.4, fw = D, fd = D;
+  if (v === 'slab' || v === 'frame') {
+    fw = D * 1.4; fd = D * 0.72;
+    if (v === 'slab') {
+      top = 14; span(g, wood, -fw / 2, fw / 2, 11.4, top, -fd / 2, fd / 2, 0.5);
+      for (const sx of [-1, 1]) span(g, wood, sx * (fw / 2 - 5) - 1.4, sx * (fw / 2 - 5) + 1.4, 0, 11.4, -fd / 2 + 2, fd / 2 - 2, 0.3);
+    } else {
+      const steel = metalFinish(s.metal || 'black');
+      top = 17.3; span(g, woodFinish(s.wood || 'reclaimed'), -fw / 2, fw / 2, 15.5, top, -fd / 2, fd / 2, 0.3);
+      for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) meshAt(new THREE.BoxGeometry(1.2, 15.5, 1.2), steel, x * (fw / 2 - 1.2), 7.75, z * (fd / 2 - 1.2), g);
+      for (const y of [4.2, 15]) for (const z of [-1, 1]) meshAt(new THREE.BoxGeometry(fw - 2.4, 0.8, 0.8), steel, 0, y, z * (fd / 2 - 1.2), g);
+      span(g, woodFinish(s.wood || 'reclaimed'), -fw / 2 + 1.8, fw / 2 - 1.8, 4.2, 5.1, -fd / 2 + 1.6, fd / 2 - 1.6, 0.2);
+    }
+  } else if (v === 'tulip') {
+    const base = metalFinish(s.metal || 'nickel'), stone = stoneFinish(s.stone || 'marble');
+    const prof = [[D * 0.36, 0], [D * 0.34, 0.8], [D * 0.12, 3], [D * 0.06, 8], [D * 0.07, 12.5], [D * 0.16, 15], [0, 15]].map(([x, y]) => new THREE.Vector2(x, y));
+    meshAt(new THREE.LatheGeometry(prof, 48), base, 0, 0, 0, g);
+    top = 16.1; meshAt(new THREE.CylinderGeometry(D / 2, D / 2 - 0.5, 1.1, 64), stone, 0, 15.55, 0, g);
+  } else if (v === 'drum') {
+    const stone = stoneFinish(s.stone || 'travertine');
+    meshAt(new THREE.CylinderGeometry(D / 2, D / 2, 12, 64), stone, 0, 6, 0, g);
+    meshAt(new THREE.CylinderGeometry(D / 2 - 0.9, D / 2 - 0.9, 0.7, 64), M.black, 0, 12.35, 0, g);         // shadow reveal
+    top = 15.2; meshAt(new THREE.CylinderGeometry(D / 2, D / 2, 2.5, 64), stone, 0, 13.95, 0, g);
+  } else {                                                                                                  // sculpted pedestal
+    const r = D / 2;
+    const prof = [[r * 0.5, 0], [r * 0.48, 1.2], [r * 0.3, 4], [r * 0.22, 8], [r * 0.26, 11.5], [r * 0.42, 14.2], [r * 0.45, 14.6], [0, 14.6]]
+      .map(([x, y]) => new THREE.Vector2(x, y));
+    meshAt(new THREE.LatheGeometry(prof, 48), wood, 0, 0, 0, g);
+    meshAt(new THREE.CylinderGeometry(r, r - 0.4, 1.8, 64), wood, 0, 15.5, 0, g);
+  }
+  // styling: stacked books, a bowl, a small vase with greenery
+  const r = Math.min(fw, fd) / 2, sx = fw / Math.min(fw, fd);
+  meshAt(new THREE.BoxGeometry(10, 1.2, 7.5), fabricMat('#d8d0c2', 'linen'), r * 0.25 * sx, top + 0.6, r * 0.2, g).rotation.y = 0.3;
+  meshAt(new THREE.BoxGeometry(9, 1, 6.5), fabricMat('#3d3833', 'linen'), r * 0.25 * sx, top + 1.7, r * 0.2, g).rotation.y = 0.15;
   const bowl = new THREE.LatheGeometry([[0, 0], [2.6, 0.2], [3.6, 1.6], [3.8, 2.2]].map(([x, y]) => new THREE.Vector2(x, y)), 32);
-  meshAt(bowl, M.stone, -r * 0.35, 16.4, r * 0.15, g).material = new THREE.MeshStandardMaterial({ color: '#2a2622', roughness: 0.6, side: THREE.DoubleSide });
+  meshAt(bowl, cached('bowl', () => new THREE.MeshStandardMaterial({ color: '#2a2622', roughness: 0.6, side: THREE.DoubleSide })), -r * 0.4 * sx, top, r * 0.15, g);
   const vase = new THREE.LatheGeometry([[0, 0], [2.2, 0.3], [3, 3], [2.2, 6], [1.2, 7.5], [1.3, 8]].map(([x, y]) => new THREE.Vector2(x, y)), 32);
-  meshAt(vase, new THREE.MeshStandardMaterial({ color: '#8c8478', roughness: 0.9 }), 0, 16.4, -r * 0.35, g);
+  meshAt(vase, cached('vase', () => new THREE.MeshStandardMaterial({ color: '#8c8478', roughness: 0.9 })), 0, top, -r * 0.35, g);
   const leaves = foliage(60, 4.5, 31, '#6f7d4f');
-  leaves.position.set(0, 26.5, -r * 0.35); g.add(leaves);
-  return { group: g, w: p.dia, d: p.dia, shadows: [[0, 0, p.dia * 0.9, p.dia * 0.9]] };
+  leaves.position.set(0, top + 10, -r * 0.35); g.add(leaves);
+  return { group: g, w: fw, d: fd, shadows: [[0, 0, fw * 0.9, fd * 0.9]] };
 }
 
-function makeOttoman(p) {
-  const g = new THREE.Group();
-  span(g, fabricMat(p.color, p.color === '#5b4636' ? 'linen' : 'boucle'), -p.w / 2, p.w / 2, 1.5, 16, -p.d / 2, p.d / 2, 3.5);
-  span(g, M.black, -p.w / 2 + 3, p.w / 2 - 3, 0, 1.6, -p.d / 2 + 3, p.d / 2 - 3, 0.2);
+// ---------------- ottoman and pouf ----------------
+function makeOttoman(p, item, s) {
+  const g = new THREE.Group(), fab = coverMat(s.cover, s.color), v = s.variant;
+  if (v === 'tufted') {
+    const wood = woodFinish(s.wood || 'walnut');
+    for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) strut(g, wood, [x * (p.w / 2 - 2.2), 0, z * (p.d / 2 - 2.2)], [x * (p.w / 2 - 2.8), 7, z * (p.d / 2 - 2.8)], 0.45, 0.75);
+    span(g, fab, -p.w / 2, p.w / 2, 7, 16.5, -p.d / 2, p.d / 2, 2.6);
+    const btn = [];
+    for (let i = 1; i < 4; i++) for (let k = 1; k < 3; k++) btn.push([-p.w / 2 + (p.w * i) / 4, 16.55, -p.d / 2 + (p.d * k) / 3]);
+    const geo = new THREE.SphereGeometry(0.65, 10, 6); geo.scale(1, 0.5, 1);
+    instances(g, geo, coverMat(s.cover, css(shade(s.color, -0.35))), btn);
+  } else if (v === 'tray') {
+    span(g, fab, -p.w / 2, p.w / 2, 1.5, 15, -p.d / 2, p.d / 2, 3);
+    span(g, M.black, -p.w / 2 + 3, p.w / 2 - 3, 0, 1.6, -p.d / 2 + 3, p.d / 2 - 3, 0.2);
+    const wood = woodFinish(s.wood || 'walnut'), tw = p.w * 0.78, td = p.d * 0.74;
+    span(g, wood, -tw / 2, tw / 2, 15, 15.7, -td / 2, td / 2, 0.3);
+    for (const sz of [-1, 1]) span(g, wood, -tw / 2, tw / 2, 15.7, 17, sz * td / 2 - 0.5, sz * td / 2 + 0.5, 0.2);
+    for (const sx of [-1, 1]) span(g, wood, sx * tw / 2 - 0.5, sx * tw / 2 + 0.5, 15.7, 17, -td / 2, td / 2, 0.2);
+  } else {
+    span(g, fab, -p.w / 2, p.w / 2, 1.5, 16, -p.d / 2, p.d / 2, 3.5);
+    span(g, M.black, -p.w / 2 + 3, p.w / 2 - 3, 0, 1.6, -p.d / 2 + 3, p.d / 2 - 3, 0.2);
+  }
   return { group: g, w: p.w, d: p.d, shadows: [[0, 0, p.w, p.d]] };
 }
+function makePouf(p, item, s) {
+  const g = new THREE.Group(), fab = coverMat(s.cover, s.color);
+  if (s.variant === 'knit') {
+    const prof = [[0, 0], [8, 0.3], [10.6, 3], [11, 7.5], [10.2, 12.5], [7.5, 15.2], [0, 15.6]].map(([x, y]) => new THREE.Vector2(x, y));
+    meshAt(new THREE.LatheGeometry(prof, 40), fab, 0, 0, 0, g);
+  } else {
+    meshAt(new THREE.CylinderGeometry(10, 10, 15, 40), fab, 0, 8, 0, g);
+    meshAt(new THREE.TorusGeometry(9.2, 1.4, 12, 40), fab, 0, 15.4, 0, g).rotation.x = Math.PI / 2;
+    meshAt(new THREE.CircleGeometry(9.3, 40), fab, 0, 16.6, 0, g).rotation.x = -Math.PI / 2;
+    if (s.variant === 'leather') {                       // panel seams
+      const seam = coverMat(s.cover, css(shade(s.color, -0.45))), list = [];
+      for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; list.push([Math.cos(a) * 10.02, 8, Math.sin(a) * 10.02, -a + Math.PI / 2]); }
+      instances(g, new THREE.BoxGeometry(0.25, 14.6, 0.12), seam, list);
+    }
+  }
+  return { group: g, w: 20, d: 20, shadows: [[0, 0, 20, 20]] };
+}
 
-function makeRug(p) {
-  const g = new THREE.Group();
-  const m = meshAt(new THREE.BoxGeometry(p.w, 0.35, p.d), [M.felt, M.felt, rugMat(p.color, p.pattern), M.felt, M.felt, M.felt], 0, 0.18, 0, g);
-  m.material = [M.felt, M.felt, rugMat(p.color, p.pattern), M.felt, M.felt, M.felt];
+// ---------------- rug ----------------
+function makeRug(p, item, s) {
+  const g = new THREE.Group(), th = s.variant === 'shag' ? 0.9 : s.variant === 'jute' ? 0.45 : 0.35;
+  const top = rugMat(s.color, s.variant, s.color2 || null);
+  meshAt(new THREE.BoxGeometry(p.w, th, p.d), [M.felt, M.felt, top, M.felt, M.felt, M.felt], 0, th / 2 + 0.01, 0, g);
   g.userData.isRug = true;
   return { group: g, w: p.w, d: p.d, shadows: [] };
 }
 
-function makeConsole(p) {
-  const g = new THREE.Group(), wood = woodMat(p.color), y0 = CONSOLE_Y0, h = CONSOLE_H, d = 15;
-  span(g, wood, -p.w / 2, p.w / 2, y0, y0 + h, -d / 2, d / 2, 0.6);
-  const n = Math.floor(p.w / 1.6);
-  const groove = new THREE.InstancedMesh(new THREE.BoxGeometry(0.25, h - 2, 0.2), M.black, n);
-  const m4 = new THREE.Matrix4();
-  for (let i = 0; i < n; i++) groove.setMatrixAt(i, m4.makeTranslation(-p.w / 2 + 1.6 * (i + 0.5), y0 + h / 2, d / 2 + 0.05));
-  g.add(groove);
+// ---------------- media console ----------------
+const CONSOLE_Y0 = 6, CONSOLE_H = 13, SOUNDBAR_H = 2.6;
+function makeConsole(p, item, s) {
+  const g = new THREE.Group(), y0 = CONSOLE_Y0, h = CONSOLE_H, d = 15, w = p.w, v = s.variant;
+  const wood = woodFinish(s.wood || (v === 'cane' ? 'oak' : 'walnut'));
+  const doorGaps = (mat, n) => { for (let i = 1; i < n; i++) span(g, mat, -w / 2 + (w * i) / n - 0.12, -w / 2 + (w * i) / n + 0.12, y0 + 0.8, y0 + h - 0.8, d / 2 - 0.1, d / 2 + 0.05, 0.02); };
+  if (v === 'lacquer') {
+    const lac = cached('lacquer-black', () => new THREE.MeshStandardMaterial({ color: '#121110', roughness: 0.62 }));
+    span(g, lac, -w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, 0.4);
+    doorGaps(M.black, 3);
+  } else if (v === 'fluted') {
+    span(g, wood, -w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, 0.6);
+    const n = Math.floor((w - 2) / 1.7), list = [];
+    for (let i = 0; i < n; i++) list.push([-w / 2 + 1 + 1.7 * (i + 0.5), y0 + h / 2, d / 2 - 0.15, -Math.PI / 2]);   // half-round faces out
+    const flute = new THREE.CylinderGeometry(0.85, 0.85, h - 1.6, 10, 1, false, 0, Math.PI);
+    instances(g, flute, wood, list);
+    for (const x of [-w / 6, w / 6]) meshAt(new THREE.CylinderGeometry(0.28, 0.28, 5, 12), metalFinish(s.metal || 'brass'), x, y0 + h / 2, d / 2 + 1.1, g);
+  } else if (v === 'frame') {
+    const steel = metalFinish(s.metal || 'black');
+    for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) meshAt(new THREE.BoxGeometry(1.2, y0 + h, 1.2), steel, x * (w / 2 - 0.6), (y0 + h) / 2, z * (d / 2 - 0.6), g);
+    for (const y of [y0, y0 + h - 0.6]) for (const z of [-1, 1]) meshAt(new THREE.BoxGeometry(w, 0.6, 0.6), steel, 0, y + 0.3, z * (d / 2 - 0.6), g);
+    span(g, wood, -w / 2 + 1.4, w / 2 - 1.4, y0 + 0.6, y0 + h - 0.8, -d / 2 + 1, d / 2 - 1, 0.3);
+    doorGaps(M.black, 3);
+  } else if (v === 'credenza') {
+    for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) strut(g, wood, [x * (w / 2 - 3.5), 0, z * (d / 2 - 3)], [x * (w / 2 - 4), y0, z * (d / 2 - 3.4)], 0.5, 0.8);
+    span(g, wood, -w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, 0.5);
+    doorGaps(M.black, 3);
+    for (const x of [-w / 3, 0, w / 3]) meshAt(new THREE.CylinderGeometry(0.55, 0.55, 0.5, 16), metalFinish(s.metal || 'brass'), x, y0 + h / 2, d / 2 + 0.25, g).rotation.x = Math.PI / 2;
+  } else if (v === 'cane') {
+    span(g, wood, -w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, 0.6);
+    const cane = cached('cane', () => new THREE.MeshStandardMaterial({ map: canvasTex(caneCanvas(), true, [3, 2]), roughness: 0.8 }));
+    for (let i = 0; i < 3; i++) {
+      const xa = -w / 2 + (w * i) / 3 + 1.4, xb = -w / 2 + (w * (i + 1)) / 3 - 1.4;
+      meshAt(new THREE.PlaneGeometry(xb - xa, h - 2.8), cane, (xa + xb) / 2, y0 + h / 2, d / 2 + 0.02, g);
+    }
+  } else {                                                                                                 // slatted, wall-hung
+    span(g, wood, -w / 2, w / 2, y0, y0 + h, -d / 2, d / 2, 0.6);
+    const n = Math.floor(w / 1.6), list = [];
+    for (let i = 0; i < n; i++) list.push([-w / 2 + 1.6 * (i + 0.5), y0 + h / 2, d / 2 + 0.05]);
+    instances(g, new THREE.BoxGeometry(0.25, h - 2, 0.2), M.black, list);
+  }
   span(g, M.black, -20, 20, y0 + h, y0 + h + SOUNDBAR_H, -2, 2, 1.2);   // soundbar
-  return { group: g, w: p.w, d, shadows: [[0, 0, p.w, d]] };
+  return { group: g, w, d, shadows: [[0, 0, w, d]] };
 }
 
-function makeSideTable(p) {
-  const g = new THREE.Group(), wood = woodMat(p.color);
+// ---------------- side table ----------------
+function makeSideTable(p, item, s) {
+  const g = new THREE.Group(), v = s.variant;
+  if (v === 'ctable') {
+    const steel = metalFinish(s.metal || 'black');
+    span(g, steel, -7, 7, 0, 0.6, -6, 6, 0.2);
+    span(g, steel, -0.6, 0.6, 0.6, 23.4, -6, -4.8, 0.2);
+    span(g, s.wood ? woodFinish(s.wood) : steel, -8, 8, 23.2, 24, -6, 6, 0.3);
+    return { group: g, w: 16, d: 12, shadows: [[0, 0, 16, 12]] };
+  }
+  if (v === 'stump') {
+    const wood = woodFinish(s.wood || 'teak'), r = rng(7), prof = [];
+    for (let i = 0; i <= 8; i++) prof.push(new THREE.Vector2(7.2 + (r() - 0.5) * 1.2 + (i === 0 ? 0.6 : 0), (18 * i) / 8));
+    prof.push(new THREE.Vector2(0, 18));
+    meshAt(new THREE.LatheGeometry(prof, 28), wood, 0, 0, 0, g);
+    return { group: g, w: 15, d: 15, shadows: [[0, 0, 16, 16]] };
+  }
+  if (v === 'pedestal') {
+    const stone = stoneFinish(s.stone || 'travertine');
+    meshAt(new THREE.CylinderGeometry(7, 7, 1.5, 40), stone, 0, 0.75, 0, g);
+    meshAt(new THREE.CylinderGeometry(3.4, 3.4, 19, 32), stone, 0, 11, 0, g);
+    meshAt(new THREE.CylinderGeometry(9, 9, 1.5, 48), stone, 0, 21.25, 0, g);
+    return { group: g, w: 18, d: 18, shadows: [[0, 0, 18, 18]] };
+  }
+  const wood = woodFinish(s.wood || 'walnut');
   meshAt(new THREE.CylinderGeometry(9, 9, 21, 48), wood, 0, 10.5, 0, g);
   meshAt(new THREE.CylinderGeometry(9.3, 9.3, 1.2, 48), wood, 0, 21.6, 0, g);
   return { group: g, w: 18, d: 18, shadows: [[0, 0, 18, 18]] };
 }
 
-function makeFloorLamp(p, item) {
-  const g = new THREE.Group();
-  meshAt(new THREE.CylinderGeometry(5.5, 6, 1, 32), M.metal, 0, 0.5, 0, g);
-  meshAt(new THREE.CylinderGeometry(0.45, 0.45, 56, 12), M.brass, 0, 28, 0, g);
-  const shadeMat = new THREE.MeshStandardMaterial({ color: '#efe2cc', roughness: 1, side: THREE.DoubleSide, emissive: '#ffcf96', emissiveIntensity: 0 });
-  meshAt(new THREE.CylinderGeometry(8, 9, 11, 40, 1, true), shadeMat, 0, 58, 0, g);
-  const light = new THREE.PointLight('#ffc78a', 0, 0, 2); light.position.set(0, 57, 0); g.add(light);
-  FX.lamps = FX.lamps || {}; FX.lamps[item.id] = { light, shadeMat };
-  return { group: g, w: 18, d: 18, shadows: [[0, 0, 16, 16]] };
+// ---------------- floor lamps ----------------
+function makeFloorLamp(p, item, s) {
+  const g = new THREE.Group(), v = s.variant, metal = metalFinish(s.metal || 'brass');
+  const glowMat = (color, emissive) => new THREE.MeshStandardMaterial({ color, roughness: 1, side: THREE.DoubleSide, emissive, emissiveIntensity: 0 });
+  let shadeMat, lightAt, glow = 0.45, w = 18, d = 18;
+  if (v === 'arc') {
+    meshAt(new THREE.BoxGeometry(12, 3, 12), stoneFinish(s.stone || 'marble'), 0, 1.5, 0, g);
+    const curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 3, -2), new THREE.Vector3(0, 98, 6), new THREE.Vector3(0, 72, 44));
+    meshAt(new THREE.TubeGeometry(curve, 40, 0.45, 8), metal, 0, 0, 0, g);
+    shadeMat = glowMat('#f2ede4', '#ffd9a8');
+    meshAt(new THREE.SphereGeometry(8, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2), shadeMat, 0, 64, 44, g);
+    lightAt = [0, 63, 44]; glow = 0.35; w = 14; d = 14;
+  } else if (v === 'tripod') {
+    const leg = s.wood ? woodFinish(s.wood) : metal;
+    for (let i = 0; i < 3; i++) { const a = (i / 3) * Math.PI * 2 + 0.5; strut(g, leg, [Math.cos(a) * 11, 0, Math.sin(a) * 11], [0, 50, 0], 0.55, 0.7); }
+    shadeMat = glowMat('#efe2cc', '#ffcf96');
+    meshAt(new THREE.CylinderGeometry(8.5, 9.5, 12, 40, 1, true), shadeMat, 0, 55, 0, g);
+    lightAt = [0, 54, 0]; w = 22; d = 22;
+  } else if (v === 'lantern') {
+    meshAt(new THREE.CylinderGeometry(6, 6.5, 0.8, 32), M.black, 0, 0.4, 0, g);
+    meshAt(new THREE.CylinderGeometry(0.4, 0.4, 12, 8), M.black, 0, 6, 0, g);
+    shadeMat = glowMat('#f3ece0', '#ffe2b8'); glow = 0.8;
+    meshAt(new THREE.CylinderGeometry(7, 7, 44, 32, 1, true), shadeMat, 0, 34, 0, g);
+    const ribs = []; for (let y = 13; y < 56; y += 3.6) ribs.push([0, y, 0]);
+    const rib = new THREE.TorusGeometry(7.05, 0.12, 4, 32); rib.rotateX(Math.PI / 2);
+    instances(g, rib, cached('rib', () => new THREE.MeshStandardMaterial({ color: '#d8ccb6', roughness: 1 })), ribs);
+    lightAt = [0, 34, 0]; w = 14; d = 14;
+  } else if (v === 'globe') {
+    meshAt(new THREE.CylinderGeometry(6, 6.5, 0.9, 32), metal, 0, 0.45, 0, g);
+    meshAt(new THREE.CylinderGeometry(0.4, 0.4, 54, 10), metal, 0, 27, 0, g);
+    shadeMat = glowMat('#f4efe6', '#ffd9a8'); glow = 0.9;
+    meshAt(new THREE.SphereGeometry(7, 32, 20), shadeMat, 0, 61, 0, g);
+    lightAt = [0, 61, 0]; w = 14; d = 14;
+  } else {                                                                                                 // linen drum
+    meshAt(new THREE.CylinderGeometry(5.5, 6, 1, 32), metal === M.brass ? M.metal : metal, 0, 0.5, 0, g);
+    meshAt(new THREE.CylinderGeometry(0.45, 0.45, 56, 12), metal, 0, 28, 0, g);
+    shadeMat = glowMat('#efe2cc', '#ffcf96');
+    meshAt(new THREE.CylinderGeometry(8, 9, 11, 40, 1, true), shadeMat, 0, 58, 0, g);
+    lightAt = [0, 57, 0];
+  }
+  const light = new THREE.PointLight('#ffc78a', 0, 0, 2); light.position.set(...lightAt); g.add(light);
+  FX.lamps = FX.lamps || {}; FX.lamps[item.id] = { light, shadeMat, glow };
+  return { group: g, w, d, shadows: [[0, 0, w - 2, d - 2]] };
 }
 function setLamp(id, on) {
   const l = FX.lamps && FX.lamps[id]; if (!l) return;
-  l.light.intensity = on ? LAMP_CD : 0; l.light.visible = on; l.shadeMat.emissiveIntensity = on ? 0.45 : 0;
+  l.light.intensity = on ? LAMP_CD : 0; l.light.visible = on; l.shadeMat.emissiveIntensity = on ? l.glow : 0;
 }
 
 /** Instanced leaf cloud: n leaves in a sphere of radius rad. */
-function foliage(n, rad, seed, color) {
-  const geo = new THREE.SphereGeometry(1, 6, 4); geo.scale(0.35, 0.08, 1.2);
-  const mat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8 });
+function foliage(n, rad, seed, color, leaf = [0.35, 0.08, 1.2]) {
+  const geo = new THREE.SphereGeometry(1, 6, 4); geo.scale(...leaf);
+  const mat = cached('leaf', () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8 }));
   const inst = new THREE.InstancedMesh(geo, mat, n), r = rng(seed), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler();
   const base = new THREE.Color(color), c = new THREE.Color();
   for (let i = 0; i < n; i++) {
     const u = r() * 2 - 1, th = r() * Math.PI * 2, rr = rad * Math.cbrt(r());
     const v = new THREE.Vector3(Math.sqrt(1 - u * u) * Math.cos(th), u * 0.8, Math.sqrt(1 - u * u) * Math.sin(th)).multiplyScalar(rr);
     e.set(r() * Math.PI, r() * Math.PI, r() * Math.PI); q.setFromEuler(e);
-    const s = 0.8 + r() * 0.6;
-    inst.setMatrixAt(i, m4.compose(v, q, new THREE.Vector3(s, s, s)));
+    const sc = 0.8 + r() * 0.6;
+    inst.setMatrixAt(i, m4.compose(v, q, new THREE.Vector3(sc, sc, sc)));
     inst.setColorAt(i, c.copy(base).offsetHSL((r() - 0.5) * 0.04, (r() - 0.5) * 0.1, (r() - 0.5) * 0.12));
   }
   return inst;
 }
 
-function makePlant(p) {
-  const g = new THREE.Group(), h = p.h;
-  const pot = new THREE.LatheGeometry([[0, 0], [7, 0], [8.6, 3], [9, 15], [8.6, 16], [7.8, 16], [7.8, 14.5]].map(([x, y]) => new THREE.Vector2(x, y)), 40);
-  meshAt(pot, M.stone, 0, 0, 0, g);
-  meshAt(new THREE.CircleGeometry(7.8, 32), new THREE.MeshStandardMaterial({ color: '#2a211a', roughness: 1 }), 0, 14.2, 0, g).rotation.x = -Math.PI / 2;
-  const bark = new THREE.MeshStandardMaterial({ color: '#5a4a3a', roughness: 0.95 });
-  const top = h - 16, r = rng(9);
+// ---------------- plants ----------------
+function plantPot(g, low) {
+  const pot = low ? [[0, 0], [7, 0], [7.8, 1.5], [8, 11], [7.4, 11.4], [7, 10.4]] : [[0, 0], [7, 0], [8.6, 3], [9, 15], [8.6, 16], [7.8, 16], [7.8, 14.5]];
+  meshAt(new THREE.LatheGeometry(pot.map(([x, y]) => new THREE.Vector2(x, y)), 40), M.stone, 0, 0, 0, g);
+  meshAt(new THREE.CircleGeometry(low ? 7 : 7.8, 32), cached('soil', () => new THREE.MeshStandardMaterial({ color: '#2a211a', roughness: 1 })), 0, low ? 10.2 : 14.2, 0, g).rotation.x = -Math.PI / 2;
+}
+function makePlant(p, item, s) {
+  const g = new THREE.Group(), h = p.h, v = s.variant;
+  const bark = cached('bark', () => new THREE.MeshStandardMaterial({ color: '#5a4a3a', roughness: 0.95 }));
+  if (v === 'snake') {                                    // upright sword leaves in a low planter
+    plantPot(g, true);
+    const r = rng(17), mat = cached('snake-leaf', () => new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7, side: THREE.DoubleSide }));
+    const n = 22, geo = new THREE.PlaneGeometry(2.6, 1, 1, 4); geo.translate(0, 0.5, 0);
+    const inst = new THREE.InstancedMesh(geo, mat, n), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), c = new THREE.Color();
+    for (let i = 0; i < n; i++) {
+      const a = r() * Math.PI * 2, rr = r() * 4.5, hh = 16 + r() * 18;
+      e.set((r() - 0.5) * 0.3, r() * Math.PI, (r() - 0.5) * 0.3); q.setFromEuler(e);
+      inst.setMatrixAt(i, m4.compose(new THREE.Vector3(Math.cos(a) * rr, 10, Math.sin(a) * rr), q, new THREE.Vector3(0.8 + r() * 0.5, hh, 1)));
+      inst.setColorAt(i, c.set(r() < 0.5 ? '#3f5f35' : '#58763f').offsetHSL(0, 0, (r() - 0.5) * 0.08));
+    }
+    g.add(inst);
+    return { group: g, w: 16, d: 16, shadows: [[0, 0, 18, 18]] };
+  }
+  plantPot(g, false);
+  const top = h - 16, r = rng(v === 'fiddle' ? 23 : 9);
+  if (v === 'fiddle') {                                   // fiddle-leaf fig: one trunk, big glossy leaves up high
+    const trunk = new THREE.CatmullRomCurve3([[0, 14, 0], [1, 14 + top * 0.5, 0.5], [-0.5, 14 + top * 0.95, 0]].map((a) => new THREE.Vector3(...a)));
+    meshAt(new THREE.TubeGeometry(trunk, 16, 0.9, 8), bark, 0, 0, 0, g);
+    for (const [y, rad, n, seed] of [[0.72, 7, 26, 51], [0.9, 8, 34, 52], [1.02, 6, 22, 53]]) {
+      const cl = foliage(n, rad, seed, '#3f5d32', [2.4, 0.12, 3.6]); cl.position.set((r() - 0.5) * 2, 14 + top * y, (r() - 0.5) * 2); g.add(cl);
+    }
+    return { group: g, w: 18, d: 18, shadows: [[0, 0, 22, 22]] };
+  }
   const trunk = new THREE.CatmullRomCurve3([[0, 14, 0], [1.5, 14 + top * 0.3, 0.5], [-1, 14 + top * 0.55, -0.5], [0.5, 14 + top * 0.7, 0]].map((a) => new THREE.Vector3(...a)));
   meshAt(new THREE.TubeGeometry(trunk, 16, 1.1, 8), bark, 0, 0, 0, g);
   const tips = [[-9, 0.82, 4], [8, 0.86, -3], [2, 0.98, 6], [-4, 0.93, -7], [6, 0.74, 7]];
@@ -1842,44 +2389,38 @@ function makePlant(p) {
   return { group: g, w: 18, d: 18, shadows: [[0, 0, 22, 22]] };
 }
 
-function makeTower() {
+// ---------------- AV, recliner, bar cart ----------------
+function makeTower(p, item, s) {
   const g = new THREE.Group();
-  span(g, M.black, -4.5, 4.5, 1, 41, -6, 6, 0.6);
-  const grille = fabricMat('#1b1a19', 'linen');
-  span(g, grille, -4.2, 4.2, 4, 39, 5.6, 6.3, 0.3);
+  span(g, avFinish(s.finish), -4.5, 4.5, 1, 41, -6, 6, 0.6);
+  span(g, fabricMat('#1b1a19', 'linen'), -4.2, 4.2, 4, 39, 5.6, 6.3, 0.3);
   for (const [y, r] of [[34, 1.6], [26, 2.8], [16, 2.8]]) meshAt(new THREE.CylinderGeometry(r, r, 0.3, 24), M.metal, 0, y, 6.4, g).rotation.x = Math.PI / 2;
   return { group: g, w: 9, d: 12, shadows: [[0, 0, 11, 13]] };
 }
-function makeSub() {
+function makeSub(p, item, s) {
   const g = new THREE.Group();
-  span(g, M.black, -7.5, 7.5, 0.6, 15.6, -7.5, 7.5, 0.8);
+  span(g, avFinish(s.finish), -7.5, 7.5, 0.6, 15.6, -7.5, 7.5, 0.8);
   meshAt(new THREE.CylinderGeometry(5.5, 5.5, 0.4, 32), M.metal, 0, 8, 7.6, g).rotation.x = Math.PI / 2;
   return { group: g, w: 15, d: 15, shadows: [[0, 0, 17, 17]] };
 }
-function makeRecliner(p) {
-  const g = new THREE.Group(), fab = fabricMat(p.color, 'linen');
+function makeRecliner(p, item, s) {
+  const g = new THREE.Group(), fab = coverMat(s.cover, s.color);
   span(g, fab, -18, -12, 2, 25, -18, 16, 2.4); span(g, fab, 12, 18, 2, 25, -18, 16, 2.4);
   span(g, fab, -12, 12, 2, 18, -12, 16, 2.4);
   const back = span(g, fab, -12, 12, 18, 41, -18, -10, 3); back.rotation.x = -0.12;
   span(g, M.black, -17, 17, 0, 2, -16, 14, 0.3);
   return { group: g, w: 36, d: 38, shadows: [[0, 0, 36, 38]] };
 }
-
-function makePouf(p) {
-  const g = new THREE.Group();
-  meshAt(new THREE.CylinderGeometry(10, 10, 15, 40), fabricMat(p.color, 'boucle'), 0, 8, 0, g);
-  meshAt(new THREE.TorusGeometry(9.2, 1.4, 12, 40), fabricMat(p.color, 'boucle'), 0, 15.4, 0, g).rotation.x = Math.PI / 2;
-  meshAt(new THREE.CircleGeometry(9.3, 40), fabricMat(p.color, 'boucle'), 0, 16.6, 0, g).rotation.x = -Math.PI / 2;
-  return { group: g, w: 20, d: 20, shadows: [[0, 0, 20, 20]] };
-}
-function makeBarCart() {
-  const g = new THREE.Group(), w = 24, d = 16;
+function makeBarCart(p, item, s) {
+  const g = new THREE.Group(), w = 24, d = 16, wood = woodFinish(s.wood || 'walnut');
+  const post = s.variant === 'oak' ? null : metalFinish(s.metal || 'brass');
   for (const [x, z] of [[-w / 2 + 0.6, -d / 2 + 0.6], [w / 2 - 0.6, -d / 2 + 0.6], [-w / 2 + 0.6, d / 2 - 0.6], [w / 2 - 0.6, d / 2 - 0.6]]) {
-    meshAt(new THREE.CylinderGeometry(0.45, 0.45, 32, 10), M.brass, x, 16, z, g);
+    if (post) meshAt(new THREE.CylinderGeometry(0.45, 0.45, 32, 10), post, x, 16, z, g);
+    else span(g, wood, x - 0.7, x + 0.7, 0.5, 33, z - 0.7, z + 0.7, 0.3);
   }
-  for (const y of [6, 30]) meshAt(new THREE.BoxGeometry(w - 0.4, 0.8, d - 0.4), woodMat('#3b281b'), 0, y, 0, g);
-  const glass = new THREE.MeshStandardMaterial({ color: '#c9d3cf', roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.45 });
-  const amber = new THREE.MeshStandardMaterial({ color: '#8a4b16', roughness: 0.1, transparent: true, opacity: 0.8 });
+  for (const y of [6, 30]) meshAt(new THREE.BoxGeometry(w - 0.4, 0.8, d - 0.4), wood, 0, y, 0, g);
+  const glass = cached('cart-glass', () => new THREE.MeshStandardMaterial({ color: '#c9d3cf', roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.45 }));
+  const amber = cached('cart-amber', () => new THREE.MeshStandardMaterial({ color: '#8a4b16', roughness: 0.1, transparent: true, opacity: 0.8 }));
   for (const [x, z, hgt, mat] of [[-7, -2, 11, amber], [-3, 3, 9, glass], [5, -3, 12, glass], [8, 3, 4, amber]]) {
     meshAt(new THREE.CylinderGeometry(1.4, 1.6, hgt, 16), mat, x, 30.4 + hgt / 2, z, g);
   }
@@ -1887,7 +2428,6 @@ function makeBarCart() {
   return { group: g, w, d, shadows: [[0, 0, w, d]] };
 }
 
-const CONSOLE_Y0 = 6, CONSOLE_H = 13, SOUNDBAR_H = 2.6;
 const FACTORIES = {
   sectional: makeSectional, sofa: makeSofa, loungeChair: makeLoungeChair, roundTable: makeRoundTable, ottoman: makeOttoman,
   rug: makeRug, console: makeConsole, sideTable: makeSideTable, floorLamp: makeFloorLamp, plant: makePlant,
@@ -1900,7 +2440,7 @@ function buildItem(item) {
   if (old) { itemsGroup.remove(old.group); disposeGroup(old.group); }
   const def = CATALOG[item.type]; if (!def) return;
   item.p = { ...def.defaults, ...item.p };
-  const built = FACTORIES[item.type](item.p, item);
+  const built = FACTORIES[item.type](item.p, item, resolveSpec(item));
   const holder = new THREE.Group();
   holder.add(built.group);
   for (const [x, z, w, d] of built.shadows) {
@@ -1914,14 +2454,428 @@ function buildItem(item) {
   itemObjects.set(item.id, { group: holder, w: built.w, d: built.d });
 }
 function placeItem(holder, item) {
-  const lift = item.type === 'rug' ? 0 : 0;
-  holder.position.copy(P(item.x, item.y, lift));
+  holder.position.copy(P(item.x, item.y, 0));
   holder.rotation.y = Math.PI + item.rot * DEG;
 }
 function buildAllItems() {
   for (const { group } of itemObjects.values()) { itemsGroup.remove(group); disposeGroup(group); }
   itemObjects.clear(); FX.lamps = {};
   for (const it of state.items) buildItem(it);
+}
+
+// ---- 45-styles.js ----
+// ===================================================================
+// 45 · Furniture style study: curated sets, upholstery library, piece
+//      variants with indicative prices and lead times, and the scoring
+//      model used to compare sets. Geometry lives in 40-furniture.js.
+// ===================================================================
+
+// ---------------- upholstery ----------------
+// Performance figures are typical for each class of cover (Wyzenbeek double rubs, cleaning code);
+// they drive the durability, acoustics and screen-contrast scores below.
+const COVERS = {
+  weave:   { label: 'Performance weave', kind: 'weave', sheen: 0, durability: 5, care: 5, pets: 5, absorb: 4, factor: 1.0, weeks: 0,
+    spec: 'Solution-dyed performance weave, 100,000 double rubs, cleaning code W/S' },
+  linen:   { label: 'Performance linen-look', kind: 'linen', sheen: 0, durability: 4, care: 4, pets: 4, absorb: 4, factor: 1.0, weeks: 0,
+    spec: 'Linen-look performance blend, 50,000 double rubs, cleaning code W/S' },
+  boucle:  { label: 'Wool-blend bouclé', kind: 'boucle', sheen: 0, durability: 3, care: 2, pets: 1, absorb: 5, factor: 1.12, weeks: 2,
+    spec: 'Wool-blend bouclé, 30,000 double rubs; loops can snag on claws' },
+  tweed:   { label: 'Wool tweed', kind: 'tweed', sheen: 0, durability: 4, care: 3, pets: 3, absorb: 4, factor: 1.08, weeks: 2,
+    spec: 'Wool-rich tweed, 40,000 double rubs, cleaning code S' },
+  velvet:  { label: 'Performance velvet', kind: 'velvet', sheen: 0.3, durability: 4, care: 3, pets: 2, absorb: 4, factor: 1.12, weeks: 2,
+    spec: 'Polyester performance velvet, 60,000 double rubs; shows pet hair' },
+  leather: { label: 'Top-grain leather', kind: 'leather', sheen: 0.4, durability: 5, care: 4, pets: 2, absorb: 1, factor: 1.55, weeks: 3,
+    spec: 'Semi-aniline top-grain leather; wipes clean, takes a patina, scratches show' },
+  natural: { label: 'Washed linen', kind: 'linen', sheen: 0, durability: 2, care: 2, pets: 2, absorb: 4, factor: 1.05, weeks: 1,
+    spec: 'Stone-washed linen on a removable slipcover; creases by design' },
+  knit:    { label: 'Chunky wool knit', kind: 'knit', sheen: 0, durability: 2, care: 2, pets: 1, absorb: 5, factor: 1.0, weeks: 0,
+    spec: 'Hand-knit wool cover over bead fill' },
+};
+// colours offered per cover in the inspector, with names for the spec sheet
+const COVER_COLORS = {
+  weave:   [['#3a3836', 'Graphite'], ['#2f2c2a', 'Ink'], ['#4b4f55', 'Slate'], ['#5f5a54', 'Pewter'], ['#8f877c', 'Stone'], ['#2f3a4a', 'Midnight']],
+  linen:   [['#8f877c', 'Stone'], ['#cdbfa8', 'Oatmeal'], ['#c9bba5', 'Oat'], ['#5f5a54', 'Graphite'], ['#3f4a3f', 'Moss'], ['#2f2c2a', 'Ink']],
+  boucle:  [['#e6dccb', 'Ivory'], ['#d8ccb6', 'Cream'], ['#c9bba5', 'Oat'], ['#8c7d68', 'Mushroom'], ['#7a5f48', 'Toffee']],
+  tweed:   [['#9a5636', 'Rust'], ['#c08a2e', 'Mustard'], ['#2f5d5a', 'Teal'], ['#6b6358', 'Heather grey'], ['#8a7a64', 'Wheat']],
+  velvet:  [['#2e4a3c', 'Forest'], ['#2a3346', 'Midnight'], ['#b8895a', 'Camel'], ['#6e2f2f', 'Oxblood'], ['#c7a196', 'Blush'], ['#3a3633', 'Charcoal']],
+  leather: [['#7a4a2a', 'Cognac'], ['#6b3f22', 'Saddle'], ['#5b4636', 'Chestnut'], ['#3a2a20', 'Chocolate'], ['#1f1c1a', 'Black']],
+  natural: [['#b9ab94', 'Flax'], ['#a99a82', 'Sand'], ['#d8ccb6', 'Natural'], ['#8c7d68', 'Mushroom']],
+  knit:    [['#d8ccb6', 'Cream'], ['#8c7d68', 'Mushroom'], ['#c9bba5', 'Oat'], ['#3a3633', 'Charcoal']],
+};
+const WOOD_FINISHES = {
+  walnut:    { label: 'Walnut', color: '#3b281b' },
+  teak:      { label: 'Teak', color: '#4a3424' },
+  oak:       { label: 'White oak', color: '#b48a5c' },
+  ebony:     { label: 'Ebonised oak', color: '#1f1813' },
+  reclaimed: { label: 'Reclaimed pine', color: '#6e4c30' },
+};
+const METAL_FINISHES = { brass: 'Satin brass', black: 'Black steel', nickel: 'Brushed nickel' };
+const STONE_FINISHES = { marble: 'White marble', travertine: 'Honed travertine', nero: 'Black marble' };
+const AV_FINISHES = { black: 'Black ash', walnut: 'Walnut veneer', oak: 'Light oak veneer' };
+const RUG_COLORS = [['#6e6559', 'Taupe'], ['#7d7466', 'Sand'], ['#3d3833', 'Charcoal'], ['#2f2d2b', 'Graphite'], ['#8a7a64', 'Wheat'],
+  ['#a68d68', 'Natural jute'], ['#d9cdb5', 'Cream'], ['#7b3f2e', 'Faded rust'], ['#3d4656', 'Indigo'], ['#2f5d5a', 'Teal']];
+const colorName = (hex) => {
+  const all = [...Object.values(COVER_COLORS).flat(), ...RUG_COLORS];
+  const hit = all.find(([c]) => c.toLowerCase() === String(hex).toLowerCase());
+  return hit ? hit[1] : String(hex).toUpperCase();
+};
+
+// ---------------- piece variants ----------------
+// price: indicative CAD range for the catalogue size (seating per linear inch, rugs per sq ft), before the cover factor.
+// weeks: typical made-to-order lead time. comfort / hangout: 1–5. H: overall height (in).
+const VARIANTS = {
+  sectional: {
+    track:    { label: 'Track-arm plinth', desc: 'Track arms, loose back cushions, recessed plinth base', H: 30, comfort: 4, hangout: 3, perIn: [17.5, 28.5], weeks: [8, 12] },
+    modular:  { label: 'Low modular', desc: 'Armless low modules, deep seats, reconfigurable', H: 26, comfort: 3, hangout: 5, perIn: [15, 26], weeks: [4, 8] },
+    tufted:   { label: 'Tufted mid-century', desc: 'Button-tufted tight back, bench seat, tapered walnut legs', H: 31, comfort: 3, hangout: 3, perIn: [16, 25], weeks: [8, 12] },
+    slope:    { label: 'Slope-arm lounge', desc: 'Sloped arms, plump channel-stitched cushions, black steel legs', H: 32, comfort: 4, hangout: 3, perIn: [18, 30], weeks: [10, 14] },
+    channel:  { label: 'Channel-tufted', desc: 'Vertical channel-tufted back, pillow arms, plinth with brass kick', H: 31, comfort: 4, hangout: 3, perIn: [19, 32], weeks: [10, 14] },
+    recliner: { label: 'Power-reclining theatre', desc: 'Power recline and headrest at each seat, USB-C in the arms', H: 40, comfort: 5, hangout: 2, perIn: [26, 44], weeks: [8, 12] },
+  },
+  loungeChair: {
+    tub:    { label: 'Curved tub chair', desc: 'Curved tub shell, tight seat, loose lumbar pillow', W: 31, D: 32, H: 28, comfort: 3, hangout: 4, price: [900, 1600], weeks: [6, 10] },
+    frame:  { label: 'Wood-frame lounge', desc: 'Solid wood frame, loose seat and back cushions', W: 30, D: 33, H: 32, comfort: 4, hangout: 3, price: [1100, 2100], weeks: [6, 10] },
+    sling:  { label: 'Sling chair', desc: 'Black steel frame, slung seat and back', W: 28, D: 32, H: 31, comfort: 3, hangout: 4, price: [700, 1300], weeks: [2, 6] },
+    swivel: { label: 'Swivel barrel', desc: 'Barrel back on a 360° swivel base: turns from the screen to the fire', W: 30, D: 30, H: 29, comfort: 4, hangout: 5, price: [1000, 1900], weeks: [6, 10] },
+    low:    { label: 'Low lounge', desc: 'Low solid-oak frame, deep seat and back cushions', W: 30, D: 30, H: 26, comfort: 4, hangout: 3, price: [950, 1800], weeks: [4, 8] },
+  },
+  roundTable: {
+    pedestal: { label: 'Sculpted pedestal', desc: 'Turned solid-wood pedestal, round top', H: 16, price: [900, 1700], weeks: [4, 8] },
+    slab:     { label: 'Low slab', desc: 'Rectangular solid-wood top on panel legs', H: 14, price: [700, 1400], weeks: [4, 8] },
+    tulip:    { label: 'Tulip, marble top', desc: 'Marble top on a flared cast pedestal', H: 16, price: [1100, 2200], weeks: [4, 10] },
+    drum:     { label: 'Travertine drum', desc: 'Honed travertine drum with a shadow reveal', H: 15, price: [1400, 2800], weeks: [6, 12] },
+    frame:    { label: 'Steel and timber', desc: 'Reclaimed-timber top on a black steel frame, lower shelf', H: 17, price: [600, 1200], weeks: [2, 6] },
+  },
+  ottoman: {
+    block:  { label: 'Block ottoman', desc: 'Upholstered block on a recessed base', H: 16, price: [500, 950], weeks: [6, 10] },
+    tufted: { label: 'Tufted ottoman', desc: 'Button-tufted top on tapered legs', H: 17, price: [650, 1200], weeks: [6, 10] },
+    tray:   { label: 'Tray ottoman', desc: 'Upholstered base with a lift-off wood tray', H: 17, price: [600, 1100], weeks: [4, 8] },
+  },
+  pouf: {
+    round:   { label: 'Round pouf', desc: 'Piped round pouf', H: 16, price: [180, 380], weeks: [2, 4] },
+    leather: { label: 'Stitched leather pouf', desc: 'Panel-stitched leather pouf', H: 16, price: [250, 520], weeks: [2, 6] },
+    knit:    { label: 'Chunky knit pouf', desc: 'Hand-knit cover over bead fill', H: 15, price: [120, 300], weeks: [1, 3] },
+  },
+  rug: {
+    weave:     { label: 'Tonal weave', desc: 'Hand-loomed wool and viscose, low pile', perSqFt: [9, 16], absorb: 3, weeks: [2, 6] },
+    border:    { label: 'Bordered', desc: 'Tufted wool with a contrast border', perSqFt: [10, 18], absorb: 3, weeks: [2, 6] },
+    vintage:   { label: 'Vintage medallion', desc: 'Distressed medallion, low pile, washable', perSqFt: [8, 22], absorb: 2, weeks: [1, 4] },
+    jute:      { label: 'Jute flatweave', desc: 'Natural jute and wool flatweave', perSqFt: [5, 10], absorb: 2, weeks: [1, 4] },
+    geometric: { label: 'Geometric', desc: 'Hand-tufted wool, mid-century geometric', perSqFt: [10, 18], absorb: 3, weeks: [4, 8] },
+    shag:      { label: 'Plush shag', desc: 'High-pile wool shag, 1½″ pile', perSqFt: [12, 22], absorb: 5, weeks: [4, 10] },
+  },
+  console: {
+    slatted:  { label: 'Slatted, wall-hung', desc: 'Wall-hung, slatted front, push-latch doors', price: [1400, 2600], weeks: [6, 10], sheen: 0.1 },
+    credenza: { label: 'Credenza', desc: 'Sliding doors on tapered legs, brass pulls', price: [1500, 2900], weeks: [6, 10], sheen: 0.1 },
+    fluted:   { label: 'Fluted', desc: 'Fluted door fronts with brass pulls', price: [1700, 3200], weeks: [8, 12], sheen: 0.1 },
+    lacquer:  { label: 'Matte lacquer', desc: 'Handleless matte-black lacquer, no glare under the screen', price: [1200, 2400], weeks: [6, 10], sheen: 0 },
+    frame:    { label: 'Steel frame', desc: 'Timber boxes in a black steel frame on legs', price: [900, 1700], weeks: [2, 6], sheen: 0.05 },
+    cane:     { label: 'Cane front', desc: 'Light oak with woven cane doors', price: [1300, 2400], weeks: [6, 10], sheen: 0 },
+  },
+  sideTable: {
+    drum:     { label: 'Drum', desc: 'Solid-wood drum', H: 22, price: [250, 550], weeks: [2, 6] },
+    ctable:   { label: 'C-table', desc: 'Black steel C-table that slides over a seat', H: 24, price: [180, 420], weeks: [1, 4] },
+    stump:    { label: 'Stump', desc: 'Solid timber stump, oiled', H: 18, price: [300, 700], weeks: [2, 6] },
+    pedestal: { label: 'Stone pedestal', desc: 'Stone top on a stone column', H: 22, price: [400, 900], weeks: [4, 8] },
+  },
+  floorLamp: {
+    drum:    { label: 'Linen drum', desc: 'Linen drum shade on a slim pole, warm 2700K bulb', H: 64, price: [250, 600], weeks: [1, 4] },
+    arc:     { label: 'Arc lamp', desc: 'Marble base, arching arm, dome shade over a seat', H: 80, price: [400, 1000], weeks: [2, 6] },
+    tripod:  { label: 'Tripod', desc: 'Tripod legs with a linen drum', H: 62, price: [250, 650], weeks: [1, 4] },
+    lantern: { label: 'Paper lantern', desc: 'Tall paper column, soft all-round glow', H: 58, price: [150, 450], weeks: [1, 4] },
+    globe:   { label: 'Opal globe', desc: 'Opal glass globe on a slim stem', H: 62, price: [350, 900], weeks: [2, 6] },
+  },
+  plant: {
+    olive:  { label: 'Olive tree', desc: 'Olive tree in a stone planter', price: [250, 700], weeks: [1, 3] },
+    fiddle: { label: 'Fiddle-leaf fig', desc: 'Fiddle-leaf fig in a stone planter', price: [200, 600], weeks: [1, 3] },
+    snake:  { label: 'Snake plant', desc: 'Snake plant in a low planter; copes with low light', price: [120, 350], weeks: [1, 3] },
+  },
+  barCart: {
+    classic: { label: 'Metal and wood', desc: 'Metal frame, two wood shelves, casters', H: 33, price: [350, 900], weeks: [1, 4] },
+    oak:     { label: 'All timber', desc: 'Solid oak frame and shelves, casters', H: 33, price: [400, 950], weeks: [2, 6] },
+  },
+  recliner: {
+    power: { label: 'Power recliner', desc: 'Power recline with adjustable headrest', H: 41, comfort: 5, hangout: 2, price: [1400, 2600], weeks: [6, 10] },
+  },
+};
+VARIANTS.sofa = VARIANTS.sectional;                        // the straight sofa shares the sectional's styles
+const UPHOLSTERED = { sectional: 1, sofa: 1, loungeChair: 1, ottoman: 1, pouf: 1, recliner: 1 };
+const AV_TYPES = { towerSpeaker: 1, subwoofer: 1 };
+
+// ---------------- curated sets ----------------
+// Each entry styles every piece type. An array means "alternate by instance" (first rug, second rug ...).
+const STYLE_SETS = {
+  'warm-modern': {
+    name: 'Warm Modern', tagline: 'Walnut, soft taupe and ivory bouclé: the current plan.',
+    palette: ['#8f877c', '#e6dccb', '#3b281b', '#5b4636', '#6e6559', '#b48a52'],
+    fit: 5, fitNote: 'Built around the walnut slat wall and the warm 2700K coves; calm next to the dark alcove.',
+    pros: ['Ties straight into the walnut slats and brass', 'Soft, absorbent fabrics help the acoustics', 'Easy to live with for years'],
+    cons: ['Ivory bouclé chairs mark and snag', 'Mid-tone taupe sectional bounces some light back at the screen'],
+    pieces: {
+      sectional: { variant: 'track', cover: 'linen', color: '#8f877c' }, sofa: { variant: 'track', cover: 'linen', color: '#8f877c' },
+      loungeChair: { variant: 'tub', cover: 'boucle', color: '#e6dccb' }, roundTable: { variant: 'pedestal', wood: 'walnut' },
+      ottoman: { variant: 'block', cover: 'leather', color: '#5b4636' }, pouf: { variant: 'round', cover: 'boucle', color: ['#c9bba5', '#7a5f48'] },
+      rug: { variant: ['weave', 'border'], color: ['#6e6559', '#7d7466'] }, console: { variant: 'slatted', wood: 'teak' },
+      sideTable: { variant: 'drum', wood: 'walnut' }, floorLamp: { variant: 'drum', metal: 'brass' }, plant: { variant: 'olive' },
+      barCart: { variant: 'classic', metal: 'brass', wood: 'walnut' }, recliner: { variant: 'power', cover: 'linen', color: '#2f2c2a' },
+      towerSpeaker: { finish: 'black' }, subwoofer: { finish: 'black' }, pillow: { cover: 'boucle', color: '#d8ccb6' },
+    },
+  },
+  'mid-century': {
+    name: 'Mid-century Modern', tagline: 'Walnut on tapered legs, rust tweed, mustard and teal.',
+    palette: ['#9a5636', '#c08a2e', '#2f5d5a', '#3b281b', '#d9cdb5', '#b48a52'],
+    fit: 4, fitNote: 'Walnut and rust pick up the slat wall; raised legs keep the room light under the 7′-10″ bulkhead.',
+    pros: ['Timeless and characterful', 'Tweed wears well and hides marks', 'Pieces on legs make the floor read bigger'],
+    cons: ['Tight tufted back is firmer for long films', 'Cream geometric rug lightens the floor in front of the screen'],
+    pieces: {
+      sectional: { variant: 'tufted', cover: 'tweed', color: '#9a5636' }, sofa: { variant: 'tufted', cover: 'tweed', color: '#9a5636' },
+      loungeChair: { variant: 'frame', cover: 'tweed', color: '#c08a2e', wood: 'walnut' }, roundTable: { variant: 'tulip', stone: 'marble', metal: 'nickel' },
+      ottoman: { variant: 'tufted', cover: 'leather', color: '#7a4a2a', wood: 'walnut' }, pouf: { variant: 'round', cover: 'tweed', color: ['#2f5d5a', '#c08a2e'] },
+      rug: { variant: 'geometric', color: ['#d9cdb5', '#2f5d5a'], color2: ['#2f5d5a', '#9a5636'] }, console: { variant: 'credenza', wood: 'walnut', metal: 'brass' },
+      sideTable: { variant: 'drum', wood: 'walnut' }, floorLamp: { variant: 'arc', metal: 'brass', stone: 'marble' }, plant: { variant: 'fiddle' },
+      barCart: { variant: 'classic', metal: 'brass', wood: 'walnut' }, recliner: { variant: 'power', cover: 'tweed', color: '#9a5636' },
+      towerSpeaker: { finish: 'walnut' }, subwoofer: { finish: 'walnut' }, pillow: { cover: 'tweed', color: '#2f5d5a' },
+    },
+  },
+  japandi: {
+    name: 'Japandi', tagline: 'Low and calm: oatmeal linen, white oak, jute and paper light.',
+    palette: ['#cdbfa8', '#b48a5c', '#a68d68', '#8c7d68', '#efe6d6', '#2b2724'],
+    fit: 4, fitNote: 'Light oak and linen lift a basement, but pale pieces fight the dark alcove when the screen is on.',
+    pros: ['Modules regroup for game nights', 'Low profile makes the 9′ ceiling feel higher', 'Lowest budget of the six'],
+    cons: ['Pale seating bounces light back at the screen', 'Washed linen and knit need gentle care', 'Low seats are harder to get out of'],
+    pieces: {
+      sectional: { variant: 'modular', cover: 'linen', color: '#cdbfa8' }, sofa: { variant: 'modular', cover: 'linen', color: '#cdbfa8' },
+      loungeChair: { variant: 'low', cover: 'natural', color: '#b9ab94', wood: 'oak' }, roundTable: { variant: 'slab', wood: 'oak' },
+      ottoman: { variant: 'block', cover: 'natural', color: '#a99a82' }, pouf: { variant: 'knit', cover: 'knit', color: ['#d8ccb6', '#8c7d68'] },
+      rug: { variant: 'jute', color: ['#a68d68', '#8a7a64'] }, console: { variant: 'cane', wood: 'oak' },
+      sideTable: { variant: 'stump', wood: 'oak' }, floorLamp: { variant: 'lantern' }, plant: { variant: 'snake' },
+      barCart: { variant: 'oak', wood: 'oak' }, recliner: { variant: 'power', cover: 'natural', color: '#a99a82' },
+      towerSpeaker: { finish: 'oak' }, subwoofer: { finish: 'oak' }, pillow: { cover: 'natural', color: '#8c7d68' },
+    },
+  },
+  industrial: {
+    name: 'Industrial Loft', tagline: 'Cognac leather, black steel, reclaimed timber and a vintage rug.',
+    palette: ['#7a4a2a', '#1d1c1a', '#6e4c30', '#7b3f2e', '#3d4656', '#c9bfb0'],
+    fit: 3, fitNote: 'Leather and steel suit a screening room, but compete with the warm walnut; best with the black band fireplace look.',
+    pros: ['Leather wipes clean and ages well', 'Sling chairs and steel tables are light to move', 'Washable vintage rug hides spills'],
+    cons: ['Leather reflects sound and some light', 'Highest seating cost per seat', 'Leather sticks to skin in summer'],
+    pieces: {
+      sectional: { variant: 'slope', cover: 'leather', color: '#7a4a2a' }, sofa: { variant: 'slope', cover: 'leather', color: '#7a4a2a' },
+      loungeChair: { variant: 'sling', cover: 'leather', color: '#6b3f22', metal: 'black' }, roundTable: { variant: 'frame', wood: 'reclaimed', metal: 'black' },
+      ottoman: { variant: 'tray', cover: 'leather', color: '#3a2a20', wood: 'reclaimed' }, pouf: { variant: 'leather', cover: 'leather', color: ['#7a4a2a', '#3a2a20'] },
+      rug: { variant: 'vintage', color: ['#7b3f2e', '#3d4656'], color2: ['#3d4656', '#7b3f2e'] }, console: { variant: 'frame', wood: 'reclaimed', metal: 'black' },
+      sideTable: { variant: 'ctable', metal: 'black', wood: 'reclaimed' }, floorLamp: { variant: 'tripod', metal: 'black', wood: 'reclaimed' }, plant: { variant: 'fiddle' },
+      barCart: { variant: 'classic', metal: 'black', wood: 'reclaimed' }, recliner: { variant: 'power', cover: 'leather', color: '#7a4a2a' },
+      towerSpeaker: { finish: 'black' }, subwoofer: { finish: 'black' }, pillow: { cover: 'tweed', color: '#6b6358' },
+    },
+  },
+  luxe: {
+    name: 'Luxe Lounge', tagline: 'Forest velvet, travertine and brass: a members’-club screening room.',
+    palette: ['#2e4a3c', '#b8895a', '#d8c7ad', '#b48a52', '#3a3633', '#3b281b'],
+    fit: 4, fitNote: 'Deep green against walnut is rich and cinematic; brass echoes the existing fittings.',
+    pros: ['Deep, dark velvet keeps the screen punchy', 'Shag rug and velvet soak up echo', 'Swivel chairs turn from the screen to the fire'],
+    cons: ['Velvet shows pet hair and pressure marks', 'Travertine needs sealing and coasters', 'Highest budget of the six'],
+    pieces: {
+      sectional: { variant: 'channel', cover: 'velvet', color: '#2e4a3c' }, sofa: { variant: 'channel', cover: 'velvet', color: '#2e4a3c' },
+      loungeChair: { variant: 'swivel', cover: 'velvet', color: '#b8895a', metal: 'brass' }, roundTable: { variant: 'drum', stone: 'travertine' },
+      ottoman: { variant: 'tufted', cover: 'velvet', color: '#6e2f2f', wood: 'walnut' }, pouf: { variant: 'round', cover: 'velvet', color: ['#b8895a', '#2e4a3c'] },
+      rug: { variant: 'shag', color: ['#3a3633', '#6b5a4a'] }, console: { variant: 'fluted', wood: 'walnut', metal: 'brass' },
+      sideTable: { variant: 'pedestal', stone: 'travertine' }, floorLamp: { variant: 'globe', metal: 'brass' }, plant: { variant: 'olive' },
+      barCart: { variant: 'classic', metal: 'brass', wood: 'walnut' }, recliner: { variant: 'power', cover: 'velvet', color: '#2e4a3c' },
+      towerSpeaker: { finish: 'black' }, subwoofer: { finish: 'black' }, pillow: { cover: 'velvet', color: '#b8895a' },
+    },
+  },
+  theater: {
+    name: 'Performance Theatre', tagline: 'Graphite performance fabric, power recline and matte black: built for films.',
+    palette: ['#3a3836', '#4b4f55', '#1f1813', '#2f2d2b', '#141210', '#8f877c'],
+    fit: 3, fitNote: 'Best seats and best picture, but the reclining sectional is visually heavy for a hangout room.',
+    pros: ['Power recline and headrests for long films', 'Dark, matte surfaces keep contrast high', 'Performance fabric shrugs off spills, kids and pets'],
+    cons: ['Reclining seats fix where people sit', 'Bulky backs block the view across the room', 'Feels more like a theatre than a lounge'],
+    pieces: {
+      sectional: { variant: 'recliner', cover: 'weave', color: '#3a3836' }, sofa: { variant: 'recliner', cover: 'weave', color: '#3a3836' },
+      loungeChair: { variant: 'swivel', cover: 'weave', color: '#4b4f55', metal: 'black' }, roundTable: { variant: 'slab', wood: 'ebony' },
+      ottoman: { variant: 'tray', cover: 'weave', color: '#2f2c2a', wood: 'ebony' }, pouf: { variant: 'round', cover: 'weave', color: ['#4b4f55', '#2f2c2a'] },
+      rug: { variant: 'weave', color: ['#2f2d2b', '#3d3833'] }, console: { variant: 'lacquer' },
+      sideTable: { variant: 'ctable', metal: 'black', wood: 'ebony' }, floorLamp: { variant: 'drum', metal: 'black' }, plant: { variant: 'snake' },
+      barCart: { variant: 'classic', metal: 'black', wood: 'ebony' }, recliner: { variant: 'power', cover: 'weave', color: '#3a3836' },
+      towerSpeaker: { finish: 'black' }, subwoofer: { finish: 'black' }, pillow: null,
+    },
+  },
+};
+const SET_IDS = Object.keys(STYLE_SETS);
+
+// ---------------- resolving a piece's style ----------------
+let previewSetId = null;                                   // set shown temporarily (compare thumbnails), ignoring overrides
+const activeSetId = () => previewSetId || (state.style && STYLE_SETS[state.style.set] ? state.style.set : 'warm-modern');
+const STYLE_KEYS = ['variant', 'cover', 'color', 'color2', 'wood', 'metal', 'stone', 'finish'];
+
+/** The style of one placed piece: its set's choice (alternating per instance) plus the owner's overrides. */
+function resolveSpec(item, setId = activeSetId(), withOverrides = !previewSetId) {
+  const set = STYLE_SETS[setId] || STYLE_SETS['warm-modern'];
+  const base = set.pieces[item.type] || {};
+  const idx = state.items.filter((i) => i.type === item.type).indexOf(item);
+  const pick = (v) => (Array.isArray(v) ? v[Math.max(0, idx) % v.length] : v);
+  const s = {};
+  for (const k of STYLE_KEYS) if (base[k] != null) s[k] = pick(base[k]);
+  if (withOverrides && item.s) for (const k of STYLE_KEYS) if (item.s[k] != null) s[k] = item.s[k];
+  const vars = VARIANTS[item.type];
+  if (vars && !vars[s.variant]) s.variant = Object.keys(vars)[0];
+  if (UPHOLSTERED[item.type] && !COVERS[s.cover]) s.cover = 'linen';
+  return s;
+}
+const hasOverrides = (item) => !!item.s && STYLE_KEYS.some((k) => item.s[k] != null);
+const isCustomised = () => state.items.some(hasOverrides);
+
+// ---------------- what a piece costs, how long it takes, how big it is ----------------
+function pieceSize(item, s) {
+  const p = { ...CATALOG[item.type].defaults, ...item.p }, v = (VARIANTS[item.type] || {})[s.variant] || {};
+  switch (item.type) {
+    case 'sectional': return { text: `${ftin(p.back)} × ${ftin(p.ret)} L, ${inch(p.depth)} deep, ${inch(v.H)} high`, run: p.back + p.ret - p.depth };
+    case 'sofa': return { text: `${inch(p.w)} W × ${inch(p.depth)} D × ${inch(v.H)} H`, run: p.w };
+    case 'rug': return { text: `${ftin(p.w)} × ${ftin(p.d)}`, sqft: (p.w * p.d) / 144 };
+    case 'roundTable': {
+      const rect = s.variant === 'slab' || s.variant === 'frame';
+      return { text: rect ? `${inch(p.dia * 1.4)} × ${inch(p.dia * 0.72)} × ${inch(v.H)} H` : `Ø ${inch(p.dia)} × ${inch(v.H)} H` };
+    }
+    case 'ottoman': return { text: `${inch(p.w)} × ${inch(p.d)} × ${inch(v.H)} H` };
+    case 'loungeChair': return { text: `${inch(v.W)} W × ${inch(v.D)} D × ${inch(v.H)} H` };
+    case 'console': return { text: `${inch(p.w)} W × 15″ D × ${s.variant === 'frame' || s.variant === 'credenza' ? '24″ H on legs' : '13″ H, wall-hung'}`, scale: p.w / 70 };
+    case 'plant': return { text: `${inch(s.variant === 'snake' ? 30 : p.h)} tall` };
+    case 'towerSpeaker': return { text: '9″ × 12″ × 41″ H' };
+    case 'subwoofer': return { text: '15″ cube' };
+    case 'recliner': return { text: '36″ × 38″ × 41″ H' };
+    case 'barCart': return { text: '24″ × 16″ × 33″ H' };
+    case 'pouf': return { text: `Ø 20″ × ${inch(v.H || 16)} H` };
+    case 'floorLamp': return { text: s.variant === 'arc' ? '80″ H, 50″ reach' : `${inch(v.H)} H` };
+    case 'sideTable': return { text: `${s.variant === 'ctable' ? '16″ × 12″' : 'Ø 18″'} × ${inch(v.H)} H` };
+    default: return { text: v.H ? `${inch(v.H)} H` : '' };
+  }
+}
+/** Indicative CAD price range [lo, hi] for one piece, or null for AV gear (budgeted separately). */
+function piecePrice(item, s) {
+  if (AV_TYPES[item.type]) return null;
+  const v = (VARIANTS[item.type] || {})[s.variant] || {}, size = pieceSize(item, s);
+  const f = UPHOLSTERED[item.type] ? (COVERS[s.cover] || COVERS.linen).factor : 1;
+  let lo, hi;
+  if (v.perIn) { const corner = item.type === 'sectional' ? 1.15 : 1; lo = v.perIn[0] * size.run * corner; hi = v.perIn[1] * size.run * corner; }
+  else if (v.perSqFt) { lo = v.perSqFt[0] * size.sqft; hi = v.perSqFt[1] * size.sqft; }
+  else if (v.price) { lo = v.price[0] * (size.scale || 1); hi = v.price[1] * (size.scale || 1); }
+  else return null;
+  const round = (x) => Math.round(x / 10) * 10;
+  return [round(lo * f), round(hi * f)];
+}
+function pieceWeeks(item, s) {
+  if (AV_TYPES[item.type]) return null;
+  const v = (VARIANTS[item.type] || {})[s.variant] || {};
+  if (!v.weeks) return null;
+  const extra = UPHOLSTERED[item.type] ? (COVERS[s.cover] || COVERS.linen).weeks : 0;
+  return [v.weeks[0] + extra, v.weeks[1] + extra];
+}
+function pieceSpecText(item, s) {
+  const v = (VARIANTS[item.type] || {})[s.variant], bits = [];
+  if (v) bits.push(v.desc);
+  if (UPHOLSTERED[item.type]) bits.push(`${COVERS[s.cover].label}, ${colorName(s.color)}`);
+  if (item.type === 'rug') bits.push(colorName(s.color));
+  if (s.wood && WOOD_FINISHES[s.wood]) bits.push(WOOD_FINISHES[s.wood].label);
+  if (s.metal && METAL_FINISHES[s.metal]) bits.push(METAL_FINISHES[s.metal]);
+  if (s.stone && STONE_FINISHES[s.stone]) bits.push(STONE_FINISHES[s.stone]);
+  if (s.finish && AV_FINISHES[s.finish]) bits.push(AV_FINISHES[s.finish] + ' cabinet');
+  return bits.join(' · ');
+}
+
+// ---------------- scoring ----------------
+const CRITERIA = [
+  { key: 'comfort', label: 'Movie comfort', note: 'Seat depth, back height and recline of the main seating, plus the lounge chairs.' },
+  { key: 'picture', label: 'Screen contrast', note: 'Dark, matte furniture facing the screen bounces less light back onto it.' },
+  { key: 'acoustics', label: 'Acoustics', note: 'Soft upholstery and deep rugs absorb echo; leather, stone and lacquer reflect it.' },
+  { key: 'care', label: 'Durability and care', note: 'Abrasion resistance, cleanability, and how it copes with kids and pets.' },
+  { key: 'hangout', label: 'Hangout flexibility', note: 'Swivels, modules and movable seats for game nights.' },
+  { key: 'budget', label: 'Budget', note: 'Indicative furniture total for this layout; lower scores higher.' },
+  { key: 'lead', label: 'Lead time', note: 'The longest wait among the pieces.' },
+  { key: 'fit', label: 'Fit with the room', note: 'Designer read on the walnut slat wall, dark alcove and warm lighting.' },
+];
+
+function luminance(hex) {
+  const c = new THREE.Color(hex);                       // three keeps colours linear: this is relative luminance
+  return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+}
+function pieceTone(item, s) {                           // [luminance, sheen] of the surface the screen sees
+  if (UPHOLSTERED[item.type]) return [luminance(s.color), (COVERS[s.cover] || {}).sheen || 0];
+  if (item.type === 'rug') return [luminance(s.color) * 0.8 + luminance(s.color2 || s.color) * 0.2, 0];
+  if (item.type === 'console') return s.variant === 'lacquer' ? [luminance('#121110'), 0] : [luminance(WOOD_FINISHES[s.wood || 'walnut'].color), VARIANTS.console[s.variant].sheen || 0.1];
+  if (item.type === 'roundTable') {
+    if (s.stone) return [luminance(s.stone === 'marble' ? '#e8e4dc' : s.stone === 'travertine' ? '#d8c7ad' : '#2a2724'), s.stone === 'marble' ? 0.3 : 0.1];
+    return [luminance(WOOD_FINISHES[s.wood || 'walnut'].color), 0.1];
+  }
+  return null;
+}
+
+/** Scores 1–5 per criterion, plus budget and lead time, for a set as designed (or the current layout with overrides). */
+function evaluateSet(setId, withOverrides = false) {
+  const set = STYLE_SETS[setId];
+  const rows = state.items.map((it) => ({ it, s: resolveSpec(it, setId, withOverrides) }));
+  const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+  const wmean = (pairs) => { const w = pairs.reduce((a, [, k]) => a + k, 0); return w ? pairs.reduce((a, [v, k]) => a + v * k, 0) / w : 0; };
+  const of = (type) => rows.filter((r) => r.it.type === type);
+  const main = of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
+  const varOf = (r) => (VARIANTS[r.it.type] || {})[r.s.variant] || {};
+  // movie comfort: main seating dominates; lounge chairs and a footrest add the rest
+  const chairs = of('loungeChair'), foot = of('ottoman').length + of('pouf').length;
+  const comfort = (main ? varOf(main).comfort * 0.6 : 2) + (chairs.length ? mean(chairs.map((r) => varOf(r).comfort)) * 0.25 : 0.75) + (foot ? 4 : 2.5) * 0.15;
+  // screen contrast: luminance and sheen of what faces the screen, weighted by how much of it the screen sees
+  const W = { sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
+  const tones = rows.map((r) => [pieceTone(r.it, r.s), W[r.it.type] || 0]).filter(([t, k]) => t && k);
+  const glare = wmean(tones.map(([[L, sh], k]) => [L + sh * 0.35, k]));
+  const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
+  // acoustics: absorption of soft surfaces by area (main seating and rugs dominate)
+  const dims = (r) => ({ ...CATALOG[r.it.type].defaults, ...r.it.p });
+  const area = (r) => ({ sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
+  const absorbOf = (r) => (r.it.type === 'rug' ? varOf(r).absorb : (COVERS[r.s.cover] || {}).absorb);
+  const acoustics = clamp(wmean(rows.filter((r) => area(r) && absorbOf(r)).map((r) => [absorbOf(r), area(r)])), 1, 5);
+  // durability and care: upholstery by area
+  const soft = rows.filter((r) => UPHOLSTERED[r.it.type]);
+  const care = clamp(wmean(soft.map((r) => { const c = COVERS[r.s.cover]; return [(c.durability + c.care + c.pets) / 3, area(r)]; })), 1, 5);
+  // hangout: modules and swivels, plus how many movable seats the layout has
+  const movable = chairs.length + of('pouf').length + of('ottoman').length;
+  const hangout = clamp((main ? varOf(main).hangout * 0.5 : 1.5) + (chairs.length ? mean(chairs.map((r) => varOf(r).hangout)) * 0.3 : 0.6) + Math.min(5, 1.5 + movable * 0.6) * 0.2, 1, 5);
+  // budget and lead time
+  let lo = 0, hi = 0, weeks = 0;
+  for (const r of rows) {
+    const pr = piecePrice(r.it, r.s); if (pr) { lo += pr[0]; hi += pr[1]; }
+    const wk = pieceWeeks(r.it, r.s); if (wk) weeks = Math.max(weeks, wk[1]);
+  }
+  const mid = (lo + hi) / 2;
+  const budget = clamp(5 - 4 * (mid - 9000) / 15000, 1, 5);
+  const lead = clamp(5 - (weeks - 4) * 0.28, 1, 5);
+  const scores = { comfort: clamp(comfort, 1, 5), picture, acoustics, care, hangout, budget, lead, fit: set.fit };
+  return { scores, lo, hi, weeks, total: weightedTotal(scores) };
+}
+function weightedTotal(scores, weights = (state.study && state.study.weights) || DEFAULT_WEIGHTS) {
+  let sw = 0, s = 0;
+  for (const c of CRITERIA) { const w = weights[c.key] ?? DEFAULT_WEIGHTS[c.key]; sw += w; s += w * scores[c.key]; }
+  return sw ? Math.round((s / sw) * 20) : 0;                // 0–100
+}
+const money = (v) => (v >= 10000 ? `$${(v / 1000).toFixed(1)}k` : `$${Math.round(v).toLocaleString('en-CA')}`);
+const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
+
+/** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
+function specRows(setId, withOverrides) {
+  const groups = new Map(), PREFIX = { sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
+    roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', plant: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
+  for (const it of state.items) {
+    const s = resolveSpec(it, setId, withOverrides), size = pieceSize(it, s), spec = pieceSpecText(it, s);
+    const key = [it.type, spec, size.text].join('|');
+    if (!groups.has(key)) {
+      const v = (VARIANTS[it.type] || {})[s.variant];
+      groups.set(key, { type: it.type, item: v ? `${CATALOG[it.type].label}: ${v.label}` : CATALOG[it.type].label, spec, size: size.text,
+        qty: 0, unit: piecePrice(it, s), weeks: pieceWeeks(it, s), care: UPHOLSTERED[it.type] ? COVERS[s.cover].spec : '' });
+    }
+    groups.get(key).qty++;
+  }
+  const order = ['SE', 'TB', 'RG', 'ST', 'LT', 'AC', 'AV'], count = {};
+  return [...groups.values()]
+    .sort((a, b) => order.indexOf(PREFIX[a.type]) - order.indexOf(PREFIX[b.type]))
+    .map((g) => { const p = PREFIX[g.type] || 'XX'; count[p] = (count[p] || 0) + 1; return { ...g, tag: `${p}-${String(count[p]).padStart(2, '0')}` }; });
 }
 
 // ---- 50-view.js ----
@@ -2431,8 +3385,8 @@ function addItem(type) {
 function undo() {
   const prev = history.pop(); $('#undoBtn').disabled = history.length === 0;
   if (!prev) return;
-  const keepSel = selected;
-  applyState(JSON.parse(prev), false);
+  const keepSel = selected, study = state.study;          // ratings and notes are not part of undo
+  applyState(JSON.parse(prev), false); state.study = study;
   rebuildAll(); refreshPanels(); save();
   if (keepSel && (keepSel.kind === 'fixture' || itemById(keepSel.id))) select(keepSel); else select(null);
   toast('Undone');
@@ -2443,8 +3397,14 @@ window.addEventListener('keydown', (e) => {
   const t = e.target || {}, tag = t.tagName || '';
   // only text entry keeps its own keys; switches, sliders and buttons still get Ctrl+Z, Q/E, etc.
   const typing = tag === 'TEXTAREA' || tag === 'SELECT' || (tag === 'INPUT' && !['checkbox', 'radio', 'range', 'button'].includes(t.type));
+  if (e.key === 'Escape') {                                // dialogs close even while you type in them
+    if (!$('#codeModal').hidden) { closeCode(); return; }
+    if (!$('#specModal').hidden) { closeSpec(); return; }
+    if (!$('#compareModal').hidden) { closeCompare(); return; }
+  }
   if (typing) return;
   if (t.type === 'range' && e.key.startsWith('Arrow')) return;
+  if ((!$('#compareModal').hidden || !$('#specModal').hidden) && e.key !== 'Escape') return;   // a sheet is open: keys stay with it
   const mod = e.ctrlKey || e.metaKey;
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); duplicateSelected(); return; }
@@ -2458,7 +3418,7 @@ window.addEventListener('keydown', (e) => {
     case '3': setMode('walk'); break;
     case 'm': case 'M': if (!viewOnly()) setMeasure(!measure.on); break;
     case 'h': case 'H': setFocus(!viewOnly()); break;
-    case 'Escape': if ($('#codeModal').hidden === false) closeCode(); else if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else select(null); break;
+    case 'Escape': if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else select(null); break;
     case 'q': case 'Q': rotateSelected(e.shiftKey ? 45 : 15); break;
     case 'e': case 'E': rotateSelected(e.shiftKey ? -45 : -15); break;
     case 'r': case 'R': rotateSelected(90); break;
@@ -2709,10 +3669,307 @@ function rebuildAll() {
   applyFinishes(); buildRoom(); buildFixtures(); buildLights(); buildAllItems(); updateLighting();
   updateLabels(); drawOutline(); updateRoomSub();
 }
-function refreshPanels() { renderFurnish(); renderLighting(); renderFinishes(); renderRoomTab(); renderInspector(); }
+function refreshPanels() { renderFurnish(); renderStyleTab(); renderLighting(); renderFinishes(); renderRoomTab(); renderInspector(); }
 function updateRoomSub() {
   const r = state.room;
   $('#roomSub').textContent = `Room 1 · ${ftin(r.width)} × ${ftin(r.depth)} · ${ftin(r.ceiling)} ceiling`;
+}
+
+// ---- 62-style-ui.js ----
+// ===================================================================
+// 62 · Furniture style study UI: Style tab, per-piece style controls,
+//      compare view (rendered thumbnails, scorecard, ratings, notes,
+//      shortlist, final pick) and the spec sheet (FF&E schedule).
+// ===================================================================
+const stars = (n) => '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
+function scoreBar(value, max = 5, cls = '') {
+  return h('span', { class: 'sbar ' + cls, title: `${value.toFixed(1)} / ${max}` }, h('i', { style: `width:${clamp(value / max, 0, 1) * 100}%` }));
+}
+function paletteStrip(colors) { return h('span', { class: 'palette' }, ...colors.map((c) => h('i', { style: `background:${c}` }))); }
+
+/** Apply a whole set: every piece takes the set's style (overrides cleared; Undo goes back). */
+function applySet(id, quiet = false) {
+  if (!STYLE_SETS[id]) return;
+  pushHistory();
+  state.style.set = id;
+  for (const it of state.items) delete it.s;
+  buildAllItems(); updateLighting(); drawOutline(); commit(false);
+  renderStyleTab(); if (!quiet) toast(`${STYLE_SETS[id].name} applied · Undo goes back`);
+}
+
+// ---------------- Style tab ----------------
+function renderStyleTab() {
+  const root = $('#tab-style'); if (!root) return;
+  root.replaceChildren();
+  const cur = activeSetId(), study = state.study, custom = isCustomised();
+  const evals = Object.fromEntries(SET_IDS.map((id) => [id, evaluateSet(id)]));
+  const ranked = [...SET_IDS].sort((a, b) => evals[b].total - evals[a].total);
+  const cards = h('div', { class: 'setlist' });
+  if (custom) {
+    const e = evaluateSet(cur, true);
+    cards.append(h('div', { class: 'setcard on custom' },
+      h('span', { class: 'row' }, h('b', {}, 'Your mix'), h('span', { class: 'score' }, String(e.total))),
+      h('span', { class: 'sub' }, `${STYLE_SETS[cur].name} with your changes to some pieces`),
+      h('span', { class: 'meta' }, `${moneyRange(e.lo, e.hi)} · up to ${e.weeks} wk`)));
+  }
+  for (const id of SET_IDS) {
+    const set = STYLE_SETS[id], e = evals[id], rank = ranked.indexOf(id) + 1, on = id === cur && !custom;
+    const rating = study.ratings[id] || 0, listed = study.shortlist.includes(id);
+    cards.append(h('button', { class: 'setcard' + (on ? ' on' : ''), 'aria-pressed': String(on), title: set.tagline, onclick: () => applySet(id) },
+      h('span', { class: 'row' }, h('b', {}, set.name),
+        study.pick === id ? h('span', { class: 'pill pick' }, 'Your pick') : listed ? h('span', { class: 'pill' }, 'Shortlist') : null,
+        h('span', { class: 'score', title: `#${rank} of ${SET_IDS.length} with your priorities` }, String(e.total))),
+      h('span', { class: 'sub' }, set.tagline),
+      paletteStrip(set.palette),
+      h('span', { class: 'meta' }, `${moneyRange(e.lo, e.hi)} · up to ${e.weeks} wk`, rating ? h('span', { class: 'stars' }, ' · ' + stars(rating)) : null)));
+  }
+  root.append(group('Furniture sets', cards,
+    h('div', { class: 'btnrow' },
+      h('button', { class: 'btn primary', onclick: () => openCompare() }, 'Compare all six'),
+      h('button', { class: 'btn', onclick: () => openSpec(custom ? 'mine' : cur) }, 'Spec sheet')),
+    h('p', { class: 'note' }, 'Click a set to dress the whole room in it. Scores out of 100 use your priorities below; prices are indicative for this layout.')));
+
+  // priorities
+  const W = study.weights, pr = h('div', { class: 'prio' });
+  for (const c of CRITERIA) {
+    const out = h('span', { class: 'val' }, String(W[c.key]));
+    const input = h('input', { type: 'range', min: 0, max: 5, step: 1, value: String(W[c.key]), 'aria-label': c.label });
+    input.addEventListener('input', () => { W[c.key] = +input.value; out.textContent = input.value; });
+    input.addEventListener('change', () => { save(); renderStyleTab(); if (!$('#compareModal').hidden) renderCompare(); });
+    pr.append(h('label', { class: 'prow', title: c.note }, h('span', {}, c.label), input, out));
+  }
+  root.append(group('Your priorities', pr,
+    h('div', { class: 'btnrow' }, ...[['Balanced', DEFAULT_WEIGHTS], ['Cinema first', { comfort: 5, picture: 5, acoustics: 4, care: 3, hangout: 1, budget: 2, lead: 1, fit: 2 }],
+      ['Hangout first', { comfort: 3, picture: 2, acoustics: 2, care: 4, hangout: 5, budget: 3, lead: 2, fit: 3 }], ['Budget first', { comfort: 2, picture: 1, acoustics: 1, care: 2, hangout: 2, budget: 5, lead: 2, fit: 1 }]]
+      .map(([label, w]) => h('button', { class: 'btn', onclick: () => { Object.assign(study.weights, w); save(); renderStyleTab(); toast(`Priorities: ${label.toLowerCase()}`); } }, label))),
+    h('p', { class: 'note' }, '0 ignores a criterion, 5 makes it count most. Hover a row for what it measures.')));
+
+  // the current set in detail
+  const set = STYLE_SETS[cur], e = custom ? evaluateSet(cur, true) : evals[cur];
+  const bars = h('div', { class: 'crit' });
+  for (const c of CRITERIA) bars.append(h('div', { class: 'crow', title: c.note }, h('span', {}, c.label), scoreBar(e.scores[c.key]), h('span', { class: 'num' }, e.scores[c.key].toFixed(1))));
+  root.append(group(custom ? `Your mix · ${set.name}` : set.name, h('p', { class: 'note' }, set.fitNote), bars,
+    h('div', { class: 'proscons' },
+      h('div', {}, h('b', {}, 'Strengths'), h('ul', {}, ...set.pros.map((t) => h('li', {}, t)))),
+      h('div', {}, h('b', {}, 'Watch-outs'), h('ul', {}, ...set.cons.map((t) => h('li', {}, t))))),
+    custom ? h('button', { class: 'btn', onclick: () => applySet(cur) }, `Reset every piece to ${set.name}`) : null,
+    h('p', { class: 'note' }, 'Select any piece in the room to change its style, cover, colour or finish on its own.')));
+}
+
+// ---------------- per-piece style controls (in the details panel) ----------------
+const WOOD_PARTS = { roundTable: ['pedestal', 'slab', 'frame'], console: ['slatted', 'credenza', 'fluted', 'frame', 'cane'], sideTable: ['drum', 'stump', 'ctable'],
+  barCart: ['classic', 'oak'], ottoman: ['tufted', 'tray'], loungeChair: ['frame', 'low'], floorLamp: ['tripod'] };
+const METAL_PARTS = { floorLamp: ['drum', 'arc', 'tripod', 'globe'], roundTable: ['tulip', 'frame'], console: ['fluted', 'frame', 'credenza'], sideTable: ['ctable'],
+  loungeChair: ['sling', 'swivel'], barCart: ['classic'] };
+const STONE_PARTS = { roundTable: ['tulip', 'drum'], sideTable: ['pedestal'], floorLamp: ['arc'] };
+function styleControls(it) {
+  const s = resolveSpec(it), base = resolveSpec(it, activeSetId(), false), vars = VARIANTS[it.type];
+  const setKey = (k, v) => {
+    it.s = { ...(it.s || {}) };
+    if (v === base[k]) delete it.s[k]; else it.s[k] = v;
+    if (k === 'cover' && COVER_COLORS[v] && !COVER_COLORS[v].some(([c]) => c === s.color)) {   // keep a colour the new cover comes in
+      const c = COVER_COLORS[v][0][0]; if (c === base.color) delete it.s.color; else it.s.color = c;
+    }
+    if (!Object.keys(it.s).length) delete it.s;
+    buildItem(it); updateLighting(); drawOutline(); renderStyleTab();
+  };
+  const row = (label, el) => h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, label)), el);
+  const out = [];
+  if (vars) out.push(row('Style', chips('Style', Object.entries(vars).map(([k, v]) => [k, v.label]), s.variant, (v) => setKey('variant', v))));
+  if (UPHOLSTERED[it.type]) {
+    const covers = Object.keys(COVERS).filter((k) => it.type === 'pouf' || k !== 'knit');
+    out.push(row('Cover', chips('Cover', covers.map((k) => [k, COVERS[k].label]), s.cover, (v) => setKey('cover', v))));
+    const list = [...(COVER_COLORS[s.cover] || [])]; if (!list.some(([c]) => c === s.color)) list.unshift([s.color, colorName(s.color)]);
+    out.push(row('Colour', swatches('Colour', list, s.color, (c) => setKey('color', c))));
+  }
+  if (it.type === 'rug') out.push(row('Colour', swatches('Colour', RUG_COLORS, s.color, (c) => setKey('color', c))));
+  if ((WOOD_PARTS[it.type] || []).includes(s.variant)) out.push(row('Wood', chips('Wood', Object.entries(WOOD_FINISHES).map(([k, v]) => [k, v.label]), s.wood || 'walnut', (v) => setKey('wood', v))));
+  if ((METAL_PARTS[it.type] || []).includes(s.variant)) out.push(row('Metal', chips('Metal', Object.entries(METAL_FINISHES), s.metal || 'black', (v) => setKey('metal', v))));
+  if ((STONE_PARTS[it.type] || []).includes(s.variant)) out.push(row('Stone', chips('Stone', Object.entries(STONE_FINISHES), s.stone || 'marble', (v) => setKey('stone', v))));
+  if (AV_TYPES[it.type]) out.push(row('Cabinet', chips('Cabinet', Object.entries(AV_FINISHES), s.finish || 'black', (v) => setKey('finish', v))));
+  const price = piecePrice(it, s), weeks = pieceWeeks(it, s);
+  out.push(h('p', { class: 'note' }, pieceSpecText(it, s)));
+  if (price) out.push(h('div', { class: 'stat' }, h('span', { class: 'k' }, 'Indicative price'), h('span', { class: 'v' }, `${moneyRange(...price)}${weeks ? ` · ${weeks[0]}–${weeks[1]} wk` : ''}`)));
+  out.push(hasOverrides(it)
+    ? h('div', { class: 'btnrow' }, h('span', { class: 'badge warn' }, `Differs from ${STYLE_SETS[activeSetId()].name}`),
+      h('button', { class: 'btn', onclick: () => { pushHistory(); delete it.s; buildItem(it); updateLighting(); drawOutline(); commit(false); renderStyleTab(); } }, 'Reset to set'))
+    : h('span', { class: 'badge ok' }, `From the ${STYLE_SETS[activeSetId()].name} set`));
+  return group('Style', ...out);
+}
+
+// ---------------- compare view ----------------
+const thumbCache = new Map();                              // `${view}|${layout}` -> { setId: dataURL }
+let compareView = 'lounge', compareMode = 'cards', compareSort = 'score', compareOnlyShortlist = false, thumbJob = 0;
+const COMPARE_VIEWS = { lounge: 'Fireplace lounge', tv: 'Sofa to screen', sofa: 'Sectional', overview: 'Whole room' };
+function layoutKey() {
+  return JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot, i.p]), state.room, state.finish, state.light.scene, state.tv, quality]);
+}
+function thumbPose(view) {
+  if (view === 'overview') return { pos: P(300, -70, 255), target: P(112, 72, 0) };
+  if (view === 'sofa') return { pos: P(118, 150, 62), target: P(175, 45, 18) };
+  return presetPose(view === 'tv' ? 'sofa' : 'lounge');
+}
+/** Render every set from one viewpoint into small JPEGs, then put the room back exactly as it was. */
+async function renderThumbs(view, onEach) {
+  const job = ++thumbJob, out = {};
+  const keep = { pos: camera.position.clone(), tgt: controls.target.clone(), aspect: camera.aspect, labels: labelsGroup.visible, helpers: helpersGroup.visible };
+  const W = 640, H = 360, pose = thumbPose(view);
+  labelsGroup.visible = false; helpersGroup.visible = false;
+  try {
+    for (const id of SET_IDS) {
+      if (job !== thumbJob) break;                           // a newer request took over
+      previewSetId = id; buildAllItems(); updateLighting();
+      renderer.setPixelRatio(1); renderer.setSize(W, H, false); composer.setPixelRatio(1); composer.setSize(W, H);
+      camera.aspect = W / H; camera.updateProjectionMatrix();
+      camera.position.copy(pose.pos); camera.up.set(0, 1, 0); camera.lookAt(pose.target); camera.updateMatrixWorld();
+      const above = camera.position.y > state.room.ceiling + 1;
+      if (FX.stairwell) FX.stairwell.visible = !above;
+      if (FX.screen) FX.screen.ceilingKit.visible = !above;
+      ghostBulkheads(above);
+      const glow = !isFast() && state.light.bloom;
+      flameUniforms.uDirect.value = glow ? 0 : 1;
+      if (glow) { renderPass.camera = camera; composer.render(0.016); } else renderer.render(scene, camera);
+      const cv = mkCanvas(W, H); cv.getContext('2d').drawImage(renderer.domElement, 0, 0, W, H);
+      out[id] = cv.toDataURL('image/jpeg', 0.85);
+      onEach && onEach(id, out[id]);
+      await new Promise((r) => setTimeout(r, 0));
+    }
+  } finally {
+    previewSetId = null; buildAllItems(); updateLighting(); drawOutline();
+    labelsGroup.visible = keep.labels; helpersGroup.visible = keep.helpers;
+    camera.position.copy(keep.pos); controls.target.copy(keep.tgt); camera.lookAt(keep.tgt);
+    resize(); controls.update(); invalidate(3);
+  }
+  return job === thumbJob ? out : null;
+}
+function openCompare() {
+  $('#compareModal').hidden = false;
+  renderCompare();
+  $('#compareClose').focus();
+}
+function closeCompare() { $('#compareModal').hidden = true; thumbJob++; save(); }
+function renderCompare() {
+  const body = $('#compareBody'), study = state.study; body.replaceChildren();
+  const evals = Object.fromEntries(SET_IDS.map((id) => [id, evaluateSet(id)]));
+  const pool = compareOnlyShortlist && study.shortlist.length ? SET_IDS.filter((id) => study.shortlist.includes(id)) : SET_IDS;
+  const order = [...pool].sort(compareSort === 'budget' ? (a, b) => (evals[a].lo + evals[a].hi) - (evals[b].lo + evals[b].hi)
+    : compareSort === 'name' ? (a, b) => STYLE_SETS[a].name.localeCompare(STYLE_SETS[b].name) : (a, b) => evals[b].total - evals[a].total);
+  const rankOf = [...SET_IDS].sort((a, b) => evals[b].total - evals[a].total);
+  // toolbar
+  const seg = (name, opts, cur, pick) => h('div', { class: 'seg', role: 'group', 'aria-label': name },
+    ...opts.map(([k, label]) => h('button', { 'aria-pressed': String(k === cur), onclick: () => pick(k) }, label)));
+  $('#compareTools').replaceChildren(...[
+    seg('Show', [['cards', 'Cards'], ['table', 'Scorecard']], compareMode, (k) => { compareMode = k; renderCompare(); }),
+    compareMode === 'cards' ? seg('View', Object.entries(COMPARE_VIEWS), compareView, (k) => { compareView = k; renderCompare(); }) : null,
+    seg('Sort', [['score', 'Score'], ['budget', 'Budget'], ['name', 'Name']], compareSort, (k) => { compareSort = k; renderCompare(); }),
+    study.shortlist.length ? seg('Filter', [['all', 'All six'], ['short', `Shortlist (${study.shortlist.length})`]], compareOnlyShortlist ? 'short' : 'all',
+      (k) => { compareOnlyShortlist = k === 'short'; renderCompare(); }) : null].filter(Boolean));
+  if (compareMode === 'table') { body.append(scorecardTable(order, evals, rankOf)); return; }
+  const grid = h('div', { class: 'cgrid' }), key = `${compareView}|${layoutKey()}`, cached = thumbCache.get(key) || {};
+  for (const id of order) {
+    const set = STYLE_SETS[id], e = evals[id], rank = rankOf.indexOf(id) + 1;
+    const img = cached[id] ? h('img', { src: cached[id], alt: `${set.name}: ${COMPARE_VIEWS[compareView].toLowerCase()} view` }) : h('div', { class: 'shimmer' }, 'Rendering…');
+    const rate = h('div', { class: 'rate', role: 'group', 'aria-label': `Your rating for ${set.name}` });
+    for (let n = 1; n <= 5; n++) {
+      rate.append(h('button', { 'aria-pressed': String((study.ratings[id] || 0) >= n), title: `${n} of 5`, onclick: () => {
+        study.ratings[id] = study.ratings[id] === n ? n - 1 : n; save(); renderCompare(); renderStyleTab(); } }, '★'));
+    }
+    const notes = h('textarea', { rows: 2, placeholder: 'Your notes (fabric samples, what the family thought…)', 'aria-label': `Notes on ${set.name}` });
+    notes.value = study.notes[id] || '';
+    notes.addEventListener('input', () => { study.notes[id] = notes.value.trim(); });
+    notes.addEventListener('change', save);
+    const listed = study.shortlist.includes(id), picked = study.pick === id;
+    const crit = h('div', { class: 'crit' });
+    for (const c of CRITERIA) crit.append(h('div', { class: 'crow', title: c.note }, h('span', {}, c.label), scoreBar(e.scores[c.key]), h('span', { class: 'num' }, e.scores[c.key].toFixed(1))));
+    grid.append(h('article', { class: 'ccard' + (picked ? ' picked' : ''), 'data-set': id },
+      h('div', { class: 'thumb', 'data-thumb': id }, img, h('span', { class: 'rank' }, `#${rank}`), picked ? h('span', { class: 'pill pick' }, 'Your pick') : null),
+      h('div', { class: 'chead' }, h('div', {}, h('h3', {}, set.name), h('p', {}, set.tagline)), h('div', { class: 'total' }, h('b', {}, String(e.total)), h('small', {}, '/ 100'))),
+      paletteStrip(set.palette), crit,
+      h('div', { class: 'facts' }, h('span', {}, h('small', {}, 'Furniture'), moneyRange(e.lo, e.hi)), h('span', {}, h('small', {}, 'Longest wait'), `${e.weeks} weeks`)),
+      h('div', { class: 'proscons' }, h('div', {}, h('b', {}, 'Strengths'), h('ul', {}, ...set.pros.map((t) => h('li', {}, t)))),
+        h('div', {}, h('b', {}, 'Watch-outs'), h('ul', {}, ...set.cons.map((t) => h('li', {}, t))))),
+      rate, notes,
+      h('div', { class: 'btnrow' },
+        h('button', { class: 'btn', onclick: () => { applySet(id); toast(`${set.name} applied: close to look around · Undo goes back`); renderCompare(); } }, 'Try in the room'),
+        h('button', { class: 'btn', 'aria-pressed': String(listed), onclick: () => {
+          study.shortlist = listed ? study.shortlist.filter((x) => x !== id) : [...study.shortlist, id]; save(); renderCompare(); renderStyleTab(); } }, listed ? '✓ Shortlisted' : 'Shortlist'),
+        h('button', { class: 'btn', onclick: () => openSpec(id) }, 'Spec sheet'),
+        h('button', { class: 'btn primary', onclick: () => { study.pick = picked ? null : id; if (!picked) { if (!study.shortlist.includes(id)) study.shortlist.push(id); applySet(id, true); toast(`${set.name} is your pick`); } save(); renderCompare(); renderStyleTab(); } },
+          picked ? 'Unpick' : 'Make my pick'))));
+  }
+  body.append(grid, h('p', { class: 'fine' }, 'Scores are a planning aid built from typical material properties and the shape of each piece, weighted by your priorities in the Style tab; they are not lab measurements. Prices are indicative 2026 CAD ranges for mid-market retail, before tax and delivery, for the pieces in this layout; AV gear is budgeted separately. Confirm prices, lead times and fabric performance with suppliers.'));
+  if (Object.keys(cached).length < SET_IDS.length) {
+    renderThumbs(compareView, (id, url) => { const el = $(`#compareBody [data-thumb="${id}"]`); if (el) el.firstChild.replaceWith(h('img', { src: url, alt: `${STYLE_SETS[id].name}` })); })
+      .then((all) => { if (all) thumbCache.set(key, all); });
+  }
+}
+function scorecardTable(order, evals, rankOf) {
+  const cls = (v) => (v >= 4 ? 'hi' : v >= 3 ? 'mid' : 'lo');
+  const head = h('tr', {}, h('th', {}, 'Criterion'), h('th', { class: 'w' }, 'Weight'), ...order.map((id) => h('th', {}, STYLE_SETS[id].name)));
+  const rows = CRITERIA.map((c) => h('tr', {}, h('th', { title: c.note }, c.label), h('td', { class: 'w' }, String(state.study.weights[c.key])),
+    ...order.map((id) => { const v = evals[id].scores[c.key]; return h('td', { class: cls(v) }, v.toFixed(1)); })));
+  const extra = [
+    ['Score / 100', (id) => h('b', {}, String(evals[id].total))],
+    ['Rank', (id) => `#${rankOf.indexOf(id) + 1}`],
+    ['Furniture budget', (id) => moneyRange(evals[id].lo, evals[id].hi)],
+    ['Longest wait', (id) => `${evals[id].weeks} weeks`],
+    ['Your rating', (id) => (state.study.ratings[id] ? stars(state.study.ratings[id]) : '—')],
+  ].map(([label, f]) => h('tr', { class: 'sum' }, h('th', {}, label), h('td', { class: 'w' }), ...order.map((id) => h('td', {}, f(id)))));
+  return h('div', { class: 'tablewrap' }, h('table', { class: 'scorecard' }, h('thead', {}, head), h('tbody', {}, ...rows, ...extra)),
+    h('p', { class: 'fine' }, 'Each criterion is scored 1–5. The total weights them by your priorities and scales to 100. Green 4+, amber 3–4, red under 3.'));
+}
+
+// ---------------- spec sheet (FF&E schedule) ----------------
+let specSet = 'mine';
+function openSpec(id) { specSet = id; $('#specModal').hidden = false; renderSpec(); $('#specClose').focus(); }
+function closeSpec() { $('#specModal').hidden = true; }
+function specData() {
+  const mine = specSet === 'mine', setId = mine ? activeSetId() : specSet;
+  const rows = specRows(setId, mine);
+  let lo = 0, hi = 0;
+  for (const r of rows) if (r.unit) { lo += r.unit[0] * r.qty; hi += r.unit[1] * r.qty; }
+  return { rows, lo, hi, title: mine ? `Your layout · ${STYLE_SETS[setId].name}${isCustomised() ? ' (your mix)' : ''}` : STYLE_SETS[setId].name };
+}
+function renderSpec() {
+  const { rows, lo, hi, title } = specData();
+  const pickSet = h('select', { 'aria-label': 'Which set', onchange: (e) => { specSet = e.target.value; renderSpec(); } },
+    h('option', { value: 'mine', selected: specSet === 'mine' }, 'Your layout as it stands'),
+    ...SET_IDS.map((id) => h('option', { value: id, selected: specSet === id }, STYLE_SETS[id].name)));
+  $('#specTools').replaceChildren(pickSet,
+    h('button', { class: 'btn', onclick: copySpecCsv }, 'Copy as CSV'),
+    h('button', { class: 'btn', onclick: () => window.print() }, 'Print'));
+  $('#specTitle').textContent = `Spec sheet · ${title}`;
+  const tr = (r) => h('tr', {},
+    h('td', { class: 'tag' }, r.tag), h('td', {}, h('b', {}, r.item), h('div', { class: 'spec' }, r.spec), r.care ? h('div', { class: 'care' }, r.care) : null),
+    h('td', {}, r.size), h('td', { class: 'n' }, String(r.qty)),
+    h('td', { class: 'n' }, r.unit ? moneyRange(...r.unit) : 'AV budget'), h('td', { class: 'n' }, r.unit ? moneyRange(r.unit[0] * r.qty, r.unit[1] * r.qty) : '—'),
+    h('td', { class: 'n' }, r.weeks ? `${r.weeks[0]}–${r.weeks[1]} wk` : '—'));
+  $('#specBody').replaceChildren(
+    h('div', { class: 'tablewrap' }, h('table', { class: 'spec' },
+      h('thead', {}, h('tr', {}, ...['Tag', 'Item and specification', 'Size', 'Qty', 'Unit (CAD)', 'Total (CAD)', 'Lead time'].map((t) => h('th', {}, t)))),
+      h('tbody', {}, ...rows.map(tr)),
+      h('tfoot', {}, h('tr', {}, h('td', { colspan: 5 }, 'Furniture total, indicative'), h('td', { class: 'n' }, h('b', {}, moneyRange(lo, hi))), h('td', {}))))),
+    h('p', { class: 'fine' }, 'Indicative 2026 CAD ranges for mid-market retail, before tax, delivery and installation. Upholstery lead times are for made-to-order; in-stock pieces ship sooner. Order cover samples and check them in the room at night under the 2700K lights before committing.'));
+}
+function specCsv() {
+  const { rows, lo, hi, title } = specData(), q = (v) => `"${String(v).replace(/"/g, '""')}"`;
+  const lines = [['Tag', 'Item', 'Specification', 'Care and performance', 'Size', 'Qty', 'Unit low', 'Unit high', 'Total low', 'Total high', 'Lead time (weeks)'].map(q).join(',')];
+  for (const r of rows) lines.push([r.tag, r.item, r.spec, r.care, r.size, r.qty, r.unit ? r.unit[0] : '', r.unit ? r.unit[1] : '', r.unit ? r.unit[0] * r.qty : '', r.unit ? r.unit[1] * r.qty : '', r.weeks ? `${r.weeks[0]}-${r.weeks[1]}` : ''].map(q).join(','));
+  lines.push(['', `Furniture total (${title})`, '', '', '', '', '', '', lo, hi, ''].map(q).join(','));
+  return lines.join('\n');
+}
+async function copySpecCsv() {
+  const csv = specCsv();
+  try { await navigator.clipboard.writeText(csv); toast('Spec sheet copied as CSV: paste it into a spreadsheet'); }
+  catch (e) {                                              // clipboard blocked: show it for manual copy
+    $('#codeText').value = csv; $('#codeModal').hidden = false; $('#codeText').select();
+    toast('Copy the CSV from the box');
+  }
+}
+function initStyleUI() {
+  $('#compareClose').addEventListener('click', closeCompare);
+  $('#specClose').addEventListener('click', closeSpec);
+  for (const id of ['#compareModal', '#specModal']) $(id).addEventListener('click', (e) => { if (e.target.id === id.slice(1)) (id === '#compareModal' ? closeCompare : closeSpec)(); });
 }
 
 // ---- 65-inspector.js ----
@@ -2816,9 +4073,8 @@ function renderInspector() {
     controls.push(h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, label)),
       chips(label, opts, it.p[k], (v) => { it.p[k] = v; buildItem(it); updateLighting(); drawOutline(); updateLabels(); })));
   }
-  if (def.colors) controls.push(h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, 'Colour')),
-    swatches('Colour', def.colors, it.p.color, (c) => { it.p.color = c; buildItem(it); updateLighting(); })));
-  if (controls.length) body.append(group('Size and finish', ...controls));
+  body.append(styleControls(it));
+  if (controls.length) body.append(group('Size', ...controls));
   body.append(group('Arrange',
     h('div', { class: 'btnrow' },
       h('button', { class: 'btn', onclick: () => rotateSelected(15), title: 'Q' }, '⟲ 15°'),
@@ -2919,7 +4175,7 @@ const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.5, 0.55, 0.
 composer.addPass(renderPass); composer.addPass(bloomPass); composer.addPass(new OutputPass());
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));
@@ -3040,6 +4296,8 @@ if (restored) toast('Restored your last layout from this browser');
 window.__cinema = {
   state: () => state, setMode, goPreset, applyScene, select, scene, selected: () => selected, mode: () => mode, loadOption,
   rebuild() { rebuildAll(); refreshPanels(); }, setQuality, quality: () => quality, dpr: () => renderer.getPixelRatio(),
+  setStyle(id) { state.style.set = id; for (const it of state.items) delete it.s; buildAllItems(); updateLighting(); invalidate(3); },
+  evaluate: (id, own = false) => evaluateSet(id, own), specRows: (id, own = false) => specRows(id, own), sets: () => SET_IDS,
   idle: () => dirty <= 0, frames: () => renderer.info.render.frame, perf: () => ({ dprScale, slowScore, fastFrames, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
   view(px, py, pz, tx, ty, tz) { tween = null; camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },
   settle() { if (FX.screen) { FX.screen.cur = state.light.screenDown ? 1 : 0.02; FX.screen.sheet.scale.y = FX.screen.cur; } invalidate(3); },

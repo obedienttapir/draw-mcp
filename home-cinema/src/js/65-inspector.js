@@ -98,9 +98,8 @@ function renderInspector() {
     controls.push(h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, label)),
       chips(label, opts, it.p[k], (v) => { it.p[k] = v; buildItem(it); updateLighting(); drawOutline(); updateLabels(); })));
   }
-  if (def.colors) controls.push(h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, 'Colour')),
-    swatches('Colour', def.colors, it.p.color, (c) => { it.p.color = c; buildItem(it); updateLighting(); })));
-  if (controls.length) body.append(group('Size and finish', ...controls));
+  body.append(styleControls(it));
+  if (controls.length) body.append(group('Size', ...controls));
   body.append(group('Arrange',
     h('div', { class: 'btnrow' },
       h('button', { class: 'btn', onclick: () => rotateSelected(15), title: 'Q' }, '⟲ 15°'),

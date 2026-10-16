@@ -185,8 +185,8 @@ function addItem(type) {
 function undo() {
   const prev = history.pop(); $('#undoBtn').disabled = history.length === 0;
   if (!prev) return;
-  const keepSel = selected;
-  applyState(JSON.parse(prev), false);
+  const keepSel = selected, study = state.study;          // ratings and notes are not part of undo
+  applyState(JSON.parse(prev), false); state.study = study;
   rebuildAll(); refreshPanels(); save();
   if (keepSel && (keepSel.kind === 'fixture' || itemById(keepSel.id))) select(keepSel); else select(null);
   toast('Undone');
@@ -197,8 +197,14 @@ window.addEventListener('keydown', (e) => {
   const t = e.target || {}, tag = t.tagName || '';
   // only text entry keeps its own keys; switches, sliders and buttons still get Ctrl+Z, Q/E, etc.
   const typing = tag === 'TEXTAREA' || tag === 'SELECT' || (tag === 'INPUT' && !['checkbox', 'radio', 'range', 'button'].includes(t.type));
+  if (e.key === 'Escape') {                                // dialogs close even while you type in them
+    if (!$('#codeModal').hidden) { closeCode(); return; }
+    if (!$('#specModal').hidden) { closeSpec(); return; }
+    if (!$('#compareModal').hidden) { closeCompare(); return; }
+  }
   if (typing) return;
   if (t.type === 'range' && e.key.startsWith('Arrow')) return;
+  if ((!$('#compareModal').hidden || !$('#specModal').hidden) && e.key !== 'Escape') return;   // a sheet is open: keys stay with it
   const mod = e.ctrlKey || e.metaKey;
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
   if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); duplicateSelected(); return; }
@@ -212,7 +218,7 @@ window.addEventListener('keydown', (e) => {
     case '3': setMode('walk'); break;
     case 'm': case 'M': if (!viewOnly()) setMeasure(!measure.on); break;
     case 'h': case 'H': setFocus(!viewOnly()); break;
-    case 'Escape': if ($('#codeModal').hidden === false) closeCode(); else if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else select(null); break;
+    case 'Escape': if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else select(null); break;
     case 'q': case 'Q': rotateSelected(e.shiftKey ? 45 : 15); break;
     case 'e': case 'E': rotateSelected(e.shiftKey ? -45 : -15); break;
     case 'r': case 'R': rotateSelected(90); break;

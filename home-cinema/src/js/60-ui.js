@@ -231,7 +231,7 @@ function rebuildAll() {
   applyFinishes(); buildRoom(); buildFixtures(); buildLights(); buildAllItems(); updateLighting();
   updateLabels(); drawOutline(); updateRoomSub();
 }
-function refreshPanels() { renderFurnish(); renderLighting(); renderFinishes(); renderRoomTab(); renderInspector(); }
+function refreshPanels() { renderFurnish(); renderStyleTab(); renderLighting(); renderFinishes(); renderRoomTab(); renderInspector(); }
 function updateRoomSub() {
   const r = state.room;
   $('#roomSub').textContent = `Room 1 · ${ftin(r.width)} × ${ftin(r.depth)} · ${ftin(r.ceiling)} ceiling`;

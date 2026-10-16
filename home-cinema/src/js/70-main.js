@@ -11,7 +11,7 @@ const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.5, 0.55, 0.
 composer.addPass(renderPass); composer.addPass(bloomPass); composer.addPass(new OutputPass());
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));
@@ -132,6 +132,8 @@ if (restored) toast('Restored your last layout from this browser');
 window.__cinema = {
   state: () => state, setMode, goPreset, applyScene, select, scene, selected: () => selected, mode: () => mode, loadOption,
   rebuild() { rebuildAll(); refreshPanels(); }, setQuality, quality: () => quality, dpr: () => renderer.getPixelRatio(),
+  setStyle(id) { state.style.set = id; for (const it of state.items) delete it.s; buildAllItems(); updateLighting(); invalidate(3); },
+  evaluate: (id, own = false) => evaluateSet(id, own), specRows: (id, own = false) => specRows(id, own), sets: () => SET_IDS,
   idle: () => dirty <= 0, frames: () => renderer.info.render.frame, perf: () => ({ dprScale, slowScore, fastFrames, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
   view(px, py, pz, tx, ty, tz) { tween = null; camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },
   settle() { if (FX.screen) { FX.screen.cur = state.light.screenDown ? 1 : 0.02; FX.screen.sheet.scale.y = FX.screen.cur; } invalidate(3); },

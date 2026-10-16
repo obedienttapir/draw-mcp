@@ -55,6 +55,8 @@ const uid = (p = 'it') => `${p}${Date.now().toString(36)}${(_uid++).toString(36)
 // wall, 185″ stairs → TV wall, 9′ ceiling); bay geometry from the
 // foundation plan (2′-7″ / 7′-9″ / 2′-7″ bay, 2′-2″ jog, steel beam W200).
 // -------------------------------------------------------------------
+// how much each criterion counts when the furniture sets are scored (0–5, see 45-styles)
+const DEFAULT_WEIGHTS = { comfort: 4, picture: 3, acoustics: 2, care: 3, hangout: 3, budget: 3, lead: 1, fit: 3 };
 const DEFAULT_STATE = {
   room: {
     width: 228,            // fireplace wall -> exterior wall
@@ -88,19 +90,22 @@ const DEFAULT_STATE = {
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
   rev: 3,                 // room-measurement revision; older saved layouts get the corrected room
+  style: { set: 'warm-modern' },                          // furniture style set (pieces can override it in item.s)
+  // the owner's evaluation of the sets: kept out of undo, travels with the layout code
+  study: { weights: { ...DEFAULT_WEIGHTS }, ratings: {}, notes: {}, shortlist: [], pick: null },
   option: 'original',
   showSightline: true,
   showSpeakers: false,
   items: [
     { id: 'sectional', type: 'sectional', x: 160, y: 52, rot: 0,
-      p: { back: 136, ret: 104, depth: 38, side: 'right', color: '#8f877c' } },
-    { id: 'rug-main', type: 'rug', x: 140, y: 78, rot: 0, p: { w: 120, d: 96, color: '#6e6559', pattern: 'weave' } },
-    { id: 'ottoman', type: 'ottoman', x: 136, y: 82, rot: 0, p: { w: 40, d: 30, color: '#5b4636' } },
-    { id: 'console', type: 'console', x: 137.5, y: 177, rot: 180, p: { w: 70, color: '#4a3424' } },
-    { id: 'rug-lounge', type: 'rug', x: 54, y: 64, rot: 90, p: { w: 96, d: 72, color: '#7d7466', pattern: 'border' } },
-    { id: 'chair-a', type: 'loungeChair', x: 50, y: 30, rot: 35, p: { color: '#e6dccb' } },
-    { id: 'chair-b', type: 'loungeChair', x: 50, y: 98, rot: 145, p: { color: '#e6dccb' } },
-    { id: 'table', type: 'roundTable', x: 62, y: 64, rot: 0, p: { dia: 34, color: '#3b281b' } },
+      p: { back: 136, ret: 104, depth: 38, side: 'right' } },
+    { id: 'rug-main', type: 'rug', x: 140, y: 78, rot: 0, p: { w: 120, d: 96 } },
+    { id: 'ottoman', type: 'ottoman', x: 136, y: 82, rot: 0, p: { w: 40, d: 30 } },
+    { id: 'console', type: 'console', x: 137.5, y: 177, rot: 180, p: { w: 70 } },
+    { id: 'rug-lounge', type: 'rug', x: 54, y: 64, rot: 90, p: { w: 96, d: 72 } },
+    { id: 'chair-a', type: 'loungeChair', x: 50, y: 30, rot: 35, p: {} },
+    { id: 'chair-b', type: 'loungeChair', x: 50, y: 98, rot: 145, p: {} },
+    { id: 'table', type: 'roundTable', x: 62, y: 64, rot: 0, p: { dia: 34 } },
     { id: 'olive', type: 'plant', x: 12, y: 106, rot: 0, p: { h: 70 } },
     { id: 'lamp', type: 'floorLamp', x: 210, y: 112, rot: 0, p: {} },
   ],
@@ -132,8 +137,8 @@ const RECOMMENDED_STATE = (() => {
   Object.assign(at('rug-lounge'), { x: 56, y: 76 });
   s.items = s.items.filter((i) => i.id !== 'lamp');
   s.items.push(
-    { id: 'pouf-a', type: 'pouf', x: 33, y: 76, rot: 0, p: { color: '#c9bba5' } },
-    { id: 'pouf-b', type: 'pouf', x: 86, y: 94, rot: 0, p: { color: '#7a5f48' } },
+    { id: 'pouf-a', type: 'pouf', x: 33, y: 76, rot: 0, p: {} },
+    { id: 'pouf-b', type: 'pouf', x: 86, y: 94, rot: 0, p: {} },
     { id: 'bar', type: 'barCart', x: 215, y: 116, rot: 180, p: {} },
     { id: 'spk-l', type: 'towerSpeaker', x: 80, y: 157, rot: 200, p: {} },
     { id: 'spk-r', type: 'towerSpeaker', x: 191, y: 157, rot: 160, p: {} },
@@ -200,8 +205,25 @@ function applyState(obj, record = true) {
     fireplace: { ...d.fireplace, ...(obj.fireplace || {}) },
     light: { ...d.light, ...(obj.light || {}) },
     items: obj.items.filter((it) => it && it.type).map((it) => ({ id: it.id || uid(), rot: 0, p: {}, ...it })),
+    style: { ...d.style, ...(obj.style || {}) },
+    study: { ...d.study, ...(obj.study || {}), weights: { ...d.study.weights, ...((obj.study || {}).weights || {}) } },
   };
+  if (!obj.style) migrateLegacyStyle();
   return true;
+}
+
+/** Layouts saved before style sets kept a colour on each piece: keep only what differs from Warm Modern (the old look). */
+function migrateLegacyStyle() {
+  const woodKey = (hex) => Object.keys(WOOD_FINISHES).find((k) => WOOD_FINISHES[k].color.toLowerCase() === String(hex).toLowerCase());
+  for (const it of state.items) {
+    const legacy = {};
+    if (it.p.color) { if (UPHOLSTERED[it.type] || it.type === 'rug') legacy.color = it.p.color; else if (woodKey(it.p.color)) legacy.wood = woodKey(it.p.color); }
+    if (it.p.pattern) legacy.variant = it.p.pattern;
+    delete it.p.color; delete it.p.pattern;
+    const base = resolveSpec(it, 'warm-modern', false), keep = {};
+    for (const k of Object.keys(legacy)) if (legacy[k] !== base[k]) keep[k] = legacy[k];
+    if (Object.keys(keep).length) it.s = { ...(it.s || {}), ...keep };
+  }
 }
 
 let toastTimer = 0;

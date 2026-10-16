@@ -24,11 +24,13 @@
   <aside class="panel left" id="leftPanel" aria-label="Design panel">
     <nav class="tabs" role="tablist">
       <button role="tab" data-tab="furnish" aria-selected="true">Furnish</button>
+      <button role="tab" data-tab="style" aria-selected="false">Style</button>
       <button role="tab" data-tab="light" aria-selected="false">Lighting</button>
       <button role="tab" data-tab="finish" aria-selected="false">Finishes</button>
       <button role="tab" data-tab="room" aria-selected="false">Room</button>
     </nav>
     <div class="scroll" id="tab-furnish" role="tabpanel"></div>
+    <div class="scroll" id="tab-style" role="tabpanel" hidden></div>
     <div class="scroll" id="tab-light" role="tabpanel" hidden></div>
     <div class="scroll" id="tab-finish" role="tabpanel" hidden></div>
     <div class="scroll" id="tab-room" role="tabpanel" hidden></div>
@@ -58,6 +60,28 @@
   <div class="hint" id="hint">Click furniture to select · drag to move · Q / E rotate · Del removes</div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <button class="restore" id="restoreBtn" hidden title="Show the menus again (H)">Show menus</button>
+
+  <div class="modal wide" id="compareModal" hidden>
+    <div class="card sheet" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+      <header class="sheethead">
+        <div><h2 id="compareTitle">Compare furniture sets</h2><p>Same room, same layout, six ways to furnish it. Scores use your priorities from the Style tab.</p></div>
+        <div class="tools" id="compareTools"></div>
+        <button class="btn" id="compareClose" aria-label="Close">Close</button>
+      </header>
+      <div class="sheetbody" id="compareBody"></div>
+    </div>
+  </div>
+
+  <div class="modal wide" id="specModal" hidden>
+    <div class="card sheet" role="dialog" aria-modal="true" aria-labelledby="specTitle">
+      <header class="sheethead">
+        <div><h2 id="specTitle">Spec sheet</h2><p>Furniture schedule for the pieces in this layout, with indicative prices and lead times.</p></div>
+        <div class="tools" id="specTools"></div>
+        <button class="btn" id="specClose" aria-label="Close">Close</button>
+      </header>
+      <div class="sheetbody" id="specBody"></div>
+    </div>
+  </div>
 
   <div class="modal" id="codeModal" hidden>
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
