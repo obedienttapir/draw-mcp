@@ -1,5 +1,7 @@
 # Basement Cinema — design review
 
+> **Design Review No. 02** — furniture, finishes and light, with every furniture collection in five lighting scenes and the fireplace wall with and without a stone slab — is in [`review/`](review/) as a PDF.
+
 What to keep, what to fix, and what to do while the ceiling is still open. Every image is a render from the planner (`../index.html`). Load the recommended version there with **Furnish › Design option › Recommended**.
 
 The slide deck version lives on claude.ai (Basement Cinema Design Review). Its slide sources are in `deck/`: `deck.json` plus one HTML file per slide; their images point at the deck's uploaded copies of the renders in `renders/`.

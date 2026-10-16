@@ -21,7 +21,7 @@
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
   color-scheme: dark;
 }
-html, body { height: 100%; overflow: hidden; background: var(--stage); color: var(--fg); }
+html, body { height: 100%; margin: 0; overflow: hidden; background: var(--stage); color: var(--fg); }
 [hidden] { display: none !important; }
 body { font-family: var(--font-ui); font-size: 13px; line-height: 1.4; }
 #app { position: relative; height: 100%; overflow: hidden; background: var(--stage); }

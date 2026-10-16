@@ -58,6 +58,10 @@ The **Style** tab dresses the whole room in one of six curated furniture sets an
 
 Ratings, notes, the shortlist and your pick are saved in the browser and travel with the layout code; Undo never erases them. Prices are indicative 2026 CAD mid-market ranges, and scores are a planning aid, not lab measurements.
 
+## Design review No. 02 (PDF)
+
+[`presentation/review/`](presentation/review/) holds a 50-page, 17 × 11 in design review of the furniture, finishes and light, rendered from this planner: all seven collections (the six sets plus the recommended **Warm Modern · Cinema Edit**) from the same cameras in five lighting scenes, the fireplace wall with slats across the windows **with and without a stone slab surround**, walnut slats behind the TV, scorecards, budgets, an FF&E schedule, a trade-quote scope and a timeline. A screen edition, a print edition, the recommended scheme as a layout code, and the pipeline that regenerates it (`presentation/review/tools/make-review.sh`).
+
 ## Design options
 
 The design review in [`presentation/`](presentation/) is built into the planner:
@@ -69,7 +73,7 @@ The design review in [`presentation/`](presentation/) is built into the planner:
 - **TV details**: a 100–120″ drop-down screen in the alcove bulkhead with a ceiling projector; the viewing report switches to the screen when it is down and warns if it is too wide for the alcove.
 - **Lighting**: a *Game night* scene, a 6500K bias light behind the TV, stair step lights, and a switch for the two pot lights over the TV.
 - **Room › Overlays › Speaker pre-wire plan (5.1.2)**: where to run speaker wire while the ceiling is open, placed from the prime seat.
-- New catalogue pieces: pouf and bar cart.
+- New catalogue pieces: pouf and bar cart; the Recommended layout puts a reading lamp in the lounge's south-west corner, out of the path.
 
 ## Editing the code
 
@@ -92,6 +96,7 @@ src/js/62-style-ui.js  Style tab, per-piece style controls, compare view, spec s
 src/js/65-inspector.js details panel, layout code dialog
 src/js/70-main.js     boot and render loop
 presentation/         design review: renders, slide sources and a readable README
+presentation/review/  design review No. 02: PDFs and the pipeline that renders and composes them
 ```
 
 The JS files are fragments of one ES module and are concatenated in name order. After editing, rebuild `index.html`:

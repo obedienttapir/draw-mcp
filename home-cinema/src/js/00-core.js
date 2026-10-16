@@ -120,7 +120,8 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
  * - TV alcove: largest TV that fits the 84″ wall, 6500K bias light, no pot
  *   lights scalloping the bulkhead, 110″ drop-down screen in the bulkhead
  * - stair step lights, lounge chairs moved off the path from the stairs,
- *   two poufs and a bar cart for hangout nights, 5.1.2 speaker pre-wire plan
+ *   two poufs and a bar cart for hangout nights, a reading lamp in the lounge
+ *   corner, 5.1.2 speaker pre-wire plan
  */
 const RECOMMENDED_STATE = (() => {
   const s = clone(DEFAULT_STATE);
@@ -135,7 +136,8 @@ const RECOMMENDED_STATE = (() => {
   Object.assign(at('chair-b'), { x: 54, y: 104, rot: 155 });
   Object.assign(at('table'), { x: 58, y: 76 });
   Object.assign(at('rug-lounge'), { x: 56, y: 76 });
-  s.items = s.items.filter((i) => i.id !== 'lamp');
+  // the reading lamp moves to the lounge's south-west corner, out of the path (an arc lamp reaches over chair A)
+  Object.assign(at('lamp'), { x: 14, y: 14, rot: 315 });
   s.items.push(
     { id: 'pouf-a', type: 'pouf', x: 33, y: 76, rot: 0, p: {} },
     { id: 'pouf-b', type: 'pouf', x: 86, y: 94, rot: 0, p: {} },

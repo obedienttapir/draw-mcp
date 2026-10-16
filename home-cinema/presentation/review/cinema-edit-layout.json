@@ -1,0 +1,252 @@
+{
+ "room": {
+  "width": 228,
+  "depth": 185,
+  "ceiling": 108,
+  "bayDepth": 55,
+  "bayLeft": 73,
+  "bayRight": 202,
+  "bayFace": 84,
+  "soffitDepth": 12,
+  "soffitBottom": 92,
+  "beamX": 33,
+  "beamDepth": 73,
+  "fireWall": 131,
+  "beamBottom": 94,
+  "pilasterW": 18,
+  "pilasterD": 12,
+  "boxX": 45,
+  "stairWidth": 40,
+  "stairStart": 92,
+  "risers": 16,
+  "floorToFloor": 122,
+  "hallDepth": 54,
+  "hallEnd": 176,
+  "transomW": 42,
+  "transomH": 10,
+  "transomBottom": 80,
+  "transomGap": 6
+ },
+ "finish": {
+  "wall": "#cbc2b3",
+  "floor": "walnut",
+  "slat": "walnut",
+  "fireplaceSlats": true,
+  "tvSlats": true,
+  "bayAccent": "paint-dark",
+  "fabric": "#8f877c",
+  "boucle": "#e6dccb",
+  "transoms": "slatted",
+  "mantel": "slab"
+ },
+ "tv": {
+  "size": 85,
+  "center": 46,
+  "offset": 0,
+  "screen": true,
+  "screenSize": 110
+ },
+ "fireplace": {
+  "width": 52,
+  "height": 22,
+  "bottom": 30,
+  "center": 60
+ },
+ "light": {
+  "scene": "evening",
+  "pots": 0.35,
+  "leds": 1,
+  "tv": false,
+  "fire": true,
+  "lamp": true,
+  "bloom": true,
+  "bayPots": false,
+  "bias": true,
+  "steps": true,
+  "screenDown": false
+ },
+ "rev": 3,
+ "style": {
+  "set": "warm-modern"
+ },
+ "study": {
+  "weights": {
+   "comfort": 4,
+   "picture": 3,
+   "acoustics": 2,
+   "care": 3,
+   "hangout": 3,
+   "budget": 3,
+   "lead": 1,
+   "fit": 3
+  },
+  "ratings": {},
+  "notes": {},
+  "shortlist": [],
+  "pick": null
+ },
+ "option": "recommended",
+ "showSightline": true,
+ "showSpeakers": false,
+ "items": [
+  {
+   "id": "sectional",
+   "rot": 0,
+   "p": {
+    "back": 124,
+    "ret": 104,
+    "depth": 38,
+    "side": "right"
+   },
+   "type": "sectional",
+   "x": 166,
+   "y": 52,
+   "s": {
+    "cover": "weave",
+    "color": "#5f5a54"
+   }
+  },
+  {
+   "id": "rug-main",
+   "rot": 0,
+   "p": {
+    "w": 120,
+    "d": 96
+   },
+   "type": "rug",
+   "x": 140,
+   "y": 78,
+   "s": {
+    "color": "#3d3833"
+   }
+  },
+  {
+   "id": "ottoman",
+   "rot": 0,
+   "p": {
+    "w": 40,
+    "d": 30
+   },
+   "type": "ottoman",
+   "x": 136,
+   "y": 82
+  },
+  {
+   "id": "console",
+   "rot": 180,
+   "p": {
+    "w": 70
+   },
+   "type": "console",
+   "x": 137.5,
+   "y": 177
+  },
+  {
+   "id": "rug-lounge",
+   "rot": 90,
+   "p": {
+    "w": 96,
+    "d": 72
+   },
+   "type": "rug",
+   "x": 56,
+   "y": 76
+  },
+  {
+   "id": "chair-a",
+   "rot": 25,
+   "p": {},
+   "type": "loungeChair",
+   "x": 54,
+   "y": 48,
+   "s": {
+    "variant": "swivel",
+    "cover": "linen",
+    "color": "#cdbfa8",
+    "metal": "brass"
+   }
+  },
+  {
+   "id": "chair-b",
+   "rot": 155,
+   "p": {},
+   "type": "loungeChair",
+   "x": 54,
+   "y": 104,
+   "s": {
+    "variant": "swivel",
+    "cover": "linen",
+    "color": "#cdbfa8",
+    "metal": "brass"
+   }
+  },
+  {
+   "id": "table",
+   "rot": 0,
+   "p": {
+    "dia": 34
+   },
+   "type": "roundTable",
+   "x": 58,
+   "y": 76
+  },
+  {
+   "id": "olive",
+   "rot": 0,
+   "p": {
+    "h": 70
+   },
+   "type": "plant",
+   "x": 12,
+   "y": 106
+  },
+  {
+   "id": "lamp",
+   "rot": 315,
+   "p": {},
+   "type": "floorLamp",
+   "x": 14,
+   "y": 14
+  },
+  {
+   "id": "pouf-a",
+   "rot": 0,
+   "p": {},
+   "type": "pouf",
+   "x": 33,
+   "y": 76
+  },
+  {
+   "id": "pouf-b",
+   "rot": 0,
+   "p": {},
+   "type": "pouf",
+   "x": 86,
+   "y": 94
+  },
+  {
+   "id": "bar",
+   "rot": 180,
+   "p": {},
+   "type": "barCart",
+   "x": 215,
+   "y": 116
+  },
+  {
+   "id": "spk-l",
+   "rot": 200,
+   "p": {},
+   "type": "towerSpeaker",
+   "x": 80,
+   "y": 157
+  },
+  {
+   "id": "spk-r",
+   "rot": 160,
+   "p": {},
+   "type": "towerSpeaker",
+   "x": 191,
+   "y": 157
+  }
+ ]
+}

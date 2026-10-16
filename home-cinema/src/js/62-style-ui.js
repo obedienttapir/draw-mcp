@@ -61,8 +61,7 @@ function renderStyleTab() {
     pr.append(h('label', { class: 'prow', title: c.note }, h('span', {}, c.label), input, out));
   }
   root.append(group('Your priorities', pr,
-    h('div', { class: 'btnrow' }, ...[['Balanced', DEFAULT_WEIGHTS], ['Cinema first', { comfort: 5, picture: 5, acoustics: 4, care: 3, hangout: 1, budget: 2, lead: 1, fit: 2 }],
-      ['Hangout first', { comfort: 3, picture: 2, acoustics: 2, care: 4, hangout: 5, budget: 3, lead: 2, fit: 3 }], ['Budget first', { comfort: 2, picture: 1, acoustics: 1, care: 2, hangout: 2, budget: 5, lead: 2, fit: 1 }]]
+    h('div', { class: 'btnrow' }, ...Object.entries(WEIGHT_PRESETS)
       .map(([label, w]) => h('button', { class: 'btn', onclick: () => { Object.assign(study.weights, w); save(); renderStyleTab(); toast(`Priorities: ${label.toLowerCase()}`); } }, label))),
     h('p', { class: 'note' }, '0 ignores a criterion, 5 makes it count most. Hover a row for what it measures.')));
 

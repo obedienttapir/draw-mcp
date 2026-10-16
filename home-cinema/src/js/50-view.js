@@ -3,7 +3,9 @@
 // ===================================================================
 const stage = $('#stage');
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
+let forcePR = 0;                                   // set by the render hook for print artwork
 function pixelRatio() {
+  if (forcePR) return forcePR;
   const d = window.devicePixelRatio || 1;
   return isFast() ? Math.min(d, 1) * dprScale : Math.min(d, 2);
 }
@@ -178,7 +180,9 @@ let prevWalk = false;
 // ---------------- labels: plan dimensions + 3D sightline ----------------
 const lineMat = new THREE.LineBasicMaterial({ color: '#d6a463', transparent: true, opacity: 0.9, depthTest: false });
 const dimMat = new THREE.LineBasicMaterial({ color: '#efe6d8', transparent: true, opacity: 0.55, depthTest: false });
+let planLog = null;                                   // print artwork: collects the plan's dimensions and tags
 function label(text, pos, cls = 'dim', rot = 0) {
+  if (planLog) planLog.push({ kind: cls === 'tag' ? 'tag' : 'label', text, x: pos.x, y: -pos.z, rot });
   const el = document.createElement('div');            // CSS2DRenderer owns this element's transform
   const inner = document.createElement('div'); inner.className = cls; inner.textContent = text;
   if (rot) inner.style.transform = `rotate(${rot}deg)`;
@@ -194,6 +198,7 @@ function line(points, mat = dimMat, dashed = false) {
   l.renderOrder = 10; labelsGroup.add(l); return l;
 }
 function dimLine(a, b, z, text, at = 0.5) {         // at: where along the line the label sits
+  if (planLog) planLog.push({ kind: 'dim', a, b, text, at });
   const pa = P(a[0], a[1], z), pb = P(b[0], b[1], z);
   line([pa, pb]);
   const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), nx = -dy / len * 4, ny = dx / len * 4;

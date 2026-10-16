@@ -68,7 +68,7 @@ function makeSeating(p, s, isL) {
   const box = (mat, xa, xb, ya, yb, za, zb, r) => span(inner, mat, xa, xb, ya, yb, za, zb, r);
   // runs: u along the seat row, v from the back (vb) to the front (vf); 'x' rows face +z, 'z' rows face +x
   const runs = isL
-    ? [{ axis: 'x', u0: x0 + bt, u1: x1 - arm, vb: z0 + bt, vf: zf, corner: d - bt }, { axis: 'z', u0: zf, u1: z1 - arm, vb: x0 + bt, vf: x0 + d, corner: 0 }]
+    ? [{ axis: 'x', u0: x0 + d, u1: x1 - arm, vb: z0 + bt, vf: zf, corner: d - bt }, { axis: 'z', u0: zf, u1: z1 - arm, vb: x0 + bt, vf: x0 + d, corner: 0 }]
     : [{ axis: 'x', u0: x0 + arm, u1: x1 - arm, vb: z0 + bt, vf: zf, corner: 0 }];
   const inRun = (run, mat, ua, ub, ya, yb, va, vb, r) => (run.axis === 'x' ? box(mat, ua, ub, ya, yb, va, vb, r) : box(mat, va, vb, ya, yb, ua, ub, r));
   const placeRot = (run, m, u, y, v, tilt) => {

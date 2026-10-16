@@ -76,9 +76,10 @@ function fireInView() {
   _fireBall.center.setFromMatrixPosition(FX.fire.group.matrixWorld); _fireBall.radius = state.fireplace.width * 0.75;
   return _frustum.intersectsSphere(_fireBall);
 }
-let lastFlame = -1, lastRaf = 0, drewLast = false, slowScore = 0, fastFrames = 0, lastScale = 0;
+let lastFlame = -1, lastRaf = 0, drewLast = false, slowScore = 0, fastFrames = 0, lastScale = 0, paused = false;
 function frame(now) {
   requestAnimationFrame(frame);
+  if (paused) return;                                 // batch rendering: frames are drawn only by capture()
   const rafGap = now - lastRaf; lastRaf = now;
   const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
   let active = false;
@@ -134,9 +135,58 @@ window.__cinema = {
   rebuild() { rebuildAll(); refreshPanels(); }, setQuality, quality: () => quality, dpr: () => renderer.getPixelRatio(),
   setStyle(id) { state.style.set = id; for (const it of state.items) delete it.s; buildAllItems(); updateLighting(); invalidate(3); },
   evaluate: (id, own = false) => evaluateSet(id, own), specRows: (id, own = false) => specRows(id, own), sets: () => SET_IDS,
+  exposure(v) { renderer.toneMappingExposure = v; invalidate(3); },
+  pause(v) { paused = !!v; invalidate(2); },
+  showItems(v) { itemsGroup.visible = !!v; invalidate(2); },       // clean architectural views for print
+  pixelRatio(v) { forcePR = v || 0; resize(); },
+  /** Draw one frame now and return it as an image (renders and print artwork). */
+  capture(type = 'image/png', q, flameT = 0) {
+    if (flameT && FX.fire) { flameUniforms.uTime.value = flameT; FX.fire.light.intensity = state.light.fire ? FIRE_CD : 0; }
+    const above = activeCam.position.y > state.room.ceiling + 1;
+    if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && !above;
+    if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
+    ghostBulkheads(mode === 'plan' || above);
+    activeCam.updateMatrixWorld();
+    const glow = !isFast() && state.light.bloom && mode !== 'plan';
+    flameUniforms.uDirect.value = glow ? 0 : 1;
+    if (glow) { renderPass.camera = activeCam; composer.render(0.016); } else renderer.render(scene, activeCam);
+    labelRenderer.render(scene, activeCam);
+    return type ? renderer.domElement.toDataURL(type, q) : '';
+  },
   idle: () => dirty <= 0, frames: () => renderer.info.render.frame, perf: () => ({ dprScale, slowScore, fastFrames, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
-  view(px, py, pz, tx, ty, tz) { tween = null; camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },
+  view(px, py, pz, tx, ty, tz, fov = 50) { tween = null; camera.fov = fov; camera.updateProjectionMatrix(); camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },
   settle() { if (FX.screen) { FX.screen.cur = state.light.screenDown ? 1 : 0.02; FX.screen.sheet.scale.y = FX.screen.cur; } invalidate(3); },
+  /** Print artwork: a top-down plan at an explicit frame (plan inches per CSS px, centre) on a paper colour, without the
+   *  overlay; returns the overlay's dimensions and tags (plan inches) so they can be redrawn as vectors. */
+  planShot({ cx, cy, scale, bg = '#120f0c' }) {
+    planLog = [];
+    setMode('plan');
+    const W = stage.clientWidth, H = stage.clientHeight;
+    Object.assign(ortho, { left: -W / 2 * scale, right: W / 2 * scale, top: H / 2 * scale, bottom: -H / 2 * scale, zoom: 1 });
+    ortho.position.copy(P(cx, cy, 1500)); ortho.up.set(0, 0, -1); ortho.lookAt(P(cx, cy, 0)); ortho.updateProjectionMatrix();
+    labelsGroup.visible = false; scene.background = new THREE.Color(bg);
+    const log = planLog; planLog = null;
+    const G = geom(), r = state.room;
+    return { W, H, log, room: { ...r }, geom: { mainY: G.mainY, westY: G.westY, hallY: G.hallY, hallEnd: G.hallEnd, tvX: G.tvX, bay: G.bay, outline: G.outline },
+      items: state.items.map(({ id, type, x, y, rot, p }) => ({ id, type, x, y, rot, p })), seat: mainSeat(), stats: viewingStats(),
+      speakers: speakerPlan(), fireplace: { ...state.fireplace }, tv: { ...state.tv } };
+  },
+  endPlanShot() { scene.background = new THREE.Color('#120f0c'); setMode('orbit'); labelsGroup.visible = true; },
+  /** Everything the printed design review needs from the style study, for each set as designed (and the current mix). */
+  studyData() {
+    const pieces = (id, own) => state.items.map((it) => {
+      const s = resolveSpec(it, id, own), v = (VARIANTS[it.type] || {})[s.variant];
+      return { id: it.id, type: it.type, label: CATALOG[it.type].label, variant: v ? v.label : '', desc: v ? v.desc : '', spec: pieceSpecText(it, s),
+        size: pieceSize(it, s).text, price: piecePrice(it, s), weeks: pieceWeeks(it, s), s };
+    });
+    const pack = (id, own) => {
+      const e = evaluateSet(id, own);
+      return { eval: e, totals: Object.fromEntries(Object.entries(WEIGHT_PRESETS).map(([k, w]) => [k, weightedTotal(e.scores, w)])),
+        spec: specRows(id, own), pieces: pieces(id, own) };
+    };
+    return { sets: SET_IDS.map((id) => ({ id, ...STYLE_SETS[id], ...pack(id, false) })), mix: isCustomised() ? { base: activeSetId(), ...pack(activeSetId(), true) } : null,
+      criteria: CRITERIA, presets: WEIGHT_PRESETS, covers: COVERS, woods: WOOD_FINISHES, metals: METAL_FINISHES, stones: STONE_FINISHES };
+  },
   screenOf(x, y, z = 10) {
     activeCam.updateMatrixWorld();
     const v = P(x, y, z).project(activeCam), r = renderer.domElement.getBoundingClientRect();

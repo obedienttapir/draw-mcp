@@ -47,7 +47,7 @@ const METAL_FINISHES = { brass: 'Satin brass', black: 'Black steel', nickel: 'Br
 const STONE_FINISHES = { marble: 'White marble', travertine: 'Honed travertine', nero: 'Black marble' };
 const AV_FINISHES = { black: 'Black ash', walnut: 'Walnut veneer', oak: 'Light oak veneer' };
 const RUG_COLORS = [['#6e6559', 'Taupe'], ['#7d7466', 'Sand'], ['#3d3833', 'Charcoal'], ['#2f2d2b', 'Graphite'], ['#8a7a64', 'Wheat'],
-  ['#a68d68', 'Natural jute'], ['#d9cdb5', 'Cream'], ['#7b3f2e', 'Faded rust'], ['#3d4656', 'Indigo'], ['#2f5d5a', 'Teal']];
+  ['#a68d68', 'Natural jute'], ['#d9cdb5', 'Cream'], ['#7b3f2e', 'Faded rust'], ['#3d4656', 'Indigo'], ['#2f5d5a', 'Teal'], ['#6b5a4a', 'Mink']];
 const colorName = (hex) => {
   const all = [...Object.values(COVER_COLORS).flat(), ...RUG_COLORS];
   const hit = all.find(([c]) => c.toLowerCase() === String(hex).toLowerCase());
@@ -384,6 +384,13 @@ function evaluateSet(setId, withOverrides = false) {
   const scores = { comfort: clamp(comfort, 1, 5), picture, acoustics, care, hangout, budget, lead, fit: set.fit };
   return { scores, lo, hi, weeks, total: weightedTotal(scores) };
 }
+// one-click priority profiles in the Style tab (0 ignores a criterion, 5 counts most)
+const WEIGHT_PRESETS = {
+  'Balanced': DEFAULT_WEIGHTS,
+  'Cinema first': { comfort: 5, picture: 5, acoustics: 4, care: 3, hangout: 1, budget: 2, lead: 1, fit: 2 },
+  'Hangout first': { comfort: 3, picture: 2, acoustics: 2, care: 4, hangout: 5, budget: 3, lead: 2, fit: 3 },
+  'Budget first': { comfort: 2, picture: 1, acoustics: 1, care: 2, hangout: 2, budget: 5, lead: 2, fit: 1 },
+};
 function weightedTotal(scores, weights = (state.study && state.study.weights) || DEFAULT_WEIGHTS) {
   let sw = 0, s = 0;
   for (const c of CRITERIA) { const w = weights[c.key] ?? DEFAULT_WEIGHTS[c.key]; sw += w; s += w * scores[c.key]; }
@@ -402,9 +409,9 @@ function specRows(setId, withOverrides) {
     if (!groups.has(key)) {
       const v = (VARIANTS[it.type] || {})[s.variant];
       groups.set(key, { type: it.type, item: v ? `${CATALOG[it.type].label}: ${v.label}` : CATALOG[it.type].label, spec, size: size.text,
-        qty: 0, unit: piecePrice(it, s), weeks: pieceWeeks(it, s), care: UPHOLSTERED[it.type] ? COVERS[s.cover].spec : '' });
+        qty: 0, unit: piecePrice(it, s), weeks: pieceWeeks(it, s), care: UPHOLSTERED[it.type] ? COVERS[s.cover].spec : '', ids: [] });
     }
-    groups.get(key).qty++;
+    groups.get(key).qty++; groups.get(key).ids.push(it.id);
   }
   const order = ['SE', 'TB', 'RG', 'ST', 'LT', 'AC', 'AV'], count = {};
   return [...groups.values()]
