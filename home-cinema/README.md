@@ -47,7 +47,17 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
 - **Lenses in real focal lengths**: 16, 20, 24, 28, 35 and 50 mm, full-frame equivalent and matched on the diagonal like a phone camera, so a 24 mm shot here frames like 24 mm in a render app. Interiors are usually shot at 16–24 mm.
 - **Framing**: 4:3, 3:2, 16:9, 1:1, 4:5 or 9:16, a thirds grid, and everything outside the frame dimmed. The label in the corner shows the lens and aspect.
 - **Straight verticals** (⊥ Level, on by default): the camera stays level and the lens shifts instead of tilting, so walls stay upright, the look of architectural photography. Views steeper than 35° (aerials) tilt freely, and the label says *aerial tilt*.
-- **3D or Walk**: orbit as usual, or walk at a seated (3′-6″), eye (5′-0″) or high (6′-0″) camera height with the ▲ ▼ pad or W A S D.
+- **Live camera moves, like a camera app**:
+
+  | | 3D | Walk |
+  | --- | --- | --- |
+  | One finger / drag | orbit | look around |
+  | Two fingers / right-drag | pan | move (up = forward, sideways = step aside) |
+  | Pinch / Ctrl + wheel / trackpad pinch | zoom the lens, 12–85 mm | zoom the lens, 12–85 mm |
+  | Hold ▲ ▼ / mouse wheel | move in and out | walk forward and back (also W A S D) |
+
+  The lens chips jump to 16–50 mm; pinching goes anywhere in between and the frame label shows the focal length live.
+- **Walk** at a seated (3′-6″), eye (5′-0″) or high (6′-0″) camera height.
 - **Viewpoints**: the camera presets plus your own saved shots (**＋ Save this view**), which keep their lens, aspect and position and travel with the layout code.
 - **Light**: exposure (±2 EV; double-tap to reset) and the lighting scene.
 - **Shutter** (or `Space`): renders exactly the frame at 2K, 3K or 4K on the long edge, JPEG or PNG, with no labels or outlines; by default with the glow and soft area light for the shot only, so the live view stays fast.

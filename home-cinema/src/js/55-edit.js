@@ -122,6 +122,8 @@ el.addEventListener('pointerdown', (e) => {
 });
 el.addEventListener('pointermove', (e) => {
   if (mode === 'walk' && walk.dragging) {
+    // two fingers move and zoom (photo mode) rather than look; after they lift, re-seat so the view doesn't jump
+    if (touches.size > 1 || walk.reseat) { walk.lx = e.clientX; walk.ly = e.clientY; walk.reseat = touches.size > 1; return; }
     walk.yaw -= (e.clientX - walk.lx) * 0.0042; walk.pitch = clamp(walk.pitch - (e.clientY - walk.ly) * 0.0042, -1.2, 1.2);
     walk.lx = e.clientX; walk.ly = e.clientY; return;
   }

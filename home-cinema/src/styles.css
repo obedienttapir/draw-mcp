@@ -401,6 +401,7 @@ select.ph-pill { padding-right: 8px; width: auto; flex: none; }
 .ph-walk { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .ph-walk .spacer { flex: 1; }
 .ph-walk .walkbtn { width: 48px; height: 40px; touch-action: none; }
+.ph-gest { font-size: 11.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .ph-sun { font-size: 18px; color: var(--muted); }
 .ph-line input[type=range] { flex: 1; min-width: 80px; accent-color: #e6c35a; }
 .ph-ev { font-family: var(--font-num); font-size: 12px; min-width: 56px; color: var(--muted); }
