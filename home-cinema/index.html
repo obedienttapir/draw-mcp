@@ -1987,15 +1987,17 @@ function instances(parent, geo, mat, list) {
 // style sets dress every piece, so the catalogue only carries geometry
 const CATALOG = {
   uSectional: {
-    label: 'U-sectional · Tremee', note: 'Wayfair Latitude Run: modular, storage, sleeper',
-    defaults: { seats: 5, mw: 30, depth: 33, chaise: 'both', ottoman: 'front', arms: 'both', layout: 'sofa', pillows: 'on' },
-    params: [['seats', 'Seats in the back row', 3, 7, 'n'], ['mw', 'Module width', 26, 34], ['depth', 'Seat depth', 30, 38]],
+    label: 'U-sectional · Tremee', note: 'Wayfair Latitude Run: 134″ modular, storage, sleeper',
+    // sizes are fixed by the product (see TREMEE); only the module count and arrangement change
+    defaults: { seats: 5, chaise: 'both', ottoman: 'front', arms: 'both', layout: 'sofa', pillows: 'off' },
+    params: [['seats', 'Seats in the back row', 3, 7, 'n']],
     options: [
       ['layout', 'Mode', [['sofa', 'Sofa'], ['bed', 'Sleeper (bed)']]],
-      ['chaise', 'Chaises', [['both', 'Both ends (U)'], ['left', 'Left only'], ['right', 'Right only'], ['none', 'None']]],
+      ['chaise', 'Chaises', [['both', 'Both ends (U)'], ['long-left', 'Long left + right'], ['long-right', 'Left + long right'],
+        ['left', 'Left only'], ['right', 'Right only'], ['none', 'None']]],
       ['ottoman', 'Loose ottoman', [['front', 'In front'], ['none', 'Put away']]],
       ['arms', 'Arms', [['both', 'Both'], ['none', 'Armless']]],
-      ['pillows', 'Throw pillows', [['on', 'On'], ['off', 'Off']]],
+      ['pillows', 'Throw pillows', [['off', 'Off (as sold)'], ['on', 'On (as styled)']]],
     ],
   },
   sectional: {
@@ -2541,72 +2543,83 @@ function makeBarCart(p, item, s) {
 }
 
 // ---------------- Tremee U-sectional (Wayfair, Latitude Run) ----------------
-// Modelled from the listing photo: a back row of square storage seats (track arms on the end seats),
-// two storage-ottoman chaises in front of the end seats (the U) and one loose ottoman in the middle.
-// Sleeper mode pulls the ottomans in front of the middle seats to make one bed deck.
-// Sizes are estimates for this class of modular corduroy sectional (the listing gives no drawing): edit them in Size.
+// From the listing's dimension sheet: 134.2″ W × 79.6″ D × 33.9″ H overall; 5 seat modules of 24.8″
+// between two 5.1″ arms (5 × 24.8 + 2 × 5.1 = 134.2); a seat module is 30″ deep (54.8″ chaise − 24.8″
+// ottoman) with an 18.9″ usable seat, so back frame + cushion take 11.1″ (54.8 − 11.1 = the 43.7″ label);
+// seat and ottoman height 17.7″, back cushion 18.1″ tall, arm 27.2″ high. Ottomans 24.8″ square in the
+// drawing (the spec table says 25.6″). The dimensioned 79.6″ depth is a long chaise: seat + 2 ottomans.
+// 10 boxes = 5 seats + 3 ottomans + 2 arms.
+const TREMEE = { mw: 24.8, depth: 30, arm: 5.1, seatUse: 18.9, seatH: 17.7, back: 33.9, backCushion: 18.1, armH: 27.2, ott: 24.8, foot: 2.4, deck: 11, ottomans: 3 };
 const U_GAP = 14;                                     // loose ottoman sits this far in front of the chaise line
+function uChaises(p, n) {                             // [seat index, ottomans deep] per chaise
+  const L = 0, R = n - 1;
+  return { both: [[L, 1], [R, 1]], 'long-left': [[L, 2], [R, 1]], 'long-right': [[L, 1], [R, 2]], left: [[L, 1]], right: [[R, 1]], none: [] }[p.chaise] || [[L, 1], [R, 1]];
+}
 function uSectionalSize(p) {
-  const arm = p.arms === 'none' ? 0 : 6, n = Math.max(1, Math.round(p.seats)), W = n * p.mw + 2 * arm;
-  const nOtt = (p.chaise === 'both' ? 2 : p.chaise === 'none' ? 0 : 1) + (p.ottoman === 'front' ? 1 : 0);
-  const bed = p.layout === 'bed' && nOtt > 0;
-  const row = bed || p.chaise !== 'none';                        // a row of ottomans touching the seat fronts
+  const T = TREMEE, arm = p.arms === 'none' ? 0 : T.arm, n = clamp(Math.round(p.seats || 5), 1, 9), W = n * T.mw + 2 * arm;
+  const ch = uChaises(p, n), inChaise = ch.reduce((a, [, k]) => a + k, 0);
+  const bed = p.layout === 'bed';
   const loose = !bed && p.ottoman === 'front';
-  const D = p.depth + (row ? p.mw : 0) + (loose ? (row ? U_GAP : 10) + p.mw : 0);
-  return { arm, n, W, D, nOtt, bed, row, loose };
+  const nOtt = inChaise + (p.ottoman === 'front' ? 1 : 0);
+  const deepest = bed ? 1 : Math.max(0, ...ch.map(([, k]) => k));
+  const D = T.depth + deepest * T.ott + (loose ? (deepest ? U_GAP : 10) + T.ott : 0);
+  return { arm, n, W, D, ch, nOtt, bed, loose, deepest };
 }
 function makeUSectional(p, item, s) {
-  const g = new THREE.Group(), u = uSectionalSize(p), { arm, n, W, D } = u, mw = p.mw, dep = p.depth;
+  const T = TREMEE, g = new THREE.Group(), u = uSectionalSize(p), { arm, n, W, D } = u, mw = T.mw, ott = T.ott;
   const cloud = s.variant === 'cloud';
-  const fab = coverMat(s.cover, s.color), seam = coverMat(s.cover, css(shade(s.color, -0.25)));
-  const z0 = -D / 2, zf = z0 + dep;                          // back of the sofa, front of the seats
-  const feet = [], shadows = [];
-  const foot = (x, z) => feet.push([x, 0.75, z]);
-  const H = { deck: 9.5, seat: cloud ? 19 : 18, back: cloud ? 29 : 31, arm: 24 };
-  // ---- back row: one module per seat ----
+  const fab = coverMat(s.cover, s.color), seam = coverMat(s.cover, css(shade(s.color, -0.3)));
+  const legMat = cached('tremee-leg', () => new THREE.MeshStandardMaterial({ color: '#141312', roughness: 0.6 }));
+  const legGeo = new THREE.CylinderGeometry(0.85, 0.6, T.foot, 12);
+  const z0 = -D / 2, zf = z0 + T.depth;                     // back of the sofa, front of the seats
+  const shadows = [];
+  const leg = (x, z) => meshAt(legGeo, legMat, x, T.foot / 2, z, g);
+  const seatTop = T.seatH + (cloud ? 1 : 0), backTop = (cloud ? T.back - 2 : T.back) - 0.3;   // the lean lifts the top corner ~0.3″
+  const backZ = z0 + (T.depth - T.seatUse);                 // where the seat cushion starts (front face of the back cushion)
+  const box4legs = (xa, xb, za, zb) => { for (const x of [xa + 2.2, xb - 2.2]) for (const z of [za + 2.2, zb - 2.2]) leg(x, z); };
+  // ---- seat modules: storage box on legs, seat cushion, back frame, leaning back cushion ----
   for (let i = 0; i < n; i++) {
     const xa = -W / 2 + arm + i * mw, xb = xa + mw, xc = (xa + xb) / 2;
-    span(g, fab, xa + 0.15, xb - 0.15, 1.5, H.deck, z0, zf, 1.5);                 // storage box
-    span(g, seam, xa + 0.6, xb - 0.6, H.deck - 0.35, H.deck, zf - 0.4, zf, 0.1);   // lid seam
-    span(g, fab, xa + 0.4, xb - 0.4, H.deck, H.seat, z0 + 6, zf + 0.6, cloud ? 4 : 3);  // seat cushion
-    span(g, fab, xa + 0.15, xb - 0.15, H.deck, 21, z0, z0 + 6, 2);                // low back frame
-    const bk = meshAt(rbox(mw - 1, H.back - H.seat + 3, cloud ? 11 : 9, cloud ? 5 : 4), fab, xc, (H.seat - 1 + H.back + 2) / 2, z0 + (cloud ? 6.5 : 5.5), g);
-    bk.rotation.x = -0.12;                                                        // loose back pillow leans back
-    for (const x of [xa + 2.5, xb - 2.5]) for (const z of [z0 + 2.5, zf - 2.5]) foot(x, z);
+    span(g, fab, xa + 0.1, xb - 0.1, T.foot, T.deck, z0, zf, 1.2);                       // box
+    span(g, seam, xa + 0.5, xb - 0.5, T.deck - 0.3, T.deck, zf - 0.35, zf + 0.02, 0.1);  // lid seam
+    span(g, fab, xa + 0.35, xb - 0.35, T.deck, seatTop, backZ - 1.5, zf + 0.5, cloud ? 3.4 : 2.6);   // seat cushion
+    span(g, fab, xa + 0.1, xb - 0.1, T.deck, 24, z0, z0 + 4, 1.6);                      // back frame
+    const ch = backTop - (seatTop - 1.2), th = (backZ - z0) - 4 + (cloud ? 2 : 0);
+    const bk = meshAt(rbox(mw - 0.8, ch, th, cloud ? 4.5 : 3.4), fab, xc, seatTop - 1.2 + ch / 2, z0 + 4 + th / 2 - 0.6, g);
+    bk.rotation.x = -0.1;
+    box4legs(xa, xb, z0, zf);
   }
-  // ---- track arms on the end seats (each with its own small back pillow, as in the photo) ----
+  // ---- arm panels: 5.1″ wide, 27.2″ high, full module depth ----
   if (arm) for (const sx of [-1, 1]) {
     const xa = sx < 0 ? -W / 2 : W / 2 - arm;
-    span(g, fab, xa, xa + arm, 1.5, H.arm, z0, zf, 2.5);
-    foot(xa + arm / 2, z0 + 2.5); foot(xa + arm / 2, zf - 2.5);
+    span(g, fab, xa, xa + arm, T.foot, T.armH, z0, zf, 2.2);
+    leg(xa + arm / 2, z0 + 2.2); leg(xa + arm / 2, zf - 2.2);
   }
-  shadows.push([0, z0 + dep / 2, W, dep]);
-  // ---- ottomans: square storage cubes the size of a seat ----
+  shadows.push([0, z0 + T.depth / 2, W, T.depth]);
+  // ---- ottomans: 24.8″ cubes, 17.7″ high ----
   const ottoman = (xc, zc) => {
-    const xa = xc - mw / 2, za = zc - mw / 2;
-    span(g, fab, xa + 0.2, xa + mw - 0.2, 1.5, H.deck, za + 0.2, za + mw - 0.2, 1.5);
-    span(g, seam, xa + 0.6, xa + mw - 0.6, H.deck - 0.35, H.deck, za + mw - 0.6, za + mw - 0.2, 0.1);
-    span(g, fab, xa + 0.4, xa + mw - 0.4, H.deck, H.seat - 0.5, za + 0.4, za + mw - 0.4, cloud ? 4 : 3);
-    for (const x of [xa + 2.5, xa + mw - 2.5]) for (const z of [za + 2.5, za + mw - 2.5]) foot(x, z);
-    shadows.push([xc, zc, mw, mw]);
+    const xa = xc - ott / 2, za = zc - ott / 2;
+    span(g, fab, xa + 0.15, xa + ott - 0.15, T.foot, T.deck, za + 0.15, za + ott - 0.15, 1.2);
+    span(g, seam, xa + 0.5, xa + ott - 0.5, T.deck - 0.3, T.deck, za + ott - 0.5, za + ott - 0.13, 0.1);
+    span(g, fab, xa + 0.35, xa + ott - 0.35, T.deck, seatTop, za + 0.35, za + ott - 0.35, cloud ? 3.4 : 2.6);
+    box4legs(xa, xa + ott, za, za + ott);
+    shadows.push([xc, zc, ott, ott]);
   };
-  const seatX = (i) => -W / 2 + arm + mw * (i + 0.5), rowZ = zf + mw / 2;
-  if (u.bed) {                                                   // all ottomans in front of the middle seats: one bed deck
+  const seatX = (i) => -W / 2 + arm + mw * (i + 0.5), rowZ = (k) => zf + ott * (k + 0.5);
+  if (u.bed) {                                                   // every ottoman in front of the middle seats: one bed deck
     const k = Math.min(u.nOtt, n), first = Math.floor((n - k) / 2);
-    for (let i = first; i < first + k; i++) ottoman(seatX(i), rowZ);
+    for (let i = first; i < first + k; i++) ottoman(seatX(i), rowZ(0));
   } else {
-    if (p.chaise === 'both' || p.chaise === 'left') ottoman(seatX(0), rowZ);
-    if (p.chaise === 'both' || p.chaise === 'right') ottoman(seatX(n - 1), rowZ);
-    if (u.loose) ottoman(0, D / 2 - mw / 2);
+    for (const [i, k] of u.ch) for (let r = 0; r < k; r++) ottoman(seatX(i), rowZ(r));
+    if (u.loose) ottoman(0, D / 2 - ott / 2);
   }
-  instances(g, new THREE.BoxGeometry(1.6, 1.5, 1.6), M.black, feet);
-  // ---- throw pillows like the listing photo: rust + floral on the left, cream + mustard plaid on the right ----
-  if (p.pillows !== 'off') {
+  // ---- optional throw pillows, as styled in the listing photo ----
+  if (p.pillows === 'on') {
     const pm = (c) => coverMat('linen', c);
     const sets = [[seatX(0), [['#8a5a3c', -0.35], ['#d9d0bd', 0.15]]], [seatX(n - 1), [['#d9d0bd', -0.15], ['#b39459', 0.35]]]];
     for (const [x, list] of sets) list.forEach(([c, dx], k) => {
-      const m = meshAt(rbox(17, 16, 5, 2.5), pm(c), x + dx * mw * 0.6, H.seat + 8, z0 + 12 + k * 2.5, g);
-      m.rotation.y = -dx * 0.6; m.rotateX(-0.22);
+      const m = meshAt(rbox(16, 15, 4.5, 2.3), pm(c), x + dx * mw * 0.6, seatTop + 7.5, backZ + 2.5 + k * 2.2, g);
+      m.rotation.y = -dx * 0.6; m.rotateX(-0.2);
     });
   }
   return { group: g, w: W, d: D, shadows };
@@ -2796,8 +2809,8 @@ const VARIANTS = {
   },
 };
 VARIANTS.uSectional = {
-  tremee: { label: 'Tremee, as sold', desc: 'Latitude Run Tremee modular U-sectional: storage seats, two storage chaises and a loose ottoman that pull together into a sleeper', H: 31, comfort: 4, hangout: 5, price: [1500, 2900], weeks: [1, 3] },
-  cloud:  { label: 'Cloud pillow-back', desc: 'Same modules with overstuffed cloud cushions and a lower, plumper back', H: 29, comfort: 5, hangout: 5, price: [1900, 3400], weeks: [2, 5] },
+  tremee: { label: 'Tremee, as sold', desc: 'Latitude Run Tremee modular U-sectional: 5 storage seats, 3 storage ottomans and 2 arms (10 boxes); the ottomans pull together into a sleeper', H: 33.9, comfort: 4, hangout: 5, price: [1500, 2900], weeks: [1, 3] },
+  cloud:  { label: 'Cloud pillow-back', desc: 'Same modules with overstuffed cloud cushions and a lower, plumper back', H: 32, comfort: 5, hangout: 5, price: [1900, 3400], weeks: [2, 5] },
 };
 VARIANTS.sofa = VARIANTS.sectional;                        // the straight sofa shares the sectional's styles
 const UPHOLSTERED = { uSectional: 1, sectional: 1, sofa: 1, loungeChair: 1, ottoman: 1, pouf: 1, recliner: 1 };
@@ -3981,6 +3994,7 @@ function itemSheet() {
     SEATING[it.type] ? act('♨', 'Face fire', () => turnTo(facing(it, 0, state.fireplace.center))) : null,
     it.type === 'rug' ? act('＋', 'Add here', () => { const at = lastHoldFloor || { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
     act('⧉', 'Copy', duplicateSelected),
+    act('⤓', '3D file', () => exportItemGLB(it)),
     act('↶', 'Undo', undo),
     act('🗑', 'Delete', removeSelected, 'danger'));
 
@@ -4039,6 +4053,11 @@ function itemSheet() {
           h('b', {}, String(it.p[k])),
           h('button', { 'aria-label': 'More', onclick: () => set(1), disabled: it.p[k] >= max }, '+')));
       }
+      if (it.type === 'uSectional') {
+        const u = uSectionalSize({ ...def.defaults, ...it.p });
+        pane.append(h('span', { class: 'badge ' + (u.nOtt <= TREMEE.ottomans && it.p.seats === 5 ? 'ok' : 'warn') },
+          u.nOtt <= TREMEE.ottomans && it.p.seats === 5 ? `Uses the boxed set: 5 seats, ${u.nOtt} of 3 ottomans` : `Needs ${it.p.seats} seats and ${u.nOtt} ottomans (the box has 5 and 3)`));
+      }
       for (const [k, label, opts] of def.options || []) {
         pane.append(h('h4', {}, label), h('div', { class: 'opts' }, opts.map(([val, text]) => big(val, text, it.p[k], () => edit(() => { it.p[k] = val; })))));
       }
@@ -4051,7 +4070,7 @@ function itemSheet() {
     }
     const price = piecePrice(it, s), weeks = pieceWeeks(it, s);
     if (price) pane.append(h('p', { class: 'note' }, `Indicative ${moneyRange(...price)}${weeks ? ` · ${weeks[0]}–${weeks[1]} wk` : ''}`));
-    if (it.type === 'uSectional') pane.append(h('p', { class: 'note' }, 'Sizes are estimates from the Wayfair photo (the listing has no drawing). Check them against the product page and adjust under Size.'));
+    if (it.type === 'uSectional') pane.append(h('p', { class: 'note' }, `Sizes from Wayfair's dimension sheet: ${pieceSize(it, s).text}. 24.8″ modules, 5.1″ arms, 17.7″ seat height, 18.9″ usable seat depth.`));
     if (hasOverrides(it)) pane.append(h('button', { class: 'btn', onclick: () => edit(() => { delete it.s; }) }, `Reset to the ${STYLE_SETS[activeSetId()].name} look`));
   };
   const tabbar = h('nav', { class: 'sheet-tabs', role: 'tablist' }, tabs.map(([k, label]) => {
@@ -4071,7 +4090,7 @@ function addSheet(at) {
   const pick = (type, extra) => { closeSheet(); addItem(type, at, extra); };
   const featured = h('div', { class: 'feature' },
     h('button', { class: 'feature-main', onclick: () => pick('uSectional') },
-      h('span', { class: 'tag' }, 'From Wayfair'), h('b', {}, 'Tremee U-sectional'), h('small', {}, '5 storage seats, 2 chaises, loose ottoman · sleeper')),
+      h('span', { class: 'tag' }, 'From Wayfair'), h('b', {}, 'Tremee U-sectional'), h('small', {}, '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper')),
     h('div', { class: 'feature-sw' }, WAYFAIR_FABRICS.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
       onclick: () => pick('uSectional', { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.'))))));
   const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && t !== 'uSectional').map((t) =>
@@ -4095,6 +4114,54 @@ function initSheet() {
   grip.addEventListener('pointerup', end); grip.addEventListener('pointercancel', end);
   el.addEventListener('contextmenu', (e) => e.preventDefault());   // a long press must not open the browser menu
   updateHint();
+}
+
+// ---- 59-export.js ----
+// ===================================================================
+// 59 · Download a piece as a 3D file (.glb, binary glTF): metres, Y up,
+//      front facing +Z. Opens in Windows 3D Viewer, macOS/iOS Quick Look
+//      via conversion, Android Scene Viewer, Blender, SketchUp (with the
+//      glTF importer) and most web viewers.
+// ===================================================================
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+
+/** InstancedMesh -> plain meshes, so viewers without EXT_mesh_gpu_instancing still show every copy. */
+function flattenInstances(root) {
+  const todo = [];
+  root.traverse((o) => { if (o.isInstancedMesh) todo.push(o); });
+  for (const inst of todo) {
+    const m4 = new THREE.Matrix4();
+    for (let i = 0; i < inst.count; i++) {
+      inst.getMatrixAt(i, m4);
+      const m = new THREE.Mesh(inst.geometry, inst.material);
+      m.applyMatrix4(m4); m.applyMatrix4(inst.matrix);
+      inst.parent.add(m);
+    }
+    inst.parent.remove(inst);
+  }
+}
+function saveBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+const fileSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+/** Export one placed piece, with its current style and configuration, as a .glb download. */
+function exportItemGLB(it) {
+  const def = CATALOG[it.type]; if (!def) return;
+  const s = resolveSpec(it), built = FACTORIES[it.type]({ ...def.defaults, ...it.p }, it, s);
+  const root = new THREE.Group();
+  root.name = def.label; root.scale.setScalar(0.0254);                     // inches -> metres
+  root.add(built.group); flattenInstances(root); root.updateMatrixWorld(true);
+  const v = (VARIANTS[it.type] || {})[s.variant];
+  const name = fileSlug([def.label.replace('·', ''), UPHOLSTERED[it.type] ? colorName(s.color) : '', UPHOLSTERED[it.type] ? COVERS[s.cover].label : ''].filter(Boolean).join(' ')) + '.glb';
+  root.userData = { source: 'Basement Cinema Planner', style: v ? v.label : '', size: pieceSize(it, s).text, units: 'metres' };
+  toast('Building the 3D file…');
+  new GLTFExporter().parse(root, (buf) => {
+    saveBlob(new Blob([buf], { type: 'model/gltf-binary' }), name);
+    toast(`${name} downloaded`);
+  }, (err) => { console.error(err); toast('Could not build the 3D file'); }, { binary: true, onlyVisible: true, maxTextureSize: 1024 });
 }
 
 // ---- 60-ui.js ----
@@ -4748,6 +4815,7 @@ function renderInspector() {
       h('button', { class: 'btn', onclick: () => rotateSelected(90), title: 'R' }, 'Turn 90°')),
     h('div', { class: 'btnrow' },
       h('button', { class: 'btn', onclick: duplicateSelected }, 'Duplicate'),
+      h('button', { class: 'btn', onclick: () => exportItemGLB(it), title: 'Download this piece as a .glb 3D file' }, '3D file (.glb)'),
       h('button', { class: 'btn danger', onclick: removeSelected }, 'Remove')),
     h('p', { class: 'note' }, 'Drag on the floor to move · arrow keys nudge 1″ (Shift: 6″).')));
   if (SEATING_MAIN[it.type]) body.append(viewingReport());

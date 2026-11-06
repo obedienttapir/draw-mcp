@@ -49,12 +49,32 @@ Built for phones first; on by default and switchable under **Furnish › Press a
 
 ## Wayfair Tremee U-sectional
 
-**U-sectional · Tremee** models the Latitude Run *Tremee U Shaped Sectional Sofa Sleeper Sofa Couch With Storage* from Wayfair: a back row of square storage seats with track arms on the end seats, two storage-ottoman chaises in front of the end seats, a loose ottoman in the middle, plump pillow backs and jumbo-wale corduroy (a new **Jumbo corduroy** cover).
+**U-sectional · Tremee** models the Latitude Run *Tremee U Shaped Sectional Sofa Sleeper Sofa Couch With Storage* from Wayfair, built to the listing's dimension sheet:
 
-- **Fabric** offers the four Wayfair options: Green Corduroy, Grey Polyester, Grey Velvet and Light Corduroy (the listing cuts the fourth name off at "Ligh…"), plus every other cover in the planner.
-- **Layout**: 3–7 seats in the back row, chaises at both ends (U), left, right or none, the loose ottoman in front or put away, arms or armless, throw pillows on or off, and **Sleeper (bed)** mode, which pulls the ottomans in front of the middle seats to make one bed deck.
+| Part | Size | Check |
+| --- | --- | --- |
+| Overall | 134.2″ W × 79.6″ D × 33.9″ H | 5 × 24.8″ seats + 2 × 5.1″ arms = 134.2″ |
+| Seat module | 24.8″ W × 30″ D, seat 17.7″ high, 18.9″ usable depth | 54.8″ chaise − 24.8″ ottoman = 30″ |
+| Back cushion | 18.1″ tall, top at 33.9″ | back frame + cushion = 30 − 18.9 = 11.1″, so the 43.7″ label = 54.8 − 11.1 |
+| Arm | 5.1″ wide × 27.2″ high, full depth | |
+| Ottoman (×3) | 24.8″ square × 17.7″ high | the spec table says 25.6″; the drawing's 24.8″ is the one that adds up |
+| In the box | 10 packages: 5 seats, 3 ottomans, 2 arms | |
+
+The 79.6″ depth is the drawing's layout: a long chaise (seat + two ottomans) on one end and a single chaise on the other. The listing photo instead shows a chaise at each end and the third ottoman loose in front (93.5″ deep with a 14″ gap).
+
+- **Fabric** offers the four Wayfair options: Green Corduroy, Grey Polyester, Grey Velvet and Light Corduroy (the listing cuts the fourth name off at "Ligh…"), in a new **Jumbo corduroy** cover, plus every other cover in the planner.
+- **Layout**: 3–7 seats; chaises at both ends (U), *Long left + right* (as dimensioned), *Left + long right*, left, right or none; the loose ottoman in front or put away; arms or armless; the listing photo's throw pillows on or off; and **Sleeper (bed)** mode, which pulls the ottomans in front of the middle seats into one bed deck. A badge says whether the layout uses only what's in the box (5 seats, 3 ottomans).
 - **Style**: *Tremee, as sold* or *Cloud pillow-back* (overstuffed cushions, lower back).
-- The listing has no dimensioned drawing, so sizes are estimates from the photo: 30″ modules, 33″ seat depth, 6″ arms, 31″ back height (13′-6″ × 8′-11″ as a 5-seat U with the loose ottoman out). Check them against the product page and change them under **Size**. The price is an indicative range, not Wayfair's.
+- The price is an indicative range, not Wayfair's.
+
+### Download a 3D file
+
+Any piece can be downloaded as a **.glb** (binary glTF) with its current fabric, colour and layout: **3D file** in the press-and-hold menu, or **3D file (.glb)** in the details panel. Files are in metres, Y up, front facing +Z, and open in Blender, SketchUp (glTF importer), Windows 3D Viewer, Android Scene Viewer and most web viewers. Corduroy ribs come through as a colour texture; glTF has no bump maps.
+
+Ready-made files in [`models/`](models/):
+
+- `tremee-u-sectional-green-corduroy.glb`: as in the listing photo (U with the loose ottoman), 134.2″ × 93.5″ × 33.9″
+- `tremee-u-sectional-as-dimensioned.glb`: as in the dimension drawing (long left chaise), 134.2″ × 79.5″ × 33.9″
 
 ## Furniture style study (phase two)
 
@@ -112,6 +132,7 @@ src/js/50-view.js     renderer, cameras, presets, walk mode, plan dimensions, vi
 src/js/55-edit.js     picking, dragging, measuring, keyboard
 src/js/57-collide.js  footprints, walls and obstacles: keeps furniture on the floor
 src/js/58-hold.js     press and hold gestures, the bottom-sheet furniture menu, Add here
+src/js/59-export.js   download a piece as a .glb 3D file
 src/js/60-ui.js       design panel tabs
 src/js/62-style-ui.js  Style tab, per-piece style controls, compare view, spec sheet
 src/js/65-inspector.js details panel, layout code dialog

@@ -108,6 +108,7 @@ function renderInspector() {
       h('button', { class: 'btn', onclick: () => rotateSelected(90), title: 'R' }, 'Turn 90°')),
     h('div', { class: 'btnrow' },
       h('button', { class: 'btn', onclick: duplicateSelected }, 'Duplicate'),
+      h('button', { class: 'btn', onclick: () => exportItemGLB(it), title: 'Download this piece as a .glb 3D file' }, '3D file (.glb)'),
       h('button', { class: 'btn danger', onclick: removeSelected }, 'Remove')),
     h('p', { class: 'note' }, 'Drag on the floor to move · arrow keys nudge 1″ (Shift: 6″).')));
   if (SEATING_MAIN[it.type]) body.append(viewingReport());

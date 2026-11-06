@@ -171,6 +171,7 @@ function itemSheet() {
     SEATING[it.type] ? act('♨', 'Face fire', () => turnTo(facing(it, 0, state.fireplace.center))) : null,
     it.type === 'rug' ? act('＋', 'Add here', () => { const at = lastHoldFloor || { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
     act('⧉', 'Copy', duplicateSelected),
+    act('⤓', '3D file', () => exportItemGLB(it)),
     act('↶', 'Undo', undo),
     act('🗑', 'Delete', removeSelected, 'danger'));
 
@@ -229,6 +230,11 @@ function itemSheet() {
           h('b', {}, String(it.p[k])),
           h('button', { 'aria-label': 'More', onclick: () => set(1), disabled: it.p[k] >= max }, '+')));
       }
+      if (it.type === 'uSectional') {
+        const u = uSectionalSize({ ...def.defaults, ...it.p });
+        pane.append(h('span', { class: 'badge ' + (u.nOtt <= TREMEE.ottomans && it.p.seats === 5 ? 'ok' : 'warn') },
+          u.nOtt <= TREMEE.ottomans && it.p.seats === 5 ? `Uses the boxed set: 5 seats, ${u.nOtt} of 3 ottomans` : `Needs ${it.p.seats} seats and ${u.nOtt} ottomans (the box has 5 and 3)`));
+      }
       for (const [k, label, opts] of def.options || []) {
         pane.append(h('h4', {}, label), h('div', { class: 'opts' }, opts.map(([val, text]) => big(val, text, it.p[k], () => edit(() => { it.p[k] = val; })))));
       }
@@ -241,7 +247,7 @@ function itemSheet() {
     }
     const price = piecePrice(it, s), weeks = pieceWeeks(it, s);
     if (price) pane.append(h('p', { class: 'note' }, `Indicative ${moneyRange(...price)}${weeks ? ` · ${weeks[0]}–${weeks[1]} wk` : ''}`));
-    if (it.type === 'uSectional') pane.append(h('p', { class: 'note' }, 'Sizes are estimates from the Wayfair photo (the listing has no drawing). Check them against the product page and adjust under Size.'));
+    if (it.type === 'uSectional') pane.append(h('p', { class: 'note' }, `Sizes from Wayfair's dimension sheet: ${pieceSize(it, s).text}. 24.8″ modules, 5.1″ arms, 17.7″ seat height, 18.9″ usable seat depth.`));
     if (hasOverrides(it)) pane.append(h('button', { class: 'btn', onclick: () => edit(() => { delete it.s; }) }, `Reset to the ${STYLE_SETS[activeSetId()].name} look`));
   };
   const tabbar = h('nav', { class: 'sheet-tabs', role: 'tablist' }, tabs.map(([k, label]) => {
@@ -261,7 +267,7 @@ function addSheet(at) {
   const pick = (type, extra) => { closeSheet(); addItem(type, at, extra); };
   const featured = h('div', { class: 'feature' },
     h('button', { class: 'feature-main', onclick: () => pick('uSectional') },
-      h('span', { class: 'tag' }, 'From Wayfair'), h('b', {}, 'Tremee U-sectional'), h('small', {}, '5 storage seats, 2 chaises, loose ottoman · sleeper')),
+      h('span', { class: 'tag' }, 'From Wayfair'), h('b', {}, 'Tremee U-sectional'), h('small', {}, '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper')),
     h('div', { class: 'feature-sw' }, WAYFAIR_FABRICS.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
       onclick: () => pick('uSectional', { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.'))))));
   const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && t !== 'uSectional').map((t) =>
