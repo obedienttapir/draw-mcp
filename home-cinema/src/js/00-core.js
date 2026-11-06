@@ -83,6 +83,10 @@ const DEFAULT_STATE = {
     hallDepth: 86,         // its east wall, from the stairs south to the far wall (green; closet door on it)
     hallWidth: 93,         // its far wall, from the wall the stairs face to the east wall (red; door on it)
     closetDoor: 28,        // the closet door opening on the east wall starts this far from the far wall
+    // the wall the stairs face (west side of the landing + hallway), from its corner with the main room:
+    westWall: 52,          // solid for 4'-4", then
+    westOpen: 69,          // a 5'-9" opening through to the rest of the basement
+    westRun: 36,           // how much of the passage beyond to show (estimate; it carries on past this)
     hallEnd: 138,
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },
@@ -97,7 +101,7 @@ const DEFAULT_STATE = {
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
-  rev: 4,                 // room-measurement revision; older saved layouts get the corrected room
+  rev: 5,                 // room-measurement revision; older saved layouts get the corrected room
   style: { set: 'warm-modern' },                          // furniture style set (pieces can override it in item.s)
   // the owner's evaluation of the sets: kept out of undo, travels with the layout code
   study: { weights: { ...DEFAULT_WEIGHTS }, ratings: {}, notes: {}, shortlist: [], pick: null },
@@ -172,8 +176,14 @@ function geom(r = state.room) {
   // floor outline, counter-clockwise (interior on the left of each edge)
   // the landing and the open hallway behind the stairs are part of the floor
   const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallWidth ? r.boxX + r.hallWidth : r.hallEnd, r.boxX + 24, r.width - 1);
+  // the opening in the wall the stairs face, with a short stub of the passage beyond (its far end is left open)
+  const oy0 = clamp(-(r.westWall ?? 0), hallY + 1, 0), oy1 = clamp(oy0 - (r.westOpen ?? 0), hallY, oy0);
+  const runX = r.boxX - clamp(r.westRun ?? 36, 6, r.boxX - 1);
+  const westOpening = oy0 - oy1 > 6
+    ? [[r.boxX, oy0], [runX, oy0], [runX, oy1], ...(oy1 > hallY + 0.5 ? [[r.boxX, oy1]] : [])] : [];
+  const openEdge = westOpening.length ? [[runX, oy0], [runX, oy1]] : null;
   const outline = [
-    [0, 0], [r.boxX, 0], [r.boxX, hallY], [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
+    [0, 0], [r.boxX, 0], ...westOpening, ...(westOpening.length && oy1 <= hallY + 0.5 ? [] : [[r.boxX, hallY]]), [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
     [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, westY],
   ];
   const riserH = r.floorToFloor / r.risers;
@@ -183,7 +193,7 @@ function geom(r = state.room) {
   const kneeX = clamp(r.width - (r.stairPanel ?? r.width - r.stairStart), r.stairStart, wallX);
   // tread run: the panel top (bottom of the 9″ stringer, 8½″ under the nosing line) is stairKnee up at wallX
   const run = r.stairKnee ? clamp(riserH * (wallX - r.stairStart) / (r.stairKnee + 8.5), 7, 12) : Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX };
+  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX, openEdge, oy0, oy1, runX };
 }
 
 // ---------------- persistence + history ----------------

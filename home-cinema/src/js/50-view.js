@@ -269,6 +269,11 @@ function updateLabels() {
     dimLine([0, G.hallY - 24], [r.width, G.hallY - 24], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
     dimLine([r.boxX, -r.stairWidth / 2], [r.stairStart, -r.stairWidth / 2], zz, ftin(r.stairStart - r.boxX));
     label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 30, zz), 'tag');
+    if (G.openEdge) {                                   // the wall the stairs face: solid part, then the opening
+      dimLine([r.boxX + 7, 0], [r.boxX + 7, G.oy0], zz, ftin(-G.oy0));
+      dimLine([r.boxX + 7, G.oy0], [r.boxX + 7, G.oy1], zz, `opening ${ftin(G.oy0 - G.oy1)}`);
+      label('to the rest of the basement →', P(G.runX + 6, (G.oy0 + G.oy1) / 2, zz), 'tag', -90);
+    }
     // your marks: the wall facing the TV (pink: solid part, blue: to the panel under the stairs) and the hallway (green, red)
     dimLine([G.wallX, -6], [r.width, -6], zz, `solid wall ${ftin(r.width - G.wallX)}`);
     dimLine([G.kneeX, -18], [r.width, -18], zz, `to stair panel ${ftin(r.width - G.kneeX)}`, 0.3);

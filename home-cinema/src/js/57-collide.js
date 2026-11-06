@@ -119,9 +119,11 @@ function wallSnap(x, y) {
   const G = geom(), o = G.outline; let best = null;
   const edges = o.map((a, i) => [a, o[(i + 1) % o.length]]);
   if (G.wallX < state.room.width - 0.5) edges.push([[G.wallX, 0], [state.room.width, 0]]);   // the solid wall facing the TV (room side)
+  const oe = G.openEdge;
   for (const [a, b] of edges) {
     const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
     if (len < 6) continue;
+    if (oe && a[0] === oe[0][0] && a[1] === oe[0][1] && b[0] === oe[1][0] && b[1] === oe[1][1]) continue;   // open: not a wall
     const ux = dx / len, uy = dy / len, t = clamp((x - a[0]) * ux + (y - a[1]) * uy, 0, len);
     const px = a[0] + ux * t, py = a[1] + uy * t, dist = Math.hypot(x - px, y - py);
     if (!best || dist < best.dist) best = { a, len, t, ux, uy, nx: -uy, ny: ux, dist };   // interior is on the left of each edge

@@ -208,6 +208,9 @@ function renderRoomTab() {
     rs('hallDepth', 'Hallway east wall, closet side (green)', 30, 140),
     rs('hallWidth', 'Hallway far wall, door side (red)', 30, Math.round(r.width - r.boxX - 1)),
     rs('closetDoor', 'Closet door opening from the far wall', 0, Math.max(1, Math.round(r.hallDepth - 32))),
+    rs('westWall', 'Wall the stairs face, corner → opening', 0, Math.round(r.stairWidth + r.hallDepth - 12)),
+    rs('westOpen', 'Opening to the rest of the basement', 0, Math.round(r.stairWidth + r.hallDepth)),
+    rs('westRun', 'Passage shown beyond the opening (estimate)', 6, Math.max(7, r.boxX - 1)),
     h('p', { class: 'note' }, 'Measured from the exterior-wall corner along the wall facing the TV, and around the hallway behind the stairs. The orange height sets the stair slope.')));
   root.append(group('From the plan and photos',
     rs('bayFace', 'TV wall width', 60, 110),

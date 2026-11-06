@@ -110,6 +110,8 @@ function buildRoom() {
     const p = o[i], q = o[(i + 1) % o.length];
     const isFireplaceWall = p[0] === 0 && q[0] === 0;
     if (isFireplaceWall) continue;                       // built with openings below
+    const oe = G.openEdge;                               // the passage to the rest of the basement carries on: no wall there
+    if (oe && p[0] === oe[0][0] && p[1] === oe[0][1] && q[0] === oe[1][0] && q[1] === oe[1][1]) continue;
     const inBay = G.bay.some((b) => b[0] === p[0] && b[1] === p[1]) && G.bay.some((b) => b[0] === q[0] && b[1] === q[1]);
     const mat = inBay && state.finish.bayAccent !== 'paint-wall' ? M.accent : M.wall;
     const segs = [[p, q]];

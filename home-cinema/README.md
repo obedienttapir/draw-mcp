@@ -21,6 +21,7 @@ It starts in **Fast** display mode so it runs smoothly on older laptops and phon
 | Steel beam bump | 18″ wide and 12″ deep on the north wall of the fireplace pocket: its face is 9′-11″ from the pocket's south wall; beam line 33″ from the fireplace wall | tape measure, plan, photos |
 | Stairs | 40″ wide along the staircase wall, 16 risers; bottom step 3′-11″ from the wall in front; tip of the stairs 11′-6″ from the exterior wall; open on the far side with a railing over the hallway | tape measure, photos |
 | Wall facing the TV (stairs' room side) | solid floor to ceiling for 91″ from the exterior-wall corner (pink); the panel under the stairs meets the floor 128″ from the corner (blue) and is 31″ high where the solid wall ends (orange); open with a railing above the panel | tape measure |
+| Wall the stairs face (west side of the landing and hallway) | solid for 4′-4″ from its corner with the main room, then a 5′-9″ opening through to the rest of the basement; the planner shows a 3′ stub of the passage beyond (an estimate), open at the far end | tape measure |
 | Stair slope | set by that 31″ panel height: about 8¾″ tread run with 7⅝″ risers | from the tape numbers |
 | Hallway behind the stairs | 93″ wide along its far wall, with a door (red) and 86″ along its east wall from the stairs, with the closet door's opening starting 2′-4″ from the far wall (green); open to the stairs under a railing | tape measure |
 | Fireplace + 2 windows | 52″ linear fireplace, two 42″ × 10″ reeded transoms above (openings already cut) | photos |

@@ -579,6 +579,10 @@ const DEFAULT_STATE = {
     hallDepth: 86,         // its east wall, from the stairs south to the far wall (green; closet door on it)
     hallWidth: 93,         // its far wall, from the wall the stairs face to the east wall (red; door on it)
     closetDoor: 28,        // the closet door opening on the east wall starts this far from the far wall
+    // the wall the stairs face (west side of the landing + hallway), from its corner with the main room:
+    westWall: 52,          // solid for 4'-4", then
+    westOpen: 69,          // a 5'-9" opening through to the rest of the basement
+    westRun: 36,           // how much of the passage beyond to show (estimate; it carries on past this)
     hallEnd: 138,
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },
@@ -593,7 +597,7 @@ const DEFAULT_STATE = {
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
-  rev: 4,                 // room-measurement revision; older saved layouts get the corrected room
+  rev: 5,                 // room-measurement revision; older saved layouts get the corrected room
   style: { set: 'warm-modern' },                          // furniture style set (pieces can override it in item.s)
   // the owner's evaluation of the sets: kept out of undo, travels with the layout code
   study: { weights: { ...DEFAULT_WEIGHTS }, ratings: {}, notes: {}, shortlist: [], pick: null },
@@ -668,8 +672,14 @@ function geom(r = state.room) {
   // floor outline, counter-clockwise (interior on the left of each edge)
   // the landing and the open hallway behind the stairs are part of the floor
   const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallWidth ? r.boxX + r.hallWidth : r.hallEnd, r.boxX + 24, r.width - 1);
+  // the opening in the wall the stairs face, with a short stub of the passage beyond (its far end is left open)
+  const oy0 = clamp(-(r.westWall ?? 0), hallY + 1, 0), oy1 = clamp(oy0 - (r.westOpen ?? 0), hallY, oy0);
+  const runX = r.boxX - clamp(r.westRun ?? 36, 6, r.boxX - 1);
+  const westOpening = oy0 - oy1 > 6
+    ? [[r.boxX, oy0], [runX, oy0], [runX, oy1], ...(oy1 > hallY + 0.5 ? [[r.boxX, oy1]] : [])] : [];
+  const openEdge = westOpening.length ? [[runX, oy0], [runX, oy1]] : null;
   const outline = [
-    [0, 0], [r.boxX, 0], [r.boxX, hallY], [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
+    [0, 0], [r.boxX, 0], ...westOpening, ...(westOpening.length && oy1 <= hallY + 0.5 ? [] : [[r.boxX, hallY]]), [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
     [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, westY],
   ];
   const riserH = r.floorToFloor / r.risers;
@@ -679,7 +689,7 @@ function geom(r = state.room) {
   const kneeX = clamp(r.width - (r.stairPanel ?? r.width - r.stairStart), r.stairStart, wallX);
   // tread run: the panel top (bottom of the 9″ stringer, 8½″ under the nosing line) is stairKnee up at wallX
   const run = r.stairKnee ? clamp(riserH * (wallX - r.stairStart) / (r.stairKnee + 8.5), 7, 12) : Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX };
+  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX, openEdge, oy0, oy1, runX };
 }
 
 // ---------------- persistence + history ----------------
@@ -1243,6 +1253,8 @@ function buildRoom() {
     const p = o[i], q = o[(i + 1) % o.length];
     const isFireplaceWall = p[0] === 0 && q[0] === 0;
     if (isFireplaceWall) continue;                       // built with openings below
+    const oe = G.openEdge;                               // the passage to the rest of the basement carries on: no wall there
+    if (oe && p[0] === oe[0][0] && p[1] === oe[0][1] && q[0] === oe[1][0] && q[1] === oe[1][1]) continue;
     const inBay = G.bay.some((b) => b[0] === p[0] && b[1] === p[1]) && G.bay.some((b) => b[0] === q[0] && b[1] === q[1]);
     const mat = inBay && state.finish.bayAccent !== 'paint-wall' ? M.accent : M.wall;
     const segs = [[p, q]];
@@ -3838,6 +3850,11 @@ function updateLabels() {
     dimLine([0, G.hallY - 24], [r.width, G.hallY - 24], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
     dimLine([r.boxX, -r.stairWidth / 2], [r.stairStart, -r.stairWidth / 2], zz, ftin(r.stairStart - r.boxX));
     label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 30, zz), 'tag');
+    if (G.openEdge) {                                   // the wall the stairs face: solid part, then the opening
+      dimLine([r.boxX + 7, 0], [r.boxX + 7, G.oy0], zz, ftin(-G.oy0));
+      dimLine([r.boxX + 7, G.oy0], [r.boxX + 7, G.oy1], zz, `opening ${ftin(G.oy0 - G.oy1)}`);
+      label('to the rest of the basement →', P(G.runX + 6, (G.oy0 + G.oy1) / 2, zz), 'tag', -90);
+    }
     // your marks: the wall facing the TV (pink: solid part, blue: to the panel under the stairs) and the hallway (green, red)
     dimLine([G.wallX, -6], [r.width, -6], zz, `solid wall ${ftin(r.width - G.wallX)}`);
     dimLine([G.kneeX, -18], [r.width, -18], zz, `to stair panel ${ftin(r.width - G.kneeX)}`, 0.3);
@@ -4360,9 +4377,11 @@ function wallSnap(x, y) {
   const G = geom(), o = G.outline; let best = null;
   const edges = o.map((a, i) => [a, o[(i + 1) % o.length]]);
   if (G.wallX < state.room.width - 0.5) edges.push([[G.wallX, 0], [state.room.width, 0]]);   // the solid wall facing the TV (room side)
+  const oe = G.openEdge;
   for (const [a, b] of edges) {
     const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
     if (len < 6) continue;
+    if (oe && a[0] === oe[0][0] && a[1] === oe[0][1] && b[0] === oe[1][0] && b[1] === oe[1][1]) continue;   // open: not a wall
     const ux = dx / len, uy = dy / len, t = clamp((x - a[0]) * ux + (y - a[1]) * uy, 0, len);
     const px = a[0] + ux * t, py = a[1] + uy * t, dist = Math.hypot(x - px, y - py);
     if (!best || dist < best.dist) best = { a, len, t, ux, uy, nx: -uy, ny: ux, dist };   // interior is on the left of each edge
@@ -5072,6 +5091,9 @@ function renderRoomTab() {
     rs('hallDepth', 'Hallway east wall, closet side (green)', 30, 140),
     rs('hallWidth', 'Hallway far wall, door side (red)', 30, Math.round(r.width - r.boxX - 1)),
     rs('closetDoor', 'Closet door opening from the far wall', 0, Math.max(1, Math.round(r.hallDepth - 32))),
+    rs('westWall', 'Wall the stairs face, corner → opening', 0, Math.round(r.stairWidth + r.hallDepth - 12)),
+    rs('westOpen', 'Opening to the rest of the basement', 0, Math.round(r.stairWidth + r.hallDepth)),
+    rs('westRun', 'Passage shown beyond the opening (estimate)', 6, Math.max(7, r.boxX - 1)),
     h('p', { class: 'note' }, 'Measured from the exterior-wall corner along the wall facing the TV, and around the hallway behind the stairs. The orange height sets the stair slope.')));
   root.append(group('From the plan and photos',
     rs('bayFace', 'TV wall width', 60, 110),
