@@ -187,19 +187,32 @@ function dragOnWall(it, obj) {
 }
 
 // ---------------- item operations ----------------
+/**
+ * Turn by `deg`, landing on the grid of that step: from 7°, +15 goes to 15° and +90 to 90°, so a piece
+ * that was ever at an odd angle can always get back to square.
+ */
 function rotateSelected(deg) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
+  const step = Math.abs(deg), r = it.rot, off = ((r % step) + step) % step;
+  const target = off < 0.01 || off > step - 0.01 ? r + deg : deg > 0 ? Math.ceil(r / step) * step : Math.floor(r / step) * step;
+  setRotation(it, target);
+}
+/** Turn a piece to an exact angle; if that swings it into a wall, slide it to the nearest spot where it fits. */
+function setRotation(it, deg) {
   if (isWallType(it.type)) { toast('Wall pieces turn with the wall: drag it onto another wall'); return; }
-  const rot = ((it.rot + deg) % 360 + 360) % 360;
+  const rot = ((Math.round(deg) % 360) + 360) % 360;
+  if (rot === it.rot) { toast(`Already at ${rot}°`); return; }
   let x = it.x, y = it.y;
-  if (fitsRoom(it) && !fitsRoom(it, x, y, rot)) {          // turning would swing it into a wall: shift it out a little, or refuse
+  if (fitsRoom(it) && !fitsRoom(it, x, y, rot)) {
     const p = nearestFit(it, x, y, rot);
-    if (!p || Math.hypot(p[0] - x, p[1] - y) > 30) { toast('No room to turn it here: move it away from the wall first'); return; }
+    if (!p) { toast('Too big to turn that way in this room'); return; }
     [x, y] = p;
   }
+  const moved = Math.hypot(x - it.x, y - it.y);
   pushHistory(); it.rot = rot; it.x = x; it.y = y;
   placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
+  toast(`Turned to ${rot}°` + (moved > 0.5 ? ` · shifted ${inch(moved)} to clear the wall` : ''));
 }
 function nudgeSelected(dx, dy) {
   if (!selected || selected.kind !== 'item') return;
@@ -239,7 +252,7 @@ function addItem(type, at, style) {
   pushHistory();
   const G = geom(), pos = at || { x: state.room.width * 0.55, y: G.mainY * 0.5 };
   const it = { id: uid(type), type, x: pos.x, y: pos.y, rot: 0, p: clone(def.defaults) };
-  if (SEATING[type]) it.rot = facing(it, G.tvX + state.tv.offset, state.room.depth);
+  if (SEATING[type]) it.rot = squareFacing(it, G.tvX + state.tv.offset, state.room.depth);   // square to the TV wall
   else if (type === 'console') it.rot = 180;
   state.items.push(it);
   if (style) for (const [k, v] of Object.entries(style)) setStyleKey(it, k, v);

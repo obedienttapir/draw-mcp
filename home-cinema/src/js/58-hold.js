@@ -186,10 +186,12 @@ function renderSheet() {
 const SEATING = { prettySectional: 1, uSectional: 1, sectional: 1, sofa: 1, recliner: 1, loungeChair: 1 };
 /** The turn (degrees) that points a piece's front at plan point (tx, ty). */
 const facing = (it, tx, ty) => ((Math.round(Math.atan2(-(tx - it.x), ty - it.y) / DEG) % 360) + 360) % 360;
+/** The square turn (0 / 90 / 180 / 270) that points a piece's front most directly at (tx, ty): square to that wall. */
+const squareFacing = (it, tx, ty) => (Math.round(facing(it, tx, ty) / 90) * 90) % 360;
 function turnTo(rot) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
-  rotateSelected(rot - it.rot);
+  setRotation(it, rot);
 }
 /** After a change of size or layout: if the piece now pokes into a wall, nudge it to the nearest spot that fits. */
 function settleItem(it) {
@@ -234,8 +236,8 @@ function itemSheet() {
       act('⟳', '15°', () => rotateSelected(-15)),
       act('↻', '90°', () => rotateSelected(90)),
     ]),
-    SEATING[it.type] ? act('▣', 'Face TV', () => turnTo(facing(it, ...tv))) : null,
-    SEATING[it.type] ? act('♨', 'Face fire', () => turnTo(facing(it, 0, state.fireplace.center))) : null,
+    SEATING[it.type] ? act('▣', 'Face TV', () => turnTo(squareFacing(it, ...tv))) : null,
+    SEATING[it.type] ? act('♨', 'Face fire', () => turnTo(squareFacing(it, 0, state.fireplace.center))) : null,
     it.type === 'rug' ? act('＋', 'Add here', () => { const at = lastHoldFloor || { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
     act('⧉', 'Copy', duplicateSelected),
     act('⤓', '3D file', () => exportItemGLB(it)),
