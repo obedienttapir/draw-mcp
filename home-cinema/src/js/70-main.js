@@ -11,7 +11,7 @@ const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.5, 0.55, 0.
 composer.addPass(renderPass); composer.addPass(bloomPass); composer.addPass(new OutputPass());
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); initStyleUI(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));

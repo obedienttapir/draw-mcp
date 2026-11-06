@@ -83,17 +83,19 @@ const WOOD_PARTS = { roundTable: ['pedestal', 'slab', 'frame'], console: ['slatt
 const METAL_PARTS = { floorLamp: ['drum', 'arc', 'tripod', 'globe'], roundTable: ['tulip', 'frame'], console: ['fluted', 'frame', 'credenza'], sideTable: ['ctable'],
   loungeChair: ['sling', 'swivel'], barCart: ['classic'] };
 const STONE_PARTS = { roundTable: ['tulip', 'drum'], sideTable: ['pedestal'], floorLamp: ['arc'] };
+/** Override one style key on a piece (dropping it when it matches the set). The caller rebuilds the piece. */
+function setStyleKey(it, k, v) {
+  const s = resolveSpec(it), base = resolveSpec(it, activeSetId(), false);
+  it.s = { ...(it.s || {}) };
+  if (v === base[k]) delete it.s[k]; else it.s[k] = v;
+  if (k === 'cover' && COVER_COLORS[v] && !COVER_COLORS[v].some(([c]) => c.toLowerCase() === String(s.color).toLowerCase())) {   // keep a colour the new cover comes in
+    const c = COVER_COLORS[v][0][0]; if (c === base.color) delete it.s.color; else it.s.color = c;
+  }
+  if (!Object.keys(it.s).length) delete it.s;
+}
 function styleControls(it) {
-  const s = resolveSpec(it), base = resolveSpec(it, activeSetId(), false), vars = VARIANTS[it.type];
-  const setKey = (k, v) => {
-    it.s = { ...(it.s || {}) };
-    if (v === base[k]) delete it.s[k]; else it.s[k] = v;
-    if (k === 'cover' && COVER_COLORS[v] && !COVER_COLORS[v].some(([c]) => c === s.color)) {   // keep a colour the new cover comes in
-      const c = COVER_COLORS[v][0][0]; if (c === base.color) delete it.s.color; else it.s.color = c;
-    }
-    if (!Object.keys(it.s).length) delete it.s;
-    buildItem(it); updateLighting(); drawOutline(); renderStyleTab();
-  };
+  const s = resolveSpec(it), vars = VARIANTS[it.type];
+  const setKey = (k, v) => { setStyleKey(it, k, v); buildItem(it); updateLighting(); drawOutline(); renderStyleTab(); };
   const row = (label, el) => h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, label)), el);
   const out = [];
   if (vars) out.push(row('Style', chips('Style', Object.entries(vars).map(([k, v]) => [k, v.label]), s.variant, (v) => setKey('variant', v))));

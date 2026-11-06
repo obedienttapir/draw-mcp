@@ -22,6 +22,8 @@ const COVERS = {
     spec: 'Semi-aniline top-grain leather; wipes clean, takes a patina, scratches show' },
   natural: { label: 'Washed linen', kind: 'linen', sheen: 0, durability: 2, care: 2, pets: 2, absorb: 4, factor: 1.05, weeks: 1,
     spec: 'Stone-washed linen on a removable slipcover; creases by design' },
+  corduroy: { label: 'Jumbo corduroy', kind: 'corduroy', sheen: 0.15, durability: 4, care: 3, pets: 3, absorb: 4, factor: 1.0, weeks: 0,
+    spec: 'Polyester jumbo-wale corduroy, about 35,000 double rubs, cleaning code S; brush the pile after spills' },
   knit:    { label: 'Chunky wool knit', kind: 'knit', sheen: 0, durability: 2, care: 2, pets: 1, absorb: 5, factor: 1.0, weeks: 0,
     spec: 'Hand-knit wool cover over bead fill' },
 };
@@ -34,6 +36,7 @@ const COVER_COLORS = {
   velvet:  [['#2e4a3c', 'Forest'], ['#2a3346', 'Midnight'], ['#b8895a', 'Camel'], ['#6e2f2f', 'Oxblood'], ['#c7a196', 'Blush'], ['#3a3633', 'Charcoal']],
   leather: [['#7a4a2a', 'Cognac'], ['#6b3f22', 'Saddle'], ['#5b4636', 'Chestnut'], ['#3a2a20', 'Chocolate'], ['#1f1c1a', 'Black']],
   natural: [['#b9ab94', 'Flax'], ['#a99a82', 'Sand'], ['#d8ccb6', 'Natural'], ['#8c7d68', 'Mushroom']],
+  corduroy: [['#2b3929', 'Green'], ['#cdbfa9', 'Light'], ['#7c7a76', 'Grey'], ['#a8814f', 'Camel'], ['#8a4a2e', 'Rust'], ['#2b3448', 'Navy'], ['#232220', 'Black']],
   knit:    [['#d8ccb6', 'Cream'], ['#8c7d68', 'Mushroom'], ['#c9bba5', 'Oat'], ['#3a3633', 'Charcoal']],
 };
 const WOOD_FINISHES = {
@@ -48,6 +51,15 @@ const STONE_FINISHES = { marble: 'White marble', travertine: 'Honed travertine',
 const AV_FINISHES = { black: 'Black ash', walnut: 'Walnut veneer', oak: 'Light oak veneer' };
 const RUG_COLORS = [['#6e6559', 'Taupe'], ['#7d7466', 'Sand'], ['#3d3833', 'Charcoal'], ['#2f2d2b', 'Graphite'], ['#8a7a64', 'Wheat'],
   ['#a68d68', 'Natural jute'], ['#d9cdb5', 'Cream'], ['#7b3f2e', 'Faded rust'], ['#3d4656', 'Indigo'], ['#2f5d5a', 'Teal'], ['#6b5a4a', 'Mink']];
+// the four fabrics Wayfair lists for the Latitude Run Tremee U-sectional (the 4th name is cut off in the listing: "Ligh…")
+const WAYFAIR_FABRICS = [
+  { label: 'Green Corduroy', cover: 'corduroy', color: '#2b3929' },
+  { label: 'Grey Polyester', cover: 'weave', color: '#8d8c88' },
+  { label: 'Grey Velvet', cover: 'velvet', color: '#4b4b4d' },
+  { label: 'Light Corduroy', cover: 'corduroy', color: '#cdbfa9' },
+];
+COVER_COLORS.weave.push(['#8d8c88', 'Grey']);
+COVER_COLORS.velvet.push(['#4b4b4d', 'Grey']);
 const colorName = (hex) => {
   const all = [...Object.values(COVER_COLORS).flat(), ...RUG_COLORS];
   const hit = all.find(([c]) => c.toLowerCase() === String(hex).toLowerCase());
@@ -132,8 +144,12 @@ const VARIANTS = {
     power: { label: 'Power recliner', desc: 'Power recline with adjustable headrest', H: 41, comfort: 5, hangout: 2, price: [1400, 2600], weeks: [6, 10] },
   },
 };
+VARIANTS.uSectional = {
+  tremee: { label: 'Tremee, as sold', desc: 'Latitude Run Tremee modular U-sectional: storage seats, two storage chaises and a loose ottoman that pull together into a sleeper', H: 31, comfort: 4, hangout: 5, price: [1500, 2900], weeks: [1, 3] },
+  cloud:  { label: 'Cloud pillow-back', desc: 'Same modules with overstuffed cloud cushions and a lower, plumper back', H: 29, comfort: 5, hangout: 5, price: [1900, 3400], weeks: [2, 5] },
+};
 VARIANTS.sofa = VARIANTS.sectional;                        // the straight sofa shares the sectional's styles
-const UPHOLSTERED = { sectional: 1, sofa: 1, loungeChair: 1, ottoman: 1, pouf: 1, recliner: 1 };
+const UPHOLSTERED = { uSectional: 1, sectional: 1, sofa: 1, loungeChair: 1, ottoman: 1, pouf: 1, recliner: 1 };
 const AV_TYPES = { towerSpeaker: 1, subwoofer: 1 };
 
 // ---------------- curated sets ----------------
@@ -241,12 +257,14 @@ const SET_IDS = Object.keys(STYLE_SETS);
 // ---------------- resolving a piece's style ----------------
 let previewSetId = null;                                   // set shown temporarily (compare thumbnails), ignoring overrides
 const activeSetId = () => previewSetId || (state.style && STYLE_SETS[state.style.set] ? state.style.set : 'warm-modern');
+// pieces the curated sets don't style yet wear their catalogue look in every set
+const PIECE_FALLBACK = { uSectional: { variant: 'tremee', cover: 'corduroy', color: '#2b3929' } };
 const STYLE_KEYS = ['variant', 'cover', 'color', 'color2', 'wood', 'metal', 'stone', 'finish'];
 
 /** The style of one placed piece: its set's choice (alternating per instance) plus the owner's overrides. */
 function resolveSpec(item, setId = activeSetId(), withOverrides = !previewSetId) {
   const set = STYLE_SETS[setId] || STYLE_SETS['warm-modern'];
-  const base = set.pieces[item.type] || {};
+  const base = set.pieces[item.type] || PIECE_FALLBACK[item.type] || {};
   const idx = state.items.filter((i) => i.type === item.type).indexOf(item);
   const pick = (v) => (Array.isArray(v) ? v[Math.max(0, idx) % v.length] : v);
   const s = {};
@@ -265,6 +283,7 @@ function pieceSize(item, s) {
   const p = { ...CATALOG[item.type].defaults, ...item.p }, v = (VARIANTS[item.type] || {})[s.variant] || {};
   switch (item.type) {
     case 'sectional': return { text: `${ftin(p.back)} × ${ftin(p.ret)} L, ${inch(p.depth)} deep, ${inch(v.H)} high`, run: p.back + p.ret - p.depth };
+    case 'uSectional': { const u = uSectionalSize(p); return { text: `${ftin(u.W)} W × ${ftin(u.D)} D × ${inch(v.H)} H, ${p.seats} seats`, run: u.W }; }
     case 'sofa': return { text: `${inch(p.w)} W × ${inch(p.depth)} D × ${inch(v.H)} H`, run: p.w };
     case 'rug': return { text: `${ftin(p.w)} × ${ftin(p.d)}`, sqft: (p.w * p.d) / 144 };
     case 'roundTable': {
@@ -291,7 +310,10 @@ function piecePrice(item, s) {
   const v = (VARIANTS[item.type] || {})[s.variant] || {}, size = pieceSize(item, s);
   const f = UPHOLSTERED[item.type] ? (COVERS[s.cover] || COVERS.linen).factor : 1;
   let lo, hi;
-  if (v.perIn) { const corner = item.type === 'sectional' ? 1.15 : 1; lo = v.perIn[0] * size.run * corner; hi = v.perIn[1] * size.run * corner; }
+  if (item.type === 'uSectional') {               // priced as the boxed set (5 seats + 3 ottomans); each extra seat ~ 1/8 of it
+    const k = (p0) => 1 + (p0.seats - 5) / 8, pp = { ...CATALOG.uSectional.defaults, ...item.p };
+    lo = v.price[0] * k(pp); hi = v.price[1] * k(pp);
+  } else if (v.perIn) { const corner = item.type === 'sectional' ? 1.15 : 1; lo = v.perIn[0] * size.run * corner; hi = v.perIn[1] * size.run * corner; }
   else if (v.perSqFt) { lo = v.perSqFt[0] * size.sqft; hi = v.perSqFt[1] * size.sqft; }
   else if (v.price) { lo = v.price[0] * (size.scale || 1); hi = v.price[1] * (size.scale || 1); }
   else return null;
@@ -351,19 +373,19 @@ function evaluateSet(setId, withOverrides = false) {
   const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
   const wmean = (pairs) => { const w = pairs.reduce((a, [, k]) => a + k, 0); return w ? pairs.reduce((a, [v, k]) => a + v * k, 0) / w : 0; };
   const of = (type) => rows.filter((r) => r.it.type === type);
-  const main = of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
+  const main = of('uSectional')[0] || of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
   const varOf = (r) => (VARIANTS[r.it.type] || {})[r.s.variant] || {};
   // movie comfort: main seating dominates; lounge chairs and a footrest add the rest
   const chairs = of('loungeChair'), foot = of('ottoman').length + of('pouf').length;
   const comfort = (main ? varOf(main).comfort * 0.6 : 2) + (chairs.length ? mean(chairs.map((r) => varOf(r).comfort)) * 0.25 : 0.75) + (foot ? 4 : 2.5) * 0.15;
   // screen contrast: luminance and sheen of what faces the screen, weighted by how much of it the screen sees
-  const W = { sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
+  const W = { uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
   const tones = rows.map((r) => [pieceTone(r.it, r.s), W[r.it.type] || 0]).filter(([t, k]) => t && k);
   const glare = wmean(tones.map(([[L, sh], k]) => [L + sh * 0.35, k]));
   const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
   // acoustics: absorption of soft surfaces by area (main seating and rugs dominate)
   const dims = (r) => ({ ...CATALOG[r.it.type].defaults, ...r.it.p });
-  const area = (r) => ({ sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
+  const area = (r) => ({ uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
   const absorbOf = (r) => (r.it.type === 'rug' ? varOf(r).absorb : (COVERS[r.s.cover] || {}).absorb);
   const acoustics = clamp(wmean(rows.filter((r) => area(r) && absorbOf(r)).map((r) => [absorbOf(r), area(r)])), 1, 5);
   // durability and care: upholstery by area
@@ -401,7 +423,7 @@ const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
 
 /** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
 function specRows(setId, withOverrides) {
-  const groups = new Map(), PREFIX = { sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
+  const groups = new Map(), PREFIX = { uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
     roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', plant: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
   for (const it of state.items) {
     const s = resolveSpec(it, setId, withOverrides), size = pieceSize(it, s), spec = pieceSpecText(it, s);

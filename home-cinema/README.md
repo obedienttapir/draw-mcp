@@ -37,6 +37,25 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
 - **Layout code**: copy the whole design as text to keep versions, paste one back to restore it. The latest layout is also saved in the browser.
 - **Hide menus** (`H`): hides every bar and panel so a phone shows only the 3D room. In this mode touches only move the camera (one finger turns, two fingers zoom and pan), so furniture can't be bumped by accident. Tap **Show menus** (or press `H` or `Esc`) to bring them back.
 
+## Press and hold (touch-first editing)
+
+Built for phones first; on by default and switchable under **Furnish › Press and hold to edit**.
+
+- **Hold a piece** (a ring fills under your finger, the phone buzzes): it lifts off the floor. Keep your finger down and drag to move it; let go and its menu slides up from the bottom.
+- **A quick tap never selects**, so one finger can orbit the room without bumping furniture. Tapping empty floor closes the menu.
+- **Hold the floor** to open **Add here**: the piece lands on that spot, seats turn to face the TV, and if it's too big for the spot it goes to the nearest place it fits. Holding a rug selects the rug; its menu has **Add here** too.
+- **The menu** is a thumb-sized bottom sheet: rotate 15° / 90°, **Face TV**, **Face fire**, copy, undo and delete, then tabs that appear only when the piece has them: **Colour** (large swatches), **Fabric** or **Finish**, **Style**, **Layout** (steppers and options such as seat count, chaises, sleeper mode) and **Size**. Swipe the grip down to close it, or up to make it taller.
+- **Walls are solid**: dragging, nudging, turning, copying and adding all keep a piece's footprint on the floor and clear of the stairs and the steel-beam bump. A drag into a wall stops at the wall and slides along it. Turning next to a wall shifts the piece out a little, or says there's no room. A piece that already overlaps a wall (an old layout) can be dragged free but never further in.
+
+## Wayfair Tremee U-sectional
+
+**U-sectional · Tremee** models the Latitude Run *Tremee U Shaped Sectional Sofa Sleeper Sofa Couch With Storage* from Wayfair: a back row of square storage seats with track arms on the end seats, two storage-ottoman chaises in front of the end seats, a loose ottoman in the middle, plump pillow backs and jumbo-wale corduroy (a new **Jumbo corduroy** cover).
+
+- **Fabric** offers the four Wayfair options: Green Corduroy, Grey Polyester, Grey Velvet and Light Corduroy (the listing cuts the fourth name off at "Ligh…"), plus every other cover in the planner.
+- **Layout**: 3–7 seats in the back row, chaises at both ends (U), left, right or none, the loose ottoman in front or put away, arms or armless, throw pillows on or off, and **Sleeper (bed)** mode, which pulls the ottomans in front of the middle seats to make one bed deck.
+- **Style**: *Tremee, as sold* or *Cloud pillow-back* (overstuffed cushions, lower back).
+- The listing has no dimensioned drawing, so sizes are estimates from the photo: 30″ modules, 33″ seat depth, 6″ arms, 31″ back height (13′-6″ × 8′-11″ as a 5-seat U with the loose ottoman out). Check them against the product page and change them under **Size**. The price is an indicative range, not Wayfair's.
+
 ## Furniture style study (phase two)
 
 The **Style** tab dresses the whole room in one of six curated furniture sets and helps you pick the best one:
@@ -91,6 +110,8 @@ src/js/40-furniture.js furniture catalogue and factories (every style variant)
 src/js/45-styles.js    style sets, upholstery library, prices, lead times, scoring, spec sheet rows
 src/js/50-view.js     renderer, cameras, presets, walk mode, plan dimensions, viewing maths
 src/js/55-edit.js     picking, dragging, measuring, keyboard
+src/js/57-collide.js  footprints, walls and obstacles: keeps furniture on the floor
+src/js/58-hold.js     press and hold gestures, the bottom-sheet furniture menu, Add here
 src/js/60-ui.js       design panel tabs
 src/js/62-style-ui.js  Style tab, per-piece style controls, compare view, spec sheet
 src/js/65-inspector.js details panel, layout code dialog

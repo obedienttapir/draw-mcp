@@ -36,7 +36,8 @@ function select(sel) {
   selected = sel && sel.kind !== 'room' ? sel : null;
   drawOutline();
   renderInspector();
-  if (selected && isNarrow()) openPanel('right');
+  if (selected && isNarrow() && !(holdMode() && selected.kind === 'item')) openPanel('right');
+  syncSheet();
 }
 function drawOutline() {
   disposeGroup(outline); invalidate(2);
@@ -96,9 +97,12 @@ function updateMeasureLabels() {
 const el = renderer.domElement;
 el.addEventListener('pointerdown', (e) => {
   el.focus({ preventScroll: true });
+  touches.add(e.pointerId);
+  if (touches.size > 1) { holdCancel(); return; }                     // pinch / two-finger pan: camera only
   down = { x: e.clientX, y: e.clientY, button: e.button, id: e.pointerId };
   if (mode === 'walk') { walk.dragging = true; walk.lx = e.clientX; walk.ly = e.clientY; el.setPointerCapture(e.pointerId); return; }
   if (e.button !== 0 || measure.on || viewOnly()) return;             // menus hidden: every touch just moves the camera
+  if (holdMode()) { holdStart(e); return; }                           // press and hold picks up; a tap never selects
   setRay(e);
   const hit = pick();
   if (hit && hit.kind === 'item') {
@@ -116,6 +120,7 @@ el.addEventListener('pointermove', (e) => {
     walk.yaw -= (e.clientX - walk.lx) * 0.0042; walk.pitch = clamp(walk.pitch - (e.clientY - walk.ly) * 0.0042, -1.2, 1.2);
     walk.lx = e.clientX; walk.ly = e.clientY; return;
   }
+  if (holdMove(e)) return;
   if (!drag) return;
   setRay(e);
   const fp = floorPoint(); if (!fp) return;
@@ -123,17 +128,27 @@ el.addEventListener('pointermove', (e) => {
   const nx = Math.round((drag.x0 + (fp.x - drag.f0.x)) * 2) / 2, ny = Math.round((drag.y0 - (fp.z - drag.f0.z)) * 2) / 2;
   if (!drag.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 4) return;
   drag.moved = true;
-  it.x = clamp(nx, -40, state.room.width + 40); it.y = clamp(ny, -state.room.stairWidth - 40, state.room.depth + 40);
-  placeItem(obj.group, it); syncOutline();
+  // walls stop the piece; it slides along them instead of passing through
+  [it.x, it.y] = resolveMove(it, clamp(nx, -40, state.room.width + 40), clamp(ny, -state.room.stairWidth - 40, state.room.depth + 40));
+  placeItem(obj.group, it); if (drag.fromHold) obj.group.position.y = 1.5;
+  syncOutline();
   renderInspectorLive();
 });
 el.addEventListener('pointerup', (e) => {
+  touches.delete(e.pointerId);
   const click = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5 && down.button === 0;
   if (mode === 'walk') { walk.dragging = false; down = null; return; }
+  const tapped = holdEnd(e);
   if (drag) {
-    if (drag.moved) { history.push(drag.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; commit(false); }
+    const d = drag;
+    if (d.moved) { history.push(d.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; }
     drag = null;
     controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
+    if (d.fromHold) { liftItem(d.id, false); buzz(8); }
+    if (d.moved) commit(false);
+    if (d.fromHold) openItemSheet(d.id);
+  } else if (holdMode() && !measure.on) {
+    if (tapped && click && !viewOnly()) holdTap(e);
   } else if (click && !viewOnly()) {
     setRay(e);
     const hit = pick();
@@ -144,19 +159,28 @@ el.addEventListener('pointerup', (e) => {
   }
   down = null;
 });
-el.addEventListener('pointercancel', () => { drag = null; down = null; walk.dragging = false; controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan'; });
+el.addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); holdCancel(); if (drag && drag.fromHold) liftItem(drag.id, false); drag = null; down = null; walk.dragging = false; controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan'; });
 
 // ---------------- item operations ----------------
 function rotateSelected(deg) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
-  pushHistory(); it.rot = ((it.rot + deg) % 360 + 360) % 360;
+  const rot = ((it.rot + deg) % 360 + 360) % 360;
+  let x = it.x, y = it.y;
+  if (fitsRoom(it) && !fitsRoom(it, x, y, rot)) {          // turning would swing it into a wall: shift it out a little, or refuse
+    const p = nearestFit(it, x, y, rot);
+    if (!p || Math.hypot(p[0] - x, p[1] - y) > 30) { toast('No room to turn it here: move it away from the wall first'); return; }
+    [x, y] = p;
+  }
+  pushHistory(); it.rot = rot; it.x = x; it.y = y;
   placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
 }
 function nudgeSelected(dx, dy) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
-  pushHistory(); it.x += dx; it.y += dy; placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
+  const [x, y] = resolveMove(it, it.x + dx, it.y + dy);
+  if (x === it.x && y === it.y) { toast('Against a wall'); return; }
+  pushHistory(); it.x = x; it.y = y; placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
 }
 function removeSelected() {
   if (!selected || selected.kind !== 'item') return;
@@ -171,16 +195,27 @@ function duplicateSelected() {
   const it = itemById(selected.id); if (!it) return;
   pushHistory();
   const copy = { ...clone(it), id: uid(it.type), x: it.x + 12, y: it.y - 12 };
-  state.items.push(copy); buildItem(copy); updateLighting(); select({ kind: 'item', id: copy.id }); commit(false);
+  state.items.push(copy); buildItem(copy);
+  const spot = nearestFit(copy, copy.x, copy.y); if (spot) { [copy.x, copy.y] = spot; placeItem(itemObjects.get(copy.id).group, copy); }
+  updateLighting(); select({ kind: 'item', id: copy.id }); commit(false);
 }
-function addItem(type) {
+/** Add a piece at plan point `at` (default: middle of the room). Seats turn to face the TV; it lands where it fits. */
+function addItem(type, at, style) {
   const def = CATALOG[type]; if (!def) return;
   pushHistory();
-  const G = geom();
-  const it = { id: uid(type), type, x: state.room.width * 0.55, y: G.mainY * 0.5, rot: 0, p: clone(def.defaults) };
-  state.items.push(it); buildItem(it); updateLighting();
+  const G = geom(), pos = at || { x: state.room.width * 0.55, y: G.mainY * 0.5 };
+  const it = { id: uid(type), type, x: pos.x, y: pos.y, rot: 0, p: clone(def.defaults) };
+  if (SEATING[type]) it.rot = facing(it, G.tvX + state.tv.offset, state.room.depth);
+  else if (type === 'console') it.rot = 180;
+  state.items.push(it);
+  if (style) for (const [k, v] of Object.entries(style)) setStyleKey(it, k, v);
+  buildItem(it);
+  let spot = nearestFit(it, it.x, it.y);
+  if (!spot && it.rot) { it.rot = 0; spot = nearestFit(it, it.x, it.y); }
+  if (spot) { [it.x, it.y] = spot; placeItem(itemObjects.get(it.id).group, it); }
+  updateLighting();
   select({ kind: 'item', id: it.id }); commit(false);
-  toast(`${def.label} added · drag it into place`);
+  toast(spot || fitsRoom(it) ? `${def.label} added · ${holdMode() ? 'press and hold to move it' : 'drag it into place'}` : `${def.label} added, but it is too big for this room`);
 }
 function undo() {
   const prev = history.pop(); $('#undoBtn').disabled = history.length === 0;

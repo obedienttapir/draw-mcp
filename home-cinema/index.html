@@ -38,7 +38,7 @@ body { font-family: var(--font-ui); font-size: 13px; line-height: 1.4; }
 #app { position: relative; height: 100%; overflow: hidden; background: var(--stage); }
 #stage { position: absolute; inset: 0; }
 #stage canvas { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
-#labels { position: absolute; inset: 0; pointer-events: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
@@ -293,6 +293,81 @@ table.spec tfoot td { border-bottom: 0; background: rgba(255,255,255,0.025); }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
+/* ---------- press and hold: progress ring + thumb-first bottom sheet ---------- */
+#stage canvas { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.holdring { position: absolute; z-index: 8; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(var(--brass) calc(var(--p, 0) * 1turn), rgba(255,255,255,0.12) 0);
+  -webkit-mask: radial-gradient(circle, transparent 25px, #000 26px); mask: radial-gradient(circle, transparent 25px, #000 26px);
+  animation: holdfill var(--hold, 420ms) linear forwards; opacity: 0.95; }
+.holdring.done { animation: holdpop 220ms ease-out forwards; }
+@property --p { syntax: '<number>'; inherits: false; initial-value: 0; }
+@keyframes holdfill { from { --p: 0; transform: scale(0.7); } to { --p: 1; transform: scale(1); } }
+@keyframes holdpop { from { --p: 1; transform: scale(1); opacity: 1; } to { --p: 1; transform: scale(1.5); opacity: 0; } }
+
+.sheet { position: absolute; left: 50%; bottom: 0; z-index: 7; width: min(560px, 100%); max-height: 56vh; display: flex; flex-direction: column;
+  transform: translate(-50%, 105%); transition: transform 220ms cubic-bezier(.2,.8,.2,1), max-height 220ms;
+  background: var(--panel-solid); border: 1px solid var(--line-strong); border-bottom: 0; border-radius: 18px 18px 0 0;
+  box-shadow: 0 -12px 40px rgba(0,0,0,0.5); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.sheet.open { transform: translate(-50%, 0); }
+.sheet.open[style*="translateY"] { transition: none; }
+.sheet.tall { max-height: 86vh; }
+.sheet-grip { flex: none; display: flex; justify-content: center; padding: 10px 0 6px; cursor: grab; touch-action: none; }
+.sheet-grip span { width: 44px; height: 5px; border-radius: 3px; background: var(--line-strong); }
+#sheetBody { min-height: 0; flex: 1; display: flex; flex-direction: column; }
+.sheet-inner { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.sheet-head { display: flex; align-items: flex-start; gap: 10px; padding: 0 16px 8px; }
+.sheet-titles { flex: 1; min-width: 0; }
+.sheet-head h2 { margin: 0; font-size: 17px; font-weight: 600; }
+.sheet-head p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet-head .badge { flex: none; margin-top: 2px; }
+.sheet-x { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; font-size: 14px; }
+.sheet-acts { display: flex; gap: 6px; overflow-x: auto; padding: 2px 16px 10px; scrollbar-width: none; flex: none; }
+.sheet-acts::-webkit-scrollbar, .sheet-tabs::-webkit-scrollbar { display: none; }
+.act { flex: none; min-width: 56px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); padding: 0 8px; }
+.act .ico { font-size: 19px; line-height: 1; }
+.act small { font-size: 11px; color: var(--muted); }
+.act:active { background: var(--brass-dim); border-color: var(--brass); }
+.act.danger .ico { filter: saturate(0.6); }
+.act.danger small { color: var(--bad); }
+.sheet-tabs { display: flex; gap: 4px; padding: 0 16px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; flex: none; }
+.sheet-tabs button { flex: none; min-height: 44px; padding: 0 14px; border: 0; background: none; color: var(--muted); font-weight: 500; border-bottom: 2px solid transparent; }
+.sheet-tabs button[aria-selected="true"] { color: var(--brass); border-bottom-color: var(--brass); }
+.sheet-pane { overflow-y: auto; padding: 12px 16px 18px; min-height: 0; flex: 1; overscroll-behavior: contain; }
+.sheet-pane h4 { margin: 12px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.sheet-pane h4:first-child { margin-top: 0; }
+.sheet-pane .note { margin: 10px 0 0; }
+.sheet-pane .btn { margin-top: 10px; min-height: 44px; }
+.sheet-pane input[type=range] { height: 32px; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { min-height: 44px; padding: 8px 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: rgba(255,255,255,0.03); display: inline-flex; align-items: center; gap: 8px; text-align: left; }
+.opt[aria-pressed="true"] { background: var(--brass-dim); border-color: var(--brass); color: var(--brass); }
+.opt .sw { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--line-strong); flex: none; }
+.opts.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.opt.card { flex-direction: column; align-items: flex-start; gap: 3px; padding: 10px 12px; }
+.opt.card small { color: var(--muted); font-size: 11.5px; line-height: 1.3; }
+.bigswatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px; }
+.bigsw { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; padding: 0; }
+.bigsw i { width: 52px; height: 52px; border-radius: 14px; background: var(--c); border: 1px solid var(--line-strong);
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0 3px, rgba(0,0,0,0.12) 3px 6px); }
+.bigsw small { font-size: 11px; color: var(--muted); }
+.bigsw[aria-pressed="true"] i { box-shadow: 0 0 0 2px var(--panel-solid), 0 0 0 4px var(--brass); }
+.bigsw.mini i { width: 40px; height: 40px; border-radius: 10px; }
+.stepper { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.stepper span { flex: 1; }
+.stepper button { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line-strong); background: rgba(255,255,255,0.04); font-size: 20px; }
+.stepper button:disabled { opacity: 0.35; }
+.stepper b { min-width: 24px; text-align: center; font-family: var(--font-num); font-size: 16px; }
+.feature { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: 14px; border: 1px solid var(--brass); background: var(--brass-dim); margin-bottom: 12px; flex-wrap: wrap; }
+.feature-main { flex: 1 1 180px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; background: none; border: 0; padding: 0; text-align: left; }
+.feature-main b { font-size: 15px; }
+.feature-main small { color: var(--muted); }
+.feature .tag { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brass); }
+.feature-sw { display: flex; gap: 8px; }
+.addgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+#app.focus .sheet { display: none; }
+@media (max-width: 520px) { .sheet { max-height: 62vh; } .sheet.tall { max-height: 90vh; } }
+
 </style>
 <script type="importmap">
 { "imports": {
@@ -362,6 +437,10 @@ table.spec tfoot td { border-bottom: 0; background: rgba(255,255,255,0.025); }
     </div>
   </div>
   <div class="hint" id="hint">Click furniture to select · drag to move · Q / E rotate · Del removes</div>
+ <section class="sheet" id="sheet" aria-hidden="true" aria-label="Furniture menu">
+    <div class="sheet-grip" title="Swipe down to close, tap to expand"><span></span></div>
+    <div id="sheetBody"></div>
+  </section>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <button class="restore" id="restoreBtn" hidden title="Show the menus again (H)">Show menus</button>
 
@@ -846,6 +925,21 @@ function bumpCanvas(kind) {
   return cv;
 }
 
+/** Corduroy: 24 rounded wales across the canvas (stripes vary along u, so wales run along v).
+ *  Bump (grey, linear) or colour multiplier (light, sRGB) for the same ridges. */
+function corduroyCanvas(asColor) {
+  const size = 256, cv = mkCanvas(size, size), g = cv.getContext('2d'), wales = 24, step = size / wales, r = rng(77);
+  for (let i = 0; i < wales; i++) {
+    const x = i * step, grd = g.createLinearGradient(x, 0, x + step, 0);
+    const lo = asColor ? '#b9b9b9' : '#2a2a2a', mid = asColor ? '#ffffff' : '#d8d8d8', hi = asColor ? '#efefef' : '#a8a8a8';
+    grd.addColorStop(0, lo); grd.addColorStop(0.18, hi); grd.addColorStop(0.5, mid); grd.addColorStop(0.82, hi); grd.addColorStop(1, lo);
+    g.fillStyle = grd; g.fillRect(x, 0, step + 0.5, size);
+  }
+  // pile: fine flecks so the ridges don't read as plastic
+  for (let k = 0; k < 2600; k++) { g.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)'; g.fillRect(r() * size, r() * size, 1, 1 + r() * 2); }
+  return cv;
+}
+
 function reededCanvas() {
   const cv = mkCanvas(256, 64), g = cv.getContext('2d');
   for (let x = 0; x < 256; x += 8) {
@@ -911,6 +1005,8 @@ function initMaterials() {
   TEX.tweed = canvasTex(bumpCanvas('tweed'), false, [3, 3]);
   TEX.leather = canvasTex(bumpCanvas('leather'), false, [2, 2]);
   TEX.knit = canvasTex(bumpCanvas('knit'), false, [2, 2]);
+  TEX.corduroy = canvasTex(corduroyCanvas(false), false);
+  TEX.corduroyMap = canvasTex(corduroyCanvas(true), true);
 
   M.wall = new THREE.MeshStandardMaterial({ color: state.finish.wall, roughness: 0.92, bumpMap: TEX.paint, bumpScale: 0.02 });
   M.accent = new THREE.MeshStandardMaterial({ color: '#2f2b28', roughness: 0.9 });
@@ -991,6 +1087,8 @@ function coverMat(cover, color) {
     if (kind === 'leather') return new THREE.MeshStandardMaterial({ color, roughness: 0.46, bumpMap: TEX.leather, bumpScale: 0.12 });
     if (kind === 'tweed') return new THREE.MeshStandardMaterial({ color, roughness: 0.96, bumpMap: TEX.tweed, bumpScale: 0.4 });
     if (kind === 'knit') return new THREE.MeshStandardMaterial({ color, roughness: 1, bumpMap: TEX.knit, bumpScale: 1.1 });
+    if (kind === 'corduroy') return new THREE.MeshPhysicalMaterial({ color, map: TEX.corduroyMap, bumpMap: TEX.corduroy, bumpScale: 0.9,
+      roughness: 0.88, sheen: 0.35, sheenRoughness: 0.6, sheenColor: shade(color, 0.12) });
     if (kind === 'weave') return new THREE.MeshStandardMaterial({ color, roughness: 0.97, bumpMap: TEX.linen, bumpScale: 0.16 });
     return fabricMat(color, kind === 'boucle' ? 'boucle' : 'linen');
   });
@@ -1888,6 +1986,18 @@ function instances(parent, geo, mat, list) {
 
 // style sets dress every piece, so the catalogue only carries geometry
 const CATALOG = {
+  uSectional: {
+    label: 'U-sectional · Tremee', note: 'Wayfair Latitude Run: modular, storage, sleeper',
+    defaults: { seats: 5, mw: 30, depth: 33, chaise: 'both', ottoman: 'front', arms: 'both', layout: 'sofa', pillows: 'on' },
+    params: [['seats', 'Seats in the back row', 3, 7, 'n'], ['mw', 'Module width', 26, 34], ['depth', 'Seat depth', 30, 38]],
+    options: [
+      ['layout', 'Mode', [['sofa', 'Sofa'], ['bed', 'Sleeper (bed)']]],
+      ['chaise', 'Chaises', [['both', 'Both ends (U)'], ['left', 'Left only'], ['right', 'Right only'], ['none', 'None']]],
+      ['ottoman', 'Loose ottoman', [['front', 'In front'], ['none', 'Put away']]],
+      ['arms', 'Arms', [['both', 'Both'], ['none', 'Armless']]],
+      ['pillows', 'Throw pillows', [['on', 'On'], ['off', 'Off']]],
+    ],
+  },
   sectional: {
     label: 'L-sectional', note: 'Six styles, return on either side', defaults: { back: 136, ret: 104, depth: 38, side: 'right' },
     params: [['back', 'Back length', 84, 180], ['ret', 'Return length', 60, 140], ['depth', 'Seat depth', 32, 44]],
@@ -2430,7 +2540,80 @@ function makeBarCart(p, item, s) {
   return { group: g, w, d, shadows: [[0, 0, w, d]] };
 }
 
+// ---------------- Tremee U-sectional (Wayfair, Latitude Run) ----------------
+// Modelled from the listing photo: a back row of square storage seats (track arms on the end seats),
+// two storage-ottoman chaises in front of the end seats (the U) and one loose ottoman in the middle.
+// Sleeper mode pulls the ottomans in front of the middle seats to make one bed deck.
+// Sizes are estimates for this class of modular corduroy sectional (the listing gives no drawing): edit them in Size.
+const U_GAP = 14;                                     // loose ottoman sits this far in front of the chaise line
+function uSectionalSize(p) {
+  const arm = p.arms === 'none' ? 0 : 6, n = Math.max(1, Math.round(p.seats)), W = n * p.mw + 2 * arm;
+  const nOtt = (p.chaise === 'both' ? 2 : p.chaise === 'none' ? 0 : 1) + (p.ottoman === 'front' ? 1 : 0);
+  const bed = p.layout === 'bed' && nOtt > 0;
+  const row = bed || p.chaise !== 'none';                        // a row of ottomans touching the seat fronts
+  const loose = !bed && p.ottoman === 'front';
+  const D = p.depth + (row ? p.mw : 0) + (loose ? (row ? U_GAP : 10) + p.mw : 0);
+  return { arm, n, W, D, nOtt, bed, row, loose };
+}
+function makeUSectional(p, item, s) {
+  const g = new THREE.Group(), u = uSectionalSize(p), { arm, n, W, D } = u, mw = p.mw, dep = p.depth;
+  const cloud = s.variant === 'cloud';
+  const fab = coverMat(s.cover, s.color), seam = coverMat(s.cover, css(shade(s.color, -0.25)));
+  const z0 = -D / 2, zf = z0 + dep;                          // back of the sofa, front of the seats
+  const feet = [], shadows = [];
+  const foot = (x, z) => feet.push([x, 0.75, z]);
+  const H = { deck: 9.5, seat: cloud ? 19 : 18, back: cloud ? 29 : 31, arm: 24 };
+  // ---- back row: one module per seat ----
+  for (let i = 0; i < n; i++) {
+    const xa = -W / 2 + arm + i * mw, xb = xa + mw, xc = (xa + xb) / 2;
+    span(g, fab, xa + 0.15, xb - 0.15, 1.5, H.deck, z0, zf, 1.5);                 // storage box
+    span(g, seam, xa + 0.6, xb - 0.6, H.deck - 0.35, H.deck, zf - 0.4, zf, 0.1);   // lid seam
+    span(g, fab, xa + 0.4, xb - 0.4, H.deck, H.seat, z0 + 6, zf + 0.6, cloud ? 4 : 3);  // seat cushion
+    span(g, fab, xa + 0.15, xb - 0.15, H.deck, 21, z0, z0 + 6, 2);                // low back frame
+    const bk = meshAt(rbox(mw - 1, H.back - H.seat + 3, cloud ? 11 : 9, cloud ? 5 : 4), fab, xc, (H.seat - 1 + H.back + 2) / 2, z0 + (cloud ? 6.5 : 5.5), g);
+    bk.rotation.x = -0.12;                                                        // loose back pillow leans back
+    for (const x of [xa + 2.5, xb - 2.5]) for (const z of [z0 + 2.5, zf - 2.5]) foot(x, z);
+  }
+  // ---- track arms on the end seats (each with its own small back pillow, as in the photo) ----
+  if (arm) for (const sx of [-1, 1]) {
+    const xa = sx < 0 ? -W / 2 : W / 2 - arm;
+    span(g, fab, xa, xa + arm, 1.5, H.arm, z0, zf, 2.5);
+    foot(xa + arm / 2, z0 + 2.5); foot(xa + arm / 2, zf - 2.5);
+  }
+  shadows.push([0, z0 + dep / 2, W, dep]);
+  // ---- ottomans: square storage cubes the size of a seat ----
+  const ottoman = (xc, zc) => {
+    const xa = xc - mw / 2, za = zc - mw / 2;
+    span(g, fab, xa + 0.2, xa + mw - 0.2, 1.5, H.deck, za + 0.2, za + mw - 0.2, 1.5);
+    span(g, seam, xa + 0.6, xa + mw - 0.6, H.deck - 0.35, H.deck, za + mw - 0.6, za + mw - 0.2, 0.1);
+    span(g, fab, xa + 0.4, xa + mw - 0.4, H.deck, H.seat - 0.5, za + 0.4, za + mw - 0.4, cloud ? 4 : 3);
+    for (const x of [xa + 2.5, xa + mw - 2.5]) for (const z of [za + 2.5, za + mw - 2.5]) foot(x, z);
+    shadows.push([xc, zc, mw, mw]);
+  };
+  const seatX = (i) => -W / 2 + arm + mw * (i + 0.5), rowZ = zf + mw / 2;
+  if (u.bed) {                                                   // all ottomans in front of the middle seats: one bed deck
+    const k = Math.min(u.nOtt, n), first = Math.floor((n - k) / 2);
+    for (let i = first; i < first + k; i++) ottoman(seatX(i), rowZ);
+  } else {
+    if (p.chaise === 'both' || p.chaise === 'left') ottoman(seatX(0), rowZ);
+    if (p.chaise === 'both' || p.chaise === 'right') ottoman(seatX(n - 1), rowZ);
+    if (u.loose) ottoman(0, D / 2 - mw / 2);
+  }
+  instances(g, new THREE.BoxGeometry(1.6, 1.5, 1.6), M.black, feet);
+  // ---- throw pillows like the listing photo: rust + floral on the left, cream + mustard plaid on the right ----
+  if (p.pillows !== 'off') {
+    const pm = (c) => coverMat('linen', c);
+    const sets = [[seatX(0), [['#8a5a3c', -0.35], ['#d9d0bd', 0.15]]], [seatX(n - 1), [['#d9d0bd', -0.15], ['#b39459', 0.35]]]];
+    for (const [x, list] of sets) list.forEach(([c, dx], k) => {
+      const m = meshAt(rbox(17, 16, 5, 2.5), pm(c), x + dx * mw * 0.6, H.seat + 8, z0 + 12 + k * 2.5, g);
+      m.rotation.y = -dx * 0.6; m.rotateX(-0.22);
+    });
+  }
+  return { group: g, w: W, d: D, shadows };
+}
+
 const FACTORIES = {
+  uSectional: makeUSectional,
   sectional: makeSectional, sofa: makeSofa, loungeChair: makeLoungeChair, roundTable: makeRoundTable, ottoman: makeOttoman,
   rug: makeRug, console: makeConsole, sideTable: makeSideTable, floorLamp: makeFloorLamp, plant: makePlant,
   towerSpeaker: makeTower, subwoofer: makeSub, recliner: makeRecliner, pouf: makePouf, barCart: makeBarCart,
@@ -2490,6 +2673,8 @@ const COVERS = {
     spec: 'Semi-aniline top-grain leather; wipes clean, takes a patina, scratches show' },
   natural: { label: 'Washed linen', kind: 'linen', sheen: 0, durability: 2, care: 2, pets: 2, absorb: 4, factor: 1.05, weeks: 1,
     spec: 'Stone-washed linen on a removable slipcover; creases by design' },
+  corduroy: { label: 'Jumbo corduroy', kind: 'corduroy', sheen: 0.15, durability: 4, care: 3, pets: 3, absorb: 4, factor: 1.0, weeks: 0,
+    spec: 'Polyester jumbo-wale corduroy, about 35,000 double rubs, cleaning code S; brush the pile after spills' },
   knit:    { label: 'Chunky wool knit', kind: 'knit', sheen: 0, durability: 2, care: 2, pets: 1, absorb: 5, factor: 1.0, weeks: 0,
     spec: 'Hand-knit wool cover over bead fill' },
 };
@@ -2502,6 +2687,7 @@ const COVER_COLORS = {
   velvet:  [['#2e4a3c', 'Forest'], ['#2a3346', 'Midnight'], ['#b8895a', 'Camel'], ['#6e2f2f', 'Oxblood'], ['#c7a196', 'Blush'], ['#3a3633', 'Charcoal']],
   leather: [['#7a4a2a', 'Cognac'], ['#6b3f22', 'Saddle'], ['#5b4636', 'Chestnut'], ['#3a2a20', 'Chocolate'], ['#1f1c1a', 'Black']],
   natural: [['#b9ab94', 'Flax'], ['#a99a82', 'Sand'], ['#d8ccb6', 'Natural'], ['#8c7d68', 'Mushroom']],
+  corduroy: [['#2b3929', 'Green'], ['#cdbfa9', 'Light'], ['#7c7a76', 'Grey'], ['#a8814f', 'Camel'], ['#8a4a2e', 'Rust'], ['#2b3448', 'Navy'], ['#232220', 'Black']],
   knit:    [['#d8ccb6', 'Cream'], ['#8c7d68', 'Mushroom'], ['#c9bba5', 'Oat'], ['#3a3633', 'Charcoal']],
 };
 const WOOD_FINISHES = {
@@ -2516,6 +2702,15 @@ const STONE_FINISHES = { marble: 'White marble', travertine: 'Honed travertine',
 const AV_FINISHES = { black: 'Black ash', walnut: 'Walnut veneer', oak: 'Light oak veneer' };
 const RUG_COLORS = [['#6e6559', 'Taupe'], ['#7d7466', 'Sand'], ['#3d3833', 'Charcoal'], ['#2f2d2b', 'Graphite'], ['#8a7a64', 'Wheat'],
   ['#a68d68', 'Natural jute'], ['#d9cdb5', 'Cream'], ['#7b3f2e', 'Faded rust'], ['#3d4656', 'Indigo'], ['#2f5d5a', 'Teal'], ['#6b5a4a', 'Mink']];
+// the four fabrics Wayfair lists for the Latitude Run Tremee U-sectional (the 4th name is cut off in the listing: "Ligh…")
+const WAYFAIR_FABRICS = [
+  { label: 'Green Corduroy', cover: 'corduroy', color: '#2b3929' },
+  { label: 'Grey Polyester', cover: 'weave', color: '#8d8c88' },
+  { label: 'Grey Velvet', cover: 'velvet', color: '#4b4b4d' },
+  { label: 'Light Corduroy', cover: 'corduroy', color: '#cdbfa9' },
+];
+COVER_COLORS.weave.push(['#8d8c88', 'Grey']);
+COVER_COLORS.velvet.push(['#4b4b4d', 'Grey']);
 const colorName = (hex) => {
   const all = [...Object.values(COVER_COLORS).flat(), ...RUG_COLORS];
   const hit = all.find(([c]) => c.toLowerCase() === String(hex).toLowerCase());
@@ -2600,8 +2795,12 @@ const VARIANTS = {
     power: { label: 'Power recliner', desc: 'Power recline with adjustable headrest', H: 41, comfort: 5, hangout: 2, price: [1400, 2600], weeks: [6, 10] },
   },
 };
+VARIANTS.uSectional = {
+  tremee: { label: 'Tremee, as sold', desc: 'Latitude Run Tremee modular U-sectional: storage seats, two storage chaises and a loose ottoman that pull together into a sleeper', H: 31, comfort: 4, hangout: 5, price: [1500, 2900], weeks: [1, 3] },
+  cloud:  { label: 'Cloud pillow-back', desc: 'Same modules with overstuffed cloud cushions and a lower, plumper back', H: 29, comfort: 5, hangout: 5, price: [1900, 3400], weeks: [2, 5] },
+};
 VARIANTS.sofa = VARIANTS.sectional;                        // the straight sofa shares the sectional's styles
-const UPHOLSTERED = { sectional: 1, sofa: 1, loungeChair: 1, ottoman: 1, pouf: 1, recliner: 1 };
+const UPHOLSTERED = { uSectional: 1, sectional: 1, sofa: 1, loungeChair: 1, ottoman: 1, pouf: 1, recliner: 1 };
 const AV_TYPES = { towerSpeaker: 1, subwoofer: 1 };
 
 // ---------------- curated sets ----------------
@@ -2709,12 +2908,14 @@ const SET_IDS = Object.keys(STYLE_SETS);
 // ---------------- resolving a piece's style ----------------
 let previewSetId = null;                                   // set shown temporarily (compare thumbnails), ignoring overrides
 const activeSetId = () => previewSetId || (state.style && STYLE_SETS[state.style.set] ? state.style.set : 'warm-modern');
+// pieces the curated sets don't style yet wear their catalogue look in every set
+const PIECE_FALLBACK = { uSectional: { variant: 'tremee', cover: 'corduroy', color: '#2b3929' } };
 const STYLE_KEYS = ['variant', 'cover', 'color', 'color2', 'wood', 'metal', 'stone', 'finish'];
 
 /** The style of one placed piece: its set's choice (alternating per instance) plus the owner's overrides. */
 function resolveSpec(item, setId = activeSetId(), withOverrides = !previewSetId) {
   const set = STYLE_SETS[setId] || STYLE_SETS['warm-modern'];
-  const base = set.pieces[item.type] || {};
+  const base = set.pieces[item.type] || PIECE_FALLBACK[item.type] || {};
   const idx = state.items.filter((i) => i.type === item.type).indexOf(item);
   const pick = (v) => (Array.isArray(v) ? v[Math.max(0, idx) % v.length] : v);
   const s = {};
@@ -2733,6 +2934,7 @@ function pieceSize(item, s) {
   const p = { ...CATALOG[item.type].defaults, ...item.p }, v = (VARIANTS[item.type] || {})[s.variant] || {};
   switch (item.type) {
     case 'sectional': return { text: `${ftin(p.back)} × ${ftin(p.ret)} L, ${inch(p.depth)} deep, ${inch(v.H)} high`, run: p.back + p.ret - p.depth };
+    case 'uSectional': { const u = uSectionalSize(p); return { text: `${ftin(u.W)} W × ${ftin(u.D)} D × ${inch(v.H)} H, ${p.seats} seats`, run: u.W }; }
     case 'sofa': return { text: `${inch(p.w)} W × ${inch(p.depth)} D × ${inch(v.H)} H`, run: p.w };
     case 'rug': return { text: `${ftin(p.w)} × ${ftin(p.d)}`, sqft: (p.w * p.d) / 144 };
     case 'roundTable': {
@@ -2759,7 +2961,10 @@ function piecePrice(item, s) {
   const v = (VARIANTS[item.type] || {})[s.variant] || {}, size = pieceSize(item, s);
   const f = UPHOLSTERED[item.type] ? (COVERS[s.cover] || COVERS.linen).factor : 1;
   let lo, hi;
-  if (v.perIn) { const corner = item.type === 'sectional' ? 1.15 : 1; lo = v.perIn[0] * size.run * corner; hi = v.perIn[1] * size.run * corner; }
+  if (item.type === 'uSectional') {               // priced as the boxed set (5 seats + 3 ottomans); each extra seat ~ 1/8 of it
+    const k = (p0) => 1 + (p0.seats - 5) / 8, pp = { ...CATALOG.uSectional.defaults, ...item.p };
+    lo = v.price[0] * k(pp); hi = v.price[1] * k(pp);
+  } else if (v.perIn) { const corner = item.type === 'sectional' ? 1.15 : 1; lo = v.perIn[0] * size.run * corner; hi = v.perIn[1] * size.run * corner; }
   else if (v.perSqFt) { lo = v.perSqFt[0] * size.sqft; hi = v.perSqFt[1] * size.sqft; }
   else if (v.price) { lo = v.price[0] * (size.scale || 1); hi = v.price[1] * (size.scale || 1); }
   else return null;
@@ -2819,19 +3024,19 @@ function evaluateSet(setId, withOverrides = false) {
   const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
   const wmean = (pairs) => { const w = pairs.reduce((a, [, k]) => a + k, 0); return w ? pairs.reduce((a, [v, k]) => a + v * k, 0) / w : 0; };
   const of = (type) => rows.filter((r) => r.it.type === type);
-  const main = of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
+  const main = of('uSectional')[0] || of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
   const varOf = (r) => (VARIANTS[r.it.type] || {})[r.s.variant] || {};
   // movie comfort: main seating dominates; lounge chairs and a footrest add the rest
   const chairs = of('loungeChair'), foot = of('ottoman').length + of('pouf').length;
   const comfort = (main ? varOf(main).comfort * 0.6 : 2) + (chairs.length ? mean(chairs.map((r) => varOf(r).comfort)) * 0.25 : 0.75) + (foot ? 4 : 2.5) * 0.15;
   // screen contrast: luminance and sheen of what faces the screen, weighted by how much of it the screen sees
-  const W = { sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
+  const W = { uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
   const tones = rows.map((r) => [pieceTone(r.it, r.s), W[r.it.type] || 0]).filter(([t, k]) => t && k);
   const glare = wmean(tones.map(([[L, sh], k]) => [L + sh * 0.35, k]));
   const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
   // acoustics: absorption of soft surfaces by area (main seating and rugs dominate)
   const dims = (r) => ({ ...CATALOG[r.it.type].defaults, ...r.it.p });
-  const area = (r) => ({ sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
+  const area = (r) => ({ uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
   const absorbOf = (r) => (r.it.type === 'rug' ? varOf(r).absorb : (COVERS[r.s.cover] || {}).absorb);
   const acoustics = clamp(wmean(rows.filter((r) => area(r) && absorbOf(r)).map((r) => [absorbOf(r), area(r)])), 1, 5);
   // durability and care: upholstery by area
@@ -2869,7 +3074,7 @@ const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
 
 /** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
 function specRows(setId, withOverrides) {
-  const groups = new Map(), PREFIX = { sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
+  const groups = new Map(), PREFIX = { uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
     roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', plant: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
   for (const it of state.items) {
     const s = resolveSpec(it, setId, withOverrides), size = pieceSize(it, s), spec = pieceSpecText(it, s);
@@ -3099,12 +3304,15 @@ function dimLine(a, b, z, text, at = 0.5) {         // at: where along the line 
 
 /** The eye point of the prime seat (plan x, y) on the main sofa, or null. */
 function mainSeat() {
-  const it = state.items.find((i) => i.type === 'sectional') || state.items.find((i) => i.type === 'sofa') || state.items.find((i) => i.type === 'recliner');
+  const it = state.items.find((i) => i.type === 'uSectional') || state.items.find((i) => i.type === 'sectional') || state.items.find((i) => i.type === 'sofa') || state.items.find((i) => i.type === 'recliner');
   if (!it) return null;
   const G = geom(), phi = it.rot * DEG, ex = [-Math.cos(phi), -Math.sin(phi)], ez = [-Math.sin(phi), Math.cos(phi)];
   const p = { ...CATALOG[it.type].defaults, ...it.p };
   let lx0, lx1, lz;
-  if (it.type === 'sectional') {
+  if (it.type === 'uSectional') {
+    const u = uSectionalSize(p);
+    lx0 = -u.W / 2 + u.arm + 12; lx1 = u.W / 2 - u.arm - 12; lz = -u.D / 2 + 22;
+  } else if (it.type === 'sectional') {
     const B = p.back, R = p.ret, d = p.depth;
     [lx0, lx1] = p.side === 'left' ? [-(B / 2 - 6), B / 2 - d] : [-B / 2 + d, B / 2 - 6];
     lz = -R / 2 + 22;
@@ -3250,7 +3458,8 @@ function select(sel) {
   selected = sel && sel.kind !== 'room' ? sel : null;
   drawOutline();
   renderInspector();
-  if (selected && isNarrow()) openPanel('right');
+  if (selected && isNarrow() && !(holdMode() && selected.kind === 'item')) openPanel('right');
+  syncSheet();
 }
 function drawOutline() {
   disposeGroup(outline); invalidate(2);
@@ -3310,9 +3519,12 @@ function updateMeasureLabels() {
 const el = renderer.domElement;
 el.addEventListener('pointerdown', (e) => {
   el.focus({ preventScroll: true });
+  touches.add(e.pointerId);
+  if (touches.size > 1) { holdCancel(); return; }                     // pinch / two-finger pan: camera only
   down = { x: e.clientX, y: e.clientY, button: e.button, id: e.pointerId };
   if (mode === 'walk') { walk.dragging = true; walk.lx = e.clientX; walk.ly = e.clientY; el.setPointerCapture(e.pointerId); return; }
   if (e.button !== 0 || measure.on || viewOnly()) return;             // menus hidden: every touch just moves the camera
+  if (holdMode()) { holdStart(e); return; }                           // press and hold picks up; a tap never selects
   setRay(e);
   const hit = pick();
   if (hit && hit.kind === 'item') {
@@ -3330,6 +3542,7 @@ el.addEventListener('pointermove', (e) => {
     walk.yaw -= (e.clientX - walk.lx) * 0.0042; walk.pitch = clamp(walk.pitch - (e.clientY - walk.ly) * 0.0042, -1.2, 1.2);
     walk.lx = e.clientX; walk.ly = e.clientY; return;
   }
+  if (holdMove(e)) return;
   if (!drag) return;
   setRay(e);
   const fp = floorPoint(); if (!fp) return;
@@ -3337,17 +3550,27 @@ el.addEventListener('pointermove', (e) => {
   const nx = Math.round((drag.x0 + (fp.x - drag.f0.x)) * 2) / 2, ny = Math.round((drag.y0 - (fp.z - drag.f0.z)) * 2) / 2;
   if (!drag.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 4) return;
   drag.moved = true;
-  it.x = clamp(nx, -40, state.room.width + 40); it.y = clamp(ny, -state.room.stairWidth - 40, state.room.depth + 40);
-  placeItem(obj.group, it); syncOutline();
+  // walls stop the piece; it slides along them instead of passing through
+  [it.x, it.y] = resolveMove(it, clamp(nx, -40, state.room.width + 40), clamp(ny, -state.room.stairWidth - 40, state.room.depth + 40));
+  placeItem(obj.group, it); if (drag.fromHold) obj.group.position.y = 1.5;
+  syncOutline();
   renderInspectorLive();
 });
 el.addEventListener('pointerup', (e) => {
+  touches.delete(e.pointerId);
   const click = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5 && down.button === 0;
   if (mode === 'walk') { walk.dragging = false; down = null; return; }
+  const tapped = holdEnd(e);
   if (drag) {
-    if (drag.moved) { history.push(drag.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; commit(false); }
+    const d = drag;
+    if (d.moved) { history.push(d.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; }
     drag = null;
     controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
+    if (d.fromHold) { liftItem(d.id, false); buzz(8); }
+    if (d.moved) commit(false);
+    if (d.fromHold) openItemSheet(d.id);
+  } else if (holdMode() && !measure.on) {
+    if (tapped && click && !viewOnly()) holdTap(e);
   } else if (click && !viewOnly()) {
     setRay(e);
     const hit = pick();
@@ -3358,19 +3581,28 @@ el.addEventListener('pointerup', (e) => {
   }
   down = null;
 });
-el.addEventListener('pointercancel', () => { drag = null; down = null; walk.dragging = false; controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan'; });
+el.addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); holdCancel(); if (drag && drag.fromHold) liftItem(drag.id, false); drag = null; down = null; walk.dragging = false; controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan'; });
 
 // ---------------- item operations ----------------
 function rotateSelected(deg) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
-  pushHistory(); it.rot = ((it.rot + deg) % 360 + 360) % 360;
+  const rot = ((it.rot + deg) % 360 + 360) % 360;
+  let x = it.x, y = it.y;
+  if (fitsRoom(it) && !fitsRoom(it, x, y, rot)) {          // turning would swing it into a wall: shift it out a little, or refuse
+    const p = nearestFit(it, x, y, rot);
+    if (!p || Math.hypot(p[0] - x, p[1] - y) > 30) { toast('No room to turn it here: move it away from the wall first'); return; }
+    [x, y] = p;
+  }
+  pushHistory(); it.rot = rot; it.x = x; it.y = y;
   placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
 }
 function nudgeSelected(dx, dy) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
-  pushHistory(); it.x += dx; it.y += dy; placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
+  const [x, y] = resolveMove(it, it.x + dx, it.y + dy);
+  if (x === it.x && y === it.y) { toast('Against a wall'); return; }
+  pushHistory(); it.x = x; it.y = y; placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
 }
 function removeSelected() {
   if (!selected || selected.kind !== 'item') return;
@@ -3385,16 +3617,27 @@ function duplicateSelected() {
   const it = itemById(selected.id); if (!it) return;
   pushHistory();
   const copy = { ...clone(it), id: uid(it.type), x: it.x + 12, y: it.y - 12 };
-  state.items.push(copy); buildItem(copy); updateLighting(); select({ kind: 'item', id: copy.id }); commit(false);
+  state.items.push(copy); buildItem(copy);
+  const spot = nearestFit(copy, copy.x, copy.y); if (spot) { [copy.x, copy.y] = spot; placeItem(itemObjects.get(copy.id).group, copy); }
+  updateLighting(); select({ kind: 'item', id: copy.id }); commit(false);
 }
-function addItem(type) {
+/** Add a piece at plan point `at` (default: middle of the room). Seats turn to face the TV; it lands where it fits. */
+function addItem(type, at, style) {
   const def = CATALOG[type]; if (!def) return;
   pushHistory();
-  const G = geom();
-  const it = { id: uid(type), type, x: state.room.width * 0.55, y: G.mainY * 0.5, rot: 0, p: clone(def.defaults) };
-  state.items.push(it); buildItem(it); updateLighting();
+  const G = geom(), pos = at || { x: state.room.width * 0.55, y: G.mainY * 0.5 };
+  const it = { id: uid(type), type, x: pos.x, y: pos.y, rot: 0, p: clone(def.defaults) };
+  if (SEATING[type]) it.rot = facing(it, G.tvX + state.tv.offset, state.room.depth);
+  else if (type === 'console') it.rot = 180;
+  state.items.push(it);
+  if (style) for (const [k, v] of Object.entries(style)) setStyleKey(it, k, v);
+  buildItem(it);
+  let spot = nearestFit(it, it.x, it.y);
+  if (!spot && it.rot) { it.rot = 0; spot = nearestFit(it, it.x, it.y); }
+  if (spot) { [it.x, it.y] = spot; placeItem(itemObjects.get(it.id).group, it); }
+  updateLighting();
   select({ kind: 'item', id: it.id }); commit(false);
-  toast(`${def.label} added · drag it into place`);
+  toast(spot || fitsRoom(it) ? `${def.label} added · ${holdMode() ? 'press and hold to move it' : 'drag it into place'}` : `${def.label} added, but it is too big for this room`);
 }
 function undo() {
   const prev = history.pop(); $('#undoBtn').disabled = history.length === 0;
@@ -3448,6 +3691,411 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => walk.keys.delete(e.code));
 window.addEventListener('blur', () => walk.keys.clear());
+
+// ---- 57-collide.js ----
+// ===================================================================
+// 57 · Walls: furniture stays on the floor. A piece's footprint (its
+//      w × d box, turned with it) must sit inside the floor outline and
+//      clear the stairs and the steel-beam bump. Moves slide along a
+//      wall instead of passing through it.
+// ===================================================================
+const WALL_SKIN = 0.5;                                  // footprints may touch a wall, not cross it
+
+/** Plan-space corners of a piece's footprint at (x, y, rot), from its built size. */
+function footprint(it, x = it.x, y = it.y, rot = it.rot) {
+  const obj = itemObjects.get(it.id); if (!obj) return null;
+  const hw = Math.max(0.5, obj.w / 2 - WALL_SKIN), hd = Math.max(0.5, obj.d / 2 - WALL_SKIN);
+  const th = Math.PI + rot * DEG, c = Math.cos(th), s = Math.sin(th);
+  // local (lx, lz) -> world X = lx c + lz s, Z = -lx s + lz c -> plan (x + X, y - Z)
+  return [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]].map(([lx, lz]) => [x + lx * c + lz * s, y + lx * s - lz * c]);
+}
+function pointInPoly([px, py], poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function segsCross(a, b, c, d) {
+  const o = (p, q, r) => (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+  const d1 = o(c, d, a), d2 = o(c, d, b), d3 = o(a, b, c), d4 = o(a, b, d);
+  return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+}
+/** Separating-axis test for two convex polygons. */
+function convexOverlap(A, B) {
+  for (const P of [A, B]) for (let i = 0; i < P.length; i++) {
+    const [x0, y0] = P[i], [x1, y1] = P[(i + 1) % P.length], nx = y0 - y1, ny = x1 - x0;
+    let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+    for (const [x, y] of A) { const v = x * nx + y * ny; a0 = Math.min(a0, v); a1 = Math.max(a1, v); }
+    for (const [x, y] of B) { const v = x * nx + y * ny; b0 = Math.min(b0, v); b1 = Math.max(b1, v); }
+    if (a1 <= b0 || b1 <= a0) return false;
+  }
+  return true;
+}
+const rectPoly = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+/** Solid things standing on the floor inside the outline. */
+function floorObstacles() {
+  const r = state.room, G = geom();
+  return [
+    rectPoly(r.stairStart, -r.stairWidth, r.width, 0),                                         // the stair run
+    rectPoly(r.beamX - r.pilasterW / 2, G.westY - r.pilasterD, r.beamX + r.pilasterW / 2, G.westY),   // steel-beam bump
+  ];
+}
+/** True when the piece at (x, y, rot) is fully on the floor and clear of walls, stairs and the bump. */
+function fitsRoom(it, x = it.x, y = it.y, rot = it.rot) {
+  const fp = footprint(it, x, y, rot); if (!fp) return true;
+  const poly = geom().outline;
+  if (!fp.every((p) => pointInPoly(p, poly))) return false;
+  for (let i = 0; i < 4; i++) for (let j = 0; j < poly.length; j++) {
+    if (segsCross(fp[i], fp[(i + 1) % 4], poly[j], poly[(j + 1) % poly.length])) return false;
+  }
+  if (poly.some((p) => pointInPoly(p, fp))) return false;    // a wall corner poking into the footprint
+  return !floorObstacles().some((o) => convexOverlap(fp, o));
+}
+/** Furthest point from (x0, y0) toward (x1, y1) where the piece still fits. */
+function furthestFit(it, x0, y0, x1, y1) {
+  if (fitsRoom(it, x1, y1)) return [x1, y1];
+  let lo = 0, hi = 1;
+  for (let k = 0; k < 10; k++) { const m = (lo + hi) / 2; if (fitsRoom(it, lerp(x0, x1, m), lerp(y0, y1, m))) lo = m; else hi = m; }
+  return [lerp(x0, x1, lo), lerp(y0, y1, lo)];
+}
+/** How much of the footprint is off the free floor: share of a 9 × 9 grid of sample points (0 = none). */
+function overlapAmount(it, x = it.x, y = it.y, rot = it.rot) {
+  const fp = footprint(it, x, y, rot); if (!fp) return 0;
+  const poly = geom().outline, obs = floorObstacles(), N = 8;
+  const inRect = (pt, o) => pt[0] > o[0][0] && pt[0] < o[2][0] && pt[1] > o[0][1] && pt[1] < o[2][1];
+  let bad = 0;
+  for (let i = 0; i <= N; i++) for (let j = 0; j <= N; j++) {
+    const u = i / N, v = j / N;
+    const pt = [lerp(lerp(fp[0][0], fp[1][0], u), lerp(fp[3][0], fp[2][0], u), v), lerp(lerp(fp[0][1], fp[1][1], u), lerp(fp[3][1], fp[2][1], u), v)];
+    if (!pointInPoly(pt, poly) || obs.some((o) => inRect(pt, o))) bad++;
+  }
+  return bad / ((N + 1) * (N + 1));
+}
+/**
+ * Where a move toward (tx, ty) actually ends: straight there if it fits, otherwise up to the wall
+ * and then sliding along it. A piece that already overlaps a wall (an old layout, or one made
+ * bigger in place) may only move in ways that don't push it further in, so it can be dragged free
+ * but never through.
+ */
+function resolveMove(it, tx, ty) {
+  if (fitsRoom(it, tx, ty)) return [tx, ty];
+  if (!fitsRoom(it)) {
+    const now = overlapAmount(it), ok = (x, y) => overlapAmount(it, x, y) <= now;
+    if (ok(tx, ty)) return [tx, ty];
+    if (ok(tx, it.y)) return [tx, it.y];
+    if (ok(it.x, ty)) return [it.x, ty];
+    return [it.x, it.y];
+  }
+  let [x, y] = furthestFit(it, it.x, it.y, tx, ty);
+  [x, y] = furthestFit(it, x, y, tx, y);
+  [x, y] = furthestFit(it, x, y, x, ty);
+  const sx = Math.round(x * 2) / 2, sy = Math.round(y * 2) / 2;   // keep the ½″ snap when it still fits
+  return fitsRoom(it, sx, sy) ? [sx, sy] : [x, y];
+}
+/** Nearest spot to (x, y) where the piece fits (spiral search), or null. */
+function nearestFit(it, x, y, rot = it.rot) {
+  if (fitsRoom(it, x, y, rot)) return [x, y];
+  for (let rad = 3; rad <= 160; rad += 3) {
+    const steps = Math.max(8, Math.round(rad / 2));
+    for (let k = 0; k < steps; k++) {
+      const a = (k / steps) * Math.PI * 2, px = Math.round((x + Math.cos(a) * rad) * 2) / 2, py = Math.round((y + Math.sin(a) * rad) * 2) / 2;
+      if (fitsRoom(it, px, py, rot)) return [px, py];
+    }
+  }
+  return null;
+}
+
+// ---- 58-hold.js ----
+// ===================================================================
+// 58 · Press and hold: the touch-first way to edit.
+//  - hold a piece  -> it lifts; drag to move it (it slides along walls), release for its menu
+//  - hold the floor -> "Add here" menu; the new piece lands on that spot
+//  - a quick tap never selects, so a phone can orbit the room without bumping furniture
+// The menu is a bottom sheet sized for thumbs: quick actions, then Colour / Fabric / Style /
+// Layout / Size tabs that only appear when the piece has them.
+// ===================================================================
+const HOLD_KEY = 'basement-cinema-hold';
+const HOLD_MS = 420, HOLD_SLOP = 10;
+let holdPref = (() => { try { return localStorage.getItem(HOLD_KEY) !== 'off'; } catch (e) { return true; } })();
+const holdMode = () => holdPref;
+function setHoldMode(on) {
+  holdPref = !!on;
+  try { localStorage.setItem(HOLD_KEY, on ? 'on' : 'off'); } catch (e) { /* stays for this visit */ }
+  if (!on) closeSheet();
+  updateHint();
+}
+function updateHint() {
+  const t = $('#hint'); if (!t) return;
+  t.textContent = holdMode()
+    ? 'Press and hold furniture to pick it up · hold the floor to add · Q / E rotate'
+    : 'Click furniture to select · drag to move · Q / E rotate · Del removes';
+}
+const buzz = (ms = 12) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* no haptics */ } };
+
+// ---------------- the gesture ----------------
+let hold = null;                                    // { id, x, y, cx, cy, timer, hit, fired, ring }
+const touches = new Set();                          // pointers currently down (a second finger cancels a hold)
+function holdStart(e) {
+  setRay(e);
+  const hit = pick(), fp = floorPoint();
+  const ring = h('div', { class: 'holdring', style: `left:${e.clientX}px;top:${e.clientY}px;--hold:${HOLD_MS}ms` });
+  $('#app').append(ring);
+  hold = { id: e.pointerId, x: e.clientX, y: e.clientY, cx: e.clientX, cy: e.clientY, hit, fp, fired: false, ring,
+    timer: setTimeout(holdFire, HOLD_MS) };
+}
+function holdCancel() {
+  if (!hold) return;
+  clearTimeout(hold.timer); hold.ring.remove(); hold = null;
+}
+function holdMove(e) {
+  if (!hold || hold.fired || e.pointerId !== hold.id) return false;
+  hold.cx = e.clientX; hold.cy = e.clientY;
+  if (Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > HOLD_SLOP) holdCancel();   // it's a camera drag
+  return true;
+}
+function holdFire() {
+  if (!hold) return;
+  const { hit, fp } = hold;
+  hold.fired = true; hold.ring.classList.add('done');
+  setTimeout(() => hold && hold.ring && hold.ring.remove(), 220);
+  buzz();
+  if (fp) lastHoldFloor = { x: Math.round(fp.x * 2) / 2, y: Math.round(-fp.z * 2) / 2 };
+  if (hit && hit.kind === 'item') {
+    const it = itemById(hit.id); if (!it) return;
+    setRay({ clientX: hold.cx, clientY: hold.cy });
+    const f0 = floorPoint() || fp; if (!f0) return;
+    closeSheet();
+    drag = { id: it.id, x0: it.x, y0: it.y, f0, moved: false, snap: snapshot(), fromHold: true };
+    down = { x: hold.cx, y: hold.cy, button: 0, id: hold.id };
+    controls.enabled = false; planControls.enabled = false;
+    try { el.setPointerCapture(hold.id); } catch (err) { /* pointer already gone */ }
+    select({ kind: 'item', id: it.id });
+    liftItem(it.id, true);
+    toast('Drag to move · let go for options');
+  } else if (hit && hit.kind === 'fixture') {
+    select({ kind: 'fixture', name: hit.name }); if (isNarrow()) openPanel('right');
+  } else if (fp && pointInPoly([fp.x, -fp.z], geom().outline) && (!hit || hit.point.y < 3)) {
+    select(null);
+    openAddSheet({ x: Math.round(fp.x * 2) / 2, y: Math.round(-fp.z * 2) / 2 });
+  } else toast('Hold the floor to add furniture');
+}
+/** A held piece floats a little so it reads as picked up. */
+function liftItem(id, on) {
+  const obj = itemObjects.get(id); if (!obj) return;
+  obj.group.position.y = on ? 1.5 : 0; outline.position.y = obj.group.position.y; invalidate(2);
+}
+function holdEnd(e) {
+  const tap = hold && !hold.fired && e.pointerId === hold.id;
+  holdCancel();
+  return tap;
+}
+let tapHints = 0, lastHoldFloor = null;
+function holdTap(e) {
+  setRay(e);
+  const hit = pick();
+  if (hit && hit.kind === 'item') {
+    if (tapHints++ < 3 || sheet) toast('Press and hold to pick it up');
+  } else if (hit && hit.kind === 'fixture') {
+    select({ kind: 'fixture', name: hit.name });
+  } else if (sheet) { closeSheet(); select(null); }
+}
+
+// ---------------- the sheet ----------------
+let sheet = null;                                     // { kind: 'item', id, tab } | { kind: 'add', at }
+const sheetTabs = {};                                 // last tab used per piece type
+function closeSheet() {
+  if (!sheet) return;
+  sheet = null;
+  const s = $('#sheet'); s.classList.remove('open'); s.setAttribute('aria-hidden', 'true');
+}
+function showSheet() {
+  const s = $('#sheet'); s.classList.add('open'); s.setAttribute('aria-hidden', 'false');
+  if (isNarrow()) openPanel(null);
+}
+function openItemSheet(id) {
+  const it = itemById(id); if (!it) return;
+  sheet = { kind: 'item', id, tab: sheetTabs[it.type] };
+  renderSheet(); showSheet();
+}
+function openAddSheet(at) {
+  sheet = { kind: 'add', at };
+  renderSheet(); showSheet();
+}
+/** Keep the sheet in step with the selection (undo, the Furnish list, keyboard). */
+function syncSheet() {
+  if (!holdMode()) return;
+  if (selected && selected.kind === 'item') {
+    if (!sheet || sheet.kind !== 'item' || sheet.id !== selected.id) { if (!drag) openItemSheet(selected.id); }
+    else renderSheet();
+  } else if (sheet && sheet.kind === 'item') closeSheet();
+}
+function renderSheet() {
+  const body = $('#sheetBody'); if (!sheet) return;
+  const keep = $('.sheet-pane', body)?.scrollTop || 0;
+  body.replaceChildren(sheet.kind === 'add' ? addSheet(sheet.at) : itemSheet());
+  const pane = $('.sheet-pane', body); if (pane) pane.scrollTop = keep;
+}
+
+const SEATING = { uSectional: 1, sectional: 1, sofa: 1, recliner: 1, loungeChair: 1 };
+/** The turn (degrees) that points a piece's front at plan point (tx, ty). */
+const facing = (it, tx, ty) => ((Math.round(Math.atan2(-(tx - it.x), ty - it.y) / DEG) % 360) + 360) % 360;
+function turnTo(rot) {
+  if (!selected || selected.kind !== 'item') return;
+  const it = itemById(selected.id); if (!it) return;
+  rotateSelected(rot - it.rot);
+}
+/** After a change of size or layout: if the piece now pokes into a wall, nudge it to the nearest spot that fits. */
+function settleItem(it) {
+  if (fitsRoom(it)) return;
+  const p = nearestFit(it, it.x, it.y);
+  if (p) { it.x = p[0]; it.y = p[1]; placeItem(itemObjects.get(it.id).group, it); syncOutline(); toast('Moved off the wall so it fits'); }
+}
+function afterEdit(it) {
+  buildItem(it); settleItem(it); updateLighting(); drawOutline(); updateLabels();
+}
+
+function sheetHead(title, sub, extra) {
+  return h('header', { class: 'sheet-head' },
+    h('div', { class: 'sheet-titles' }, h('h2', {}, title), sub ? h('p', {}, sub) : null),
+    extra || null,
+    h('button', { class: 'sheet-x', 'aria-label': 'Close', onclick: () => { closeSheet(); select(null); } }, '✕'));
+}
+const act = (icon, label, fn, cls = '') => h('button', { class: 'act ' + cls, onclick: fn, 'aria-label': label }, h('span', { class: 'ico', 'aria-hidden': 'true' }, icon), h('small', {}, label));
+
+function itemSheet() {
+  const it = itemById(sheet.id); if (!it) { closeSheet(); return h('div'); }
+  const def = CATALOG[it.type], s = resolveSpec(it), vars = VARIANTS[it.type] || {}, v = vars[s.variant];
+  const obj = itemObjects.get(it.id);
+  const sub = [v && v.label, UPHOLSTERED[it.type] || it.type === 'rug' ? colorName(s.color) : null, obj ? `${ftin(obj.w)} × ${ftin(obj.d)}` : null].filter(Boolean).join(' · ');
+  const fits = fitsRoom(it);
+  const status = h('span', { class: 'badge ' + (fits ? 'ok' : 'bad') }, fits ? 'Clear of walls' : 'Overlaps a wall: drag it free');
+
+  const G = geom(), tv = [G.tvX + state.tv.offset, state.room.depth];
+  const acts = h('div', { class: 'sheet-acts' },
+    act('⟲', '15°', () => rotateSelected(15)),
+    act('⟳', '15°', () => rotateSelected(-15)),
+    act('↻', '90°', () => rotateSelected(90)),
+    SEATING[it.type] ? act('▣', 'Face TV', () => turnTo(facing(it, ...tv))) : null,
+    SEATING[it.type] ? act('♨', 'Face fire', () => turnTo(facing(it, 0, state.fireplace.center))) : null,
+    it.type === 'rug' ? act('＋', 'Add here', () => { const at = lastHoldFloor || { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
+    act('⧉', 'Copy', duplicateSelected),
+    act('↶', 'Undo', undo),
+    act('🗑', 'Delete', removeSelected, 'danger'));
+
+  // ---- which tabs this piece has ----
+  const tabs = [];
+  const colours = UPHOLSTERED[it.type] ? [...(COVER_COLORS[s.cover] || [])] : it.type === 'rug' ? RUG_COLORS : null;
+  if (colours) tabs.push(['colour', 'Colour']);
+  const hasMat = UPHOLSTERED[it.type] || (WOOD_PARTS[it.type] || []).includes(s.variant) || (METAL_PARTS[it.type] || []).includes(s.variant)
+    || (STONE_PARTS[it.type] || []).includes(s.variant) || AV_TYPES[it.type];
+  if (hasMat) tabs.push(['material', UPHOLSTERED[it.type] ? 'Fabric' : 'Finish']);
+  if (Object.keys(vars).length > 1) tabs.push(['style', 'Style']);
+  const counts = (def.params || []).filter((q) => q[4] === 'n'), sizes = (def.params || []).filter((q) => q[4] !== 'n');
+  if ((def.options || []).length || counts.length) tabs.push(['layout', 'Layout']);
+  if (sizes.length) tabs.push(['size', 'Size']);
+  let tab = sheet.tab && tabs.some(([k]) => k === sheet.tab) ? sheet.tab : tabs[0] && tabs[0][0];
+
+  const edit = (fn) => { pushHistory(); fn(); afterEdit(it); commit(false); renderStyleTab(); };
+  const style = (pairs) => edit(() => { for (const [k, val] of pairs) setStyleKey(it, k, val); });
+  const big = (val, text, cur, fn, swatch) => h('button', { class: 'opt' + (swatch ? ' has-sw' : ''), 'aria-pressed': String(val === cur), onclick: fn },
+    swatch ? h('i', { class: 'sw', style: `background:${swatch}` }) : null, h('span', {}, text));
+  const pane = h('div', { class: 'sheet-pane' });
+  const fill = () => {
+    pane.replaceChildren();
+    if (tab === 'colour') {
+      const list = [...colours]; if (!list.some(([c]) => c.toLowerCase() === String(s.color).toLowerCase())) list.unshift([s.color, colorName(s.color)]);
+      pane.append(h('div', { class: 'bigswatches' }, list.map(([c, name]) => h('button', {
+        class: 'bigsw', style: `--c:${c}`, 'aria-pressed': String(c.toLowerCase() === String(s.color).toLowerCase()), 'aria-label': name,
+        onclick: () => style([['color', c]]) }, h('i'), h('small', {}, name)))));
+      if (UPHOLSTERED[it.type]) pane.append(h('p', { class: 'note' }, `${COVERS[s.cover].label} colours. More covers under Fabric.`));
+    } else if (tab === 'material') {
+      if (it.type === 'uSectional') {
+        pane.append(h('h4', {}, 'Wayfair fabric options'), h('div', { class: 'opts cards' }, WAYFAIR_FABRICS.map((f) =>
+          big(`${f.cover}|${f.color}`, f.label, `${s.cover}|${String(s.color).toLowerCase()}`, () => style([['cover', f.cover], ['color', f.color]]), f.color))));
+        pane.append(h('h4', {}, 'Any cover'));
+      }
+      if (UPHOLSTERED[it.type]) {
+        const covers = Object.keys(COVERS).filter((k) => it.type === 'pouf' || k !== 'knit');
+        pane.append(h('div', { class: 'opts' }, covers.map((k) => big(k, COVERS[k].label, s.cover, () => style([['cover', k]]), (COVER_COLORS[k] || [[s.color]])[0][0]))));
+      }
+      if ((WOOD_PARTS[it.type] || []).includes(s.variant)) pane.append(h('h4', {}, 'Wood'), h('div', { class: 'opts' },
+        Object.entries(WOOD_FINISHES).map(([k, w]) => big(k, w.label, s.wood || 'walnut', () => style([['wood', k]]), w.color))));
+      if ((METAL_PARTS[it.type] || []).includes(s.variant)) pane.append(h('h4', {}, 'Metal'), h('div', { class: 'opts' },
+        Object.entries(METAL_FINISHES).map(([k, label]) => big(k, label, s.metal || 'black', () => style([['metal', k]]), { brass: '#b48a52', black: '#1d1c1a', nickel: '#b9b6ae' }[k]))));
+      if ((STONE_PARTS[it.type] || []).includes(s.variant)) pane.append(h('h4', {}, 'Stone'), h('div', { class: 'opts' },
+        Object.entries(STONE_FINISHES).map(([k, label]) => big(k, label, s.stone || 'marble', () => style([['stone', k]]), { marble: '#e8e4dc', travertine: '#d8c7ad', nero: '#1b1a19' }[k]))));
+      if (AV_TYPES[it.type]) pane.append(h('h4', {}, 'Cabinet'), h('div', { class: 'opts' },
+        Object.entries(AV_FINISHES).map(([k, label]) => big(k, label, s.finish || 'black', () => style([['finish', k]])))));
+    } else if (tab === 'style') {
+      pane.append(h('div', { class: 'opts cards' }, Object.entries(vars).map(([k, vv]) =>
+        h('button', { class: 'opt card', 'aria-pressed': String(k === s.variant), onclick: () => style([['variant', k]]) }, h('b', {}, vv.label), h('small', {}, vv.desc)))));
+    } else if (tab === 'layout') {
+      for (const [k, label, min, max] of counts) {
+        const set = (d) => { const nv = clamp(it.p[k] + d, min, max); if (nv !== it.p[k]) edit(() => { it.p[k] = nv; }); };
+        pane.append(h('div', { class: 'stepper' }, h('span', {}, label),
+          h('button', { 'aria-label': 'Fewer', onclick: () => set(-1), disabled: it.p[k] <= min }, '−'),
+          h('b', {}, String(it.p[k])),
+          h('button', { 'aria-label': 'More', onclick: () => set(1), disabled: it.p[k] >= max }, '+')));
+      }
+      for (const [k, label, opts] of def.options || []) {
+        pane.append(h('h4', {}, label), h('div', { class: 'opts' }, opts.map(([val, text]) => big(val, text, it.p[k], () => edit(() => { it.p[k] = val; })))));
+      }
+    } else if (tab === 'size') {
+      for (const [k, label, min, max] of sizes) {
+        const sl = slider(`sh-${k}`, label, min, max, 1, it.p[k], inch, (val) => { it.p[k] = val; queue(() => { buildItem(it); updateLighting(); drawOutline(); updateLabels(); }); });
+        $('input', sl).addEventListener('change', () => { settleItem(it); renderSheet(); });
+        pane.append(sl);
+      }
+    }
+    const price = piecePrice(it, s), weeks = pieceWeeks(it, s);
+    if (price) pane.append(h('p', { class: 'note' }, `Indicative ${moneyRange(...price)}${weeks ? ` · ${weeks[0]}–${weeks[1]} wk` : ''}`));
+    if (it.type === 'uSectional') pane.append(h('p', { class: 'note' }, 'Sizes are estimates from the Wayfair photo (the listing has no drawing). Check them against the product page and adjust under Size.'));
+    if (hasOverrides(it)) pane.append(h('button', { class: 'btn', onclick: () => edit(() => { delete it.s; }) }, `Reset to the ${STYLE_SETS[activeSetId()].name} look`));
+  };
+  const tabbar = h('nav', { class: 'sheet-tabs', role: 'tablist' }, tabs.map(([k, label]) => {
+    const b = h('button', { role: 'tab', 'aria-selected': String(k === tab), onclick: () => {
+      tab = sheet.tab = sheetTabs[it.type] = k;
+      $$('button', tabbar).forEach((x) => x.setAttribute('aria-selected', String(x === b))); fill();
+    } }, label);
+    return b;
+  }));
+  fill();
+  return h('div', { class: 'sheet-inner' }, sheetHead(def.label, sub, status), acts, tabs.length ? tabbar : null, pane);
+}
+
+// ---------------- add here ----------------
+const ADD_ORDER = ['uSectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
+function addSheet(at) {
+  const pick = (type, extra) => { closeSheet(); addItem(type, at, extra); };
+  const featured = h('div', { class: 'feature' },
+    h('button', { class: 'feature-main', onclick: () => pick('uSectional') },
+      h('span', { class: 'tag' }, 'From Wayfair'), h('b', {}, 'Tremee U-sectional'), h('small', {}, '5 storage seats, 2 chaises, loose ottoman · sleeper')),
+    h('div', { class: 'feature-sw' }, WAYFAIR_FABRICS.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
+      onclick: () => pick('uSectional', { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.'))))));
+  const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && t !== 'uSectional').map((t) =>
+    h('button', { class: 'opt card', onclick: () => pick(t) }, h('b', {}, CATALOG[t].label), h('small', {}, CATALOG[t].note))));
+  return h('div', { class: 'sheet-inner' },
+    sheetHead('Add here', `${ftin(at.x)} from the fireplace wall · ${ftin(at.y)} from the stairs`),
+    h('div', { class: 'sheet-pane' }, featured, grid, h('p', { class: 'note' }, 'Seats turn to face the TV. If a piece is too big for the spot, it lands at the nearest place it fits.')));
+}
+
+function initSheet() {
+  const s = $('#sheet'), grip = $('.sheet-grip', s);
+  // swipe the grip down to dismiss
+  let y0 = null;
+  grip.addEventListener('pointerdown', (e) => { y0 = e.clientY; grip.setPointerCapture(e.pointerId); });
+  grip.addEventListener('pointermove', (e) => { if (y0 != null) s.style.transform = `translateY(${Math.max(0, e.clientY - y0)}px)`; });
+  const end = (e) => {
+    if (y0 == null) return;
+    const dy = e.clientY - y0; y0 = null; s.style.transform = '';
+    if (dy > 60) { closeSheet(); select(null); } else if (dy < -30 || Math.abs(dy) < 6) s.classList.toggle('tall', dy < -30 || !s.classList.contains('tall'));
+  };
+  grip.addEventListener('pointerup', end); grip.addEventListener('pointercancel', end);
+  el.addEventListener('contextmenu', (e) => e.preventDefault());   // a long press must not open the browser menu
+  updateHint();
+}
 
 // ---- 60-ui.js ----
 // ===================================================================
@@ -3539,7 +4187,9 @@ function renderFurnish() {
   for (const [type, def] of Object.entries(CATALOG)) {
     grid.append(h('button', { onclick: () => addItem(type), title: 'Add ' + def.label }, h('b', {}, def.label), h('small', {}, def.note)));
   }
-  root.append(group('Add to the room', grid));
+  root.append(group('Add to the room', grid,
+    toggle('hold-mode', 'Press and hold to edit (touch-friendly)', holdMode(), (v) => setHoldMode(v)),
+    h('p', { class: 'note' }, 'On: hold a piece to pick it up and get its menu, hold the floor to add here. Taps only move the camera, so nothing gets bumped. Furniture never passes through walls.')));
   const list = h('div', { class: 'chips' });
   for (const it of state.items) {
     const sel = selected && selected.kind === 'item' && selected.id === it.id;
@@ -3775,17 +4425,19 @@ const WOOD_PARTS = { roundTable: ['pedestal', 'slab', 'frame'], console: ['slatt
 const METAL_PARTS = { floorLamp: ['drum', 'arc', 'tripod', 'globe'], roundTable: ['tulip', 'frame'], console: ['fluted', 'frame', 'credenza'], sideTable: ['ctable'],
   loungeChair: ['sling', 'swivel'], barCart: ['classic'] };
 const STONE_PARTS = { roundTable: ['tulip', 'drum'], sideTable: ['pedestal'], floorLamp: ['arc'] };
+/** Override one style key on a piece (dropping it when it matches the set). The caller rebuilds the piece. */
+function setStyleKey(it, k, v) {
+  const s = resolveSpec(it), base = resolveSpec(it, activeSetId(), false);
+  it.s = { ...(it.s || {}) };
+  if (v === base[k]) delete it.s[k]; else it.s[k] = v;
+  if (k === 'cover' && COVER_COLORS[v] && !COVER_COLORS[v].some(([c]) => c.toLowerCase() === String(s.color).toLowerCase())) {   // keep a colour the new cover comes in
+    const c = COVER_COLORS[v][0][0]; if (c === base.color) delete it.s.color; else it.s.color = c;
+  }
+  if (!Object.keys(it.s).length) delete it.s;
+}
 function styleControls(it) {
-  const s = resolveSpec(it), base = resolveSpec(it, activeSetId(), false), vars = VARIANTS[it.type];
-  const setKey = (k, v) => {
-    it.s = { ...(it.s || {}) };
-    if (v === base[k]) delete it.s[k]; else it.s[k] = v;
-    if (k === 'cover' && COVER_COLORS[v] && !COVER_COLORS[v].some(([c]) => c === s.color)) {   // keep a colour the new cover comes in
-      const c = COVER_COLORS[v][0][0]; if (c === base.color) delete it.s.color; else it.s.color = c;
-    }
-    if (!Object.keys(it.s).length) delete it.s;
-    buildItem(it); updateLighting(); drawOutline(); renderStyleTab();
-  };
+  const s = resolveSpec(it), vars = VARIANTS[it.type];
+  const setKey = (k, v) => { setStyleKey(it, k, v); buildItem(it); updateLighting(); drawOutline(); renderStyleTab(); };
   const row = (label, el) => h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, label)), el);
   const out = [];
   if (vars) out.push(row('Style', chips('Style', Object.entries(vars).map(([k, v]) => [k, v.label]), s.variant, (v) => setKey('variant', v))));
@@ -3990,6 +4642,7 @@ function initStyleUI() {
 // 65 · Details panel (selection inspector + viewing report), commit,
 //      layout-code dialog, narrow-screen panel toggles
 // ===================================================================
+const SEATING_MAIN = { uSectional: 1, sectional: 1, sofa: 1, recliner: 1 };
 const TV_SIZES = [65, 75, 77, 83, 85, 98];
 
 function viewingReport() {
@@ -4079,8 +4732,8 @@ function renderInspector() {
   const def = CATALOG[it.type];
   inspHead(def.note, def.label, itemDims(it));
   const controls = [];
-  for (const [k, label, min, max] of def.params || []) {
-    controls.push(slider(`p-${k}`, label, min, max, 1, it.p[k], inch, (v) => { it.p[k] = v; queue(() => { buildItem(it); updateLighting(); drawOutline(); updateLabels(); renderInspectorLive(); }); }));
+  for (const [k, label, min, max, unit] of def.params || []) {
+    controls.push(slider(`p-${k}`, label, min, max, 1, it.p[k], unit === 'n' ? String : inch, (v) => { it.p[k] = v; queue(() => { buildItem(it); updateLighting(); drawOutline(); updateLabels(); renderInspectorLive(); }); }));
   }
   for (const [k, label, opts] of def.options || []) {
     controls.push(h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, label)),
@@ -4097,7 +4750,7 @@ function renderInspector() {
       h('button', { class: 'btn', onclick: duplicateSelected }, 'Duplicate'),
       h('button', { class: 'btn danger', onclick: removeSelected }, 'Remove')),
     h('p', { class: 'note' }, 'Drag on the floor to move · arrow keys nudge 1″ (Shift: 6″).')));
-  if (['sectional', 'sofa', 'recliner'].includes(it.type)) body.append(viewingReport());
+  if (SEATING_MAIN[it.type]) body.append(viewingReport());
   renderFurnishSelection();
 }
 function renderInspectorLive() {
@@ -4108,6 +4761,7 @@ function renderFurnishSelection() { if (!$('#tab-furnish').hidden) renderFurnish
 /** After an edit: persist, refresh overlays and the details panel. */
 function commit() {
   save(); updateLabels(); renderInspector(); updateRoomSub();
+  if (sheet && sheet.kind === 'item') renderSheet();
 }
 
 // ---------------- layout code dialog ----------------
@@ -4188,7 +4842,7 @@ const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.5, 0.55, 0.
 composer.addPass(renderPass); composer.addPass(bloomPass); composer.addPass(new OutputPass());
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); initStyleUI(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));

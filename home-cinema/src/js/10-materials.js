@@ -201,6 +201,21 @@ function bumpCanvas(kind) {
   return cv;
 }
 
+/** Corduroy: 24 rounded wales across the canvas (stripes vary along u, so wales run along v).
+ *  Bump (grey, linear) or colour multiplier (light, sRGB) for the same ridges. */
+function corduroyCanvas(asColor) {
+  const size = 256, cv = mkCanvas(size, size), g = cv.getContext('2d'), wales = 24, step = size / wales, r = rng(77);
+  for (let i = 0; i < wales; i++) {
+    const x = i * step, grd = g.createLinearGradient(x, 0, x + step, 0);
+    const lo = asColor ? '#b9b9b9' : '#2a2a2a', mid = asColor ? '#ffffff' : '#d8d8d8', hi = asColor ? '#efefef' : '#a8a8a8';
+    grd.addColorStop(0, lo); grd.addColorStop(0.18, hi); grd.addColorStop(0.5, mid); grd.addColorStop(0.82, hi); grd.addColorStop(1, lo);
+    g.fillStyle = grd; g.fillRect(x, 0, step + 0.5, size);
+  }
+  // pile: fine flecks so the ridges don't read as plastic
+  for (let k = 0; k < 2600; k++) { g.fillStyle = r() < 0.5 ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)'; g.fillRect(r() * size, r() * size, 1, 1 + r() * 2); }
+  return cv;
+}
+
 function reededCanvas() {
   const cv = mkCanvas(256, 64), g = cv.getContext('2d');
   for (let x = 0; x < 256; x += 8) {
@@ -266,6 +281,8 @@ function initMaterials() {
   TEX.tweed = canvasTex(bumpCanvas('tweed'), false, [3, 3]);
   TEX.leather = canvasTex(bumpCanvas('leather'), false, [2, 2]);
   TEX.knit = canvasTex(bumpCanvas('knit'), false, [2, 2]);
+  TEX.corduroy = canvasTex(corduroyCanvas(false), false);
+  TEX.corduroyMap = canvasTex(corduroyCanvas(true), true);
 
   M.wall = new THREE.MeshStandardMaterial({ color: state.finish.wall, roughness: 0.92, bumpMap: TEX.paint, bumpScale: 0.02 });
   M.accent = new THREE.MeshStandardMaterial({ color: '#2f2b28', roughness: 0.9 });
@@ -346,6 +363,8 @@ function coverMat(cover, color) {
     if (kind === 'leather') return new THREE.MeshStandardMaterial({ color, roughness: 0.46, bumpMap: TEX.leather, bumpScale: 0.12 });
     if (kind === 'tweed') return new THREE.MeshStandardMaterial({ color, roughness: 0.96, bumpMap: TEX.tweed, bumpScale: 0.4 });
     if (kind === 'knit') return new THREE.MeshStandardMaterial({ color, roughness: 1, bumpMap: TEX.knit, bumpScale: 1.1 });
+    if (kind === 'corduroy') return new THREE.MeshPhysicalMaterial({ color, map: TEX.corduroyMap, bumpMap: TEX.corduroy, bumpScale: 0.9,
+      roughness: 0.88, sheen: 0.35, sheenRoughness: 0.6, sheenColor: shade(color, 0.12) });
     if (kind === 'weave') return new THREE.MeshStandardMaterial({ color, roughness: 0.97, bumpMap: TEX.linen, bumpScale: 0.16 });
     return fabricMat(color, kind === 'boucle' ? 'boucle' : 'linen');
   });

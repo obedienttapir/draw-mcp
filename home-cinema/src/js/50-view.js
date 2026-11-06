@@ -209,12 +209,15 @@ function dimLine(a, b, z, text, at = 0.5) {         // at: where along the line 
 
 /** The eye point of the prime seat (plan x, y) on the main sofa, or null. */
 function mainSeat() {
-  const it = state.items.find((i) => i.type === 'sectional') || state.items.find((i) => i.type === 'sofa') || state.items.find((i) => i.type === 'recliner');
+  const it = state.items.find((i) => i.type === 'uSectional') || state.items.find((i) => i.type === 'sectional') || state.items.find((i) => i.type === 'sofa') || state.items.find((i) => i.type === 'recliner');
   if (!it) return null;
   const G = geom(), phi = it.rot * DEG, ex = [-Math.cos(phi), -Math.sin(phi)], ez = [-Math.sin(phi), Math.cos(phi)];
   const p = { ...CATALOG[it.type].defaults, ...it.p };
   let lx0, lx1, lz;
-  if (it.type === 'sectional') {
+  if (it.type === 'uSectional') {
+    const u = uSectionalSize(p);
+    lx0 = -u.W / 2 + u.arm + 12; lx1 = u.W / 2 - u.arm - 12; lz = -u.D / 2 + 22;
+  } else if (it.type === 'sectional') {
     const B = p.back, R = p.ret, d = p.depth;
     [lx0, lx1] = p.side === 'left' ? [-(B / 2 - 6), B / 2 - d] : [-B / 2 + d, B / 2 - 6];
     lz = -R / 2 + 22;

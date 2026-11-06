@@ -2,6 +2,7 @@
 // 65 · Details panel (selection inspector + viewing report), commit,
 //      layout-code dialog, narrow-screen panel toggles
 // ===================================================================
+const SEATING_MAIN = { uSectional: 1, sectional: 1, sofa: 1, recliner: 1 };
 const TV_SIZES = [65, 75, 77, 83, 85, 98];
 
 function viewingReport() {
@@ -91,8 +92,8 @@ function renderInspector() {
   const def = CATALOG[it.type];
   inspHead(def.note, def.label, itemDims(it));
   const controls = [];
-  for (const [k, label, min, max] of def.params || []) {
-    controls.push(slider(`p-${k}`, label, min, max, 1, it.p[k], inch, (v) => { it.p[k] = v; queue(() => { buildItem(it); updateLighting(); drawOutline(); updateLabels(); renderInspectorLive(); }); }));
+  for (const [k, label, min, max, unit] of def.params || []) {
+    controls.push(slider(`p-${k}`, label, min, max, 1, it.p[k], unit === 'n' ? String : inch, (v) => { it.p[k] = v; queue(() => { buildItem(it); updateLighting(); drawOutline(); updateLabels(); renderInspectorLive(); }); }));
   }
   for (const [k, label, opts] of def.options || []) {
     controls.push(h('div', { class: 'slider' }, h('div', { class: 'row' }, h('label', {}, label)),
@@ -109,7 +110,7 @@ function renderInspector() {
       h('button', { class: 'btn', onclick: duplicateSelected }, 'Duplicate'),
       h('button', { class: 'btn danger', onclick: removeSelected }, 'Remove')),
     h('p', { class: 'note' }, 'Drag on the floor to move · arrow keys nudge 1″ (Shift: 6″).')));
-  if (['sectional', 'sofa', 'recliner'].includes(it.type)) body.append(viewingReport());
+  if (SEATING_MAIN[it.type]) body.append(viewingReport());
   renderFurnishSelection();
 }
 function renderInspectorLive() {
@@ -120,6 +121,7 @@ function renderFurnishSelection() { if (!$('#tab-furnish').hidden) renderFurnish
 /** After an edit: persist, refresh overlays and the details panel. */
 function commit() {
   save(); updateLabels(); renderInspector(); updateRoomSub();
+  if (sheet && sheet.kind === 'item') renderSheet();
 }
 
 // ---------------- layout code dialog ----------------

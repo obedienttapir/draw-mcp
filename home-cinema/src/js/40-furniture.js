@@ -27,6 +27,18 @@ function instances(parent, geo, mat, list) {
 
 // style sets dress every piece, so the catalogue only carries geometry
 const CATALOG = {
+  uSectional: {
+    label: 'U-sectional · Tremee', note: 'Wayfair Latitude Run: modular, storage, sleeper',
+    defaults: { seats: 5, mw: 30, depth: 33, chaise: 'both', ottoman: 'front', arms: 'both', layout: 'sofa', pillows: 'on' },
+    params: [['seats', 'Seats in the back row', 3, 7, 'n'], ['mw', 'Module width', 26, 34], ['depth', 'Seat depth', 30, 38]],
+    options: [
+      ['layout', 'Mode', [['sofa', 'Sofa'], ['bed', 'Sleeper (bed)']]],
+      ['chaise', 'Chaises', [['both', 'Both ends (U)'], ['left', 'Left only'], ['right', 'Right only'], ['none', 'None']]],
+      ['ottoman', 'Loose ottoman', [['front', 'In front'], ['none', 'Put away']]],
+      ['arms', 'Arms', [['both', 'Both'], ['none', 'Armless']]],
+      ['pillows', 'Throw pillows', [['on', 'On'], ['off', 'Off']]],
+    ],
+  },
   sectional: {
     label: 'L-sectional', note: 'Six styles, return on either side', defaults: { back: 136, ret: 104, depth: 38, side: 'right' },
     params: [['back', 'Back length', 84, 180], ['ret', 'Return length', 60, 140], ['depth', 'Seat depth', 32, 44]],
@@ -569,7 +581,80 @@ function makeBarCart(p, item, s) {
   return { group: g, w, d, shadows: [[0, 0, w, d]] };
 }
 
+// ---------------- Tremee U-sectional (Wayfair, Latitude Run) ----------------
+// Modelled from the listing photo: a back row of square storage seats (track arms on the end seats),
+// two storage-ottoman chaises in front of the end seats (the U) and one loose ottoman in the middle.
+// Sleeper mode pulls the ottomans in front of the middle seats to make one bed deck.
+// Sizes are estimates for this class of modular corduroy sectional (the listing gives no drawing): edit them in Size.
+const U_GAP = 14;                                     // loose ottoman sits this far in front of the chaise line
+function uSectionalSize(p) {
+  const arm = p.arms === 'none' ? 0 : 6, n = Math.max(1, Math.round(p.seats)), W = n * p.mw + 2 * arm;
+  const nOtt = (p.chaise === 'both' ? 2 : p.chaise === 'none' ? 0 : 1) + (p.ottoman === 'front' ? 1 : 0);
+  const bed = p.layout === 'bed' && nOtt > 0;
+  const row = bed || p.chaise !== 'none';                        // a row of ottomans touching the seat fronts
+  const loose = !bed && p.ottoman === 'front';
+  const D = p.depth + (row ? p.mw : 0) + (loose ? (row ? U_GAP : 10) + p.mw : 0);
+  return { arm, n, W, D, nOtt, bed, row, loose };
+}
+function makeUSectional(p, item, s) {
+  const g = new THREE.Group(), u = uSectionalSize(p), { arm, n, W, D } = u, mw = p.mw, dep = p.depth;
+  const cloud = s.variant === 'cloud';
+  const fab = coverMat(s.cover, s.color), seam = coverMat(s.cover, css(shade(s.color, -0.25)));
+  const z0 = -D / 2, zf = z0 + dep;                          // back of the sofa, front of the seats
+  const feet = [], shadows = [];
+  const foot = (x, z) => feet.push([x, 0.75, z]);
+  const H = { deck: 9.5, seat: cloud ? 19 : 18, back: cloud ? 29 : 31, arm: 24 };
+  // ---- back row: one module per seat ----
+  for (let i = 0; i < n; i++) {
+    const xa = -W / 2 + arm + i * mw, xb = xa + mw, xc = (xa + xb) / 2;
+    span(g, fab, xa + 0.15, xb - 0.15, 1.5, H.deck, z0, zf, 1.5);                 // storage box
+    span(g, seam, xa + 0.6, xb - 0.6, H.deck - 0.35, H.deck, zf - 0.4, zf, 0.1);   // lid seam
+    span(g, fab, xa + 0.4, xb - 0.4, H.deck, H.seat, z0 + 6, zf + 0.6, cloud ? 4 : 3);  // seat cushion
+    span(g, fab, xa + 0.15, xb - 0.15, H.deck, 21, z0, z0 + 6, 2);                // low back frame
+    const bk = meshAt(rbox(mw - 1, H.back - H.seat + 3, cloud ? 11 : 9, cloud ? 5 : 4), fab, xc, (H.seat - 1 + H.back + 2) / 2, z0 + (cloud ? 6.5 : 5.5), g);
+    bk.rotation.x = -0.12;                                                        // loose back pillow leans back
+    for (const x of [xa + 2.5, xb - 2.5]) for (const z of [z0 + 2.5, zf - 2.5]) foot(x, z);
+  }
+  // ---- track arms on the end seats (each with its own small back pillow, as in the photo) ----
+  if (arm) for (const sx of [-1, 1]) {
+    const xa = sx < 0 ? -W / 2 : W / 2 - arm;
+    span(g, fab, xa, xa + arm, 1.5, H.arm, z0, zf, 2.5);
+    foot(xa + arm / 2, z0 + 2.5); foot(xa + arm / 2, zf - 2.5);
+  }
+  shadows.push([0, z0 + dep / 2, W, dep]);
+  // ---- ottomans: square storage cubes the size of a seat ----
+  const ottoman = (xc, zc) => {
+    const xa = xc - mw / 2, za = zc - mw / 2;
+    span(g, fab, xa + 0.2, xa + mw - 0.2, 1.5, H.deck, za + 0.2, za + mw - 0.2, 1.5);
+    span(g, seam, xa + 0.6, xa + mw - 0.6, H.deck - 0.35, H.deck, za + mw - 0.6, za + mw - 0.2, 0.1);
+    span(g, fab, xa + 0.4, xa + mw - 0.4, H.deck, H.seat - 0.5, za + 0.4, za + mw - 0.4, cloud ? 4 : 3);
+    for (const x of [xa + 2.5, xa + mw - 2.5]) for (const z of [za + 2.5, za + mw - 2.5]) foot(x, z);
+    shadows.push([xc, zc, mw, mw]);
+  };
+  const seatX = (i) => -W / 2 + arm + mw * (i + 0.5), rowZ = zf + mw / 2;
+  if (u.bed) {                                                   // all ottomans in front of the middle seats: one bed deck
+    const k = Math.min(u.nOtt, n), first = Math.floor((n - k) / 2);
+    for (let i = first; i < first + k; i++) ottoman(seatX(i), rowZ);
+  } else {
+    if (p.chaise === 'both' || p.chaise === 'left') ottoman(seatX(0), rowZ);
+    if (p.chaise === 'both' || p.chaise === 'right') ottoman(seatX(n - 1), rowZ);
+    if (u.loose) ottoman(0, D / 2 - mw / 2);
+  }
+  instances(g, new THREE.BoxGeometry(1.6, 1.5, 1.6), M.black, feet);
+  // ---- throw pillows like the listing photo: rust + floral on the left, cream + mustard plaid on the right ----
+  if (p.pillows !== 'off') {
+    const pm = (c) => coverMat('linen', c);
+    const sets = [[seatX(0), [['#8a5a3c', -0.35], ['#d9d0bd', 0.15]]], [seatX(n - 1), [['#d9d0bd', -0.15], ['#b39459', 0.35]]]];
+    for (const [x, list] of sets) list.forEach(([c, dx], k) => {
+      const m = meshAt(rbox(17, 16, 5, 2.5), pm(c), x + dx * mw * 0.6, H.seat + 8, z0 + 12 + k * 2.5, g);
+      m.rotation.y = -dx * 0.6; m.rotateX(-0.22);
+    });
+  }
+  return { group: g, w: W, d: D, shadows };
+}
+
 const FACTORIES = {
+  uSectional: makeUSectional,
   sectional: makeSectional, sofa: makeSofa, loungeChair: makeLoungeChair, roundTable: makeRoundTable, ottoman: makeOttoman,
   rug: makeRug, console: makeConsole, sideTable: makeSideTable, floorLamp: makeFloorLamp, plant: makePlant,
   towerSpeaker: makeTower, subwoofer: makeSub, recliner: makeRecliner, pouf: makePouf, barCart: makeBarCart,
