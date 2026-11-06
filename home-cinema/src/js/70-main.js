@@ -32,7 +32,7 @@ function resize() {
   renderer.setPixelRatio(pixelRatio());
   composer.setPixelRatio(renderer.getPixelRatio());
   renderer.setSize(w, hgt, false); composer.setSize(w, hgt); labelRenderer.setSize(w, hgt);
-  camera.aspect = w / hgt; camera.updateProjectionMatrix();
+  camera.aspect = w / hgt; camera.updateProjectionMatrix(); applyViewInset(viewInset);
   if (mode === 'plan') fitPlan();
   invalidate(2);
 }

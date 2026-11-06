@@ -591,6 +591,13 @@ function makeBarCart(p, item, s) {
 // drawing (the spec table says 25.6″). The dimensioned 79.6″ depth is a long chaise: seat + 2 ottomans.
 // 10 boxes = 5 seats + 3 ottomans + 2 arms.
 const TREMEE = { mw: 24.8, depth: 30, arm: 5.1, seatUse: 18.9, seatH: 17.7, back: 33.9, backCushion: 18.1, armH: 27.2, ott: 24.8, foot: 2.4, deck: 11, ottomans: 3 };
+// one-tap arrangements of the boxed set (5 seats, 3 ottomans); left/right as you face the sofa
+const TREMEE_CONFIGS = [
+  { label: '1 · U + loose ottoman', note: 'A chaise at each end, the third ottoman free in front (listing photo)', p: { chaise: 'both', ottoman: 'front', layout: 'sofa' } },
+  { label: '2 · Long chaise, left', note: 'The loose ottoman joins the left chaise: 134″ × 80″ (dimension sheet)', p: { chaise: 'long-left', ottoman: 'none', layout: 'sofa' } },
+  { label: '3 · Long chaise, right', note: 'The same, mirrored', p: { chaise: 'long-right', ottoman: 'none', layout: 'sofa' } },
+  { label: 'Sleeper', note: 'All three ottomans in front of the middle seats: one bed deck', p: { layout: 'bed' } },
+];
 const U_GAP = 14;                                     // loose ottoman sits this far in front of the chaise line
 function uChaises(p, n) {                             // [seat index, ottomans deep] per chaise
   const L = 0, R = n - 1;
@@ -690,10 +697,10 @@ function buildItem(item) {
   holder.traverse((o) => { o.userData.itemId = item.id; });
   placeItem(holder, item);
   itemsGroup.add(holder);
-  itemObjects.set(item.id, { group: holder, w: built.w, d: built.d });
+  itemObjects.set(item.id, { group: holder, w: built.w, d: built.d, hv: built.hv || 0 });
 }
 function placeItem(holder, item) {
-  holder.position.copy(P(item.x, item.y, 0));
+  holder.position.copy(P(item.x, item.y, CATALOG[item.type] && CATALOG[item.type].wall ? item.p.h : 0));   // wall pieces hang at their centre height
   holder.rotation.y = Math.PI + item.rot * DEG;
 }
 function buildAllItems() {

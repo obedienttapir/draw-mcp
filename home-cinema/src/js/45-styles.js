@@ -300,6 +300,11 @@ function pieceSize(item, s) {
     case 'barCart': return { text: '24″ × 16″ × 33″ H' };
     case 'pouf': return { text: `Ø 20″ × ${inch(v.H || 16)} H` };
     case 'floorLamp': return { text: s.variant === 'arc' ? '80″ H, 50″ reach' : `${inch(v.H)} H` };
+    case 'frame': case 'acousticPanel': return { text: `${inch(p.w)} × ${inch(p.hgt)}, centre ${ftin(p.h)} up` };
+    case 'mirror': return { text: s.variant === 'round' ? `Ø ${inch(p.w)}, centre ${ftin(p.h)} up` : `${inch(p.w)} × ${inch(p.hgt)}, centre ${ftin(p.h)} up` };
+    case 'gallery': return { text: `${p.count} frames, centre ${ftin(p.h)} up` };
+    case 'shelf': return { text: `${inch(p.w)} long, ${ftin(p.h)} up` };
+    case 'sconce': return { text: `${ftin(p.h)} up` };
     case 'sideTable': return { text: `${s.variant === 'ctable' ? '16″ × 12″' : 'Ø 18″'} × ${inch(v.H)} H` };
     default: return { text: v.H ? `${inch(v.H)} H` : '' };
   }
@@ -385,7 +390,7 @@ function evaluateSet(setId, withOverrides = false) {
   const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
   // acoustics: absorption of soft surfaces by area (main seating and rugs dominate)
   const dims = (r) => ({ ...CATALOG[r.it.type].defaults, ...r.it.p });
-  const area = (r) => ({ uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
+  const area = (r) => ({ acousticPanel: (dims(r).w * dims(r).hgt) / 300, uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
   const absorbOf = (r) => (r.it.type === 'rug' ? varOf(r).absorb : (COVERS[r.s.cover] || {}).absorb);
   const acoustics = clamp(wmean(rows.filter((r) => area(r) && absorbOf(r)).map((r) => [absorbOf(r), area(r)])), 1, 5);
   // durability and care: upholstery by area
@@ -424,7 +429,8 @@ const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
 /** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
 function specRows(setId, withOverrides) {
   const groups = new Map(), PREFIX = { uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
-    roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', plant: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
+    roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', sconce: 'LT', plant: 'AC',
+    frame: 'AC', gallery: 'AC', mirror: 'AC', shelf: 'AC', acousticPanel: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
   for (const it of state.items) {
     const s = resolveSpec(it, setId, withOverrides), size = pieceSize(it, s), spec = pieceSpecText(it, s);
     const key = [it.type, spec, size.text].join('|');

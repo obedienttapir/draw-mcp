@@ -162,7 +162,7 @@ function updateLighting() {
     if (!o.material) return;
     for (const m of [].concat(o.material)) if (m.isMeshStandardMaterial) m.envMapIntensity = env;
   });
-  for (const it of state.items) if (it.type === 'floorLamp') setLamp(it.id, L.lamp);
+  for (const it of state.items) if (it.type === 'floorLamp' || it.type === 'sconce') setLamp(it.id, L.lamp);
   invalidate(3);
 }
 

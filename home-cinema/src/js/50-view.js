@@ -49,6 +49,16 @@ function updatePlanDensity() {
   $('#labels').classList.toggle('compact', mode === 'plan' && ortho.zoom / planFit < 1.6);
 }
 
+// ---------------- room visible above a bottom sheet ----------------
+let viewInset = 0;                                     // px of the stage covered from the bottom (phone menu sheet)
+/** Shift the picture up by half the covered height, so the middle of the room sits in the middle of what you can see. */
+function applyViewInset(px) {
+  viewInset = px;
+  const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
+  for (const cam of [camera, ortho]) { if (px > 0.5) cam.setViewOffset(w, h, 0, px / 2, w, h); else cam.clearViewOffset(); }
+  invalidate(2);
+}
+
 // ---------------- presets ----------------
 let tween = null;
 function presetPose(name) {

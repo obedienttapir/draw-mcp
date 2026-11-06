@@ -153,6 +153,7 @@ function initCodeDialog() {
 const isNarrow = () => window.matchMedia('(max-width: 900px)').matches;
 /** Narrow screens show one panel at a time; 'left' | 'right' | null. */
 function openPanel(which) {
+  if (which) closeSheet();                                  // a panel and the sheet would cover each other on a phone
   $('#leftPanel').classList.toggle('collapsed', which !== 'left');
   $('#rightPanel').classList.toggle('collapsed', which !== 'right');
   $('#toggleLeft').setAttribute('aria-expanded', String(which === 'left'));

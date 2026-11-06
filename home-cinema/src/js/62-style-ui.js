@@ -79,9 +79,10 @@ function renderStyleTab() {
 
 // ---------------- per-piece style controls (in the details panel) ----------------
 const WOOD_PARTS = { roundTable: ['pedestal', 'slab', 'frame'], console: ['slatted', 'credenza', 'fluted', 'frame', 'cane'], sideTable: ['drum', 'stump', 'ctable'],
-  barCart: ['classic', 'oak'], ottoman: ['tufted', 'tray'], loungeChair: ['frame', 'low'], floorLamp: ['tripod'] };
+  barCart: ['classic', 'oak'], ottoman: ['tufted', 'tray'], loungeChair: ['frame', 'low'], floorLamp: ['tripod'],
+  frame: ['wood', 'float'], gallery: ['wood'], shelf: ['floating', 'ledge'], acousticPanel: ['slat'] };
 const METAL_PARTS = { floorLamp: ['drum', 'arc', 'tripod', 'globe'], roundTable: ['tulip', 'frame'], console: ['fluted', 'frame', 'credenza'], sideTable: ['ctable'],
-  loungeChair: ['sling', 'swivel'], barCart: ['classic'] };
+  loungeChair: ['sling', 'swivel'], barCart: ['classic'], frame: ['metal'], gallery: ['metal'], mirror: ['round', 'arch', 'rect'], sconce: ['globe', 'arm', 'cone'] };
 const STONE_PARTS = { roundTable: ['tulip', 'drum'], sideTable: ['pedestal'], floorLamp: ['arc'] };
 /** Override one style key on a piece (dropping it when it matches the set). The caller rebuilds the piece. */
 function setStyleKey(it, k, v) {

@@ -49,6 +49,7 @@ function floorObstacles() {
 }
 /** True when the piece at (x, y, rot) is fully on the floor and clear of walls, stairs and the bump. */
 function fitsRoom(it, x = it.x, y = it.y, rot = it.rot) {
+  if (isWallType(it.type)) return true;                     // wall pieces are kept on a wall by placeOnWall instead
   const fp = footprint(it, x, y, rot); if (!fp) return true;
   const poly = geom().outline;
   if (!fp.every((p) => pointInPoly(p, poly))) return false;
@@ -110,4 +111,65 @@ function nearestFit(it, x, y, rot = it.rot) {
     }
   }
   return null;
+}
+
+// ---------------- wall pieces ----------------
+/** Nearest wall (an edge of the floor outline) to plan point (x, y): its ends, length, the distance along it, inward normal. */
+function wallSnap(x, y) {
+  const o = geom().outline; let best = null;
+  for (let i = 0; i < o.length; i++) {
+    const a = o[i], b = o[(i + 1) % o.length], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+    if (len < 6) continue;
+    const ux = dx / len, uy = dy / len, t = clamp((x - a[0]) * ux + (y - a[1]) * uy, 0, len);
+    const px = a[0] + ux * t, py = a[1] + uy * t, dist = Math.hypot(x - px, y - py);
+    if (!best || dist < best.dist) best = { a, len, t, ux, uy, nx: -uy, ny: ux, dist };   // interior is on the left of each edge
+  }
+  return best;
+}
+/** Highest a wall piece's centre may go: under the bulkhead over the TV alcove or the fireplace lounge, else the ceiling. */
+function wallTop(x, y) {
+  const r = state.room, G = geom();
+  if (y > G.mainY - r.soffitDepth && x > r.bayLeft - 1 && x < r.bayRight + 1) return r.soffitBottom;
+  if (x < r.beamDepth && y > G.westY - 40) return r.beamBottom;
+  return r.ceiling;
+}
+/** Hang a wall piece on the wall nearest (x, y): flat against it, facing into the room, kept inside the wall's length and height. */
+function placeOnWall(it, x, y, h = it.p.h) {
+  const obj = itemObjects.get(it.id), w = obj ? obj.w : 20, d = obj ? obj.d : 2, hv = obj ? obj.hv : 20;
+  const s = wallSnap(x, y); if (!s) return;
+  const t = s.len > w + 2 ? clamp(s.t, w / 2 + 1, s.len - w / 2 - 1) : s.len / 2;
+  // slat walls stand proud of the plaster: hang on their face
+  const onFireWall = Math.abs(s.a[0]) < 0.01 && Math.abs(s.ux) < 0.01, onTVWall = Math.abs(s.a[1] - state.room.depth) < 0.01 && Math.abs(s.uy) < 0.01;
+  const face = (onFireWall && state.finish.fireplaceSlats) || (onTVWall && state.finish.tvSlats) ? SLAT_FACE : 0;
+  const off = d / 2 + 0.15 + face;
+  it.x = Math.round((s.a[0] + s.ux * t + s.nx * off) * 4) / 4;
+  it.y = Math.round((s.a[1] + s.uy * t + s.ny * off) * 4) / 4;
+  it.rot = ((Math.round(Math.atan2(-s.nx, s.ny) / DEG) % 360) + 360) % 360;
+  const top = wallTop(it.x, it.y) - hv / 2 - 1, bottom = Math.min(top, hv / 2 + 2);
+  it.p.h = Math.round(clamp(h, bottom, top) * 2) / 2;
+  // keep clear of the fireplace, the two windows over it and the TV: take the smallest step that frees it
+  const keep = wallKeepOuts(onFireWall, onTVWall); if (!keep.length) return;
+  const along = onFireWall ? 'y' : 'x', lo = Math.min(s.a[onFireWall ? 1 : 0], s.a[onFireWall ? 1 : 0] + (onFireWall ? s.uy : s.ux) * s.len);
+  const hi = lo + s.len, m = 1.5;
+  const hits = (u, z) => keep.some(([u0, u1, z0, z1]) => u + w / 2 + m > u0 && u - w / 2 - m < u1 && z + hv / 2 + m > z0 && z - hv / 2 - m < z1);
+  const u = it[along], z = it.p.h; if (!hits(u, z)) return;
+  const cands = [];
+  for (const [u0, u1, z0, z1] of keep) cands.push([u0 - w / 2 - m, z], [u1 + w / 2 + m, z], [u, z1 + hv / 2 + m], [u, z0 - hv / 2 - m]);
+  const ok = cands.filter(([cu, cz]) => cu - w / 2 >= lo && cu + w / 2 <= hi && cz >= bottom && cz <= top && !hits(cu, cz))
+    .sort((p, q) => Math.hypot(p[0] - u, p[1] - z) - Math.hypot(q[0] - u, q[1] - z));
+  if (ok.length) { it[along] = Math.round(ok[0][0] * 4) / 4; it.p.h = Math.round(ok[0][1] * 2) / 2; }
+}
+/** [along0, along1, z0, z1] areas a wall piece must not cover: fireplace + windows on the fireplace wall, the TV on the TV wall. */
+function wallKeepOuts(onFireWall, onTVWall) {
+  const out = [];
+  if (onFireWall) {
+    const f = state.fireplace, r = state.room, c = f.center, gap = r.transomGap / 2;
+    out.push([c - f.width / 2 - 2, c + f.width / 2 + 2, f.bottom - 2, f.bottom + f.height + 2]);
+    if (state.finish.transoms !== 'hidden') out.push([c - gap - r.transomW - 1, c + gap + r.transomW + 1, r.transomBottom - 1, r.transomBottom + r.transomH + 1]);
+  }
+  if (onTVWall) {
+    const t = state.tv, d = tvDims(t.size), x = geom().tvX + t.offset;
+    out.push([x - d.w / 2 - 2, x + d.w / 2 + 2, t.center - d.h / 2 - 2, t.center + d.h / 2 + 2]);
+  }
+  return out;
 }

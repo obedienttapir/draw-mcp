@@ -44,7 +44,9 @@ Built for phones first; on by default and switchable under **Furnish › Press a
 - **Hold a piece** (a ring fills under your finger, the phone buzzes): it lifts off the floor. Keep your finger down and drag to move it; let go and its menu slides up from the bottom.
 - **A quick tap never selects**, so one finger can orbit the room without bumping furniture. Tapping empty floor closes the menu.
 - **Hold the floor** to open **Add here**: the piece lands on that spot, seats turn to face the TV, and if it's too big for the spot it goes to the nearest place it fits. Holding a rug selects the rug; its menu has **Add here** too.
-- **The menu** is a thumb-sized bottom sheet: rotate 15° / 90°, **Face TV**, **Face fire**, copy, undo and delete, then tabs that appear only when the piece has them: **Colour** (large swatches), **Fabric** or **Finish**, **Style**, **Layout** (steppers and options such as seat count, chaises, sleeper mode) and **Size**. Swipe the grip down to close it, or up to make it taller.
+- **The menu** is a bottom sheet that stays out of the way. It opens as a slim strip (about 150 px on a phone) with the name, quick actions (rotate 15° / 90°, **Face TV**, **Face fire**, copy, **3D file**, undo, delete) and tabs that appear only when the piece has them: **Colour**, **Fabric** or **Finish**, **Style**, **Layout** and **Size**. Tap a tab to open its options; tap it again, or touch the room, to fold back to the strip. Swipe the grip up for more room and down to fold or close.
+- **The room stays in view**: on a phone the 3D picture (and Plan) shifts up by half the sheet's height so the room centres in the part you can see, and if the piece you picked is hidden behind the sheet the camera glides to it. The camera presets hide while the sheet is up.
+- **Hold a wall** to open **Hang on this wall**: frames, a gallery wall, mirrors, shelves, sconces and acoustic panels land flat on that wall at the height you held.
 - **Walls are solid**: dragging, nudging, turning, copying and adding all keep a piece's footprint on the floor and clear of the stairs and the steel-beam bump. A drag into a wall stops at the wall and slides along it. Turning next to a wall shifts the piece out a little, or says there's no room. A piece that already overlaps a wall (an old layout) can be dragged free but never further in.
 
 ## Wayfair Tremee U-sectional
@@ -63,6 +65,7 @@ Built for phones first; on by default and switchable under **Furnish › Press a
 The 79.6″ depth is the drawing's layout: a long chaise (seat + two ottomans) on one end and a single chaise on the other. The listing photo instead shows a chaise at each end and the third ottoman loose in front (93.5″ deep with a 14″ gap).
 
 - **Fabric** offers the four Wayfair options: Green Corduroy, Grey Polyester, Grey Velvet and Light Corduroy (the listing cuts the fourth name off at "Ligh…"), in a new **Jumbo corduroy** cover, plus every other cover in the planner.
+- **Configurations** (one tap, in Layout): **1 · U + loose ottoman** (listing photo), **2 · Long chaise, left**: the loose ottoman joins the end of the left chaise (134″ × 80″, the dimension sheet), **3 · Long chaise, right** (mirrored) and **Sleeper**. Left and right are as you face the sofa.
 - **Layout**: 3–7 seats; chaises at both ends (U), *Long left + right* (as dimensioned), *Left + long right*, left, right or none; the loose ottoman in front or put away; arms or armless; the listing photo's throw pillows on or off; and **Sleeper (bed)** mode, which pulls the ottomans in front of the middle seats into one bed deck. A badge says whether the layout uses only what's in the box (5 seats, 3 ottomans).
 - **Style**: *Tremee, as sold* or *Cloud pillow-back* (overstuffed cushions, lower back).
 - The price is an indicative range, not Wayfair's.
@@ -75,6 +78,24 @@ Ready-made files in [`models/`](models/):
 
 - `tremee-u-sectional-green-corduroy.glb`: as in the listing photo (U with the loose ottoman), 134.2″ × 93.5″ × 33.9″
 - `tremee-u-sectional-as-dimensioned.glb`: as in the dimension drawing (long left chaise), 134.2″ × 79.5″ × 33.9″
+
+## Wall décor
+
+Six wall pieces, under **Furnish** or by holding a wall (or the floor: they go on the nearest wall):
+
+| Piece | Styles | Options |
+| --- | --- | --- |
+| Picture frame | wood, thin metal, floating, gallery canvas | six artworks (warm abstract, dusk landscape, botanical, film poster, B&W photograph, line drawing), white mat or none, any size |
+| Gallery wall | wood or black metal frames | 3, 5 or 6 (grid) frames, mixed or matching art |
+| Mirror | round, arch, rectangle | brass, black or nickel; size |
+| Wall shelf | styled floating shelf, picture ledge with leaning frames | wood, length |
+| Wall sconce | opal globe, swing-arm, up/down cylinder | metal; it lights up with the lamps |
+| Acoustic panel | fabric (any cover and colour) or wood slats on felt | size; counts towards the acoustics score |
+
+- Wall pieces hang flat on the wall, facing the room, and on the face of the slats where a wall has them. Their centre height is in **Size** (57″ is gallery eye level: the **57″ eye** button).
+- **Hold one and drag** to slide it along the wall and up or down, or across to another wall. In the menu, **Up / Down** move it 2″ and **Slide** moves it 4″ along the wall; arrow keys do the same on a keyboard.
+- They stay inside the wall, under the ceiling or bulkhead, and step aside so they never cover the fireplace, the windows above it or the TV.
+- Art is drawn by the planner (no images to download), so it works offline once loaded.
 
 ## Furniture style study (phase two)
 
@@ -127,10 +148,12 @@ src/js/20-room.js     floor, walls with openings, ceiling, bulkheads, pilaster
 src/js/25-fixtures.js stairs, slat walls, fireplace with animated flames, transoms, TV
 src/js/30-lights.js   pot lights, LED channels, lighting scenes
 src/js/40-furniture.js furniture catalogue and factories (every style variant)
+src/js/42-decor.js     wall décor: frames, gallery wall, mirrors, shelves, sconces, acoustic panels, procedural art
 src/js/45-styles.js    style sets, upholstery library, prices, lead times, scoring, spec sheet rows
+src/js/46-decor-styles.js wall décor variants, prices and default finishes
 src/js/50-view.js     renderer, cameras, presets, walk mode, plan dimensions, viewing maths
 src/js/55-edit.js     picking, dragging, measuring, keyboard
-src/js/57-collide.js  footprints, walls and obstacles: keeps furniture on the floor
+src/js/57-collide.js  footprints, walls and obstacles: keeps furniture on the floor and wall pieces on walls
 src/js/58-hold.js     press and hold gestures, the bottom-sheet furniture menu, Add here
 src/js/59-export.js   download a piece as a .glb 3D file
 src/js/60-ui.js       design panel tabs

@@ -44,6 +44,11 @@ function drawOutline() {
   if (!selected) return;
   if (selected.kind === 'item') {
     const it = itemById(selected.id), obj = itemObjects.get(selected.id); if (!it || !obj) { selected = null; return; }
+    if (isWallType(it.type)) {                              // a wall piece: an upright outline just in front of it
+      const w = obj.w / 2 + 2, hv = obj.hv / 2 + 2, z = obj.d / 2 + 0.6;
+      const loop = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([[-w, -hv], [w, -hv], [w, hv], [-w, hv]].map(([a, b]) => new THREE.Vector3(a, b, z))), OUTLINE_MAT);
+      loop.renderOrder = 20; outline.add(loop); syncOutline(); return;
+    }
     const w = obj.w + 5, d = obj.d + 5, rr = 3, pts = [];
     for (const [cx, cz, a0] of [[w / 2 - rr, d / 2 - rr, 0], [-w / 2 + rr, d / 2 - rr, 90], [-w / 2 + rr, -d / 2 + rr, 180], [w / 2 - rr, -d / 2 + rr, 270]]) {
       for (let k = 0; k <= 6; k++) { const a = (a0 + k * 15) * DEG; pts.push(new THREE.Vector3(cx + Math.cos(a) * rr, 0.8, cz + Math.sin(a) * rr)); }
@@ -102,7 +107,7 @@ el.addEventListener('pointerdown', (e) => {
   down = { x: e.clientX, y: e.clientY, button: e.button, id: e.pointerId };
   if (mode === 'walk') { walk.dragging = true; walk.lx = e.clientX; walk.ly = e.clientY; el.setPointerCapture(e.pointerId); return; }
   if (e.button !== 0 || measure.on || viewOnly()) return;             // menus hidden: every touch just moves the camera
-  if (holdMode()) { holdStart(e); return; }                           // press and hold picks up; a tap never selects
+  if (holdMode()) { sheetYieldToCanvas(); holdStart(e); return; }                           // press and hold picks up; a tap never selects
   setRay(e);
   const hit = pick();
   if (hit && hit.kind === 'item') {
@@ -128,6 +133,7 @@ el.addEventListener('pointermove', (e) => {
   const nx = Math.round((drag.x0 + (fp.x - drag.f0.x)) * 2) / 2, ny = Math.round((drag.y0 - (fp.z - drag.f0.z)) * 2) / 2;
   if (!drag.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 4) return;
   drag.moved = true;
+  if (isWallType(it.type)) { dragOnWall(it, obj); return; }
   // walls stop the piece; it slides along them instead of passing through
   [it.x, it.y] = resolveMove(it, clamp(nx, -40, state.room.width + 40), clamp(ny, -state.room.stairWidth - 40, state.room.depth + 40));
   placeItem(obj.group, it); if (drag.fromHold) obj.group.position.y = 1.5;
@@ -161,10 +167,30 @@ el.addEventListener('pointerup', (e) => {
 });
 el.addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); holdCancel(); if (drag && drag.fromHold) liftItem(drag.id, false); drag = null; down = null; walk.dragging = false; controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan'; });
 
+/** Drag a wall piece: follow the wall under the finger (sliding along it, up and down), or the nearest wall to the floor point. */
+function dragOnWall(it, obj) {
+  const hits = ray.intersectObjects([roomGroup, fixturesGroup], true);
+  let hit = null;
+  for (const h of hits) {
+    let vis = true; for (let q = h.object; q; q = q.parent) if (!q.visible) vis = false;
+    if (!vis || (h.object.material && h.object.material.opacity < 0.5)) continue;
+    hit = h; break;
+  }
+  if (hit && hit.point.y > 2 && hit.point.y < state.room.ceiling - 1) {
+    if (drag.dh == null) drag.dh = it.p.h - hit.point.y;            // keep the finger where it grabbed the piece
+    placeOnWall(it, hit.point.x, -hit.point.z, hit.point.y + drag.dh);
+  } else {
+    const fp = floorPoint(); if (!fp) return;
+    placeOnWall(it, fp.x, -fp.z);
+  }
+  placeItem(obj.group, it); syncOutline(); renderInspectorLive();
+}
+
 // ---------------- item operations ----------------
 function rotateSelected(deg) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
+  if (isWallType(it.type)) { toast('Wall pieces turn with the wall: drag it onto another wall'); return; }
   const rot = ((it.rot + deg) % 360 + 360) % 360;
   let x = it.x, y = it.y;
   if (fitsRoom(it) && !fitsRoom(it, x, y, rot)) {          // turning would swing it into a wall: shift it out a little, or refuse
@@ -178,6 +204,11 @@ function rotateSelected(deg) {
 function nudgeSelected(dx, dy) {
   if (!selected || selected.kind !== 'item') return;
   const it = itemById(selected.id); if (!it) return;
+  if (isWallType(it.type)) {                              // left/right slide along the wall, up/down change the height
+    pushHistory(); const c = Math.cos(it.rot * DEG), s = Math.sin(it.rot * DEG);
+    placeOnWall(it, it.x - c * dx, it.y - s * dx, it.p.h + dy);
+    placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false); return;
+  }
   const [x, y] = resolveMove(it, it.x + dx, it.y + dy);
   if (x === it.x && y === it.y) { toast('Against a wall'); return; }
   pushHistory(); it.x = x; it.y = y; placeItem(itemObjects.get(it.id).group, it); syncOutline(); commit(false);
@@ -196,7 +227,10 @@ function duplicateSelected() {
   pushHistory();
   const copy = { ...clone(it), id: uid(it.type), x: it.x + 12, y: it.y - 12 };
   state.items.push(copy); buildItem(copy);
-  const spot = nearestFit(copy, copy.x, copy.y); if (spot) { [copy.x, copy.y] = spot; placeItem(itemObjects.get(copy.id).group, copy); }
+  if (isWallType(copy.type)) {
+    const w = itemObjects.get(copy.id).w + 4, c = Math.cos(it.rot * DEG), s = Math.sin(it.rot * DEG);
+    placeOnWall(copy, it.x - c * w, it.y - s * w); placeItem(itemObjects.get(copy.id).group, copy);
+  } else { const spot = nearestFit(copy, copy.x, copy.y); if (spot) { [copy.x, copy.y] = spot; placeItem(itemObjects.get(copy.id).group, copy); } }
   updateLighting(); select({ kind: 'item', id: copy.id }); commit(false);
 }
 /** Add a piece at plan point `at` (default: middle of the room). Seats turn to face the TV; it lands where it fits. */
@@ -210,6 +244,13 @@ function addItem(type, at, style) {
   state.items.push(it);
   if (style) for (const [k, v] of Object.entries(style)) setStyleKey(it, k, v);
   buildItem(it);
+  if (def.wall) {                                         // hang it on the nearest wall, at the held height if a wall was held
+    placeOnWall(it, pos.x, pos.y, at && at.wall ? at.wall.h : it.p.h); it.rot = it.rot || 0;
+    placeItem(itemObjects.get(it.id).group, it); updateLighting();
+    select({ kind: 'item', id: it.id }); commit(false);
+    toast(`${def.label} hung · ${holdMode() ? 'hold it to slide it along the wall or up and down' : 'drag it along the wall'}`);
+    return;
+  }
   let spot = nearestFit(it, it.x, it.y);
   if (!spot && it.rot) { it.rot = 0; spot = nearestFit(it, it.x, it.y); }
   if (spot) { [it.x, it.y] = spot; placeItem(itemObjects.get(it.id).group, it); }
