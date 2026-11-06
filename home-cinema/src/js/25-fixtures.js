@@ -207,10 +207,14 @@ function buildStairs() {
     const nose = i === 0 ? 2 : 1.2;                        // the starting step's bullnose is the tip of the stairs
     const len = Math.min(G.run + nose, r.width - x0 + nose);
     const extra = i === 0 ? 3 : 0;                         // wider starting step, like the one on site
-    treads.setMatrixAt(n, m4.compose(P(x0 - nose + len / 2, yc, top - 0.62), q, sc.set(len, 1.25, wid + 1.2 + 2 * extra)));
-    risers.setMatrixAt(n, m4.compose(P(x0 + 0.4, yc, top - G.riserH / 2 - 0.62), q, sc.set(0.75, G.riserH - 1.25, wid + 2 * extra)));
+    // the hallway side overhangs ½″; the room side stops 2½″ short of the wall facing the TV (behind the stringer), so on
+    // GPUs with a coarse depth buffer nothing flickers through that wall from across the room
+    const ys = y0 - 0.6 - extra, yn = y1 - 2.5 + extra;
+    treads.setMatrixAt(n, m4.compose(P(x0 - nose + len / 2, (ys + yn) / 2, top - 0.62), q, sc.set(len, 1.25, yn - ys)));
+    risers.setMatrixAt(n, m4.compose(P(x0 + 0.4, (ys + yn) / 2 + 0.3, top - G.riserH / 2 - 0.62), q, sc.set(0.75, G.riserH - 1.25, yn - ys - 0.6)));
     const fh = Math.max(0.1, top - 1.3);
-    fills.setMatrixAt(n, m4.compose(P(x0 + G.run / 2 + 0.75, yc, fh / 2), q, sc.set(G.run - 0.6, fh, wid - 0.2)));
+    // kept 3″ off the room side, so it can't flicker through the wall facing the TV from a distance
+    fills.setMatrixAt(n, m4.compose(P(x0 + G.run / 2 + 0.75, yc - 1.5, fh / 2), q, sc.set(G.run - 0.6, fh, wid - 3.2)));
     steps.push({ x0, top });
     if (top < H + 20) {                                    // low-glare light in each riser
       const lens = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
@@ -221,21 +225,23 @@ function buildStairs() {
   for (const im of [treads, risers, fills]) { im.count = n; g.add(im); }
 
   // knee walls under the stringers: room side (faces north) and hallway side (faces south)
-  const knee = (x1, side) => {
-    const pts = [[r.stairStart + 2, 0], [x1, 0], [x1, Math.min(H, zAt(x1) - 3)], [Math.min(x1, xTop), Math.min(H, zAt(Math.min(x1, xTop)) - 3)]];
+  const knee = (x0, x1, side) => {
+    const pts = [[x0, 0], [x1, 0], [x1, Math.min(H, zAt(x1) - 3)], [Math.min(x1, xTop), Math.min(H, zAt(Math.min(x1, xTop)) - 3)]];
+    if (zAt(x0) - 3 > 0.5) pts.push([x0, zAt(x0) - 3]);
     const geo = new THREE.ShapeGeometry(shapeFrom(side > 0 ? pts.map(([x, z]) => [-x, z]) : pts));
     const m = new THREE.Mesh(geo, M.wall);
     if (side > 0) { m.rotation.y = Math.PI; m.position.copy(P(0, 0.05, 0)); }   // mirrored + turned: faces north
     else m.position.copy(P(0, y0 - 0.05, 0));                                       // faces south, into the hallway
     g.add(m);
   };
-  knee(r.width, 1);
-  if (openTo > r.stairStart + 4) knee(openTo, -1);
+  // room side: the panel runs from the 2nd riser (blue) to where the solid wall facing the TV starts (pink); hallway side to the hall's end
+  knee(G.kneeX, G.wallX, 1);
+  if (openTo > r.stairStart + 4) knee(r.stairStart + 2, openTo, -1);
 
   // dark stringers, iron balusters (one instanced draw), handrails and newels
   const iron = cached('stair-iron', () => new THREE.MeshStandardMaterial({ color: '#141312', roughness: 0.5, metalness: 0.6 }));
   const rail = 34, bal = [];
-  const side = (yy, xEnd) => {
+  const side = (yy, xEnd, topNewel) => {
     const len = (xEnd - r.stairStart) / Math.cos(Math.atan(slope)), mid = (r.stairStart + xEnd) / 2;
     const stringer = new THREE.Mesh(new THREE.BoxGeometry(len, 9, 0.9), M.stairWood);
     stringer.rotation.z = Math.atan(slope); stringer.position.copy(P(mid, yy, zAt(mid) - 4)); g.add(stringer);
@@ -250,8 +256,12 @@ function buildStairs() {
     newel.position.copy(P(r.stairStart - 1.5, yy, 20)); g.add(newel);
     const cap = new THREE.Mesh(new THREE.BoxGeometry(4.6, 1.2, 4.6), M.stairWood);
     cap.position.copy(P(r.stairStart - 1.5, yy, 40.6)); g.add(cap);
+    if (topNewel) {                                        // a tall newel where the rail meets the wall, as on site
+      const zt = zAt(xEnd) + G.riserH + rail + 6, nw = new THREE.Mesh(new THREE.BoxGeometry(3.6, zt, 3.6), M.stairWood);
+      nw.position.copy(P(xEnd - 2, yy, zt / 2)); g.add(nw);
+    }
   };
-  side(-1.8, xTop);                                        // room side
+  side(-1.8, G.wallX, true);                               // room side: open only up to the solid wall
   if (openTo > r.stairStart + 4) side(y0 + 1.8, openTo);   // hallway side, open
   const balusters = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.32, 0.32, 1, 8), iron, bal.length);
   bal.forEach(([x, yy, z0, z1], i) => balusters.setMatrixAt(i, m4.compose(P(x, yy, (z0 + z1) / 2), q, sc.set(1, z1 - z0, 1))));

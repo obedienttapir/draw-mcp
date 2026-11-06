@@ -571,7 +571,14 @@ const DEFAULT_STATE = {
     pilasterW: 18, pilasterD: 12,   // steel-beam bump: its face is 9'-11" from the south end of the fireplace pocket
     boxX: 45,              // wall the stairs face: fireplace alcove is 3'-9" deep from its corner
     stairWidth: 40, stairStart: 92, risers: 16, floorToFloor: 122,   // 3'-11" landing, tip 11'-6" from the exterior wall
-    hallDepth: 54, hallEnd: 176,   // open hallway behind the stairs (two doors), railing along that side
+    // the wall facing the TV (the stairs' room side), from the exterior-wall corner:
+    stairWall: 91,         // solid, floor to ceiling (pink): the stairwell opens west of it
+    stairPanel: 128,       // to where the panel under the stairs meets the floor (blue): the 2nd riser
+    stairKnee: 31,         // height of that panel where the solid wall ends (orange): sets the stair slope
+    // the hallway behind the stairs, open to them under a railing
+    hallDepth: 86,         // its east wall, from the stairs south to the far wall (green; closet door on it)
+    hallWidth: 93,         // its far wall, from the wall the stairs face to the east wall (red; door on it)
+    hallEnd: 138,
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },
   finish: {
@@ -585,7 +592,7 @@ const DEFAULT_STATE = {
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
-  rev: 3,                 // room-measurement revision; older saved layouts get the corrected room
+  rev: 4,                 // room-measurement revision; older saved layouts get the corrected room
   style: { set: 'warm-modern' },                          // furniture style set (pieces can override it in item.s)
   // the owner's evaluation of the sets: kept out of undo, travels with the layout code
   study: { weights: { ...DEFAULT_WEIGHTS }, ratings: {}, notes: {}, shortlist: [], pick: null },
@@ -659,15 +666,19 @@ function geom(r = state.room) {
   const tvX = (bay[2][0] + bay[3][0]) / 2;
   // floor outline, counter-clockwise (interior on the left of each edge)
   // the landing and the open hallway behind the stairs are part of the floor
-  const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallEnd, r.boxX + 24, r.width - 1);
+  const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallWidth ? r.boxX + r.hallWidth : r.hallEnd, r.boxX + 24, r.width - 1);
   const outline = [
     [0, 0], [r.boxX, 0], [r.boxX, hallY], [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
     [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, westY],
   ];
   const riserH = r.floorToFloor / r.risers;
   const treads = r.risers - 1;
-  const run = Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd };
+  // the wall facing the TV: solid from wallX to the exterior wall; under the stairs a panel from kneeX
+  const wallX = clamp(r.width - (r.stairWall ?? 0), r.stairStart + 12, r.width);
+  const kneeX = clamp(r.width - (r.stairPanel ?? r.width - r.stairStart), r.stairStart, wallX);
+  // tread run: the panel top (bottom of the 9″ stringer, 8½″ under the nosing line) is stairKnee up at wallX
+  const run = r.stairKnee ? clamp(riserH * (wallX - r.stairStart) / (r.stairKnee + 8.5), 7, 12) : Math.min((r.width - r.stairStart) / treads, 11);
+  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX };
 }
 
 // ---------------- persistence + history ----------------
@@ -1260,6 +1271,13 @@ function buildRoom() {
   // reveals (jambs) through the wall thickness
   for (const h of [fp, ...tr]) addReveal(h, M.wall);
 
+  // ---- the wall facing the TV: solid from the stairwell opening to the exterior wall (both faces) ----
+  if (G.wallX < r.width - 0.5) {
+    const tv = wallQuad([G.wallX, 0], [r.width, 0], 0, H, M.wall); tv.name = 'wall facing TV'; roomGroup.add(tv);
+    roomGroup.add(wallQuad([r.width, 0], [G.wallX, 0], 0, H, M.wall));                     // its stair side
+    roomGroup.add(wallCap([G.wallX, 0], [r.width, 0], H + 0.2));
+  }
+
   // ---- ceiling with the stairwell opening ----
   const ceilGeo = new THREE.ShapeGeometry(shapeFrom(G.outline, [rect(stairOpenX, -r.stairWidth + 0.01, r.width - 0.01, -0.01)]));
   ceilGeo.rotateX(-Math.PI / 2);
@@ -1304,10 +1322,11 @@ function buildRoom() {
       roomGroup.add(b2); FX.bulkheads.push(b2);
     }
   }
-  // two doors on the hallway's far wall, as on site
+  // the hallway: a door on its far wall (a third of the way from its east end, as on site)
+  // and the closet door on its east wall, next to the stairs
   const hallLen = G.hallEnd - r.boxX;
-  const doors = hallLen >= 120 ? [r.boxX + hallLen * 0.27, r.boxX + hallLen * 0.67] : hallLen >= 40 ? [r.boxX + hallLen / 2] : [];
-  for (const x of doors) roomGroup.add(makeDoor(x, G.hallY));
+  if (hallLen >= 40) roomGroup.add(makeDoor(Math.max(r.boxX + 20, G.hallEnd - hallLen * 0.34), G.hallY));
+  if (r.hallDepth >= 34) roomGroup.add(makeDoor(G.hallEnd, -r.stairWidth - 19, -Math.PI / 2, 26));
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
   pil.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
@@ -1332,8 +1351,8 @@ function addReveal(h, mat) {
 }
 
 /** White two-panel door with casing on a wall facing north (into the hallway). */
-function makeDoor(x, y) {
-  const g = new THREE.Group(), w = 30, h = 80;
+function makeDoor(x, y, turn = Math.PI, w = 30) {
+  const g = new THREE.Group(), h = 80;
   const white = cached('door-white', () => new THREE.MeshStandardMaterial({ color: '#f1eee8', roughness: 0.55 }));
   const slab = new THREE.Mesh(new THREE.BoxGeometry(w, h, 1.4), white); slab.position.set(0, h / 2, 0.7); g.add(slab);
   for (const py of [h * 0.72, h * 0.3]) {
@@ -1343,8 +1362,8 @@ function makeDoor(x, y) {
     const c = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, 0.8), white); c.position.set(px, py, 0.4); g.add(c);
   }
   const knob = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 8), M.metal); knob.position.set(w / 2 - 3, 36, 2.2); g.add(knob);
-  g.rotation.y = Math.PI;                       // face north (world -Z)
-  g.position.copy(P(x, y + 0.05, 0));
+  g.rotation.y = turn;                          // π: on a south wall, facing north · -π/2: on an east wall, facing west
+  g.position.copy(turn === Math.PI ? P(x, y + 0.05, 0) : P(x - 0.05, y, 0));
   return g;
 }
 
@@ -1558,10 +1577,14 @@ function buildStairs() {
     const nose = i === 0 ? 2 : 1.2;                        // the starting step's bullnose is the tip of the stairs
     const len = Math.min(G.run + nose, r.width - x0 + nose);
     const extra = i === 0 ? 3 : 0;                         // wider starting step, like the one on site
-    treads.setMatrixAt(n, m4.compose(P(x0 - nose + len / 2, yc, top - 0.62), q, sc.set(len, 1.25, wid + 1.2 + 2 * extra)));
-    risers.setMatrixAt(n, m4.compose(P(x0 + 0.4, yc, top - G.riserH / 2 - 0.62), q, sc.set(0.75, G.riserH - 1.25, wid + 2 * extra)));
+    // the hallway side overhangs ½″; the room side stops 2½″ short of the wall facing the TV (behind the stringer), so on
+    // GPUs with a coarse depth buffer nothing flickers through that wall from across the room
+    const ys = y0 - 0.6 - extra, yn = y1 - 2.5 + extra;
+    treads.setMatrixAt(n, m4.compose(P(x0 - nose + len / 2, (ys + yn) / 2, top - 0.62), q, sc.set(len, 1.25, yn - ys)));
+    risers.setMatrixAt(n, m4.compose(P(x0 + 0.4, (ys + yn) / 2 + 0.3, top - G.riserH / 2 - 0.62), q, sc.set(0.75, G.riserH - 1.25, yn - ys - 0.6)));
     const fh = Math.max(0.1, top - 1.3);
-    fills.setMatrixAt(n, m4.compose(P(x0 + G.run / 2 + 0.75, yc, fh / 2), q, sc.set(G.run - 0.6, fh, wid - 0.2)));
+    // kept 3″ off the room side, so it can't flicker through the wall facing the TV from a distance
+    fills.setMatrixAt(n, m4.compose(P(x0 + G.run / 2 + 0.75, yc - 1.5, fh / 2), q, sc.set(G.run - 0.6, fh, wid - 3.2)));
     steps.push({ x0, top });
     if (top < H + 20) {                                    // low-glare light in each riser
       const lens = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
@@ -1572,21 +1595,23 @@ function buildStairs() {
   for (const im of [treads, risers, fills]) { im.count = n; g.add(im); }
 
   // knee walls under the stringers: room side (faces north) and hallway side (faces south)
-  const knee = (x1, side) => {
-    const pts = [[r.stairStart + 2, 0], [x1, 0], [x1, Math.min(H, zAt(x1) - 3)], [Math.min(x1, xTop), Math.min(H, zAt(Math.min(x1, xTop)) - 3)]];
+  const knee = (x0, x1, side) => {
+    const pts = [[x0, 0], [x1, 0], [x1, Math.min(H, zAt(x1) - 3)], [Math.min(x1, xTop), Math.min(H, zAt(Math.min(x1, xTop)) - 3)]];
+    if (zAt(x0) - 3 > 0.5) pts.push([x0, zAt(x0) - 3]);
     const geo = new THREE.ShapeGeometry(shapeFrom(side > 0 ? pts.map(([x, z]) => [-x, z]) : pts));
     const m = new THREE.Mesh(geo, M.wall);
     if (side > 0) { m.rotation.y = Math.PI; m.position.copy(P(0, 0.05, 0)); }   // mirrored + turned: faces north
     else m.position.copy(P(0, y0 - 0.05, 0));                                       // faces south, into the hallway
     g.add(m);
   };
-  knee(r.width, 1);
-  if (openTo > r.stairStart + 4) knee(openTo, -1);
+  // room side: the panel runs from the 2nd riser (blue) to where the solid wall facing the TV starts (pink); hallway side to the hall's end
+  knee(G.kneeX, G.wallX, 1);
+  if (openTo > r.stairStart + 4) knee(r.stairStart + 2, openTo, -1);
 
   // dark stringers, iron balusters (one instanced draw), handrails and newels
   const iron = cached('stair-iron', () => new THREE.MeshStandardMaterial({ color: '#141312', roughness: 0.5, metalness: 0.6 }));
   const rail = 34, bal = [];
-  const side = (yy, xEnd) => {
+  const side = (yy, xEnd, topNewel) => {
     const len = (xEnd - r.stairStart) / Math.cos(Math.atan(slope)), mid = (r.stairStart + xEnd) / 2;
     const stringer = new THREE.Mesh(new THREE.BoxGeometry(len, 9, 0.9), M.stairWood);
     stringer.rotation.z = Math.atan(slope); stringer.position.copy(P(mid, yy, zAt(mid) - 4)); g.add(stringer);
@@ -1601,8 +1626,12 @@ function buildStairs() {
     newel.position.copy(P(r.stairStart - 1.5, yy, 20)); g.add(newel);
     const cap = new THREE.Mesh(new THREE.BoxGeometry(4.6, 1.2, 4.6), M.stairWood);
     cap.position.copy(P(r.stairStart - 1.5, yy, 40.6)); g.add(cap);
+    if (topNewel) {                                        // a tall newel where the rail meets the wall, as on site
+      const zt = zAt(xEnd) + G.riserH + rail + 6, nw = new THREE.Mesh(new THREE.BoxGeometry(3.6, zt, 3.6), M.stairWood);
+      nw.position.copy(P(xEnd - 2, yy, zt / 2)); g.add(nw);
+    }
   };
-  side(-1.8, xTop);                                        // room side
+  side(-1.8, G.wallX, true);                               // room side: open only up to the solid wall
   if (openTo > r.stairStart + 4) side(y0 + 1.8, openTo);   // hallway side, open
   const balusters = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.32, 0.32, 1, 8), iron, bal.length);
   bal.forEach(([x, yy, z0, z1], i) => balusters.setMatrixAt(i, m4.compose(P(x, yy, (z0 + z1) / 2), q, sc.set(1, z1 - z0, 1))));
@@ -3804,7 +3833,12 @@ function updateLabels() {
     const zz = r.ceiling + 2;
     dimLine([0, G.hallY - 24], [r.width, G.hallY - 24], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
     dimLine([r.boxX, -r.stairWidth / 2], [r.stairStart, -r.stairWidth / 2], zz, ftin(r.stairStart - r.boxX));
-    label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 14, zz), 'tag');
+    label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 30, zz), 'tag');
+    // your marks: the wall facing the TV (pink: solid part, blue: to the panel under the stairs) and the hallway (green, red)
+    dimLine([G.wallX, -6], [r.width, -6], zz, `solid wall ${ftin(r.width - G.wallX)}`);
+    dimLine([G.kneeX, -18], [r.width, -18], zz, `to stair panel ${ftin(r.width - G.kneeX)}`, 0.3);
+    dimLine([G.hallEnd - 10, -r.stairWidth], [G.hallEnd - 10, G.hallY], zz, ftin(r.hallDepth));
+    dimLine([r.boxX, G.hallY + 10], [G.hallEnd, G.hallY + 10], zz, ftin(G.hallEnd - r.boxX));
     // measured from the stair-side line: exterior wall to the alcove notch, then the whole depth to the TV wall
     dimLine([r.width + 20, 0], [r.width + 20, G.mainY], zz, ftin(G.mainY), 0.32);   // staggered from the outer label
     dimLine([r.width + 48, 0], [r.width + 48, r.depth], zz, `${ftin(r.depth)} to TV wall`);
@@ -3818,7 +3852,7 @@ function updateLabels() {
     label('Steel beam W200', P(r.beamX, G.westY * 0.5, zz), 'tag', -90);
     label('TV alcove', P(G.tvX, G.mainY + r.bayDepth * 0.55, zz), 'tag');
     if (r.beamDepth > 1) dimLine([0, G.westY + 14], [r.beamDepth, G.westY + 14], zz, `bulkhead at ${ftin(r.beamBottom)}`);
-    label('Stairs ↑', P((r.stairStart + r.width) / 2, -r.stairWidth * 0.3, zz), 'tag');
+    label('Stairs ↑', P(r.stairStart + 14, -r.stairWidth * 0.7, zz), 'tag');
     dimLine([r.stairStart - 2, -r.stairWidth + 8], [r.width, -r.stairWidth + 8], zz, `tip of stairs ${ftin(r.width - r.stairStart + 2)}`);
     label('Exterior wall', P(r.width - 10, G.mainY / 2, zz), 'tag', 90);
     label('Fireplace', P(10, state.fireplace.center, zz), 'tag', -90);
@@ -4319,9 +4353,11 @@ function nearestFit(it, x, y, rot = it.rot) {
 // ---------------- wall pieces ----------------
 /** Nearest wall (an edge of the floor outline) to plan point (x, y): its ends, length, the distance along it, inward normal. */
 function wallSnap(x, y) {
-  const o = geom().outline; let best = null;
-  for (let i = 0; i < o.length; i++) {
-    const a = o[i], b = o[(i + 1) % o.length], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+  const G = geom(), o = G.outline; let best = null;
+  const edges = o.map((a, i) => [a, o[(i + 1) % o.length]]);
+  if (G.wallX < state.room.width - 0.5) edges.push([[G.wallX, 0], [state.room.width, 0]]);   // the solid wall facing the TV (room side)
+  for (const [a, b] of edges) {
+    const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
     if (len < 6) continue;
     const ux = dx / len, uy = dy / len, t = clamp((x - a[0]) * ux + (y - a[1]) * uy, 0, len);
     const px = a[0] + ux * t, py = a[1] + uy * t, dist = Math.hypot(x - px, y - py);
@@ -5025,6 +5061,13 @@ function renderRoomTab() {
     }),
     rs('boxX', 'Fireplace nook depth', 24, 72),
     h('p', { class: 'note' }, 'Your tape numbers. Plan view shows each one as a dimension, with the bottom step and the tip of the stairs.')));
+  root.append(group('Stairs and hallway',
+    rs('stairWall', 'Wall facing TV, solid part (pink)', 0, Math.round(r.width - r.stairStart - 12)),
+    rs('stairPanel', 'Corner → stair panel at the floor (blue)', Math.round(r.stairWall || 0), Math.round(r.width - r.stairStart)),
+    rs('stairKnee', 'Stair panel height where the wall ends (orange)', 12, 60),
+    rs('hallDepth', 'Hallway east wall, closet side (green)', 30, 140),
+    rs('hallWidth', 'Hallway far wall, door side (red)', 30, Math.round(r.width - r.boxX - 1)),
+    h('p', { class: 'note' }, 'Measured from the exterior-wall corner along the wall facing the TV, and around the hallway behind the stairs. The orange height sets the stair slope.')));
   root.append(group('From the plan and photos',
     rs('bayFace', 'TV wall width', 60, 110),
     rs('soffitBottom', 'Alcove bulkhead height', 80, r.ceiling),

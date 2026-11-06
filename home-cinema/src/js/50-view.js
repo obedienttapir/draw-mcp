@@ -268,7 +268,12 @@ function updateLabels() {
     const zz = r.ceiling + 2;
     dimLine([0, G.hallY - 24], [r.width, G.hallY - 24], zz, `${ftin(r.width)}  fireplace wall → exterior wall`);
     dimLine([r.boxX, -r.stairWidth / 2], [r.stairStart, -r.stairWidth / 2], zz, ftin(r.stairStart - r.boxX));
-    label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 14, zz), 'tag');
+    label('Hallway', P((r.boxX + G.hallEnd) / 2, G.hallY + 30, zz), 'tag');
+    // your marks: the wall facing the TV (pink: solid part, blue: to the panel under the stairs) and the hallway (green, red)
+    dimLine([G.wallX, -6], [r.width, -6], zz, `solid wall ${ftin(r.width - G.wallX)}`);
+    dimLine([G.kneeX, -18], [r.width, -18], zz, `to stair panel ${ftin(r.width - G.kneeX)}`, 0.3);
+    dimLine([G.hallEnd - 10, -r.stairWidth], [G.hallEnd - 10, G.hallY], zz, ftin(r.hallDepth));
+    dimLine([r.boxX, G.hallY + 10], [G.hallEnd, G.hallY + 10], zz, ftin(G.hallEnd - r.boxX));
     // measured from the stair-side line: exterior wall to the alcove notch, then the whole depth to the TV wall
     dimLine([r.width + 20, 0], [r.width + 20, G.mainY], zz, ftin(G.mainY), 0.32);   // staggered from the outer label
     dimLine([r.width + 48, 0], [r.width + 48, r.depth], zz, `${ftin(r.depth)} to TV wall`);
@@ -282,7 +287,7 @@ function updateLabels() {
     label('Steel beam W200', P(r.beamX, G.westY * 0.5, zz), 'tag', -90);
     label('TV alcove', P(G.tvX, G.mainY + r.bayDepth * 0.55, zz), 'tag');
     if (r.beamDepth > 1) dimLine([0, G.westY + 14], [r.beamDepth, G.westY + 14], zz, `bulkhead at ${ftin(r.beamBottom)}`);
-    label('Stairs ↑', P((r.stairStart + r.width) / 2, -r.stairWidth * 0.3, zz), 'tag');
+    label('Stairs ↑', P(r.stairStart + 14, -r.stairWidth * 0.7, zz), 'tag');
     dimLine([r.stairStart - 2, -r.stairWidth + 8], [r.width, -r.stairWidth + 8], zz, `tip of stairs ${ftin(r.width - r.stairStart + 2)}`);
     label('Exterior wall', P(r.width - 10, G.mainY / 2, zz), 'tag', 90);
     label('Fireplace', P(10, state.fireplace.center, zz), 'tag', -90);

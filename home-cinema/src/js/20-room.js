@@ -139,6 +139,13 @@ function buildRoom() {
   // reveals (jambs) through the wall thickness
   for (const h of [fp, ...tr]) addReveal(h, M.wall);
 
+  // ---- the wall facing the TV: solid from the stairwell opening to the exterior wall (both faces) ----
+  if (G.wallX < r.width - 0.5) {
+    const tv = wallQuad([G.wallX, 0], [r.width, 0], 0, H, M.wall); tv.name = 'wall facing TV'; roomGroup.add(tv);
+    roomGroup.add(wallQuad([r.width, 0], [G.wallX, 0], 0, H, M.wall));                     // its stair side
+    roomGroup.add(wallCap([G.wallX, 0], [r.width, 0], H + 0.2));
+  }
+
   // ---- ceiling with the stairwell opening ----
   const ceilGeo = new THREE.ShapeGeometry(shapeFrom(G.outline, [rect(stairOpenX, -r.stairWidth + 0.01, r.width - 0.01, -0.01)]));
   ceilGeo.rotateX(-Math.PI / 2);
@@ -183,10 +190,11 @@ function buildRoom() {
       roomGroup.add(b2); FX.bulkheads.push(b2);
     }
   }
-  // two doors on the hallway's far wall, as on site
+  // the hallway: a door on its far wall (a third of the way from its east end, as on site)
+  // and the closet door on its east wall, next to the stairs
   const hallLen = G.hallEnd - r.boxX;
-  const doors = hallLen >= 120 ? [r.boxX + hallLen * 0.27, r.boxX + hallLen * 0.67] : hallLen >= 40 ? [r.boxX + hallLen / 2] : [];
-  for (const x of doors) roomGroup.add(makeDoor(x, G.hallY));
+  if (hallLen >= 40) roomGroup.add(makeDoor(Math.max(r.boxX + 20, G.hallEnd - hallLen * 0.34), G.hallY));
+  if (r.hallDepth >= 34) roomGroup.add(makeDoor(G.hallEnd, -r.stairWidth - 19, -Math.PI / 2, 26));
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
   pil.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
@@ -211,8 +219,8 @@ function addReveal(h, mat) {
 }
 
 /** White two-panel door with casing on a wall facing north (into the hallway). */
-function makeDoor(x, y) {
-  const g = new THREE.Group(), w = 30, h = 80;
+function makeDoor(x, y, turn = Math.PI, w = 30) {
+  const g = new THREE.Group(), h = 80;
   const white = cached('door-white', () => new THREE.MeshStandardMaterial({ color: '#f1eee8', roughness: 0.55 }));
   const slab = new THREE.Mesh(new THREE.BoxGeometry(w, h, 1.4), white); slab.position.set(0, h / 2, 0.7); g.add(slab);
   for (const py of [h * 0.72, h * 0.3]) {
@@ -222,7 +230,7 @@ function makeDoor(x, y) {
     const c = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, 0.8), white); c.position.set(px, py, 0.4); g.add(c);
   }
   const knob = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 8), M.metal); knob.position.set(w / 2 - 3, 36, 2.2); g.add(knob);
-  g.rotation.y = Math.PI;                       // face north (world -Z)
-  g.position.copy(P(x, y + 0.05, 0));
+  g.rotation.y = turn;                          // π: on a south wall, facing north · -π/2: on an east wall, facing west
+  g.position.copy(turn === Math.PI ? P(x, y + 0.05, 0) : P(x - 0.05, y, 0));
   return g;
 }

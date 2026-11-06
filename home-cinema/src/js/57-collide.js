@@ -116,9 +116,11 @@ function nearestFit(it, x, y, rot = it.rot) {
 // ---------------- wall pieces ----------------
 /** Nearest wall (an edge of the floor outline) to plan point (x, y): its ends, length, the distance along it, inward normal. */
 function wallSnap(x, y) {
-  const o = geom().outline; let best = null;
-  for (let i = 0; i < o.length; i++) {
-    const a = o[i], b = o[(i + 1) % o.length], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+  const G = geom(), o = G.outline; let best = null;
+  const edges = o.map((a, i) => [a, o[(i + 1) % o.length]]);
+  if (G.wallX < state.room.width - 0.5) edges.push([[G.wallX, 0], [state.room.width, 0]]);   // the solid wall facing the TV (room side)
+  for (const [a, b] of edges) {
+    const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
     if (len < 6) continue;
     const ux = dx / len, uy = dy / len, t = clamp((x - a[0]) * ux + (y - a[1]) * uy, 0, len);
     const px = a[0] + ux * t, py = a[1] + uy * t, dist = Math.hypot(x - px, y - py);

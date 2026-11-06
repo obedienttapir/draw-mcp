@@ -201,6 +201,13 @@ function renderRoomTab() {
     }),
     rs('boxX', 'Fireplace nook depth', 24, 72),
     h('p', { class: 'note' }, 'Your tape numbers. Plan view shows each one as a dimension, with the bottom step and the tip of the stairs.')));
+  root.append(group('Stairs and hallway',
+    rs('stairWall', 'Wall facing TV, solid part (pink)', 0, Math.round(r.width - r.stairStart - 12)),
+    rs('stairPanel', 'Corner → stair panel at the floor (blue)', Math.round(r.stairWall || 0), Math.round(r.width - r.stairStart)),
+    rs('stairKnee', 'Stair panel height where the wall ends (orange)', 12, 60),
+    rs('hallDepth', 'Hallway east wall, closet side (green)', 30, 140),
+    rs('hallWidth', 'Hallway far wall, door side (red)', 30, Math.round(r.width - r.boxX - 1)),
+    h('p', { class: 'note' }, 'Measured from the exterior-wall corner along the wall facing the TV, and around the hallway behind the stairs. The orange height sets the stair slope.')));
   root.append(group('From the plan and photos',
     rs('bayFace', 'TV wall width', 60, 110),
     rs('soffitBottom', 'Alcove bulkhead height', 80, r.ceiling),

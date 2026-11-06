@@ -75,7 +75,14 @@ const DEFAULT_STATE = {
     pilasterW: 18, pilasterD: 12,   // steel-beam bump: its face is 9'-11" from the south end of the fireplace pocket
     boxX: 45,              // wall the stairs face: fireplace alcove is 3'-9" deep from its corner
     stairWidth: 40, stairStart: 92, risers: 16, floorToFloor: 122,   // 3'-11" landing, tip 11'-6" from the exterior wall
-    hallDepth: 54, hallEnd: 176,   // open hallway behind the stairs (two doors), railing along that side
+    // the wall facing the TV (the stairs' room side), from the exterior-wall corner:
+    stairWall: 91,         // solid, floor to ceiling (pink): the stairwell opens west of it
+    stairPanel: 128,       // to where the panel under the stairs meets the floor (blue): the 2nd riser
+    stairKnee: 31,         // height of that panel where the solid wall ends (orange): sets the stair slope
+    // the hallway behind the stairs, open to them under a railing
+    hallDepth: 86,         // its east wall, from the stairs south to the far wall (green; closet door on it)
+    hallWidth: 93,         // its far wall, from the wall the stairs face to the east wall (red; door on it)
+    hallEnd: 138,
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },
   finish: {
@@ -89,7 +96,7 @@ const DEFAULT_STATE = {
   fireplace: { width: 52, height: 22, bottom: 30, center: 60 },
   light: { scene: 'evening', pots: 0.35, leds: 1, tv: false, fire: true, lamp: true, bloom: true,
     bayPots: true, bias: false, steps: false, screenDown: false },
-  rev: 3,                 // room-measurement revision; older saved layouts get the corrected room
+  rev: 4,                 // room-measurement revision; older saved layouts get the corrected room
   style: { set: 'warm-modern' },                          // furniture style set (pieces can override it in item.s)
   // the owner's evaluation of the sets: kept out of undo, travels with the layout code
   study: { weights: { ...DEFAULT_WEIGHTS }, ratings: {}, notes: {}, shortlist: [], pick: null },
@@ -163,15 +170,19 @@ function geom(r = state.room) {
   const tvX = (bay[2][0] + bay[3][0]) / 2;
   // floor outline, counter-clockwise (interior on the left of each edge)
   // the landing and the open hallway behind the stairs are part of the floor
-  const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallEnd, r.boxX + 24, r.width - 1);
+  const hallY = -r.stairWidth - r.hallDepth, hallEnd = clamp(r.hallWidth ? r.boxX + r.hallWidth : r.hallEnd, r.boxX + 24, r.width - 1);
   const outline = [
     [0, 0], [r.boxX, 0], [r.boxX, hallY], [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
     [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, westY],
   ];
   const riserH = r.floorToFloor / r.risers;
   const treads = r.risers - 1;
-  const run = Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd };
+  // the wall facing the TV: solid from wallX to the exterior wall; under the stairs a panel from kneeX
+  const wallX = clamp(r.width - (r.stairWall ?? 0), r.stairStart + 12, r.width);
+  const kneeX = clamp(r.width - (r.stairPanel ?? r.width - r.stairStart), r.stairStart, wallX);
+  // tread run: the panel top (bottom of the 9″ stringer, 8½″ under the nosing line) is stairKnee up at wallX
+  const run = r.stairKnee ? clamp(riserH * (wallX - r.stairStart) / (r.stairKnee + 8.5), 7, 12) : Math.min((r.width - r.stairStart) / treads, 11);
+  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX };
 }
 
 // ---------------- persistence + history ----------------
