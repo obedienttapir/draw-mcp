@@ -207,6 +207,7 @@ function renderRoomTab() {
     rs('stairKnee', 'Stair panel height where the wall ends (orange)', 12, 60),
     rs('hallDepth', 'Hallway east wall, closet side (green)', 30, 140),
     rs('hallWidth', 'Hallway far wall, door side (red)', 30, Math.round(r.width - r.boxX - 1)),
+    rs('closetDoor', 'Closet door opening from the far wall', 0, Math.max(1, Math.round(r.hallDepth - 32))),
     h('p', { class: 'note' }, 'Measured from the exterior-wall corner along the wall facing the TV, and around the hallway behind the stairs. The orange height sets the stair slope.')));
   root.append(group('From the plan and photos',
     rs('bayFace', 'TV wall width', 60, 110),

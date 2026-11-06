@@ -191,10 +191,13 @@ function buildRoom() {
     }
   }
   // the hallway: a door on its far wall (a third of the way from its east end, as on site)
-  // and the closet door on its east wall, next to the stairs
+  // and the closet door on its east wall, its 26″ opening starting closetDoor from the far wall
   const hallLen = G.hallEnd - r.boxX;
   if (hallLen >= 40) roomGroup.add(makeDoor(Math.max(r.boxX + 20, G.hallEnd - hallLen * 0.34), G.hallY));
-  if (r.hallDepth >= 34) roomGroup.add(makeDoor(G.hallEnd, -r.stairWidth - 19, -Math.PI / 2, 26));
+  if (r.hallDepth >= 34) {
+    const cy = clamp(G.hallY + (r.closetDoor ?? 28) + 13, G.hallY + 16, -r.stairWidth - 16);
+    roomGroup.add(makeDoor(G.hallEnd, cy, -Math.PI / 2, 26));
+  }
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
   pil.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';

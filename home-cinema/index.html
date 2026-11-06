@@ -578,6 +578,7 @@ const DEFAULT_STATE = {
     // the hallway behind the stairs, open to them under a railing
     hallDepth: 86,         // its east wall, from the stairs south to the far wall (green; closet door on it)
     hallWidth: 93,         // its far wall, from the wall the stairs face to the east wall (red; door on it)
+    closetDoor: 28,        // the closet door opening on the east wall starts this far from the far wall
     hallEnd: 138,
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },
@@ -1323,10 +1324,13 @@ function buildRoom() {
     }
   }
   // the hallway: a door on its far wall (a third of the way from its east end, as on site)
-  // and the closet door on its east wall, next to the stairs
+  // and the closet door on its east wall, its 26″ opening starting closetDoor from the far wall
   const hallLen = G.hallEnd - r.boxX;
   if (hallLen >= 40) roomGroup.add(makeDoor(Math.max(r.boxX + 20, G.hallEnd - hallLen * 0.34), G.hallY));
-  if (r.hallDepth >= 34) roomGroup.add(makeDoor(G.hallEnd, -r.stairWidth - 19, -Math.PI / 2, 26));
+  if (r.hallDepth >= 34) {
+    const cy = clamp(G.hallY + (r.closetDoor ?? 28) + 13, G.hallY + 16, -r.stairWidth - 16);
+    roomGroup.add(makeDoor(G.hallEnd, cy, -Math.PI / 2, 26));
+  }
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
   pil.position.copy(P(r.beamX, G.westY - r.pilasterD / 2, r.beamBottom / 2)); pil.name = 'pilaster';
@@ -5067,6 +5071,7 @@ function renderRoomTab() {
     rs('stairKnee', 'Stair panel height where the wall ends (orange)', 12, 60),
     rs('hallDepth', 'Hallway east wall, closet side (green)', 30, 140),
     rs('hallWidth', 'Hallway far wall, door side (red)', 30, Math.round(r.width - r.boxX - 1)),
+    rs('closetDoor', 'Closet door opening from the far wall', 0, Math.max(1, Math.round(r.hallDepth - 32))),
     h('p', { class: 'note' }, 'Measured from the exterior-wall corner along the wall facing the TV, and around the hallway behind the stairs. The orange height sets the stair slope.')));
   root.append(group('From the plan and photos',
     rs('bayFace', 'TV wall width', 60, 110),

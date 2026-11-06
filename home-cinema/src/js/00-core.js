@@ -82,6 +82,7 @@ const DEFAULT_STATE = {
     // the hallway behind the stairs, open to them under a railing
     hallDepth: 86,         // its east wall, from the stairs south to the far wall (green; closet door on it)
     hallWidth: 93,         // its far wall, from the wall the stairs face to the east wall (red; door on it)
+    closetDoor: 28,        // the closet door opening on the east wall starts this far from the far wall
     hallEnd: 138,
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },

@@ -22,7 +22,7 @@ It starts in **Fast** display mode so it runs smoothly on older laptops and phon
 | Stairs | 40″ wide along the staircase wall, 16 risers; bottom step 3′-11″ from the wall in front; tip of the stairs 11′-6″ from the exterior wall; open on the far side with a railing over the hallway | tape measure, photos |
 | Wall facing the TV (stairs' room side) | solid floor to ceiling for 91″ from the exterior-wall corner (pink); the panel under the stairs meets the floor 128″ from the corner (blue) and is 31″ high where the solid wall ends (orange); open with a railing above the panel | tape measure |
 | Stair slope | set by that 31″ panel height: about 8¾″ tread run with 7⅝″ risers | from the tape numbers |
-| Hallway behind the stairs | 93″ wide along its far wall, with a door (red) and 86″ along its east wall from the stairs, with the closet door next to the stairs (green); open to the stairs under a railing | tape measure |
+| Hallway behind the stairs | 93″ wide along its far wall, with a door (red) and 86″ along its east wall from the stairs, with the closet door's opening starting 2′-4″ from the far wall (green); open to the stairs under a railing | tape measure |
 | Fireplace + 2 windows | 52″ linear fireplace, two 42″ × 10″ reeded transoms above (openings already cut) | photos |
 
 Your tape measurements are sliders under **Room › Measured**, and Plan view shows each one as a dimension. The values marked as estimated can be changed in the same tab; the room rebuilds as you drag.
