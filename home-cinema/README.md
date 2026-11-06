@@ -40,6 +40,20 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
 - **Layout code**: copy the whole design as text to keep versions, paste one back to restore it. The latest layout is also saved in the browser.
 - **Hide menus** (`H`): hides every bar and panel so a phone shows only the 3D room. In this mode touches only move the camera (one finger turns, two fingers zoom and pan), so furniture can't be bumped by accident. Tap **Show menus** (or press `H` or `Esc`) to bring them back.
 
+## Photo mode
+
+**◉ Photo** in the top bar (or `P`) turns the screen into a camera for good snapshots, on a phone too, to keep or to send to another app for rendering.
+
+- **Lenses in real focal lengths**: 16, 20, 24, 28, 35 and 50 mm, full-frame equivalent and matched on the diagonal like a phone camera, so a 24 mm shot here frames like 24 mm in a render app. Interiors are usually shot at 16–24 mm.
+- **Framing**: 4:3, 3:2, 16:9, 1:1, 4:5 or 9:16, a thirds grid, and everything outside the frame dimmed. The label in the corner shows the lens and aspect.
+- **Straight verticals** (⊥ Level, on by default): the camera stays level and the lens shifts instead of tilting, so walls stay upright, the look of architectural photography. Views steeper than 35° (aerials) tilt freely, and the label says *aerial tilt*.
+- **3D or Walk**: orbit as usual, or walk at a seated (3′-6″), eye (5′-0″) or high (6′-0″) camera height with the ▲ ▼ pad or W A S D.
+- **Viewpoints**: the camera presets plus your own saved shots (**＋ Save this view**), which keep their lens, aspect and position and travel with the layout code.
+- **Light**: exposure (±2 EV; double-tap to reset) and the lighting scene.
+- **Shutter** (or `Space`): renders exactly the frame at 2K, 3K or 4K on the long edge, JPEG or PNG, with no labels or outlines; by default with the glow and soft area light for the shot only, so the live view stays fast.
+- **After the shot**: **Share to an app…** (the phone's share sheet: a render or AI app, Photos, Messages), **Download**, **Copy**, and for render apps: **Scene + camera (.glb)**, the whole room and furniture in metres with a glTF camera that matches the shot (Blender, D5, SketchUp, Twinmotion open it with the same framing), and **Camera data** (position, look-at, focal length, sensor, field of view, aspect and the lens shift to set when straight verticals is on).
+- `Esc` or ✕ leaves photo mode; editing is off while it's open, so taps only move the camera.
+
 ## Press and hold (touch-first editing)
 
 Built for phones first; on by default and switchable under **Furnish › Press and hold to edit**.
@@ -179,6 +193,7 @@ src/js/59-export.js   download a piece as a .glb 3D file
 src/js/60-ui.js       design panel tabs
 src/js/62-style-ui.js  Style tab, per-piece style controls, compare view, spec sheet
 src/js/65-inspector.js details panel, layout code dialog
+src/js/68-photo.js     photo mode: lenses, framing, straight verticals, shutter, share and scene export
 src/js/70-main.js     boot and render loop
 presentation/         design review: renders, slide sources and a readable README
 presentation/review/  design review No. 02: PDFs and the pipeline that renders and composes them

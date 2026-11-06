@@ -160,7 +160,7 @@ function openPanel(which) {
   $('#toggleRight').setAttribute('aria-expanded', String(which === 'right'));
 }
 /** View-only mode: every menu hidden so a phone shows just the 3D room; touches only move the camera. */
-function viewOnly() { return $('#app').classList.contains('focus'); }
+function viewOnly() { const a = $('#app').classList; return a.contains('focus') || a.contains('photo'); }
 function setFocus(on) {
   if (on) { select(null); if (measure.on) setMeasure(false); }
   $('#app').classList.toggle('focus', on);

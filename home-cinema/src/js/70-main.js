@@ -11,7 +11,7 @@ const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.5, 0.55, 0.
 composer.addPass(renderPass); composer.addPass(bloomPass); composer.addPass(new OutputPass());
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initPhoto(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));
@@ -33,6 +33,7 @@ function resize() {
   composer.setPixelRatio(renderer.getPixelRatio());
   renderer.setSize(w, hgt, false); composer.setSize(w, hgt); labelRenderer.setSize(w, hgt);
   camera.aspect = w / hgt; camera.updateProjectionMatrix(); applyViewInset(viewInset);
+  if (photo.on) photoLayout();
   if (mode === 'plan') fitPlan();
   invalidate(2);
 }
@@ -89,6 +90,7 @@ function frame(now) {
     stepTween(dt);
     if ((mode === 'plan' ? planControls : controls).update()) active = true;   // true while moving or easing
   }
+  photoCamera();                                      // photo mode: level camera, lens, frame-centred projection
   if (FX.screen) {                                    // motorised screen rolls down / up
     const target = state.light.screenDown ? 1 : 0.02;
     if (Math.abs(FX.screen.cur - target) > 0.001) {
