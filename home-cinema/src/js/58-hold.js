@@ -183,7 +183,7 @@ function renderSheet() {
   const pane = $('.sheet-pane', body); if (pane) pane.scrollTop = keep;
 }
 
-const SEATING = { uSectional: 1, sectional: 1, sofa: 1, recliner: 1, loungeChair: 1 };
+const SEATING = { prettySectional: 1, uSectional: 1, sectional: 1, sofa: 1, recliner: 1, loungeChair: 1 };
 /** The turn (degrees) that points a piece's front at plan point (tx, ty). */
 const facing = (it, tx, ty) => ((Math.round(Math.atan2(-(tx - it.x), ty - it.y) / DEG) % 360) + 360) % 360;
 function turnTo(rot) {
@@ -269,8 +269,9 @@ function itemSheet() {
         onclick: () => style([['color', c]]) }, h('i'), h('small', {}, name)))));
       if (UPHOLSTERED[it.type]) pane.append(h('p', { class: 'note' }, `${COVERS[s.cover].label} colours. More covers under Fabric.`));
     } else if (tab === 'material') {
-      if (it.type === 'uSectional') {
-        pane.append(h('h4', {}, 'Wayfair fabric options'), h('div', { class: 'opts cards' }, WAYFAIR_FABRICS.map((f) =>
+      if (PRODUCT_FABRICS[it.type]) {
+        const [title, list] = PRODUCT_FABRICS[it.type];
+        pane.append(h('h4', {}, title), h('div', { class: 'opts cards' }, list.map((f) =>
           big(`${f.cover}|${f.color}`, f.label, `${s.cover}|${String(s.color).toLowerCase()}`, () => style([['cover', f.cover], ['color', f.color]]), f.color))));
         pane.append(h('h4', {}, 'Any cover'));
       }
@@ -324,6 +325,7 @@ function itemSheet() {
     }
     const price = piecePrice(it, s), weeks = pieceWeeks(it, s);
     if (price) pane.append(h('p', { class: 'note' }, `Indicative ${moneyRange(...price)}${weeks ? ` · ${weeks[0]}–${weeks[1]} wk` : ''}`));
+    if (it.type === 'prettySectional') pane.append(h('p', { class: 'note' }, `Sizes from Must Société's product page: ${pieceSize(it, s).text}. Module split (30″ corner and middle, 67″ and 63″ ends, 10″ backs) read from the photo to fit those totals.`));
     if (it.type === 'uSectional') pane.append(h('p', { class: 'note' }, `Sizes from Wayfair's dimension sheet: ${pieceSize(it, s).text}. 24.8″ modules, 5.1″ arms, 17.7″ seat height, 18.9″ usable seat depth.`));
     if (hasOverrides(it)) pane.append(h('button', { class: 'btn', onclick: () => edit(() => { delete it.s; }) }, `Reset to the ${STYLE_SETS[activeSetId()].name} look`));
   };
@@ -341,7 +343,7 @@ function itemSheet() {
 }
 
 // ---------------- add here ----------------
-const ADD_ORDER = ['uSectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
+const ADD_ORDER = ['uSectional', 'prettySectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
 const artThumbs = {};
 const artThumb = (kind) => artThumbs[kind] || (artThumbs[kind] = artCanvas(kind === 'mixed' ? 'abstract' : kind, 0.75, kind === 'mixed' ? 3 : 1).toDataURL('image/jpeg', 0.7));
 const DECOR_ICON = { frame: '▭', gallery: '▦', mirror: '◯', shelf: '⎯', sconce: '✺', acousticPanel: '▥' };
@@ -352,12 +354,15 @@ function addSheet(at) {
   if (at.wall) return h('div', { class: 'sheet-inner' },
     sheetHead('Hang on this wall', `${ftin(at.wall.h)} up · it lands flat on the wall, facing the room`),
     h('div', { class: 'sheet-pane' }, decorGrid(), h('p', { class: 'note' }, 'Hold a hung piece to slide it along the wall or up and down; drag it across to another wall.')));
-  const featured = h('div', { class: 'feature' },
-    h('button', { class: 'feature-main', onclick: () => pick('uSectional') },
-      h('span', { class: 'tag' }, 'From Wayfair'), h('b', {}, 'Tremee U-sectional'), h('small', {}, '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper')),
-    h('div', { class: 'feature-sw' }, WAYFAIR_FABRICS.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
-      onclick: () => pick('uSectional', { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.'))))));
-  const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && t !== 'uSectional').map((t) =>
+  const FEATURED = [
+    ['uSectional', 'From Wayfair', 'Tremee U-sectional', '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper', WAYFAIR_FABRICS],
+    ['prettySectional', 'From Must Société', 'Pretty modular sectional', '127″ × 93″ × 26″ · curved L, rounded open ends', MUST_FABRICS],
+  ];
+  const featured = FEATURED.map(([type, tag, title, sub, fabrics]) => h('div', { class: 'feature' },
+    h('button', { class: 'feature-main', onclick: () => pick(type) }, h('span', { class: 'tag' }, tag), h('b', {}, title), h('small', {}, sub)),
+    h('div', { class: 'feature-sw' }, fabrics.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
+      onclick: () => pick(type, { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.')))))));
+  const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && !FEATURED.some(([f]) => f === t)).map((t) =>
     h('button', { class: 'opt card', onclick: () => pick(t) }, h('b', {}, CATALOG[t].label), h('small', {}, CATALOG[t].note))));
   return h('div', { class: 'sheet-inner' },
     sheetHead('Add here', `${ftin(at.x)} from the fireplace wall · ${ftin(at.y)} from the stairs`),

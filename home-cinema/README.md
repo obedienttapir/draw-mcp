@@ -79,6 +79,22 @@ Ready-made files in [`models/`](models/):
 - `tremee-u-sectional-green-corduroy.glb`: as in the listing photo (U with the loose ottoman), 134.2″ × 93.5″ × 33.9″
 - `tremee-u-sectional-as-dimensioned.glb`: as in the dimension drawing (long left chaise), 134.2″ × 79.5″ × 33.9″
 
+## Must Société Pretty sectional
+
+**Pretty sectional · Must** models the Must Société *Pretty – Fabric Modular Sectional Sofa* (SKU 906121): a low corner L in a textured bouclé, with open, fully rounded ends and lumbar pillows against low, thick backs.
+
+| Part | Size | Source |
+| --- | --- | --- |
+| Overall | 127″ W × 93″ D × 26″ H | product page |
+| Seat | 14″ high, 20″ deep | product page |
+| Modules | 30″ deep with a 10″ back (leaving the 20″ seat); long run = 30″ corner + 30″ middle + 67″ end; short run = 30″ corner + 63″ end | read from the photo to fit the totals |
+| Open ends | the back stops 28″ short of each end; the seat finishes in a half-round | photo |
+
+- **Fabric**: the four colours on the product page (Light grey, Taupe, Light blue, Green) are listed first, plus every other cover.
+- **Layout**: 0–3 middle modules (the listing has 1), the short end on the left as pictured or on the right, lumbar pillows on or off.
+- Price shown is the listed $3,796 (or $3,036.80 on the Black Friday sale), scaled for extra middles; lead time is a guess.
+- Ready-made 3D file: [`models/pretty-sectional-green.glb`](models/pretty-sectional-green.glb), 127″ × 93″ × 26″.
+
 ## Wall décor
 
 Six wall pieces, under **Furnish** or by holding a wall (or the floor: they go on the nearest wall):
@@ -148,6 +164,7 @@ src/js/20-room.js     floor, walls with openings, ceiling, bulkheads, pilaster
 src/js/25-fixtures.js stairs, slat walls, fireplace with animated flames, transoms, TV
 src/js/30-lights.js   pot lights, LED channels, lighting scenes
 src/js/40-furniture.js furniture catalogue and factories (every style variant)
+src/js/43-pretty.js    Must Société Pretty sectional (curved modular L)
 src/js/42-decor.js     wall décor: frames, gallery wall, mirrors, shelves, sconces, acoustic panels, procedural art
 src/js/45-styles.js    style sets, upholstery library, prices, lead times, scoring, spec sheet rows
 src/js/46-decor-styles.js wall décor variants, prices and default finishes

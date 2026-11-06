@@ -283,6 +283,7 @@ function pieceSize(item, s) {
   const p = { ...CATALOG[item.type].defaults, ...item.p }, v = (VARIANTS[item.type] || {})[s.variant] || {};
   switch (item.type) {
     case 'sectional': return { text: `${ftin(p.back)} × ${ftin(p.ret)} L, ${inch(p.depth)} deep, ${inch(v.H)} high`, run: p.back + p.ret - p.depth };
+    case 'prettySectional': { const u = prettySize(p); return { text: `${ftin(u.W)} W × ${ftin(u.D)} D × ${inch(v.H)} H, seat 14″ high × 20″ deep`, run: u.W }; }
     case 'uSectional': { const u = uSectionalSize(p); return { text: `${ftin(u.W)} W × ${ftin(u.D)} D × ${inch(v.H)} H, ${p.seats} seats`, run: u.W }; }
     case 'sofa': return { text: `${inch(p.w)} W × ${inch(p.depth)} D × ${inch(v.H)} H`, run: p.w };
     case 'rug': return { text: `${ftin(p.w)} × ${ftin(p.d)}`, sqft: (p.w * p.d) / 144 };
@@ -315,7 +316,10 @@ function piecePrice(item, s) {
   const v = (VARIANTS[item.type] || {})[s.variant] || {}, size = pieceSize(item, s);
   const f = UPHOLSTERED[item.type] ? (COVERS[s.cover] || COVERS.linen).factor : 1;
   let lo, hi;
-  if (item.type === 'uSectional') {               // priced as the boxed set (5 seats + 3 ottomans); each extra seat ~ 1/8 of it
+  if (item.type === 'prettySectional') {           // the listed set (1 middle module); each extra middle ~ 18%
+    const m = prettySize({ ...CATALOG.prettySectional.defaults, ...item.p }).mids;
+    lo = v.price[0] * (1 + (m - 1) * 0.18); hi = v.price[1] * (1 + (m - 1) * 0.18);
+  } else if (item.type === 'uSectional') {               // priced as the boxed set (5 seats + 3 ottomans); each extra seat ~ 1/8 of it
     const k = (p0) => 1 + (p0.seats - 5) / 8, pp = { ...CATALOG.uSectional.defaults, ...item.p };
     lo = v.price[0] * k(pp); hi = v.price[1] * k(pp);
   } else if (v.perIn) { const corner = item.type === 'sectional' ? 1.15 : 1; lo = v.perIn[0] * size.run * corner; hi = v.perIn[1] * size.run * corner; }
@@ -378,19 +382,19 @@ function evaluateSet(setId, withOverrides = false) {
   const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
   const wmean = (pairs) => { const w = pairs.reduce((a, [, k]) => a + k, 0); return w ? pairs.reduce((a, [v, k]) => a + v * k, 0) / w : 0; };
   const of = (type) => rows.filter((r) => r.it.type === type);
-  const main = of('uSectional')[0] || of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
+  const main = of('prettySectional')[0] || of('uSectional')[0] || of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
   const varOf = (r) => (VARIANTS[r.it.type] || {})[r.s.variant] || {};
   // movie comfort: main seating dominates; lounge chairs and a footrest add the rest
   const chairs = of('loungeChair'), foot = of('ottoman').length + of('pouf').length;
   const comfort = (main ? varOf(main).comfort * 0.6 : 2) + (chairs.length ? mean(chairs.map((r) => varOf(r).comfort)) * 0.25 : 0.75) + (foot ? 4 : 2.5) * 0.15;
   // screen contrast: luminance and sheen of what faces the screen, weighted by how much of it the screen sees
-  const W = { uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
+  const W = { prettySectional: 3, uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
   const tones = rows.map((r) => [pieceTone(r.it, r.s), W[r.it.type] || 0]).filter(([t, k]) => t && k);
   const glare = wmean(tones.map(([[L, sh], k]) => [L + sh * 0.35, k]));
   const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
   // acoustics: absorption of soft surfaces by area (main seating and rugs dominate)
   const dims = (r) => ({ ...CATALOG[r.it.type].defaults, ...r.it.p });
-  const area = (r) => ({ acousticPanel: (dims(r).w * dims(r).hgt) / 300, uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
+  const area = (r) => ({ prettySectional: 26, acousticPanel: (dims(r).w * dims(r).hgt) / 300, uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
   const absorbOf = (r) => (r.it.type === 'rug' ? varOf(r).absorb : (COVERS[r.s.cover] || {}).absorb);
   const acoustics = clamp(wmean(rows.filter((r) => area(r) && absorbOf(r)).map((r) => [absorbOf(r), area(r)])), 1, 5);
   // durability and care: upholstery by area
@@ -428,7 +432,7 @@ const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
 
 /** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
 function specRows(setId, withOverrides) {
-  const groups = new Map(), PREFIX = { uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
+  const groups = new Map(), PREFIX = { prettySectional: 'SE', uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
     roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', sconce: 'LT', plant: 'AC',
     frame: 'AC', gallery: 'AC', mirror: 'AC', shelf: 'AC', acousticPanel: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
   for (const it of state.items) {

@@ -38,3 +38,13 @@ Object.assign(PIECE_FALLBACK, {
   sconce: { variant: 'globe', metal: 'brass' }, acousticPanel: { variant: 'fabric', cover: 'weave', color: '#3a3836', wood: 'walnut' },
 });
 UPHOLSTERED.acousticPanel = 1;
+
+// ---- Pretty sectional (Must Société) ----
+VARIANTS.prettySectional = {
+  pretty: { label: 'Pretty, as sold', desc: 'Must Société Pretty modular sectional: low curved L with open rounded ends, tight seats, lumbar pillows', H: 26, comfort: 3, hangout: 5, price: [3037, 3796], weeks: [2, 6] },
+};
+PIECE_FALLBACK.prettySectional = { variant: 'pretty', cover: 'boucle', color: '#626b58' };
+UPHOLSTERED.prettySectional = 1;
+COVER_COLORS.boucle.push(...MUST_FABRICS.map((f) => [f.color, f.label]));
+/** Brand fabric lists shown first under Fabric for real products. */
+const PRODUCT_FABRICS = { uSectional: ['Wayfair fabric options', WAYFAIR_FABRICS], prettySectional: ['Must Société colours', MUST_FABRICS] };

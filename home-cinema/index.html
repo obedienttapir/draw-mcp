@@ -2938,6 +2938,95 @@ Object.assign(FACTORIES, { frame: makeFrame, gallery: makeGallery, mirror: makeM
 const DECOR_TYPES = ['frame', 'gallery', 'mirror', 'shelf', 'sconce', 'acousticPanel'];
 const isWallType = (type) => !!(CATALOG[type] && CATALOG[type].wall);
 
+// ---- 43-pretty.js ----
+// ===================================================================
+// 43 · Pretty modular sectional (Must Société, SKU 906121).
+// From the product page: 127″ W × 93″ D × 26″ H, seat height 14″,
+// seat depth 20″. Modelled from the listing photo as a low corner L:
+//   long run  = corner seat + middle seat + long end module
+//   short run = (shared corner) + end module
+// Each end module's back stops short, so the seat runs on into an open,
+// fully rounded end. Modules are 30″ deep with a 10″ back, which leaves the
+// 20″ seat; the 127″ run = 30 corner + 30 middle + 67 end, the 93″ run = 30 + 63.
+// Lumbar pillows sit against the backs. Built around its footprint centre,
+// +Z = the side people face; the short run is on your left as you face it
+// (side 'right' mirrors it).
+// ===================================================================
+const PRETTY = { depth: 30, back: 10, seatH: 14, H: 26, plinth: 1.8, mid: 30, longEnd: 67, shortEnd: 63, open: 28 };
+function prettySize(p) {
+  const T = PRETTY, mids = clamp(Math.round(p.mids ?? 1), 0, 3);
+  return { mids, W: T.depth + mids * T.mid + T.longEnd, D: T.depth + T.shortEnd };
+}
+/** Plan outline (x, z) of a box with its own corner radii [back-left, back-right, front-right, front-left], as a Shape in (x, -z). */
+function planShape(x0, x1, z0, z1, radii) {
+  const pts = [];
+  const arc = (cx, cz, r, a0) => { for (let k = 0; k <= 10; k++) { const a = (a0 + k * 9) * DEG; pts.push(new THREE.Vector2(cx + Math.cos(a) * r, -(cz + Math.sin(a) * r))); } };
+  const lim = Math.min(x1 - x0, z1 - z0) / 2 - 0.05;          // two curves on one side must not overlap (a full half-round end)
+  const [bl, br, fr, fl] = radii.map((r) => clamp(r, 0.05, lim));
+  arc(x0 + bl, z0 + bl, bl, 180); arc(x1 - br, z0 + br, br, 270); arc(x1 - fr, z1 - fr, fr, 0); arc(x0 + fl, z1 - fl, fl, 90);
+  return new THREE.Shape(pts);
+}
+/** A soft upholstered block: a plan outline extruded from y0 to y1 with a rounded (bevelled) edge all round. */
+function softBlock(g, mat, x0, x1, z0, z1, y0, y1, radii, b = 1.6) {
+  const geo = new THREE.ExtrudeGeometry(planShape(x0 + b, x1 - b, z0 + b, z1 - b, radii.map((r) => Math.max(0.3, r - b))),
+    { depth: Math.max(0.1, y1 - y0 - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 4, curveSegments: 20 });
+  const m = new THREE.Mesh(geo, mat); m.rotation.x = -Math.PI / 2; m.position.y = y0 + b; g.add(m); return m;
+}
+function makePretty(p, item, s) {
+  const T = PRETTY, g = new THREE.Group(), inner = new THREE.Group(); g.add(inner);
+  const { mids, W, D } = prettySize(p), fab = coverMat(s.cover, s.color);
+  const xL = -W / 2, zB = -D / 2, d = T.depth, bt = T.back, gap = 0.25, R = d / 2;
+  // seams only between modules: the outside edges sit exactly on the listed 127″ × 93″
+  const gx = (v) => (Math.abs(v - xL) < 0.01 || Math.abs(v - W / 2) < 0.01 ? 0 : gap), gz = (v) => (Math.abs(v - zB) < 0.01 || Math.abs(v - D / 2) < 0.01 ? 0 : gap);
+  const seat = (x0, x1, z0, z1, radii) => {
+    softBlock(inner, fab, x0 + gx(x0), x1 - gx(x1), z0 + gz(z0), z1 - gz(z1), T.plinth, T.seatH, radii, 2.2);
+    softBlock(inner, M.black, x0 + 3, x1 - 3, z0 + 3, z1 - 3, 0, T.plinth + 0.2, radii.map((r) => Math.max(0.5, r - 3)), 0.3);   // recessed plinth, same outline
+  };
+  const back = (x0, x1, z0, z1) => softBlock(inner, fab, x0 + gx(x0), x1 - gap, z0 + gz(z0), z1 - gap, T.seatH - 2.5, T.H, [3.5, 3.5, 3.5, 3.5], 3.2);
+  // ---- long run, along the back ----
+  let x = xL;
+  seat(x, x + d, zB, zB + d, [5, 2, 2, 2]);                                       // corner
+  back(x, x + d, zB, zB + bt); back(x, x + bt, zB + bt, zB + d);
+  x += d;
+  for (let i = 0; i < mids; i++) { seat(x, x + T.mid, zB, zB + d, [2, 2, 2, 2]); back(x, x + T.mid, zB, zB + bt); x += T.mid; }
+  seat(x, W / 2, zB, zB + d, [2, R, R, 2]);                                         // long end: rounded open end
+  back(x, W / 2 - T.open, zB, zB + bt);
+  const midBackX = x - T.mid / 2, endBackX = (x + W / 2 - T.open) / 2;
+  // ---- short run, coming forward on the left ----
+  seat(xL, xL + d, zB + d, D / 2, [2, 2, R, R]);
+  back(xL, xL + bt, zB + d, D / 2 - T.open);
+  // ---- lumbar pillows ----
+  if (p.pillows !== 'off') {
+    const pm = coverMat(s.cover, css(shade(s.color, -0.08)));
+    const pillow = (px, pz, ry) => { const m = meshAt(rbox(19, 8, 5, 2.4), pm, px, T.seatH + 5, pz, inner); m.rotation.y = ry; m.rotateX(-0.22); };
+    pillow(xL + bt + 8, zB + bt + 8, Math.PI / 4);                                 // across the corner
+    if (mids) pillow(midBackX, zB + bt + 2.6, 0);
+    pillow(endBackX, zB + bt + 2.6, 0);
+    pillow(xL + bt + 2.6, (zB + d + D / 2 - T.open) / 2, Math.PI / 2);
+  }
+  const sx = p.side === 'right' ? -1 : 1;
+  if (sx < 0) inner.scale.x = -1;
+  return { group: g, w: W, d: D, shadows: [[0, zB + d / 2, W, d], [sx * (xL + d / 2), (zB + d + D / 2) / 2, d, D - d]] };
+}
+
+CATALOG.prettySectional = {
+  label: 'Pretty sectional · Must', note: 'Must Société: curved modular L, 127″ × 93″ × 26″',
+  defaults: { mids: 1, side: 'left', pillows: 'on' },
+  params: [['mids', 'Middle modules', 0, 3, 'n']],
+  options: [
+    ['side', 'Short end', [['left', 'On the left (as pictured)'], ['right', 'On the right']]],
+    ['pillows', 'Lumbar pillows', [['on', 'On'], ['off', 'Off']]],
+  ],
+};
+FACTORIES.prettySectional = makePretty;
+// the four colours on the product page
+const MUST_FABRICS = [
+  { label: 'Light grey', cover: 'boucle', color: '#d6d2c8' },
+  { label: 'Taupe', cover: 'boucle', color: '#9a8a7c' },
+  { label: 'Light blue', cover: 'boucle', color: '#a9bfd3' },
+  { label: 'Green', cover: 'boucle', color: '#626b58' },
+];
+
 // ---- 45-styles.js ----
 // ===================================================================
 // 45 · Furniture style study: curated sets, upholstery library, piece
@@ -3224,6 +3313,7 @@ function pieceSize(item, s) {
   const p = { ...CATALOG[item.type].defaults, ...item.p }, v = (VARIANTS[item.type] || {})[s.variant] || {};
   switch (item.type) {
     case 'sectional': return { text: `${ftin(p.back)} × ${ftin(p.ret)} L, ${inch(p.depth)} deep, ${inch(v.H)} high`, run: p.back + p.ret - p.depth };
+    case 'prettySectional': { const u = prettySize(p); return { text: `${ftin(u.W)} W × ${ftin(u.D)} D × ${inch(v.H)} H, seat 14″ high × 20″ deep`, run: u.W }; }
     case 'uSectional': { const u = uSectionalSize(p); return { text: `${ftin(u.W)} W × ${ftin(u.D)} D × ${inch(v.H)} H, ${p.seats} seats`, run: u.W }; }
     case 'sofa': return { text: `${inch(p.w)} W × ${inch(p.depth)} D × ${inch(v.H)} H`, run: p.w };
     case 'rug': return { text: `${ftin(p.w)} × ${ftin(p.d)}`, sqft: (p.w * p.d) / 144 };
@@ -3256,7 +3346,10 @@ function piecePrice(item, s) {
   const v = (VARIANTS[item.type] || {})[s.variant] || {}, size = pieceSize(item, s);
   const f = UPHOLSTERED[item.type] ? (COVERS[s.cover] || COVERS.linen).factor : 1;
   let lo, hi;
-  if (item.type === 'uSectional') {               // priced as the boxed set (5 seats + 3 ottomans); each extra seat ~ 1/8 of it
+  if (item.type === 'prettySectional') {           // the listed set (1 middle module); each extra middle ~ 18%
+    const m = prettySize({ ...CATALOG.prettySectional.defaults, ...item.p }).mids;
+    lo = v.price[0] * (1 + (m - 1) * 0.18); hi = v.price[1] * (1 + (m - 1) * 0.18);
+  } else if (item.type === 'uSectional') {               // priced as the boxed set (5 seats + 3 ottomans); each extra seat ~ 1/8 of it
     const k = (p0) => 1 + (p0.seats - 5) / 8, pp = { ...CATALOG.uSectional.defaults, ...item.p };
     lo = v.price[0] * k(pp); hi = v.price[1] * k(pp);
   } else if (v.perIn) { const corner = item.type === 'sectional' ? 1.15 : 1; lo = v.perIn[0] * size.run * corner; hi = v.perIn[1] * size.run * corner; }
@@ -3319,19 +3412,19 @@ function evaluateSet(setId, withOverrides = false) {
   const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
   const wmean = (pairs) => { const w = pairs.reduce((a, [, k]) => a + k, 0); return w ? pairs.reduce((a, [v, k]) => a + v * k, 0) / w : 0; };
   const of = (type) => rows.filter((r) => r.it.type === type);
-  const main = of('uSectional')[0] || of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
+  const main = of('prettySectional')[0] || of('uSectional')[0] || of('sectional')[0] || of('sofa')[0] || of('recliner')[0];
   const varOf = (r) => (VARIANTS[r.it.type] || {})[r.s.variant] || {};
   // movie comfort: main seating dominates; lounge chairs and a footrest add the rest
   const chairs = of('loungeChair'), foot = of('ottoman').length + of('pouf').length;
   const comfort = (main ? varOf(main).comfort * 0.6 : 2) + (chairs.length ? mean(chairs.map((r) => varOf(r).comfort)) * 0.25 : 0.75) + (foot ? 4 : 2.5) * 0.15;
   // screen contrast: luminance and sheen of what faces the screen, weighted by how much of it the screen sees
-  const W = { uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
+  const W = { prettySectional: 3, uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
   const tones = rows.map((r) => [pieceTone(r.it, r.s), W[r.it.type] || 0]).filter(([t, k]) => t && k);
   const glare = wmean(tones.map(([[L, sh], k]) => [L + sh * 0.35, k]));
   const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
   // acoustics: absorption of soft surfaces by area (main seating and rugs dominate)
   const dims = (r) => ({ ...CATALOG[r.it.type].defaults, ...r.it.p });
-  const area = (r) => ({ acousticPanel: (dims(r).w * dims(r).hgt) / 300, uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
+  const area = (r) => ({ prettySectional: 26, acousticPanel: (dims(r).w * dims(r).hgt) / 300, uSectional: 30, sectional: 24, sofa: 18, recliner: 6, loungeChair: 5, ottoman: 4, pouf: 2, rug: (dims(r).w * dims(r).d) / 300 })[r.it.type] || 0;
   const absorbOf = (r) => (r.it.type === 'rug' ? varOf(r).absorb : (COVERS[r.s.cover] || {}).absorb);
   const acoustics = clamp(wmean(rows.filter((r) => area(r) && absorbOf(r)).map((r) => [absorbOf(r), area(r)])), 1, 5);
   // durability and care: upholstery by area
@@ -3369,7 +3462,7 @@ const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
 
 /** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
 function specRows(setId, withOverrides) {
-  const groups = new Map(), PREFIX = { uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
+  const groups = new Map(), PREFIX = { prettySectional: 'SE', uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
     roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', sconce: 'LT', plant: 'AC',
     frame: 'AC', gallery: 'AC', mirror: 'AC', shelf: 'AC', acousticPanel: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
   for (const it of state.items) {
@@ -3429,6 +3522,16 @@ Object.assign(PIECE_FALLBACK, {
   sconce: { variant: 'globe', metal: 'brass' }, acousticPanel: { variant: 'fabric', cover: 'weave', color: '#3a3836', wood: 'walnut' },
 });
 UPHOLSTERED.acousticPanel = 1;
+
+// ---- Pretty sectional (Must Société) ----
+VARIANTS.prettySectional = {
+  pretty: { label: 'Pretty, as sold', desc: 'Must Société Pretty modular sectional: low curved L with open rounded ends, tight seats, lumbar pillows', H: 26, comfort: 3, hangout: 5, price: [3037, 3796], weeks: [2, 6] },
+};
+PIECE_FALLBACK.prettySectional = { variant: 'pretty', cover: 'boucle', color: '#626b58' };
+UPHOLSTERED.prettySectional = 1;
+COVER_COLORS.boucle.push(...MUST_FABRICS.map((f) => [f.color, f.label]));
+/** Brand fabric lists shown first under Fabric for real products. */
+const PRODUCT_FABRICS = { uSectional: ['Wayfair fabric options', WAYFAIR_FABRICS], prettySectional: ['Must Société colours', MUST_FABRICS] };
 
 // ---- 50-view.js ----
 // ===================================================================
@@ -3652,12 +3755,15 @@ function dimLine(a, b, z, text, at = 0.5) {         // at: where along the line 
 
 /** The eye point of the prime seat (plan x, y) on the main sofa, or null. */
 function mainSeat() {
-  const it = state.items.find((i) => i.type === 'uSectional') || state.items.find((i) => i.type === 'sectional') || state.items.find((i) => i.type === 'sofa') || state.items.find((i) => i.type === 'recliner');
+  const it = state.items.find((i) => i.type === 'prettySectional') || state.items.find((i) => i.type === 'uSectional') || state.items.find((i) => i.type === 'sectional') || state.items.find((i) => i.type === 'sofa') || state.items.find((i) => i.type === 'recliner');
   if (!it) return null;
   const G = geom(), phi = it.rot * DEG, ex = [-Math.cos(phi), -Math.sin(phi)], ez = [-Math.sin(phi), Math.cos(phi)];
   const p = { ...CATALOG[it.type].defaults, ...it.p };
   let lx0, lx1, lz;
-  if (it.type === 'uSectional') {
+  if (it.type === 'prettySectional') {
+    const u = prettySize(p), sx = p.side === 'right' ? -1 : 1;
+    [lx0, lx1] = [sx * (-u.W / 2 + PRETTY.depth + 6), sx * (u.W / 2 - PRETTY.open)]; lz = -u.D / 2 + 22;
+  } else if (it.type === 'uSectional') {
     const u = uSectionalSize(p);
     lx0 = -u.W / 2 + u.arm + 12; lx1 = u.W / 2 - u.arm - 12; lz = -u.D / 2 + 22;
   } else if (it.type === 'sectional') {
@@ -4444,7 +4550,7 @@ function renderSheet() {
   const pane = $('.sheet-pane', body); if (pane) pane.scrollTop = keep;
 }
 
-const SEATING = { uSectional: 1, sectional: 1, sofa: 1, recliner: 1, loungeChair: 1 };
+const SEATING = { prettySectional: 1, uSectional: 1, sectional: 1, sofa: 1, recliner: 1, loungeChair: 1 };
 /** The turn (degrees) that points a piece's front at plan point (tx, ty). */
 const facing = (it, tx, ty) => ((Math.round(Math.atan2(-(tx - it.x), ty - it.y) / DEG) % 360) + 360) % 360;
 function turnTo(rot) {
@@ -4530,8 +4636,9 @@ function itemSheet() {
         onclick: () => style([['color', c]]) }, h('i'), h('small', {}, name)))));
       if (UPHOLSTERED[it.type]) pane.append(h('p', { class: 'note' }, `${COVERS[s.cover].label} colours. More covers under Fabric.`));
     } else if (tab === 'material') {
-      if (it.type === 'uSectional') {
-        pane.append(h('h4', {}, 'Wayfair fabric options'), h('div', { class: 'opts cards' }, WAYFAIR_FABRICS.map((f) =>
+      if (PRODUCT_FABRICS[it.type]) {
+        const [title, list] = PRODUCT_FABRICS[it.type];
+        pane.append(h('h4', {}, title), h('div', { class: 'opts cards' }, list.map((f) =>
           big(`${f.cover}|${f.color}`, f.label, `${s.cover}|${String(s.color).toLowerCase()}`, () => style([['cover', f.cover], ['color', f.color]]), f.color))));
         pane.append(h('h4', {}, 'Any cover'));
       }
@@ -4585,6 +4692,7 @@ function itemSheet() {
     }
     const price = piecePrice(it, s), weeks = pieceWeeks(it, s);
     if (price) pane.append(h('p', { class: 'note' }, `Indicative ${moneyRange(...price)}${weeks ? ` · ${weeks[0]}–${weeks[1]} wk` : ''}`));
+    if (it.type === 'prettySectional') pane.append(h('p', { class: 'note' }, `Sizes from Must Société's product page: ${pieceSize(it, s).text}. Module split (30″ corner and middle, 67″ and 63″ ends, 10″ backs) read from the photo to fit those totals.`));
     if (it.type === 'uSectional') pane.append(h('p', { class: 'note' }, `Sizes from Wayfair's dimension sheet: ${pieceSize(it, s).text}. 24.8″ modules, 5.1″ arms, 17.7″ seat height, 18.9″ usable seat depth.`));
     if (hasOverrides(it)) pane.append(h('button', { class: 'btn', onclick: () => edit(() => { delete it.s; }) }, `Reset to the ${STYLE_SETS[activeSetId()].name} look`));
   };
@@ -4602,7 +4710,7 @@ function itemSheet() {
 }
 
 // ---------------- add here ----------------
-const ADD_ORDER = ['uSectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
+const ADD_ORDER = ['uSectional', 'prettySectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
 const artThumbs = {};
 const artThumb = (kind) => artThumbs[kind] || (artThumbs[kind] = artCanvas(kind === 'mixed' ? 'abstract' : kind, 0.75, kind === 'mixed' ? 3 : 1).toDataURL('image/jpeg', 0.7));
 const DECOR_ICON = { frame: '▭', gallery: '▦', mirror: '◯', shelf: '⎯', sconce: '✺', acousticPanel: '▥' };
@@ -4613,12 +4721,15 @@ function addSheet(at) {
   if (at.wall) return h('div', { class: 'sheet-inner' },
     sheetHead('Hang on this wall', `${ftin(at.wall.h)} up · it lands flat on the wall, facing the room`),
     h('div', { class: 'sheet-pane' }, decorGrid(), h('p', { class: 'note' }, 'Hold a hung piece to slide it along the wall or up and down; drag it across to another wall.')));
-  const featured = h('div', { class: 'feature' },
-    h('button', { class: 'feature-main', onclick: () => pick('uSectional') },
-      h('span', { class: 'tag' }, 'From Wayfair'), h('b', {}, 'Tremee U-sectional'), h('small', {}, '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper')),
-    h('div', { class: 'feature-sw' }, WAYFAIR_FABRICS.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
-      onclick: () => pick('uSectional', { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.'))))));
-  const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && t !== 'uSectional').map((t) =>
+  const FEATURED = [
+    ['uSectional', 'From Wayfair', 'Tremee U-sectional', '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper', WAYFAIR_FABRICS],
+    ['prettySectional', 'From Must Société', 'Pretty modular sectional', '127″ × 93″ × 26″ · curved L, rounded open ends', MUST_FABRICS],
+  ];
+  const featured = FEATURED.map(([type, tag, title, sub, fabrics]) => h('div', { class: 'feature' },
+    h('button', { class: 'feature-main', onclick: () => pick(type) }, h('span', { class: 'tag' }, tag), h('b', {}, title), h('small', {}, sub)),
+    h('div', { class: 'feature-sw' }, fabrics.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
+      onclick: () => pick(type, { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.')))))));
+  const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && !FEATURED.some(([f]) => f === t)).map((t) =>
     h('button', { class: 'opt card', onclick: () => pick(t) }, h('b', {}, CATALOG[t].label), h('small', {}, CATALOG[t].note))));
   return h('div', { class: 'sheet-inner' },
     sheetHead('Add here', `${ftin(at.x)} from the fireplace wall · ${ftin(at.y)} from the stairs`),
@@ -4677,7 +4788,7 @@ function saveBlob(blob, name) {
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
-const fileSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const fileSlug = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 /** Export one placed piece, with its current style and configuration, as a .glb download. */
 function exportItemGLB(it) {
   const def = CATALOG[it.type]; if (!def) return;
@@ -5241,7 +5352,7 @@ function initStyleUI() {
 // 65 · Details panel (selection inspector + viewing report), commit,
 //      layout-code dialog, narrow-screen panel toggles
 // ===================================================================
-const SEATING_MAIN = { uSectional: 1, sectional: 1, sofa: 1, recliner: 1 };
+const SEATING_MAIN = { prettySectional: 1, uSectional: 1, sectional: 1, sofa: 1, recliner: 1 };
 const TV_SIZES = [65, 75, 77, 83, 85, 98];
 
 function viewingReport() {

@@ -2,7 +2,7 @@
 // 65 · Details panel (selection inspector + viewing report), commit,
 //      layout-code dialog, narrow-screen panel toggles
 // ===================================================================
-const SEATING_MAIN = { uSectional: 1, sectional: 1, sofa: 1, recliner: 1 };
+const SEATING_MAIN = { prettySectional: 1, uSectional: 1, sectional: 1, sofa: 1, recliner: 1 };
 const TV_SIZES = [65, 75, 77, 83, 85, 98];
 
 function viewingReport() {

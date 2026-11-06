@@ -27,7 +27,7 @@ function saveBlob(blob, name) {
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
-const fileSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const fileSlug = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 /** Export one placed piece, with its current style and configuration, as a .glb download. */
 function exportItemGLB(it) {
   const def = CATALOG[it.type]; if (!def) return;
