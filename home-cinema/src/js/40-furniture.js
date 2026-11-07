@@ -639,20 +639,32 @@ function makeUSectional(p, item, s) {
     bk.rotation.x = -0.1;
     box4legs(xa, xb, z0, zf);
   }
-  // ---- arm panels: 5.1″ wide, 27.2″ high, full module depth ----
+  // ---- arm panels: 5.1″ wide, 27.2″ high, a module deep ----
+  // On the corner end (the one with the side back cushion) with a chaise in front, the arm sits beside the first chaise
+  // piece and a low frame carries the side cushion over the corner seat, so the side backrest runs along two blocks,
+  // as in the listing's dimension drawing. Elsewhere the arm sits beside the end seat.
+  const chaiseAt = (i) => !u.bed && u.ch.some(([j, k]) => j === i && k > 0);
   if (arm) for (const sx of [-1, 1]) {
     const xa = sx < 0 ? -W / 2 : W / 2 - arm;
-    span(g, fab, xa, xa + arm, T.foot, T.armH, z0, zf, 2.2);
-    leg(xa + arm / 2, z0 + 2.2); leg(xa + arm / 2, zf - 2.2);
+    const cornerHere = (p.corner === 'left' && sx < 0) || (p.corner === 'right' && sx > 0);
+    if (cornerHere && chaiseAt(sx < 0 ? 0 : n - 1)) {
+      span(g, fab, xa, xa + arm, T.deck, 24, z0, zf, 1.6);                         // low side frame under the side cushion
+      span(g, fab, xa + 0.1, xa + arm - 0.1, T.foot, T.deck, z0, zf, 1.2);          // its base, in line with the seat box
+      span(g, fab, xa, xa + arm, T.foot, T.armH, zf, zf + ott, 2.2);               // the arm, beside the first chaise piece
+      leg(xa + arm / 2, z0 + 2.2); leg(xa + arm / 2, zf + ott - 2.2);
+    } else {
+      span(g, fab, xa, xa + arm, T.foot, T.armH, z0, zf, 2.2);
+      leg(xa + arm / 2, z0 + 2.2); leg(xa + arm / 2, zf - 2.2);
+    }
   }
-  // ---- the corner seat: a sixth back cushion stands along the end seat's side, against the arm, so that end
+  // ---- the corner seat: a sixth back cushion stands along the end seat's side (on its low side frame), so that end
   //      reads as a corner (lean on the side and stretch out along the chaise), as in both listing photos ----
   if (p.corner === 'left' || p.corner === 'right') {
     const sx = p.corner === 'left' ? -1 : 1, thk = 8.5, ch = backTop - (seatTop - 1.2);
     const xIn = sx < 0 ? -W / 2 + arm : W / 2 - arm;                       // inner face of the arm (or the end, armless)
     const len = zf - backZ + 0.8;                                           // the usable seat depth, front to the back cushion
     const side = meshAt(rbox(thk, ch - 1, len, cloud ? 4 : 2.8), fab, xIn - sx * thk / 2, seatTop - 1.2 + (ch - 1) / 2, backZ + len / 2 - 0.4, g);
-    side.rotation.z = sx * -0.1;                                            // leans outward, against the arm
+    side.rotation.z = sx * -0.1;                                            // leans outward, against the side frame / arm
   }
   shadows.push([0, z0 + T.depth / 2, W, T.depth]);
   // ---- ottomans: 24.8″ cubes, 17.7″ high ----
