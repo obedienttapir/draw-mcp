@@ -91,7 +91,8 @@ const DEFAULT_STATE = {
     transomW: 42, transomH: 10, transomBottom: 80, transomGap: 6,
   },
   finish: {
-    wall: '#cbc2b3', floor: 'walnut', slat: 'walnut',
+    wall: '#e6dfcc', ceiling: '#e6dfcc', baseboards: true,   // Shoji White SW 7042: matte walls, flat ceiling, satin baseboards
+    floor: 'walnut', slat: 'walnut',
     fireplaceSlats: true, tvSlats: false, bayAccent: 'paint-dark',
     fabric: '#8f877c', boucle: '#e6dccb',
     transoms: 'windows',   // windows | slatted | hidden | framed | band | shade  (the two openings are already cut)
@@ -233,6 +234,8 @@ function applyState(obj, record = true) {
     study: { ...d.study, ...(obj.study || {}), weights: { ...d.study.weights, ...((obj.study || {}).weights || {}) } },
   };
   if (!obj.style) migrateLegacyStyle();
+  // the planner's old default wall colour moves to the new default, Shoji White
+  if (state.finish.wall === '#cbc2b3') state.finish.wall = '#e6dfcc';
   return true;
 }
 

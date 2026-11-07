@@ -152,7 +152,12 @@ const MANTEL_NOTES = {
 };
 function renderFinishes() {
   const root = $('#tab-finish'), f = state.finish; root.replaceChildren();
-  root.append(group('Wall paint', swatches('Wall paint', WALL_COLORS, f.wall, (c) => { f.wall = c; applyFinishes(); queue(rebuildRoomOnly); })));
+  root.append(group('Wall paint', swatches('Wall paint', WALL_COLORS, f.wall, (c) => { f.wall = c; applyFinishes(); queue(rebuildRoomOnly); }),
+    h('p', { class: 'note' }, `${(WALL_COLORS.find(([c]) => c.toLowerCase() === String(f.wall).toLowerCase()) || [, 'Custom'])[1]} · matte walls; the baseboards are painted to match in satin.`)));
+  root.append(group('Ceiling', swatches('Ceiling paint', [[SHOJI_WHITE, 'Shoji White SW 7042'], ['#f2f0ea', 'Ceiling white'], ['#efebe4', 'Soft white']], f.ceiling || SHOJI_WHITE,
+    (c) => { f.ceiling = c; applyFinishes(); queue(rebuildRoomOnly); }), h('p', { class: 'note' }, 'Flat finish.')));
+  root.append(group('Baseboards', toggle('fin-base', 'Baseboards (Metrie 8095D, 4¾″ colonial)', f.baseboards !== false, (v) => { f.baseboards = v; queue(rebuildRoomOnly); }),
+    h('p', { class: 'note' }, '23/32″ × 4-3/4″ primed MDF, painted to match the walls in satin. They stop at door casings and the open passage, and are left off slat walls.')));
   root.append(group('TV alcove walls', chips('TV alcove walls', [['paint-dark', 'Charcoal'], ['paint-navy', 'Navy'], ['paint-green', 'Forest'], ['paint-wall', 'Same as walls']], f.bayAccent,
     (v) => { f.bayAccent = v; applyFinishes(); queue(rebuildRoomOnly); }),
   h('p', { class: 'note' }, 'A dark alcove cuts screen reflections and makes the picture look deeper.')));

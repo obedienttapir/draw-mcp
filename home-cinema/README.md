@@ -36,7 +36,8 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
 - **TV**: click it to change size (65″–98″), mount height and offset. The details panel reports eye-to-screen distance, the field of view the picture fills (SMPTE 30° / THX 36° references), whether it fits the 84″ alcove wall, neck tilt, and whether it clears the soundbar.
 - **Measure** (`M`): click two points. In Plan view points are taken on the floor.
 - **Lighting**: Bright, Evening, Movie and Fireside scenes, plus dimmers for the pot lights and the 2700K LED channels, TV, flame and lamps.
-- **Finishes**: wall paint, alcove accent colour, floor, slat wood, slats on the fireplace wall and/or behind the TV.
+- **Finishes**: wall paint, alcove accent colour, floor, slat wood, slats on the fireplace wall and/or behind the TV. Walls, ceiling and baseboards default to **Sherwin-Williams Shoji White (SW 7042)**: matte walls, flat ceiling, satin baseboards (the wall swatch shows SW 7042's published RGB, 230 / 223 / 204).
+- **Baseboards**: Metrie 8095D colonial, 23/32″ × 4-3/4″ primed MDF, traced from its profile (flat face, step, cove, rounded bead) and run along every wall, painted to match the walls in satin. They wrap the outside corners (the steel-beam bump), stop at the door casings and the open passage, run along the wall facing the TV and the panels under the stairs, and are left off slat walls. **Finishes › Baseboards** turns them off.
 - **Layout code**: copy the whole design as text to keep versions, paste one back to restore it. The latest layout is also saved in the browser.
 - **Hide menus** (`H`): hides every bar and panel so a phone shows only the 3D room. In this mode touches only move the camera (one finger turns, two fingers zoom and pan), so furniture can't be bumped by accident. Tap **Show menus** (or press `H` or `Esc`) to bring them back.
 

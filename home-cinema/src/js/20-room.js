@@ -194,11 +194,15 @@ function buildRoom() {
   }
   // the hallway: a door on its far wall (a third of the way from its east end, as on site)
   // and the closet door on its east wall, its 26″ opening starting closetDoor from the far wall
-  const hallLen = G.hallEnd - r.boxX;
-  if (hallLen >= 40) roomGroup.add(makeDoor(Math.max(r.boxX + 20, G.hallEnd - hallLen * 0.34), G.hallY));
+  const hallLen = G.hallEnd - r.boxX, farDoorX = Math.max(r.boxX + 20, G.hallEnd - hallLen * 0.34);
+  if (hallLen >= 40) roomGroup.add(makeDoor(farDoorX, G.hallY));
   if (r.hallDepth >= 34) {
     const cy = clamp(G.hallY + (r.closetDoor ?? 28) + 13, G.hallY + 16, -r.stairWidth - 16);
     roomGroup.add(makeDoor(G.hallEnd, cy, -Math.PI / 2, 26));
+  }
+  if (state.finish.baseboards !== false) {
+    const cy = clamp(G.hallY + (r.closetDoor ?? 28) + 13, G.hallY + 16, -r.stairWidth - 16);
+    buildBaseboards(G, r, { far: hallLen >= 40 ? [farDoorX - 17.6, farDoorX + 17.6] : null, closet: r.hallDepth >= 34 ? [cy - 15.6, cy + 15.6] : null });
   }
   // ---- pilaster under the beam bearing (the rectangular protrusion) ----
   const pil = new THREE.Mesh(new THREE.BoxGeometry(r.pilasterW, r.beamBottom, r.pilasterD), M.wall);
@@ -221,6 +225,72 @@ function addReveal(h, mat) {
   const north = new THREE.Mesh(new THREE.PlaneGeometry(T, ht), mat);
   north.position.copy(P(-T / 2, h.u1, vc));                                        // faces south
   roomGroup.add(head, sill, south, north);
+}
+
+// ---------------- baseboards ----------------
+// Metrie 8095D colonial baseboard, 23/32″ × 4-3/4″: a flat lower face, a small step, a cove and a rounded bead at the top.
+// Profile in (out from the wall, height) inches, traced from the label drawing.
+const BASE_T = 23 / 32, BASE_H = 4.75;
+const BASE_PROFILE = [[0, 0], [BASE_T, 0], [BASE_T, 2.95], [0.62, 3.0], [0.6, 3.08], [0.52, 3.2], [0.46, 3.35], [0.43, 3.5], [0.42, 3.6],
+  [0.47, 3.72], [0.52, 3.88], [0.53, 4.02], [0.5, 4.16], [0.43, 4.28], [0.36, 4.36], [0.34, 4.4], [0.3, 4.5], [0.24, 4.62], [0.16, 4.7], [0.08, 4.74], [0, BASE_H]];
+const baseShape = () => cached('base-profile-geo', () => new THREE.Shape(BASE_PROFILE.map(([x, y]) => new THREE.Vector2(x, y))));
+/** One straight run of baseboard along the wall from plan point a to b (the room on the left of a→b), extended at either end. */
+function baseRun(a, b, ext0 = 0, ext1 = 0) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy); if (len < 0.5) return;
+  const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+  const geo = new THREE.ExtrudeGeometry(baseShape(), { depth: len + ext0 + ext1, bevelEnabled: false, curveSegments: 1 });
+  const m = new THREE.Mesh(geo, M.trim);
+  // local X = out of the wall (into the room), Y = up, Z = along the wall
+  const X = new THREE.Vector3(nx, 0, -ny), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(ux, 0, -uy);
+  m.matrixAutoUpdate = false;
+  m.matrix.makeBasis(X, Y, Z).setPosition(P(a[0] - ux * ext0, a[1] - uy * ext0, 0));
+  m.name = 'baseboard'; roomGroup.add(m);
+}
+/** Run a wall's baseboard, leaving gaps (along-the-wall distances from a) for door casings. */
+function baseWall(a, b, gaps = [], ext0 = 0, ext1 = 0) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / len, uy = (b[1] - a[1]) / len, at = (t) => [a[0] + ux * t, a[1] + uy * t];
+  let t0 = 0;
+  for (const [g0, g1] of gaps.slice().sort((p, q) => p[0] - q[0])) {
+    if (g1 <= 0 || g0 >= len) continue;
+    if (g0 > t0) baseRun(at(t0), at(g0), t0 === 0 ? ext0 : 0, 0);
+    t0 = Math.max(t0, g1);
+  }
+  if (t0 < len) baseRun(at(t0), b, t0 === 0 ? ext0 : 0, ext1);
+}
+function buildBaseboards(G, r, doors) {
+  const o = G.outline, n = o.length, same = (p, q) => Math.abs(p[0] - q[0]) < 0.01 && Math.abs(p[1] - q[1]) < 0.01;
+  const turn = (i) => {                                    // at vertex i: > 0 an inside corner of the room, < 0 an outside corner
+    const p = o[(i - 1 + n) % n], c = o[i], q = o[(i + 1) % n];
+    return (c[0] - p[0]) * (q[1] - c[1]) - (c[1] - p[1]) * (q[0] - c[0]);
+  };
+  const oe = G.openEdge, sw = r.stairWidth, bayBack = [G.bay[3], G.bay[2]];
+  for (let i = 0; i < n; i++) {
+    let a = o[i], b = o[(i + 1) % n];
+    if (oe && same(a, oe[0]) && same(b, oe[1])) continue;                                   // the passage carries on
+    if (a[0] === 0 && b[0] === 0 && state.finish.fireplaceSlats) continue;                // slat wall to the floor
+    if (same(a, bayBack[0]) && same(b, bayBack[1]) && state.finish.tvSlats) continue;
+    const inStrip = (p) => p[1] <= 0.01 && p[1] >= -sw - 0.01 && p[0] >= r.stairStart - 0.01;
+    if (inStrip(a) && inStrip(b)) continue;                                                 // under / behind the stairs
+    if (a[0] === r.width && b[0] === r.width && a[1] < 0) a = [r.width, 0];                // exterior wall: only from the wall facing the TV
+    const ext0 = turn(i) < 0 ? BASE_T : 0, ext1 = turn((i + 1) % n) < 0 ? BASE_T : 0;      // outside corners: run past to meet
+    let gaps = [];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (doors.far && a[1] === G.hallY && b[1] === G.hallY) gaps = [[doors.far[0] - a[0], doors.far[1] - a[0]]];
+    if (doors.closet && a[0] === G.hallEnd && b[0] === G.hallEnd && b[1] > a[1]) gaps = [[doors.closet[0] - a[1], doors.closet[1] - a[1]]];
+    if (len > 0.5) baseWall(a, b, gaps, ext0, ext1);
+  }
+  // the wall facing the TV and the panel under the stairs (room side)
+  if (G.wallX < r.width - 0.5 || G.kneeX < G.wallX) baseWall([G.kneeX, 0], [r.width, 0]);
+  // the hallway side of the stairs, under the railing
+  const openTo = Math.min(G.hallEnd, r.width);
+  if (openTo > r.stairStart + 4) baseWall([openTo, -sw], [r.stairStart + 2, -sw]);
+  // round the steel-beam bump
+  if (r.pilasterD > 0.5) {
+    const x0 = r.beamX - r.pilasterW / 2, x1 = r.beamX + r.pilasterW / 2, yf = G.westY - r.pilasterD, yb = G.westY;
+    baseWall([x1, yf], [x0, yf], [], BASE_T, BASE_T);
+    baseWall([x1, yb], [x1, yf], [], 0, 0);
+    baseWall([x0, yf], [x0, yb], [], 0, 0);
+  }
 }
 
 /** White two-panel door with casing on a wall facing north (into the hallway). */

@@ -248,8 +248,10 @@ const SLATS = {
   smoked: { label: 'Smoked', base: '#4a3a2e', grain: '#251b14' },
   black:  { label: 'Black',  base: '#1d1a17', grain: '#0b0908' },
 };
+// Sherwin-Williams Shoji White SW 7042 (published RGB 230 / 223 / 204, LRV 74): the default for walls, ceiling and trim
+const SHOJI_WHITE = '#e6dfcc';
 const WALL_COLORS = [
-  ['#cbc2b3', 'Greige (current)'], ['#e4ded3', 'Warm white'], ['#a79c8c', 'Taupe'],
+  [SHOJI_WHITE, 'Shoji White SW 7042'], ['#cbc2b3', 'Greige (previous)'], ['#e4ded3', 'Warm white'], ['#a79c8c', 'Taupe'],
   ['#6e665d', 'Mushroom'], ['#3f3a36', 'Charcoal'], ['#2b2f33', 'Navy slate'], ['#4a3f35', 'Cocoa'],
 ];
 const FABRICS = [
@@ -284,10 +286,11 @@ function initMaterials() {
   TEX.corduroy = canvasTex(corduroyCanvas(false), false);
   TEX.corduroyMap = canvasTex(corduroyCanvas(true), true);
 
-  M.wall = new THREE.MeshStandardMaterial({ color: state.finish.wall, roughness: 0.92, bumpMap: TEX.paint, bumpScale: 0.02 });
+  M.wall = new THREE.MeshStandardMaterial({ color: state.finish.wall, roughness: 0.9, bumpMap: TEX.paint, bumpScale: 0.02 });   // matte
+  M.trim = new THREE.MeshStandardMaterial({ color: state.finish.wall, roughness: 0.32 });                                         // satin baseboard
   M.accent = new THREE.MeshStandardMaterial({ color: '#2f2b28', roughness: 0.9 });
-  M.ceiling = new THREE.MeshStandardMaterial({ color: '#efebe4', roughness: 0.95 });
-  M.bulkhead = new THREE.MeshStandardMaterial({ color: '#ebe6de', roughness: 0.95 });   // ghosted when seen from above
+  M.ceiling = new THREE.MeshStandardMaterial({ color: state.finish.ceiling || SHOJI_WHITE, roughness: 1 });                  // flat
+  M.bulkhead = new THREE.MeshStandardMaterial({ color: state.finish.ceiling || SHOJI_WHITE, roughness: 1 });   // ghosted when seen from above
   M.floor = new THREE.MeshStandardMaterial({ roughness: 0.55, metalness: 0 });
   M.slat = new THREE.MeshStandardMaterial({ roughness: 0.6 });
   M.felt = new THREE.MeshStandardMaterial({ color: '#141210', roughness: 1 });
@@ -321,6 +324,8 @@ function cached(key, make) { return _texCache[key] || (_texCache[key] = make());
 function applyFinishes() {
   const f = state.finish;
   M.wall.color.set(f.wall);
+  M.trim.color.set(f.wall);                                                  // baseboards are painted to match the walls (satin)
+  M.ceiling.color.set(f.ceiling || SHOJI_WHITE); M.bulkhead.color.set(f.ceiling || SHOJI_WHITE);
   const fl = FLOORS[f.floor] || FLOORS.walnut;
   if (fl.carpet) {
     M.floor.map = cached('carpet', () => canvasTex(noiseCanvas(512, { base: fl.base, amp: 30, seed: 41 }), true, [1 / 60, 1 / 60]));
