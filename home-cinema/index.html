@@ -5947,7 +5947,7 @@ function enterPhoto() {
   $('#app').classList.add('photo');
   labelsGroup.visible = false; helpersGroup.visible = false;
   renderer.toneMappingExposure = BASE_EXPOSURE * 2 ** photo.ev;
-  // like a camera app: one finger orbits, two fingers pan, pinch zooms the lens (handled below). The orbit
+  // like a camera app: one finger orbits, two fingers pan, pinch moves you in and out (handled below). The orbit
   // controls keep their two-finger dolly+pan; their dolly is switched off while fingers are down (see gestures)
   renderPhotoUI(); photoLayout();
   if (mode === 'walk') walk.pos.y = photo.eye;
@@ -5957,8 +5957,8 @@ function enterPhoto() {
 function photoHint() {
   const touch = matchMedia('(pointer: coarse)').matches;
   toast(mode === 'walk'
-    ? (touch ? 'Drag to look · two fingers to move · pinch to zoom the lens' : 'Drag to look · wheel or W/S to move · Ctrl+wheel zooms the lens')
-    : (touch ? 'One finger orbits · two fingers pan · pinch zooms the lens · hold ▲ ▼ to move in' : 'Drag to orbit · right-drag pans · wheel moves in · Ctrl+wheel zooms the lens'));
+    ? (touch ? 'Drag to look · pinch to walk in and out · two fingers to move · lens chips change the focal length' : 'Drag to look · wheel, pinch or W/S to move · Alt+wheel zooms the lens')
+    : (touch ? 'One finger orbits · two fingers pan · pinch moves in and out · lens chips change the focal length' : 'Drag to orbit · right-drag pans · wheel or pinch moves in · Alt+wheel zooms the lens'));
 }
 function exitPhoto() {
   if (!photo.on) return;
@@ -6228,7 +6228,7 @@ function renderPhotoUI() {
   const walkRow = h('div', { class: 'ph-walk' },
     ...(mode === 'walk' ? [[42, 'Seated'], [60, 'Eye'], [72, 'High']].map(([y, label]) => h('button', { class: 'chip', 'aria-pressed': String(photo.eye === y),
       onclick: () => { photo.eye = y; walk.pos.y = y; savePhotoPrefs(); renderPhotoUI(); invalidate(3); } }, `${label} ${ftin(y)}`))
-      : [h('span', { class: 'ph-gest' }, matchMedia('(pointer: coarse)').matches ? '1 finger orbit · 2 pan · pinch = lens' : 'drag orbit · right-drag pan · Ctrl+wheel = lens')]),
+      : [h('span', { class: 'ph-gest' }, matchMedia('(pointer: coarse)').matches ? '1 finger orbit · 2 pan · pinch = move in' : 'drag orbit · right-drag pan · Alt+wheel = lens')]),
     h('span', { class: 'spacer' }),
     ...[[1, '▲'], [-1, '▼']].map(([d, t]) => {
       const b = h('button', { class: 'ph-ic walkbtn', 'aria-label': d > 0 ? 'Move in' : 'Move back', title: 'Hold to move' }, t);
@@ -6260,7 +6260,7 @@ function setLens(mm, commit = false) {
   invalidate(2);
   if (commit) savePhotoPrefs();
 }
-// ---- live gestures: pinch zooms the lens (both modes); in walk, two fingers also move you ----
+// ---- live gestures: pinch moves you in and out (both modes); in walk, a two-finger drag also moves you ----
 const pinch = { pts: new Map(), d0: 0, mm0: 24, mid0: null };
 const pinchMid = () => { const p = [...pinch.pts.values()]; return [(p[0][0] + p[1][0]) / 2, (p[0][1] + p[1][1]) / 2]; };
 const pinchDist = () => { const p = [...pinch.pts.values()]; return Math.hypot(p[0][0] - p[1][0], p[0][1] - p[1][1]); };
@@ -6272,19 +6272,30 @@ function walkBy(fwd, side) {
   if (insideRoom(walk.pos.x, -next.z + m) && insideRoom(walk.pos.x, -next.z - m)) walk.pos.z = next.z;
   invalidate(2);
 }
+/** Move the camera in (+) or out (−) by inches: in Walk you step forward; in 3D the camera and its aim point travel
+ *  together along the view, so you can push right in, past the old aim point. */
+function photoMove(inches) {
+  if (!inches) return;
+  if (mode === 'walk') { walkBy(inches, 0); return; }
+  const dir = controls.target.clone().sub(camera.position);
+  if (dir.lengthSq() < 1e-6) return;
+  dir.normalize().multiplyScalar(inches);
+  camera.position.add(dir); controls.target.add(dir);
+  invalidate(2);
+}
 function initPhotoGestures() {
   const cv = renderer.domElement;
   cv.addEventListener('pointerdown', (e) => {
     if (!photo.on || e.pointerType !== 'touch') return;
     controls.enableZoom = false;                                        // fingers pan and zoom the lens, never dolly
     pinch.pts.set(e.pointerId, [e.clientX, e.clientY]);
-    if (pinch.pts.size === 2) { pinch.d0 = Math.max(10, pinchDist()); pinch.mm0 = photo.mm; pinch.mid0 = pinchMid(); }
+    if (pinch.pts.size === 2) { pinch.d0 = Math.max(10, pinchDist()); pinch.mid0 = pinchMid(); }
   }, true);
   cv.addEventListener('pointermove', (e) => {
     if (!photo.on || !pinch.pts.has(e.pointerId)) return;
     pinch.pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (pinch.pts.size !== 2) return;
-    setLens(pinch.mm0 * pinchDist() / pinch.d0);                       // spread = longer lens (zoom in)
+    const d = pinchDist(); photoMove((d - pinch.d0) * 0.45); pinch.d0 = d;  // spread = move in, like walking toward it
     if (mode === 'walk') {                                              // two-finger drag: up = forward, sideways = step
       const [mx, my] = pinchMid();
       walkBy((pinch.mid0[1] - my) * 0.35, (pinch.mid0[0] - mx) * 0.35);
@@ -6299,8 +6310,8 @@ function initPhotoGestures() {
   // desktop: Ctrl+wheel (and trackpad pinch) zooms the lens; the wheel moves in 3D (orbit dolly) and walks in Walk
   window.addEventListener('wheel', (e) => {
     if (!photo.on || e.target !== cv) return;
-    if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopImmediatePropagation(); setLens(photo.mm * Math.exp(-e.deltaY * 0.006), true); }
-    else if (mode === 'walk') { e.preventDefault(); walkBy(-e.deltaY * 0.12, 0); }
+    if (e.altKey) { e.preventDefault(); e.stopImmediatePropagation(); setLens(photo.mm * Math.exp(-(e.deltaY || e.deltaX) * 0.006), true); }   // Alt+wheel: lens
+    else if (e.ctrlKey || e.metaKey || mode === 'walk') { e.preventDefault(); e.stopImmediatePropagation(); photoMove(-e.deltaY * (e.ctrlKey ? 0.6 : 0.12)); }  // trackpad pinch / wheel: move
   }, { capture: true, passive: false });
 }
 function initPhoto() {

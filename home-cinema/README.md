@@ -54,10 +54,11 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
   | --- | --- | --- |
   | One finger / drag | orbit | look around |
   | Two fingers / right-drag | pan | move (up = forward, sideways = step aside) |
-  | Pinch / Ctrl + wheel / trackpad pinch | zoom the lens, 12–85 mm | zoom the lens, 12–85 mm |
+  | Pinch / trackpad pinch | move in and out (camera and aim point travel together, so you can push past it) | walk forward and back |
   | Hold ▲ ▼ / mouse wheel | move in and out | walk forward and back (also W A S D) |
+  | Lens chips / Alt + wheel | focal length: chips 16–50 mm; Alt + wheel anywhere from 12 to 85 mm | the same |
 
-  The lens chips jump to 16–50 mm; pinching goes anywhere in between and the frame label shows the focal length live.
+  The frame label shows the focal length live.
 - **Walk** at a seated (3′-6″), eye (5′-0″) or high (6′-0″) camera height.
 - **Viewpoints**: the camera presets plus your own saved shots (**＋ Save this view**), which keep their lens, aspect and position and travel with the layout code.
 - **Light**: exposure (±2 EV; double-tap to reset) and the lighting scene.
