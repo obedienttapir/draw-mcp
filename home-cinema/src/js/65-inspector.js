@@ -121,7 +121,7 @@ function renderFurnishSelection() { if (!$('#tab-furnish').hidden) renderFurnish
 
 /** After an edit: persist, refresh overlays and the details panel. */
 function commit() {
-  save(); updateLabels(); renderInspector(); updateRoomSub();
+  save(); updateLabels(); renderInspector(); updateRoomSub(); markEnvDirty(); markShadowsDirty();
   if (sheet && sheet.kind === 'item') renderSheet();
 }
 

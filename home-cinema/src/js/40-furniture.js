@@ -721,6 +721,7 @@ function buildItem(item) {
   placeItem(holder, item);
   itemsGroup.add(holder);
   itemObjects.set(item.id, { group: holder, w: built.w, d: built.d, hv: built.hv || 0, top: built.top });
+  markShadowsDirty();
 }
 function placeItem(holder, item) {
   holder.position.copy(P(item.x, item.y, CATALOG[item.type] && CATALOG[item.type].wall ? item.p.h : 0));   // wall pieces hang at their centre height

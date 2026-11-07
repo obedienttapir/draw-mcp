@@ -456,8 +456,8 @@ select.ph-pill { padding-right: 8px; width: auto; flex: none; }
 </style>
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
 } }
 </script>
 </head>
@@ -1186,7 +1186,7 @@ function initMaterials() {
   M.glassDark = new THREE.MeshStandardMaterial({ color: '#050505', roughness: 0.05, metalness: 0.9, transparent: true, opacity: 0.55, depthWrite: false });
   M.reeded = new THREE.MeshStandardMaterial({ map: TEX.reeded, roughness: 0.2, metalness: 0.1, transparent: true, opacity: 0.88,
     emissive: '#b8c6d4', emissiveMap: TEX.reeded, emissiveIntensity: 0.25 });
-  M.shadow = new THREE.MeshBasicMaterial({ map: TEX.shadow, transparent: true, depthWrite: false, opacity: 0.8 });
+  M.shadow = new THREE.MeshBasicMaterial({ map: TEX.shadow, transparent: true, depthWrite: false, opacity: 0.45 });
   M.led = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffb46b').multiplyScalar(3), toneMapped: false });
   M.potOn = new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff1dc').multiplyScalar(4), toneMapped: false });
   M.potOff = new THREE.MeshStandardMaterial({ color: '#d9d4cc', roughness: 0.4 });
@@ -1207,6 +1207,7 @@ function cached(key, make) { return _texCache[key] || (_texCache[key] = make());
 
 function applyFinishes() {
   const f = state.finish;
+  if (typeof markEnvDirty === 'function') markEnvDirty();
   M.wall.color.set(f.wall);
   M.trim.color.set(f.wall);                                                  // baseboards are painted to match the walls (satin)
   M.ceiling.color.set(f.ceiling || SHOJI_WHITE); M.bulkhead.color.set(f.ceiling || SHOJI_WHITE);
@@ -2156,6 +2157,7 @@ const hemi = new THREE.HemisphereLight('#fff1e2', '#2a2119', 0.25);
 scene.add(hemi);
 const POT_CD = 11 * LUX;        // tuned to display exposure (a 650 lm wafer, scaled)
 const LED_NITS = 2.2;
+const ENV_GAIN = 0.7;            // strength of the captured bounce light
 
 const FIRE_CD = 0.7 * LUX;
 const LAMP_CD = 0.8 * LUX;
@@ -2169,9 +2171,10 @@ const SCENES = {
   fireside: { label: 'Fireside', pots: 0.08, leds: 0.7, tv: false, fire: true,  lamp: true,  steps: true,  screenDown: false },
 };
 
-function addPot(x, y, z, group) {
+function addPot(x, y, z, group, shadow = false) {
   // fast mode keeps the fixtures but lets a few zone lights do the lighting
   const light = isFast() ? null : new THREE.SpotLight('#ffd9b0', 0, 0, 52 * DEG, 0.75, 2);
+  if (light && shadow) shadowize(light, 512);
   if (light) {
     light.position.copy(P(x, y, z - 0.6));
     light.target.position.copy(P(x, y, 0));
@@ -2204,19 +2207,26 @@ function rectLight(w, h, pos, target, group, color = '#ffb36e') {
 
 function buildLights() {
   disposeGroup(lightsGroup);
+  markShadowsDirty();
   FX.pots = []; FX.leds = []; FX.ledMeshes = []; FX.zones = [];
   const r = state.room, G = geom(), H = r.ceiling;
   lightsGroup.updateMatrixWorld(true);
   if (isFast()) {
     // one point light per zone stands in for that zone's pots (and its LED wash)
-    const zone = (x, y, z, pots, led, color = '#ffd9b0') => {
-      const l = new THREE.PointLight(color, 0, 0, 2); l.position.copy(P(x, y, z)); lightsGroup.add(l);
-      FX.zones.push({ light: l, pots, led });
+    // the zones with seating are lit from above by a wide downward light that casts a soft shadow, like the pots
+    // it stands in for; the hallway and stairwell use plain point lights
+    const zone = (x, y, z, pots, led, color = '#ffd9b0', shadow = false) => {
+      let l;
+      if (shadow) {
+        l = shadowize(new THREE.SpotLight(color, 0, 0, 72 * DEG, 0.85, 2), 1024);
+        l.position.copy(P(x, y, z)); l.target.position.copy(P(x, y, 0)); lightsGroup.add(l, l.target);
+      } else { l = new THREE.PointLight(color, 0, 0, 2); l.position.copy(P(x, y, z)); lightsGroup.add(l); }
+      FX.zones.push({ light: l, pots: shadow ? pots * 1.25 : pots, led: shadow ? led * 1.25 : led });
     };
     const bb = Math.min(r.beamBottom, H);
-    zone(Math.max(r.beamDepth, 30) / 2, G.westY / 2, bb - 10, 2, 1.1, '#ffd2a0');                            // fireplace lounge
-    zone((Math.max(r.beamDepth, 0) + r.width) / 2, G.mainY / 2, H - 12, 6, 0.35);                               // main room
-    zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a');  // TV alcove
+    zone(Math.max(r.beamDepth, 30) / 2, G.westY / 2, bb - 10, 2, 1.1, '#ffd2a0', true);                      // fireplace lounge
+    zone((Math.max(r.beamDepth, 0) + r.width) / 2, G.mainY / 2, H - 12, 6, 0.35, '#ffd9b0', true);             // main room
+    zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a', true);  // TV alcove
     zone((r.boxX + G.hallEnd) / 2, (G.hallY - r.stairWidth) / 2 + 12, H - 12, 2, 0.1);                         // landing + hallway
   }
   // the stairwell (landing, upper flight, main-floor landing) is lit from upstairs; it follows the pot-light dimmer
@@ -2232,7 +2242,7 @@ function buildLights() {
   if (state.light.bayPots) for (const dx of [-24, 24]) addPot(G.tvX + dx, bayPotY, H, lightsGroup);
   // main ceiling grid (clear of the fireplace bulkhead)
   const x0 = Math.max(r.beamDepth, 0) + 8, x1 = r.width - 22;
-  for (const fx of [0, 0.5, 1]) for (const fy of [0.24, 0.74]) addPot(lerp(x0 + 14, x1, fx), G.mainY * fy, H, lightsGroup);
+  for (const fx of [0, 0.5, 1]) for (const fy of [0.24, 0.74]) addPot(lerp(x0 + 14, x1, fx), G.mainY * fy, H, lightsGroup, true);
   // fireplace bulkhead underside, the landing below it, and the hallway behind the stairs
   if (r.beamDepth > 12) for (const dy of [-34, 34]) addPot(r.beamDepth / 2 + 4, state.fireplace.center + dy, r.beamBottom, lightsGroup);
   if (r.beamDepth > r.boxX + 6 && r.beamBottom < H) addPot((r.boxX + r.beamDepth) / 2, -r.stairWidth / 2, r.beamBottom, lightsGroup);
@@ -2313,12 +2323,10 @@ function updateLighting() {
   for (const b of FX.transomGlow) b.material.color.set(L.pots > 0.5 ? '#6f8396' : '#2b3846');
   M.reeded.emissiveIntensity = 0.1 + 0.3 * Math.max(L.pots, 0.3 * L.leds);
   const planBoost = typeof mode !== 'undefined' && mode === 'plan' ? 1.4 : 0;
-  hemi.intensity = 0.06 + 0.5 * L.pots + 0.12 * L.leds + planBoost;
-  const env = 0.015 + 0.08 * L.pots + 0.02 * L.leds + planBoost * 0.05;
-  scene.traverse((o) => {
-    if (!o.material) return;
-    for (const m of [].concat(o.material)) if (m.isMeshStandardMaterial) m.envMapIntensity = env;
-  });
+  // the room's own light, captured and bounced (52-render), does the ambient work; the hemisphere only lifts black corners
+  hemi.intensity = 0.03 + 0.06 * L.pots + 0.03 * L.leds + planBoost;
+  scene.environmentIntensity = ENV_GAIN + planBoost * 0.3;
+  markEnvDirty();
   for (const it of state.items) if (it.type === 'floorLamp' || it.type === 'sconce') setLamp(it.id, L.lamp);
   invalidate(3);
 }
@@ -3053,6 +3061,7 @@ function buildItem(item) {
   placeItem(holder, item);
   itemsGroup.add(holder);
   itemObjects.set(item.id, { group: holder, w: built.w, d: built.d, hv: built.hv || 0, top: built.top });
+  markShadowsDirty();
 }
 function placeItem(holder, item) {
   holder.position.copy(P(item.x, item.y, CATALOG[item.type] && CATALOG[item.type].wall ? item.p.h : 0));   // wall pieces hang at their centre height
@@ -4004,7 +4013,8 @@ const PRODUCT_FABRICS = { uSectional: ['Wayfair fabric options', WAYFAIR_FABRICS
 // 50 · Renderer, cameras, view modes, presets, labels, sightline
 // ===================================================================
 const stage = $('#stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
+// every frame goes through a composer with its own 4× MSAA target (52-render), so the canvas needs no MSAA of its own
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: false });
 let forcePR = 0;                                   // set by the render hook for print artwork
 function pixelRatio() {
   if (forcePR) return forcePR;
@@ -4013,6 +4023,11 @@ function pixelRatio() {
 }
 renderer.setPixelRatio(pixelRatio());
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
+// soft shadows (PCF: 5 filtered Vogel-disk taps) that don't depend on the camera: drawn once when something
+// changes (markShadowsDirty), never per frame while you orbit
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.shadowMap.autoUpdate = false;
 renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 stage.appendChild(renderer.domElement);
@@ -4020,8 +4035,7 @@ renderer.domElement.tabIndex = 0;
 renderer.domElement.setAttribute('aria-label', '3D view of the basement cinema');
 RectAreaLightUniformsLib.init();
 scene.background = new THREE.Color('#120f0c');
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+const pmrem = new THREE.PMREMGenerator(renderer);   // turns the captured room (52-render) into the scene's light
 
 const labelRenderer = new CSS2DRenderer({ element: $('#labels') });
 
@@ -4187,7 +4201,6 @@ function setMode(m) {
   if (m === 'walk') { enterWalk(); toast(matchMedia('(pointer: coarse)').matches ? 'Drag to look · hold ▲ to walk' : 'Drag to look · W A S D to walk · Shift to hurry'); }
   if (m === 'orbit') { camera.up.set(0, 1, 0); if (camera.position.y < 30 || prevWalk) goPreset('overview'); }
   prevWalk = m === 'walk';
-  renderPass.camera = activeCam;
   labelsGroup.visible = true;
   updateLighting();
   updateLabels();
@@ -4362,6 +4375,169 @@ function drawSpeakerPlan() {
     if (seat) line([P(seat.x, seat.y, mode === 'plan' ? state.room.ceiling + 3 : 40), pos], new THREE.LineBasicMaterial({ color: '#7fb3d5', transparent: true, opacity: 0.35, depthTest: false }));
     const o = label(s.k, pos, 'dim spk'); o.element.title = `${s.name}: ${s.how}`;
   }
+}
+
+// ---- 52-render.js ----
+// ===================================================================
+// 52 · Rendering pipeline
+//  - Progressive: while the camera (or a piece) moves, a quick frame at whatever resolution keeps up
+//    (adaptive, no ambient occlusion); as soon as it stops, one full frame: full resolution, ambient
+//    occlusion (soft contact shadows in corners and under furniture), glow in High, 4× MSAA.
+//    Interaction stays smooth in both modes and the still picture is the best the device can draw.
+//  - Bounce light: the room is captured from its middle into a cube map and used as the scene's
+//    environment, so walls, floor and the lighting scene tint everything (one bounce of indirect
+//    light, plus matching reflections). It is recaptured only when the room, finishes, lights or
+//    layout change, never per frame.
+// ===================================================================
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+
+// A few materials (sheen fabrics with deep bump maps, at grazing angles) can shade an odd pixel to NaN. On its own
+// that's one dark speck, but a blur (the glow, or the bounce-light map) spreads it into black blotches, so every
+// picture is cleaned right after it's drawn: NaN or infinite pixels become black, negatives become zero.
+const NAN_GUARD_GLSL = `
+  vec4 nanGuard(vec4 c) {
+    if (any(isnan(c)) || any(isinf(c))) return vec4(0.0, 0.0, 0.0, 1.0);
+    return max(c, vec4(0.0));
+  }`;
+const NanGuardShader = {
+  name: 'NanGuardShader',
+  uniforms: { tDiffuse: { value: null } },
+  vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; varying vec2 vUv; ${NAN_GUARD_GLSL}
+    void main() { gl_FragColor = nanGuard(texture2D(tDiffuse, vUv)); }`,
+};
+
+const RQ = {                                         // per display quality: pixel ratios and effects
+  fast: { still: 1.5, move: 1, bloom: true, env: 160 },     // glow runs at half resolution: cheap enough everywhere
+  high: { still: 2, move: 1.25, bloom: true, env: 256 },
+};
+const rq = () => RQ[isFast() ? 'fast' : 'high'];
+let moveScale = 1;                                    // adaptive factor on the moving-frame resolution
+
+/** A composer rendering into a 4× MSAA half-float target, with optional ambient occlusion and glow. */
+function makeComposer(withAO) {
+  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
+  const c = new EffectComposer(renderer, rt);
+  const rp = new RenderPass(scene, camera); c.addPass(rp);
+  c.addPass(new ShaderPass(NanGuardShader));
+  let ao = null;
+  if (withAO) {
+    ao = new GTAOPass(scene, camera, 1, 1);
+    // world units are inches: look about 16″ around each point for occluders
+    ao.updateGtaoMaterial({ radius: 16, distanceExponent: 1.4, thickness: 6, scale: 1.05, samples: 16, distanceFallOff: 1 });
+    ao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 12 });
+    ao.blendIntensity = 0.85;
+    c.addPass(ao);
+  }
+  // glow only from light sources (LEDs, flames, lamps, hot spots), not from walls brightened by the bounce light
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.38, 0.42, 1.6); c.addPass(bloom);
+  c.addPass(new OutputPass());
+  return { c, rp, ao, bloom };
+}
+let PIPE = null;
+function initPipeline() {
+  PIPE = { move: makeComposer(false), still: makeComposer(true) };
+  sizePipeline();
+}
+const stillPR = () => (forcePR || Math.min(window.devicePixelRatio || 1, rq().still));
+const movePR = () => (forcePR || clamp(Math.min(window.devicePixelRatio || 1, rq().move) * moveScale, 0.45, stillPR()));
+function sizePipeline() {
+  if (!PIPE) return;
+  const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
+  PIPE.still.c.setPixelRatio(stillPR()); PIPE.still.c.setSize(w, h);
+  PIPE.move.c.setPixelRatio(movePR()); PIPE.move.c.setSize(w, h);
+}
+/** Draw the view with one of the composers ('move' quick, 'still' full). */
+function drawView(cam, which) {
+  updateShadowsIfDirty();
+  const p = PIPE[which], glow = rq().bloom && state.light.bloom && mode !== 'plan';
+  p.rp.camera = cam;
+  if (p.ao) { p.ao.camera = cam; p.ao.enabled = !!cam.isPerspectiveCamera; }   // the AO shader is built for a perspective camera: off in Plan
+  p.bloom.enabled = glow;
+  flameUniforms.uDirect.value = glow ? 0 : 1;
+  p.c.render(0.016);
+}
+/** One full-quality frame at an explicit size into the canvas (photos, thumbnails, print). Call resize() after. */
+function drawStillAt(cam, W, H) {
+  renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+  PIPE.still.c.setPixelRatio(1); PIPE.still.c.setSize(W, H);
+  drawView(cam, 'still');
+}
+
+// ---------------- shadows ----------------
+let shadowsDirty = true;
+/** Lights, room or furniture changed: redraw the shadow maps with the next frame. */
+function markShadowsDirty() { shadowsDirty = true; invalidate(2); }
+/** Every solid surface receives shadows; furniture, fixtures, walls and stairs cast them (the ceiling doesn't). */
+function flagShadows() {
+  scene.traverse((o) => {
+    if (!o.isMesh) return;
+    const m = Array.isArray(o.material) ? o.material[0] : o.material;
+    const solid = m && (!m.transparent || m === M.bulkhead) && (m.isMeshStandardMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial);
+    o.receiveShadow = !!solid;
+    o.castShadow = !!solid && o.name !== 'ceiling' && !o.userData.noShadow;
+  });
+}
+function updateShadowsIfDirty() {
+  if (!shadowsDirty) return;
+  shadowsDirty = false;
+  flagShadows();
+  renderer.shadowMap.needsUpdate = true;              // consumed by the next render call
+}
+/** A light that casts a soft shadow; world units are inches. */
+function shadowize(light, size) {
+  light.castShadow = true;
+  light.shadow.mapSize.set(size, size);
+  light.shadow.camera.near = 4; light.shadow.camera.far = 420;
+  light.shadow.bias = -0.0005; light.shadow.normalBias = 0.8; light.shadow.radius = 3;
+  return light;
+}
+
+// ---------------- bounce light ----------------
+let envCube = null, envCam = null, envRT = null, envDirty = true, envTimer = 0;
+let guardCube = null, guardCam = null;
+// the capture is copied through the same guard (a cube drawn inside out, sampling the capture) before it's blurred
+const guardCubeMat = new THREE.ShaderMaterial({
+  uniforms: { src: { value: null } }, side: THREE.BackSide, depthTest: false, depthWrite: false,
+  vertexShader: 'varying vec3 vDir; void main() { vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `uniform samplerCube src; varying vec3 vDir; ${NAN_GUARD_GLSL}
+    void main() { gl_FragColor = nanGuard(textureCube(src, normalize(vDir))); }`,
+});
+const guardScene = new THREE.Scene(); guardScene.add(new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), guardCubeMat));
+/** Something lit or coloured changed: recapture the room's light once things settle. */
+function markEnvDirty(delay = 250) {
+  clearTimeout(envTimer);
+  envTimer = setTimeout(() => { envDirty = true; invalidate(2); }, delay);
+}
+function captureEnv() {
+  envDirty = false;
+  const size = rq().env;
+  if (!envCube || envCube.width !== size) {
+    if (envCube) { envCube.dispose(); guardCube.dispose(); }
+    envCube = new THREE.WebGLCubeRenderTarget(size, { type: THREE.HalfFloatType });
+    envCam = new THREE.CubeCamera(2, 4000, envCube);
+    guardCube = new THREE.WebGLCubeRenderTarget(size, { type: THREE.HalfFloatType });
+    guardCam = new THREE.CubeCamera(0.1, 10, guardCube);
+  }
+  const r = state.room, G = geom();
+  envCam.position.copy(P(r.width * 0.55, G.mainY * 0.5, 52));          // middle of the room, seated eye height
+  envCam.updateMatrixWorld(true);
+  const keep = { l: labelsGroup.visible, h: helpersGroup.visible, sw: FX.stairwell ? FX.stairwell.visible : null, g: ghosted, env: scene.environment };
+  labelsGroup.visible = false; helpersGroup.visible = false;
+  if (FX.stairwell) FX.stairwell.visible = true;
+  ghostBulkheads(false);
+  scene.environment = null;                                               // one clean bounce: no feedback between captures
+  flameUniforms.uDirect.value = 1;
+  updateShadowsIfDirty();
+  envCam.update(renderer, scene);
+  guardCubeMat.uniforms.src.value = envCube.texture; guardCam.update(renderer, guardScene);
+  const rt = pmrem.fromCubemap(guardCube.texture);
+  if (envRT) envRT.dispose();
+  envRT = rt; scene.environment = rt.texture;
+  labelsGroup.visible = keep.l; helpersGroup.visible = keep.h;
+  if (FX.stairwell && keep.sw != null) FX.stairwell.visible = keep.sw;
+  if (keep.g != null) ghostBulkheads(keep.g);
 }
 
 // ---- 55-edit.js ----
@@ -5438,16 +5614,17 @@ function renderLighting() {
     toggle('stepsOn', 'Stair step lights', L.steps, (v) => { L.steps = v; updateLighting(); }),
     toggle('bayPotsOn', 'Pot lights over the TV', L.bayPots, (v) => { L.bayPots = v; queue(() => { buildLights(); updateLighting(); }); }),
     state.tv.screen ? toggle('screenDownOn', 'Projector screen down', L.screenDown, (v) => { L.screenDown = v; updateLighting(); updateLabels(); renderInspector(); }) : null,
-    isFast() ? null : toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; invalidate(3); }),
+    toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; invalidate(3); }),
     h('p', { class: 'note' }, 'Movie dims the pots and leaves a little LED glow around the TV alcove to ease eye strain.')));
   // display quality is a device preference, kept out of layouts and undo
   const q = h('div', { class: 'chips', role: 'group', 'aria-label': 'Display quality' });
-  for (const [val, text] of [['fast', 'Fast'], ['high', 'High quality']]) {
+  for (const [val, text] of [['fast', 'Standard'], ['high', 'High']]) {
     q.append(h('button', { class: 'chip', 'aria-pressed': String(quality === val), onclick: () => { if (quality !== val) setQuality(val); } }, text));
   }
   root.append(group('Display', q, h('p', { class: 'note' }, isFast()
-    ? 'Fast runs smoothly on any laptop or phone. High quality adds glow and soft area light, for a strong graphics card.'
-    : 'High quality adds glow and soft area light. Switch back to Fast if moving around feels slow.')));
+    ? 'Standard: soft shadows from the ceiling lights, light bouncing off the walls and floor, contact shadows in corners and under furniture, and glow, on any phone or laptop. High adds every ceiling light with its own shadow, soft light from the LED channels and sharper detail.'
+    : 'High: every ceiling light with its own shadow, soft light from the LED channels and glow, at up to 2× resolution. Standard is lighter on the battery.'),
+    h('p', { class: 'note' }, 'Both stay smooth while you move: quick frames during the move, then the full-quality picture the moment you stop.')));
 }
 
 // one-click fireplace wall combinations: windows + surround + slats
@@ -5575,13 +5752,14 @@ function renderRoomTab() {
     h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => openCode() }, 'Layout code'))));
 }
 
-function rebuildRoomOnly() { buildRoom(); buildLights(); updateLighting(); }
+function rebuildRoomOnly() { buildRoom(); buildLights(); updateLighting(); markShadowsDirty(); }
 function rebuildFixturesAndLights() { buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); }
 function rebuildTV() {
   if (FX.tv) { fixturesGroup.remove(FX.tv.group); disposeGroup(FX.tv.group); }
   buildTV(); updateLighting(); drawOutline(); updateLabels();
 }
 function rebuildAll() {
+  markShadowsDirty();
   applyFinishes(); buildRoom(); buildFixtures(); buildLights(); buildAllItems(); updateLighting();
   updateLabels(); drawOutline(); updateRoomSub();
 }
@@ -5737,16 +5915,14 @@ async function renderThumbs(view, onEach) {
     for (const id of SET_IDS) {
       if (job !== thumbJob) break;                           // a newer request took over
       previewSetId = id; buildAllItems(); updateLighting();
-      renderer.setPixelRatio(1); renderer.setSize(W, H, false); composer.setPixelRatio(1); composer.setSize(W, H);
+      if (envDirty) captureEnv();
       camera.aspect = W / H; camera.updateProjectionMatrix();
       camera.position.copy(pose.pos); camera.up.set(0, 1, 0); camera.lookAt(pose.target); camera.updateMatrixWorld();
       const above = viewFromAbove(camera);
       if (FX.stairwell) FX.stairwell.visible = !above;
       if (FX.screen) FX.screen.ceilingKit.visible = !above;
       ghostBulkheads(above);
-      const glow = !isFast() && state.light.bloom;
-      flameUniforms.uDirect.value = glow ? 0 : 1;
-      if (glow) { renderPass.camera = camera; composer.render(0.016); } else renderer.render(scene, camera);
+      drawStillAt(camera, W, H);
       const cv = mkCanvas(W, H); cv.getContext('2d').drawImage(renderer.domElement, 0, 0, W, H);
       out[id] = cv.toDataURL('image/jpeg', 0.85);
       onEach && onEach(id, out[id]);
@@ -6014,7 +6190,7 @@ function renderFurnishSelection() { if (!$('#tab-furnish').hidden) renderFurnish
 
 /** After an edit: persist, refresh overlays and the details panel. */
 function commit() {
-  save(); updateLabels(); renderInspector(); updateRoomSub();
+  save(); updateLabels(); renderInspector(); updateRoomSub(); markEnvDirty(); markShadowsDirty();
   if (sheet && sheet.kind === 'item') renderSheet();
 }
 
@@ -6222,7 +6398,7 @@ async function takePhoto() {
   const keepQ = quality;
   try {
     if (tempHQ) { quality = 'high'; buildFixtures(); buildLights(); updateLighting(); }
-    renderer.setPixelRatio(1); renderer.setSize(W, H, false); composer.setPixelRatio(1); composer.setSize(W, H);
+    if (envDirty || tempHQ) captureEnv();               // High's lights for this shot: bounce light to match
     const vf = frameVFov();
     camera.aspect = W / H; camera.fov = vf / DEG;
     if (photo.shift) camera.setViewOffset(W, H, 0, -photo.shift * H / 2, W, H); else camera.clearViewOffset();
@@ -6230,9 +6406,7 @@ async function takePhoto() {
     const above = viewFromAbove(camera);
     if (FX.stairwell) FX.stairwell.visible = !above;
     if (FX.screen) FX.screen.ceilingKit.visible = !above;
-    const glow = !isFast() && state.light.bloom;
-    flameUniforms.uDirect.value = glow ? 0 : 1;
-    if (glow) { renderPass.camera = camera; composer.render(0.016); } else renderer.render(scene, camera);
+    drawStillAt(camera, W, H);
     const cv = mkCanvas(W, H); cv.getContext('2d').drawImage(renderer.domElement, 0, 0, W, H);
     const type = photo.fmt === 'png' ? 'image/png' : 'image/jpeg';
     const blob = await new Promise((r) => cv.toBlob(r, type, 0.93));
@@ -6522,10 +6696,7 @@ initMaterials();
 const restored = loadSaved();
 initControls();
 
-const composer = new EffectComposer(renderer);
-const renderPass = new RenderPass(scene, camera);
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.5, 0.55, 0.92);
-composer.addPass(renderPass); composer.addPass(bloomPass); composer.addPass(new OutputPass());
+initPipeline();                                       // composers: quick frames while moving, full frames when still (52-render)
 
 rebuildAll();
 initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initPhoto(); refreshPanels();
@@ -6546,9 +6717,8 @@ $$('#walkpad button').forEach((b) => {
 
 function resize() {
   const w = Math.max(1, stage.clientWidth), hgt = Math.max(1, stage.clientHeight);
-  renderer.setPixelRatio(pixelRatio());
-  composer.setPixelRatio(renderer.getPixelRatio());
-  renderer.setSize(w, hgt, false); composer.setSize(w, hgt); labelRenderer.setSize(w, hgt);
+  renderer.setPixelRatio(stillPR());
+  renderer.setSize(w, hgt, false); sizePipeline(); labelRenderer.setSize(w, hgt);
   camera.aspect = w / hgt; camera.updateProjectionMatrix(); applyViewInset(viewInset);
   if (photo.on) photoLayout();
   if (mode === 'plan') fitPlan();
@@ -6564,10 +6734,10 @@ updateLabels();
 function setQuality(q) {
   quality = q === 'high' ? 'high' : 'fast';
   try { localStorage.setItem(QUALITY_KEY, quality); } catch (e) { /* preference stays for this visit */ }
-  dprScale = 1;
+  dprScale = 1; moveScale = 1;
   $('#app').classList.toggle('fast', isFast());
-  buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); resize(); renderLighting();
-  toast(isFast() ? 'Fast display: smooth on any computer' : 'High quality: glow and soft area light');
+  buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); resize(); renderLighting(); markEnvDirty(0);
+  toast(isFast() ? 'Standard: smooth on phones and laptops' : 'High: every light fitting, soft area light and glow');
 }
 $('#app').classList.toggle('fast', isFast());
 
@@ -6585,7 +6755,7 @@ for (const ev of ['pointerdown', 'pointerup', 'wheel', 'keydown', 'keyup', 'inpu
 window.addEventListener('pointermove', (e) => { if (e.buttons || walk.dragging || drag) invalidate(2); }, { passive: true, capture: true });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) invalidate(3); });
 
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();                     // THREE.Clock is deprecated (r168+)
 const _frustum = new THREE.Frustum(), _pv = new THREE.Matrix4(), _fireBall = new THREE.Sphere();
 function fireInView() {
   if (mode === 'plan') return false;
@@ -6595,18 +6765,25 @@ function fireInView() {
   return _frustum.intersectsSphere(_fireBall);
 }
 let lastFlame = -1, lastRaf = 0, drewLast = false, slowScore = 0, fastFrames = 0, lastScale = 0, paused = false;
+let moveUntil = 0, lastWasMove = false, lastWasStill = false, stillSlow = false, lastDragShadow = 0;
+function sizeMove() { const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight); PIPE.move.c.setPixelRatio(movePR()); PIPE.move.c.setSize(w, h); }
 function frame(now) {
   requestAnimationFrame(frame);
   if (paused) return;                                 // batch rendering: frames are drawn only by capture()
   const rafGap = now - lastRaf; lastRaf = now;
-  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-  let active = false;
-  if (mode === 'walk') { if (walk.keys.size || walk.pad) active = true; stepWalk(dt); }
+  if (lastWasStill && rafGap < 1000) stillSlow = rafGap > 70;   // how long the GPU took over the last full frame
+  clock.update(now);
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.getElapsed();
+  let active = false, moving = false;                 // moving: the view or a piece is changing (quick frames)
+  if (mode === 'walk') { if (walk.keys.size || walk.pad || walk.dragging) moving = true; stepWalk(dt); }
   else {
-    if (tween) active = true;
+    if (tween) moving = true;
     stepTween(dt);
-    if ((mode === 'plan' ? planControls : controls).update()) active = true;   // true while moving or easing
+    if ((mode === 'plan' ? planControls : controls).update()) moving = true;   // true while moving or easing
   }
+  if (drag && drag.moved) { moving = true; if (now - lastDragShadow > 200) { lastDragShadow = now; markShadowsDirty(); } }
+  if (moving) { moveUntil = now + 160; active = true; }
+  const inMove = now < moveUntil;
   photoCamera();                                      // photo mode: level camera, lens, frame-centred projection
   if (FX.screen) {                                    // motorised screen rolls down / up
     const target = state.light.screenDown ? 1 : 0.02;
@@ -6615,34 +6792,36 @@ function frame(now) {
       FX.screen.sheet.scale.y = FX.screen.cur; active = true;
     }
   }
-  // the flame animates at 24 fps in fast mode, 50 in high, and only while it is on screen; nothing else needs a clock
-  if (FX.fire && state.light.fire && t - lastFlame > (isFast() ? 1 / 24 : 1 / 50) && fireInView()) {
+  // the flame animates only while it is on screen: with the quick frames while you move, and at a gentle rate on the
+  // full-quality picture when you stop (slower still if the device takes long to draw a full frame)
+  const flameDt = inMove ? 1 / 30 : stillSlow ? 1 / 5 : isFast() ? 1 / 15 : 1 / 12;
+  if (FX.fire && state.light.fire && t - lastFlame > flameDt && fireInView()) {
     lastFlame = t;
     flameUniforms.uTime.value = t;
     FX.fire.light.intensity = FIRE_CD * (0.85 + 0.18 * Math.sin(t * 7.3) + 0.1 * Math.sin(t * 13.7 + 1.3));
     active = true;
   }
   if (active) invalidate(1);
-  if (dirty <= 0) { drewLast = false; return; }       // idle: no GPU work at all
+  if (!inMove && lastWasMove) invalidate(1);          // just stopped: draw the full-quality frame
+  if (envDirty && !inMove) { captureEnv(); invalidate(1); }   // the room's light changed: recapture the bounce
+  if (dirty <= 0) { drewLast = false; lastWasStill = false; return; }   // idle: no GPU work at all
   dirty--;
   const above = viewFromAbove(activeCam);
   if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && !above;
   if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
   ghostBulkheads(mode === 'plan' || above);
   if (sightline) { const far = activeCam.position.distanceTo(sightline.eye) > 30; for (const o of sightline.objs) o.visible = far; }
-  const glow = !isFast() && state.light.bloom && mode !== 'plan';
-  flameUniforms.uDirect.value = glow ? 0 : 1;
-  if (glow) { renderPass.camera = activeCam; composer.render(dt); }
-  else renderer.render(scene, activeCam);
+  const which = inMove ? 'move' : 'still';
+  drawView(activeCam, which);
   labelRenderer.render(scene, activeCam);
-  // fast mode: drop resolution while frames are slow, raise it back when there is headroom. Only back-to-back
-  // frames count: the 24 fps flame draws every few display frames, and those gaps are not a sign of a slow GPU.
-  if (isFast() && drewLast && rafGap < 1000) {          // (a longer stall is a one-off, e.g. a shader compile)
-    // a frame under 24 fps adds to the score in proportion to how slow it was, so a very slow GPU adapts within seconds
-    if (rafGap > 42) { slowScore += Math.min(4, rafGap / 42); fastFrames = 0; } else if (rafGap < 22) { fastFrames++; slowScore = 0; }
-    if (slowScore > 12 && dprScale > 0.55 && now - lastScale > 700) { dprScale = Math.max(0.55, dprScale - 0.15); slowScore = 0; lastScale = now; resize(); }
-    else if (fastFrames > 90 && dprScale < 1 && now - lastScale > 2500) { dprScale = Math.min(1, dprScale + 0.15); fastFrames = 0; lastScale = now; resize(); }
+  // moving frames: drop their resolution while they're slow, raise it back when there is headroom. Only back-to-back
+  // moving frames count (a longer stall is a one-off, e.g. a shader compile); the full frame is never scaled down.
+  if (which === 'move' && lastWasMove && rafGap < 1000) {
+    if (rafGap > 34) { slowScore += Math.min(4, rafGap / 34); fastFrames = 0; } else if (rafGap < 20) { fastFrames++; slowScore = 0; }
+    if (slowScore > 6 && moveScale > 0.35 && now - lastScale > 350) { moveScale = Math.max(0.35, moveScale * 0.8); slowScore = 0; lastScale = now; sizeMove(); }
+    else if (fastFrames > 40 && moveScale < 1 && now - lastScale > 1200) { moveScale = Math.min(1, moveScale * 1.12); fastFrames = 0; lastScale = now; sizeMove(); }
   }
+  lastWasMove = which === 'move'; lastWasStill = which === 'still';
   drewLast = true;
 }
 requestAnimationFrame(frame);
@@ -6666,13 +6845,13 @@ window.__cinema = {
     if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
     ghostBulkheads(mode === 'plan' || above);
     activeCam.updateMatrixWorld();
-    const glow = !isFast() && state.light.bloom && mode !== 'plan';
-    flameUniforms.uDirect.value = glow ? 0 : 1;
-    if (glow) { renderPass.camera = activeCam; composer.render(0.016); } else renderer.render(scene, activeCam);
+    if (envDirty) captureEnv();
+    drawView(activeCam, 'still');
     labelRenderer.render(scene, activeCam);
     return type ? renderer.domElement.toDataURL(type, q) : '';
   },
-  idle: () => dirty <= 0, frames: () => renderer.info.render.frame, perf: () => ({ dprScale, slowScore, fastFrames, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
+  idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
+  perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
   view(px, py, pz, tx, ty, tz, fov = 50) { tween = null; camera.fov = fov; camera.updateProjectionMatrix(); camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },
   settle() { if (FX.screen) { FX.screen.cur = state.light.screenDown ? 1 : 0.02; FX.screen.sheet.scale.y = FX.screen.cur; } invalidate(3); },
   /** Print artwork: a top-down plan at an explicit frame (plan inches per CSS px, centre) on a paper colour, without the

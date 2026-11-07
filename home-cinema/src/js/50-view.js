@@ -2,7 +2,8 @@
 // 50 · Renderer, cameras, view modes, presets, labels, sightline
 // ===================================================================
 const stage = $('#stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: false });
+// every frame goes through a composer with its own 4× MSAA target (52-render), so the canvas needs no MSAA of its own
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: false });
 let forcePR = 0;                                   // set by the render hook for print artwork
 function pixelRatio() {
   if (forcePR) return forcePR;
@@ -11,6 +12,11 @@ function pixelRatio() {
 }
 renderer.setPixelRatio(pixelRatio());
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
+// soft shadows (PCF: 5 filtered Vogel-disk taps) that don't depend on the camera: drawn once when something
+// changes (markShadowsDirty), never per frame while you orbit
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.shadowMap.autoUpdate = false;
 renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 stage.appendChild(renderer.domElement);
@@ -18,8 +24,7 @@ renderer.domElement.tabIndex = 0;
 renderer.domElement.setAttribute('aria-label', '3D view of the basement cinema');
 RectAreaLightUniformsLib.init();
 scene.background = new THREE.Color('#120f0c');
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+const pmrem = new THREE.PMREMGenerator(renderer);   // turns the captured room (52-render) into the scene's light
 
 const labelRenderer = new CSS2DRenderer({ element: $('#labels') });
 
@@ -185,7 +190,6 @@ function setMode(m) {
   if (m === 'walk') { enterWalk(); toast(matchMedia('(pointer: coarse)').matches ? 'Drag to look · hold ▲ to walk' : 'Drag to look · W A S D to walk · Shift to hurry'); }
   if (m === 'orbit') { camera.up.set(0, 1, 0); if (camera.position.y < 30 || prevWalk) goPreset('overview'); }
   prevWalk = m === 'walk';
-  renderPass.camera = activeCam;
   labelsGroup.visible = true;
   updateLighting();
   updateLabels();

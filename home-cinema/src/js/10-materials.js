@@ -332,7 +332,7 @@ function initMaterials() {
   M.glassDark = new THREE.MeshStandardMaterial({ color: '#050505', roughness: 0.05, metalness: 0.9, transparent: true, opacity: 0.55, depthWrite: false });
   M.reeded = new THREE.MeshStandardMaterial({ map: TEX.reeded, roughness: 0.2, metalness: 0.1, transparent: true, opacity: 0.88,
     emissive: '#b8c6d4', emissiveMap: TEX.reeded, emissiveIntensity: 0.25 });
-  M.shadow = new THREE.MeshBasicMaterial({ map: TEX.shadow, transparent: true, depthWrite: false, opacity: 0.8 });
+  M.shadow = new THREE.MeshBasicMaterial({ map: TEX.shadow, transparent: true, depthWrite: false, opacity: 0.45 });
   M.led = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffb46b').multiplyScalar(3), toneMapped: false });
   M.potOn = new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff1dc').multiplyScalar(4), toneMapped: false });
   M.potOff = new THREE.MeshStandardMaterial({ color: '#d9d4cc', roughness: 0.4 });
@@ -353,6 +353,7 @@ function cached(key, make) { return _texCache[key] || (_texCache[key] = make());
 
 function applyFinishes() {
   const f = state.finish;
+  if (typeof markEnvDirty === 'function') markEnvDirty();
   M.wall.color.set(f.wall);
   M.trim.color.set(f.wall);                                                  // baseboards are painted to match the walls (satin)
   M.ceiling.color.set(f.ceiling || SHOJI_WHITE); M.bulkhead.color.set(f.ceiling || SHOJI_WHITE);

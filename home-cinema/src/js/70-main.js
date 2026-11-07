@@ -5,10 +5,7 @@ initMaterials();
 const restored = loadSaved();
 initControls();
 
-const composer = new EffectComposer(renderer);
-const renderPass = new RenderPass(scene, camera);
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.5, 0.55, 0.92);
-composer.addPass(renderPass); composer.addPass(bloomPass); composer.addPass(new OutputPass());
+initPipeline();                                       // composers: quick frames while moving, full frames when still (52-render)
 
 rebuildAll();
 initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initPhoto(); refreshPanels();
@@ -29,9 +26,8 @@ $$('#walkpad button').forEach((b) => {
 
 function resize() {
   const w = Math.max(1, stage.clientWidth), hgt = Math.max(1, stage.clientHeight);
-  renderer.setPixelRatio(pixelRatio());
-  composer.setPixelRatio(renderer.getPixelRatio());
-  renderer.setSize(w, hgt, false); composer.setSize(w, hgt); labelRenderer.setSize(w, hgt);
+  renderer.setPixelRatio(stillPR());
+  renderer.setSize(w, hgt, false); sizePipeline(); labelRenderer.setSize(w, hgt);
   camera.aspect = w / hgt; camera.updateProjectionMatrix(); applyViewInset(viewInset);
   if (photo.on) photoLayout();
   if (mode === 'plan') fitPlan();
@@ -47,10 +43,10 @@ updateLabels();
 function setQuality(q) {
   quality = q === 'high' ? 'high' : 'fast';
   try { localStorage.setItem(QUALITY_KEY, quality); } catch (e) { /* preference stays for this visit */ }
-  dprScale = 1;
+  dprScale = 1; moveScale = 1;
   $('#app').classList.toggle('fast', isFast());
-  buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); resize(); renderLighting();
-  toast(isFast() ? 'Fast display: smooth on any computer' : 'High quality: glow and soft area light');
+  buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); resize(); renderLighting(); markEnvDirty(0);
+  toast(isFast() ? 'Standard: smooth on phones and laptops' : 'High: every light fitting, soft area light and glow');
 }
 $('#app').classList.toggle('fast', isFast());
 
@@ -68,7 +64,7 @@ for (const ev of ['pointerdown', 'pointerup', 'wheel', 'keydown', 'keyup', 'inpu
 window.addEventListener('pointermove', (e) => { if (e.buttons || walk.dragging || drag) invalidate(2); }, { passive: true, capture: true });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) invalidate(3); });
 
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();                     // THREE.Clock is deprecated (r168+)
 const _frustum = new THREE.Frustum(), _pv = new THREE.Matrix4(), _fireBall = new THREE.Sphere();
 function fireInView() {
   if (mode === 'plan') return false;
@@ -78,18 +74,25 @@ function fireInView() {
   return _frustum.intersectsSphere(_fireBall);
 }
 let lastFlame = -1, lastRaf = 0, drewLast = false, slowScore = 0, fastFrames = 0, lastScale = 0, paused = false;
+let moveUntil = 0, lastWasMove = false, lastWasStill = false, stillSlow = false, lastDragShadow = 0;
+function sizeMove() { const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight); PIPE.move.c.setPixelRatio(movePR()); PIPE.move.c.setSize(w, h); }
 function frame(now) {
   requestAnimationFrame(frame);
   if (paused) return;                                 // batch rendering: frames are drawn only by capture()
   const rafGap = now - lastRaf; lastRaf = now;
-  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-  let active = false;
-  if (mode === 'walk') { if (walk.keys.size || walk.pad) active = true; stepWalk(dt); }
+  if (lastWasStill && rafGap < 1000) stillSlow = rafGap > 70;   // how long the GPU took over the last full frame
+  clock.update(now);
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.getElapsed();
+  let active = false, moving = false;                 // moving: the view or a piece is changing (quick frames)
+  if (mode === 'walk') { if (walk.keys.size || walk.pad || walk.dragging) moving = true; stepWalk(dt); }
   else {
-    if (tween) active = true;
+    if (tween) moving = true;
     stepTween(dt);
-    if ((mode === 'plan' ? planControls : controls).update()) active = true;   // true while moving or easing
+    if ((mode === 'plan' ? planControls : controls).update()) moving = true;   // true while moving or easing
   }
+  if (drag && drag.moved) { moving = true; if (now - lastDragShadow > 200) { lastDragShadow = now; markShadowsDirty(); } }
+  if (moving) { moveUntil = now + 160; active = true; }
+  const inMove = now < moveUntil;
   photoCamera();                                      // photo mode: level camera, lens, frame-centred projection
   if (FX.screen) {                                    // motorised screen rolls down / up
     const target = state.light.screenDown ? 1 : 0.02;
@@ -98,34 +101,36 @@ function frame(now) {
       FX.screen.sheet.scale.y = FX.screen.cur; active = true;
     }
   }
-  // the flame animates at 24 fps in fast mode, 50 in high, and only while it is on screen; nothing else needs a clock
-  if (FX.fire && state.light.fire && t - lastFlame > (isFast() ? 1 / 24 : 1 / 50) && fireInView()) {
+  // the flame animates only while it is on screen: with the quick frames while you move, and at a gentle rate on the
+  // full-quality picture when you stop (slower still if the device takes long to draw a full frame)
+  const flameDt = inMove ? 1 / 30 : stillSlow ? 1 / 5 : isFast() ? 1 / 15 : 1 / 12;
+  if (FX.fire && state.light.fire && t - lastFlame > flameDt && fireInView()) {
     lastFlame = t;
     flameUniforms.uTime.value = t;
     FX.fire.light.intensity = FIRE_CD * (0.85 + 0.18 * Math.sin(t * 7.3) + 0.1 * Math.sin(t * 13.7 + 1.3));
     active = true;
   }
   if (active) invalidate(1);
-  if (dirty <= 0) { drewLast = false; return; }       // idle: no GPU work at all
+  if (!inMove && lastWasMove) invalidate(1);          // just stopped: draw the full-quality frame
+  if (envDirty && !inMove) { captureEnv(); invalidate(1); }   // the room's light changed: recapture the bounce
+  if (dirty <= 0) { drewLast = false; lastWasStill = false; return; }   // idle: no GPU work at all
   dirty--;
   const above = viewFromAbove(activeCam);
   if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && !above;
   if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
   ghostBulkheads(mode === 'plan' || above);
   if (sightline) { const far = activeCam.position.distanceTo(sightline.eye) > 30; for (const o of sightline.objs) o.visible = far; }
-  const glow = !isFast() && state.light.bloom && mode !== 'plan';
-  flameUniforms.uDirect.value = glow ? 0 : 1;
-  if (glow) { renderPass.camera = activeCam; composer.render(dt); }
-  else renderer.render(scene, activeCam);
+  const which = inMove ? 'move' : 'still';
+  drawView(activeCam, which);
   labelRenderer.render(scene, activeCam);
-  // fast mode: drop resolution while frames are slow, raise it back when there is headroom. Only back-to-back
-  // frames count: the 24 fps flame draws every few display frames, and those gaps are not a sign of a slow GPU.
-  if (isFast() && drewLast && rafGap < 1000) {          // (a longer stall is a one-off, e.g. a shader compile)
-    // a frame under 24 fps adds to the score in proportion to how slow it was, so a very slow GPU adapts within seconds
-    if (rafGap > 42) { slowScore += Math.min(4, rafGap / 42); fastFrames = 0; } else if (rafGap < 22) { fastFrames++; slowScore = 0; }
-    if (slowScore > 12 && dprScale > 0.55 && now - lastScale > 700) { dprScale = Math.max(0.55, dprScale - 0.15); slowScore = 0; lastScale = now; resize(); }
-    else if (fastFrames > 90 && dprScale < 1 && now - lastScale > 2500) { dprScale = Math.min(1, dprScale + 0.15); fastFrames = 0; lastScale = now; resize(); }
+  // moving frames: drop their resolution while they're slow, raise it back when there is headroom. Only back-to-back
+  // moving frames count (a longer stall is a one-off, e.g. a shader compile); the full frame is never scaled down.
+  if (which === 'move' && lastWasMove && rafGap < 1000) {
+    if (rafGap > 34) { slowScore += Math.min(4, rafGap / 34); fastFrames = 0; } else if (rafGap < 20) { fastFrames++; slowScore = 0; }
+    if (slowScore > 6 && moveScale > 0.35 && now - lastScale > 350) { moveScale = Math.max(0.35, moveScale * 0.8); slowScore = 0; lastScale = now; sizeMove(); }
+    else if (fastFrames > 40 && moveScale < 1 && now - lastScale > 1200) { moveScale = Math.min(1, moveScale * 1.12); fastFrames = 0; lastScale = now; sizeMove(); }
   }
+  lastWasMove = which === 'move'; lastWasStill = which === 'still';
   drewLast = true;
 }
 requestAnimationFrame(frame);
@@ -149,13 +154,13 @@ window.__cinema = {
     if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
     ghostBulkheads(mode === 'plan' || above);
     activeCam.updateMatrixWorld();
-    const glow = !isFast() && state.light.bloom && mode !== 'plan';
-    flameUniforms.uDirect.value = glow ? 0 : 1;
-    if (glow) { renderPass.camera = activeCam; composer.render(0.016); } else renderer.render(scene, activeCam);
+    if (envDirty) captureEnv();
+    drawView(activeCam, 'still');
     labelRenderer.render(scene, activeCam);
     return type ? renderer.domElement.toDataURL(type, q) : '';
   },
-  idle: () => dirty <= 0, frames: () => renderer.info.render.frame, perf: () => ({ dprScale, slowScore, fastFrames, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
+  idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
+  perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
   view(px, py, pz, tx, ty, tz, fov = 50) { tween = null; camera.fov = fov; camera.updateProjectionMatrix(); camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },
   settle() { if (FX.screen) { FX.screen.cur = state.light.screenDown ? 1 : 0.02; FX.screen.sheet.scale.y = FX.screen.cur; } invalidate(3); },
   /** Print artwork: a top-down plan at an explicit frame (plan inches per CSS px, centre) on a paper colour, without the

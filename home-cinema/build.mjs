@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const src = (p) => readFileSync(join(root, 'src', p), 'utf8');
-const THREE_VERSION = '0.160.0';
+const THREE_VERSION = '0.186.1';
 
 const js = readdirSync(join(root, 'src', 'js')).filter((f) => f.endsWith('.js')).sort()
   .map((f) => `// ---- ${f} ----\n${src('js/' + f)}`).join('\n');

@@ -2,9 +2,17 @@
 
 An interactive three.js model of the basement home cinema (Room 1 on the foundation plan, plus the strip past the W200 steel beam up to the fireplace wall). Use it to try furniture layouts, TV sizes, finishes and lighting before building.
 
-Open `index.html` in a recent desktop or mobile browser. It loads three.js r160 and the fonts from public CDNs, so it needs an internet connection. Nothing else to install.
+Open `index.html` in a recent desktop or mobile browser. It loads three.js 0.186 and the fonts from public CDNs, so it needs an internet connection. Nothing else to install.
 
-It starts in **Fast** display mode so it runs smoothly on older laptops and phones: it draws at standard resolution (lower still if frames get slow), skips the glow and area lights, and only redraws when something changes. The flame animates only while the fireplace is on screen. Switch to **High quality** (glow, soft area light, full resolution on sharp screens) under **Lighting › Display** if you have a strong graphics card. The choice is remembered per browser.
+### Rendering
+
+- **Progressive**: while you move the camera (or drag a piece) the planner draws quick frames at whatever resolution keeps up, and the moment you stop it draws the full-quality picture. Nothing is drawn while nothing changes, and the flame animates only while the fireplace is on screen.
+- **Bounce light**: the room is captured from its middle and used as its own ambient light, so the walls, floor and lighting scene tint everything (one bounce, with matching reflections). It's recaptured only when the room, finishes, lights or layout change.
+- **Soft shadows** from the ceiling lights, drawn once when something changes (never per frame while you orbit), and **ambient occlusion** (contact shadows in corners and under furniture) on the full-quality picture.
+- **Two display modes**, under **Lighting › Display** (remembered per browser):
+  - **Standard** (default): the ceiling lights are grouped into a few zones, three of them casting shadows, with glow; full picture at up to 1.5× resolution. Runs on any phone or laptop.
+  - **High**: every pot light (the six over the main room with their own shadows), soft area light from the LED channels and glow, full picture at up to 2× resolution.
+- ACES tone mapping, 4× MSAA on every frame, and a guard that keeps a stray invalid pixel from a fabric shader from blooming into a black blotch.
 
 ## What's modelled
 
@@ -215,6 +223,7 @@ src/js/42-decor.js     wall décor: frames, gallery wall, mirrors, shelves, scon
 src/js/45-styles.js    style sets, upholstery library, prices, lead times, scoring, spec sheet rows
 src/js/46-decor-styles.js wall décor variants, prices and default finishes
 src/js/50-view.js     renderer, cameras, presets, walk mode, plan dimensions, viewing maths
+src/js/52-render.js   rendering: quick/full frames, bounce light, shadows, ambient occlusion, glow
 src/js/55-edit.js     picking, dragging, measuring, keyboard
 src/js/57-collide.js  footprints, walls and obstacles: keeps furniture on the floor and wall pieces on walls
 src/js/58-hold.js     press and hold gestures, the bottom-sheet furniture menu, Add here

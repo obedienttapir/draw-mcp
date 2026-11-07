@@ -114,16 +114,17 @@ function renderLighting() {
     toggle('stepsOn', 'Stair step lights', L.steps, (v) => { L.steps = v; updateLighting(); }),
     toggle('bayPotsOn', 'Pot lights over the TV', L.bayPots, (v) => { L.bayPots = v; queue(() => { buildLights(); updateLighting(); }); }),
     state.tv.screen ? toggle('screenDownOn', 'Projector screen down', L.screenDown, (v) => { L.screenDown = v; updateLighting(); updateLabels(); renderInspector(); }) : null,
-    isFast() ? null : toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; invalidate(3); }),
+    toggle('bloomOn', 'Glow effect', L.bloom, (v) => { L.bloom = v; invalidate(3); }),
     h('p', { class: 'note' }, 'Movie dims the pots and leaves a little LED glow around the TV alcove to ease eye strain.')));
   // display quality is a device preference, kept out of layouts and undo
   const q = h('div', { class: 'chips', role: 'group', 'aria-label': 'Display quality' });
-  for (const [val, text] of [['fast', 'Fast'], ['high', 'High quality']]) {
+  for (const [val, text] of [['fast', 'Standard'], ['high', 'High']]) {
     q.append(h('button', { class: 'chip', 'aria-pressed': String(quality === val), onclick: () => { if (quality !== val) setQuality(val); } }, text));
   }
   root.append(group('Display', q, h('p', { class: 'note' }, isFast()
-    ? 'Fast runs smoothly on any laptop or phone. High quality adds glow and soft area light, for a strong graphics card.'
-    : 'High quality adds glow and soft area light. Switch back to Fast if moving around feels slow.')));
+    ? 'Standard: soft shadows from the ceiling lights, light bouncing off the walls and floor, contact shadows in corners and under furniture, and glow, on any phone or laptop. High adds every ceiling light with its own shadow, soft light from the LED channels and sharper detail.'
+    : 'High: every ceiling light with its own shadow, soft light from the LED channels and glow, at up to 2× resolution. Standard is lighter on the battery.'),
+    h('p', { class: 'note' }, 'Both stay smooth while you move: quick frames during the move, then the full-quality picture the moment you stop.')));
 }
 
 // one-click fireplace wall combinations: windows + surround + slats
@@ -251,13 +252,14 @@ function renderRoomTab() {
     h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => openCode() }, 'Layout code'))));
 }
 
-function rebuildRoomOnly() { buildRoom(); buildLights(); updateLighting(); }
+function rebuildRoomOnly() { buildRoom(); buildLights(); updateLighting(); markShadowsDirty(); }
 function rebuildFixturesAndLights() { buildFixtures(); buildLights(); updateLighting(); drawOutline(); updateLabels(); }
 function rebuildTV() {
   if (FX.tv) { fixturesGroup.remove(FX.tv.group); disposeGroup(FX.tv.group); }
   buildTV(); updateLighting(); drawOutline(); updateLabels();
 }
 function rebuildAll() {
+  markShadowsDirty();
   applyFinishes(); buildRoom(); buildFixtures(); buildLights(); buildAllItems(); updateLighting();
   updateLabels(); drawOutline(); updateRoomSub();
 }

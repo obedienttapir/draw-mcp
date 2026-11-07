@@ -143,16 +143,14 @@ async function renderThumbs(view, onEach) {
     for (const id of SET_IDS) {
       if (job !== thumbJob) break;                           // a newer request took over
       previewSetId = id; buildAllItems(); updateLighting();
-      renderer.setPixelRatio(1); renderer.setSize(W, H, false); composer.setPixelRatio(1); composer.setSize(W, H);
+      if (envDirty) captureEnv();
       camera.aspect = W / H; camera.updateProjectionMatrix();
       camera.position.copy(pose.pos); camera.up.set(0, 1, 0); camera.lookAt(pose.target); camera.updateMatrixWorld();
       const above = viewFromAbove(camera);
       if (FX.stairwell) FX.stairwell.visible = !above;
       if (FX.screen) FX.screen.ceilingKit.visible = !above;
       ghostBulkheads(above);
-      const glow = !isFast() && state.light.bloom;
-      flameUniforms.uDirect.value = glow ? 0 : 1;
-      if (glow) { renderPass.camera = camera; composer.render(0.016); } else renderer.render(scene, camera);
+      drawStillAt(camera, W, H);
       const cv = mkCanvas(W, H); cv.getContext('2d').drawImage(renderer.domElement, 0, 0, W, H);
       out[id] = cv.toDataURL('image/jpeg', 0.85);
       onEach && onEach(id, out[id]);

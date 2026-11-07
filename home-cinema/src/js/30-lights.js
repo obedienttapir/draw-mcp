@@ -5,6 +5,7 @@ const hemi = new THREE.HemisphereLight('#fff1e2', '#2a2119', 0.25);
 scene.add(hemi);
 const POT_CD = 11 * LUX;        // tuned to display exposure (a 650 lm wafer, scaled)
 const LED_NITS = 2.2;
+const ENV_GAIN = 0.7;            // strength of the captured bounce light
 
 const FIRE_CD = 0.7 * LUX;
 const LAMP_CD = 0.8 * LUX;
@@ -18,9 +19,10 @@ const SCENES = {
   fireside: { label: 'Fireside', pots: 0.08, leds: 0.7, tv: false, fire: true,  lamp: true,  steps: true,  screenDown: false },
 };
 
-function addPot(x, y, z, group) {
+function addPot(x, y, z, group, shadow = false) {
   // fast mode keeps the fixtures but lets a few zone lights do the lighting
   const light = isFast() ? null : new THREE.SpotLight('#ffd9b0', 0, 0, 52 * DEG, 0.75, 2);
+  if (light && shadow) shadowize(light, 512);
   if (light) {
     light.position.copy(P(x, y, z - 0.6));
     light.target.position.copy(P(x, y, 0));
@@ -53,19 +55,26 @@ function rectLight(w, h, pos, target, group, color = '#ffb36e') {
 
 function buildLights() {
   disposeGroup(lightsGroup);
+  markShadowsDirty();
   FX.pots = []; FX.leds = []; FX.ledMeshes = []; FX.zones = [];
   const r = state.room, G = geom(), H = r.ceiling;
   lightsGroup.updateMatrixWorld(true);
   if (isFast()) {
     // one point light per zone stands in for that zone's pots (and its LED wash)
-    const zone = (x, y, z, pots, led, color = '#ffd9b0') => {
-      const l = new THREE.PointLight(color, 0, 0, 2); l.position.copy(P(x, y, z)); lightsGroup.add(l);
-      FX.zones.push({ light: l, pots, led });
+    // the zones with seating are lit from above by a wide downward light that casts a soft shadow, like the pots
+    // it stands in for; the hallway and stairwell use plain point lights
+    const zone = (x, y, z, pots, led, color = '#ffd9b0', shadow = false) => {
+      let l;
+      if (shadow) {
+        l = shadowize(new THREE.SpotLight(color, 0, 0, 72 * DEG, 0.85, 2), 1024);
+        l.position.copy(P(x, y, z)); l.target.position.copy(P(x, y, 0)); lightsGroup.add(l, l.target);
+      } else { l = new THREE.PointLight(color, 0, 0, 2); l.position.copy(P(x, y, z)); lightsGroup.add(l); }
+      FX.zones.push({ light: l, pots: shadow ? pots * 1.25 : pots, led: shadow ? led * 1.25 : led });
     };
     const bb = Math.min(r.beamBottom, H);
-    zone(Math.max(r.beamDepth, 30) / 2, G.westY / 2, bb - 10, 2, 1.1, '#ffd2a0');                            // fireplace lounge
-    zone((Math.max(r.beamDepth, 0) + r.width) / 2, G.mainY / 2, H - 12, 6, 0.35);                               // main room
-    zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a');  // TV alcove
+    zone(Math.max(r.beamDepth, 30) / 2, G.westY / 2, bb - 10, 2, 1.1, '#ffd2a0', true);                      // fireplace lounge
+    zone((Math.max(r.beamDepth, 0) + r.width) / 2, G.mainY / 2, H - 12, 6, 0.35, '#ffd9b0', true);             // main room
+    zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a', true);  // TV alcove
     zone((r.boxX + G.hallEnd) / 2, (G.hallY - r.stairWidth) / 2 + 12, H - 12, 2, 0.1);                         // landing + hallway
   }
   // the stairwell (landing, upper flight, main-floor landing) is lit from upstairs; it follows the pot-light dimmer
@@ -81,7 +90,7 @@ function buildLights() {
   if (state.light.bayPots) for (const dx of [-24, 24]) addPot(G.tvX + dx, bayPotY, H, lightsGroup);
   // main ceiling grid (clear of the fireplace bulkhead)
   const x0 = Math.max(r.beamDepth, 0) + 8, x1 = r.width - 22;
-  for (const fx of [0, 0.5, 1]) for (const fy of [0.24, 0.74]) addPot(lerp(x0 + 14, x1, fx), G.mainY * fy, H, lightsGroup);
+  for (const fx of [0, 0.5, 1]) for (const fy of [0.24, 0.74]) addPot(lerp(x0 + 14, x1, fx), G.mainY * fy, H, lightsGroup, true);
   // fireplace bulkhead underside, the landing below it, and the hallway behind the stairs
   if (r.beamDepth > 12) for (const dy of [-34, 34]) addPot(r.beamDepth / 2 + 4, state.fireplace.center + dy, r.beamBottom, lightsGroup);
   if (r.beamDepth > r.boxX + 6 && r.beamBottom < H) addPot((r.boxX + r.beamDepth) / 2, -r.stairWidth / 2, r.beamBottom, lightsGroup);
@@ -162,12 +171,10 @@ function updateLighting() {
   for (const b of FX.transomGlow) b.material.color.set(L.pots > 0.5 ? '#6f8396' : '#2b3846');
   M.reeded.emissiveIntensity = 0.1 + 0.3 * Math.max(L.pots, 0.3 * L.leds);
   const planBoost = typeof mode !== 'undefined' && mode === 'plan' ? 1.4 : 0;
-  hemi.intensity = 0.06 + 0.5 * L.pots + 0.12 * L.leds + planBoost;
-  const env = 0.015 + 0.08 * L.pots + 0.02 * L.leds + planBoost * 0.05;
-  scene.traverse((o) => {
-    if (!o.material) return;
-    for (const m of [].concat(o.material)) if (m.isMeshStandardMaterial) m.envMapIntensity = env;
-  });
+  // the room's own light, captured and bounced (52-render), does the ambient work; the hemisphere only lifts black corners
+  hemi.intensity = 0.03 + 0.06 * L.pots + 0.03 * L.leds + planBoost;
+  scene.environmentIntensity = ENV_GAIN + planBoost * 0.3;
+  markEnvDirty();
   for (const it of state.items) if (it.type === 'floorLamp' || it.type === 'sconce') setLamp(it.id, L.lamp);
   invalidate(3);
 }

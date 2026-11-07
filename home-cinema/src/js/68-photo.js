@@ -136,7 +136,7 @@ async function takePhoto() {
   const keepQ = quality;
   try {
     if (tempHQ) { quality = 'high'; buildFixtures(); buildLights(); updateLighting(); }
-    renderer.setPixelRatio(1); renderer.setSize(W, H, false); composer.setPixelRatio(1); composer.setSize(W, H);
+    if (envDirty || tempHQ) captureEnv();               // High's lights for this shot: bounce light to match
     const vf = frameVFov();
     camera.aspect = W / H; camera.fov = vf / DEG;
     if (photo.shift) camera.setViewOffset(W, H, 0, -photo.shift * H / 2, W, H); else camera.clearViewOffset();
@@ -144,9 +144,7 @@ async function takePhoto() {
     const above = viewFromAbove(camera);
     if (FX.stairwell) FX.stairwell.visible = !above;
     if (FX.screen) FX.screen.ceilingKit.visible = !above;
-    const glow = !isFast() && state.light.bloom;
-    flameUniforms.uDirect.value = glow ? 0 : 1;
-    if (glow) { renderPass.camera = camera; composer.render(0.016); } else renderer.render(scene, camera);
+    drawStillAt(camera, W, H);
     const cv = mkCanvas(W, H); cv.getContext('2d').drawImage(renderer.domElement, 0, 0, W, H);
     const type = photo.fmt === 'png' ? 'image/png' : 'image/jpeg';
     const blob = await new Promise((r) => cv.toBlob(r, type, 0.93));
