@@ -80,9 +80,16 @@ function drawView(cam, which) {
 }
 /** One full-quality frame at an explicit size into the canvas (photos, thumbnails, print). Call resize() after. */
 function drawStillAt(cam, W, H) {
+  // 3K/4K photos: no MSAA (the pixel density does the anti-aliasing), which keeps a 4K shot from needing ~1 GB of GPU memory
+  const big = W * H > 3.5e6;
+  if (big) setSamples(PIPE.still.c, 0);
   renderer.setPixelRatio(1); renderer.setSize(W, H, false);
   PIPE.still.c.setPixelRatio(1); PIPE.still.c.setSize(W, H);
   drawView(cam, 'still');
+  if (big) setSamples(PIPE.still.c, 4);                 // the picture is already in the canvas; normal frames get MSAA back
+}
+function setSamples(c, n) {
+  for (const rt of [c.renderTarget1, c.renderTarget2]) if (rt.samples !== n) { rt.samples = n; rt.dispose(); }
 }
 
 // ---------------- shadows ----------------
