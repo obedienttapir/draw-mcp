@@ -1070,6 +1070,34 @@ function corduroyCanvas(asColor) {
   return cv;
 }
 
+/**
+ * The ceramic on the landing and the main floor: 24″ × 12″ porcelain with fine linear striations along the long side,
+ * laid in a ⅓ running bond with thin taupe grout (from the owner's photos). One repeat = 3 columns × one tile:
+ * 36″ across (u) × 24″ along (v); the long side runs along v.
+ */
+function tileCanvas() {
+  const W = 768, H = 512, ppi = W / 36, cw = W / 3, cv = mkCanvas(W, H), g = cv.getContext('2d'), r = rng(57);
+  const veins = ['#a99a83', '#b7a993', '#9e8d74', '#e7e0d3', '#efe9de', '#c2b49e'];
+  for (let c = 0; c < 3; c++) {
+    const t = mkCanvas(cw, H), tg = t.getContext('2d');
+    tg.fillStyle = css(shade('#d0c5b3', (r() - 0.5) * 0.06)); tg.fillRect(0, 0, cw, H);
+    for (let i = 0; i < 230; i++) {                                     // striations along the long side
+      const x = r() * cw, a = 0.6 + r() * 1.6, f = 0.004 + r() * 0.01, ph = r() * 6;
+      tg.strokeStyle = veins[Math.floor(r() * veins.length)]; tg.globalAlpha = 0.25 + r() * 0.45; tg.lineWidth = 0.5 + r() * 1.8;
+      tg.beginPath(); tg.moveTo(x, 0);
+      for (let y = 0; y <= H; y += 16) tg.lineTo(x + Math.sin(y * f + ph) * a, y);
+      tg.stroke();
+    }
+    tg.globalAlpha = 1;
+    const seam = Math.round((c * 8 * ppi) % H);                        // each column's joint is 8″ along from its neighbour's
+    g.drawImage(t, c * cw, seam); g.drawImage(t, c * cw, seam - H);
+    g.fillStyle = '#6f6557';                                            // ⅛″ grout
+    g.fillRect(c * cw, 0, 2, H); g.fillRect(c * cw, seam, cw, 2);
+  }
+  return cv;
+}
+const tileMat = () => cached('tile-porcelain', () => new THREE.MeshStandardMaterial({ map: canvasTex(tileCanvas(), true, [1 / 36, 1 / 24]), roughness: 0.38 }));
+
 function reededCanvas() {
   const cv = mkCanvas(256, 64), g = cv.getContext('2d');
   for (let x = 0; x < 256; x += 8) {
@@ -1407,11 +1435,12 @@ function buildRoom() {
   roomGroup.add(wallQuad([G.hallEnd, G.uy0], [r.width, G.uy0], 0, H, M.wall)); roomGroup.add(wallCap([G.hallEnd, G.uy0], [r.width, G.uy0], H + 0.2));
   roomGroup.add(wallQuad([r.width, G.uy0], [r.width, -r.stairWidth], 0, H, M.wall)); roomGroup.add(wallCap([r.width, G.uy0], [r.width, -r.stairWidth], H + 0.2));
   // the stairwell above the ceiling: a box round both flights and the landing, with a lid (inward faces only)
-  const top = H + 110, sx0 = Math.min(stairOpenX, G.topX - 30), sy0 = G.uy0;
+  const top = H + 110, sx0 = Math.min(stairOpenX, G.topX - 40), sy0 = G.uy0;
   stairwell.add(wallQuad([r.width, 0], [sx0, 0], H, top, M.wall));
   stairwell.add(wallQuad([sx0, 0], [sx0, sy0], H, top, M.wall));
   stairwell.add(wallQuad([sx0, sy0], [r.width, sy0], H, top, M.wall));
   stairwell.add(wallQuad([r.width, sy0], [r.width, 0], H, top, M.wall));
+  FX.stairwellBox = { x0: sx0, x1: r.width, y0: sy0, y1: 0, top };
   const lid = new THREE.Mesh(new THREE.PlaneGeometry(r.width - sx0, -sy0), M.ceiling);
   lid.rotation.x = Math.PI / 2; lid.position.copy(P((sx0 + r.width) / 2, sy0 / 2, top));
   stairwell.add(lid);
@@ -1487,7 +1516,7 @@ const BASE_PROFILE = [[0, 0], [BASE_T, 0], [BASE_T, 2.95], [0.62, 3.0], [0.6, 3.
   [0.47, 3.72], [0.52, 3.88], [0.53, 4.02], [0.5, 4.16], [0.43, 4.28], [0.36, 4.36], [0.34, 4.4], [0.3, 4.5], [0.24, 4.62], [0.16, 4.7], [0.08, 4.74], [0, BASE_H]];
 const baseShape = () => cached('base-profile-geo', () => new THREE.Shape(BASE_PROFILE.map(([x, y]) => new THREE.Vector2(x, y))));
 /** One straight run of baseboard along the wall from plan point a to b (the room on the left of a→b), extended at either end. */
-function baseRun(a, b, ext0 = 0, ext1 = 0) {
+function baseRun(a, b, ext0 = 0, ext1 = 0, z = 0, parent = roomGroup) {
   const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy); if (len < 0.5) return;
   const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
   const geo = new THREE.ExtrudeGeometry(baseShape(), { depth: len + ext0 + ext1, bevelEnabled: false, curveSegments: 1 });
@@ -1495,8 +1524,8 @@ function baseRun(a, b, ext0 = 0, ext1 = 0) {
   // local X = out of the wall (into the room), Y = up, Z = along the wall
   const X = new THREE.Vector3(nx, 0, -ny), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(ux, 0, -uy);
   m.matrixAutoUpdate = false;
-  m.matrix.makeBasis(X, Y, Z).setPosition(P(a[0] - ux * ext0, a[1] - uy * ext0, 0));
-  m.name = 'baseboard'; roomGroup.add(m);
+  m.matrix.makeBasis(X, Y, Z).setPosition(P(a[0] - ux * ext0, a[1] - uy * ext0, z));
+  m.name = 'baseboard'; parent.add(m);
 }
 /** Run a wall's baseboard, leaving gaps (along-the-wall distances from a) for door casings. */
 function baseWall(a, b, gaps = [], ext0 = 0, ext1 = 0) {
@@ -1797,6 +1826,14 @@ function buildStairs() {
   const Hl = G.landingStep * G.riserH, xL = G.xL, uy0 = G.uy0, uy1 = G.uy1, topX = G.topX, Hm = r.floorToFloor, R = G.run;
   slabAt(M.stairWood, xL, xL + 0.75, y0 - 0.6, y1 - 2.5, Hl - G.riserH, Hl - 1.25);                  // its riser (the 10th)
   slabAt(M.stairWood, xL - 1.2, r.width - 0.3, uy0 + 0.3, y1 - 2.5, Hl - 1.25, Hl);                // the landing floor
+  slabAt(M.stairWood, xL - 1.2, xL + 3.5, y0 - 0.6, y1 - 2.5, Hl - 1.25, Hl + 0.12);               // its stained nosing
+  // ceramic on the landing: the long side of each tile runs along the nosing (as on site), a joint at the nosing
+  const tilePlane = (pts, x0, z) => {
+    const geo = new THREE.ShapeGeometry(shapeFrom(pts.map(([x, y]) => [x - x0, y])));
+    geo.rotateX(-Math.PI / 2); geo.translate(x0, z, 0);
+    const m = new THREE.Mesh(geo, tileMat()); m.name = 'tile floor'; g.add(m); return m;
+  };
+  tilePlane([[xL, uy0], [r.width, uy0], [r.width, -0.2], [xL + 3.5, -0.2], [xL + 3.5, uy1], [xL, uy1]], xL + 3.5, Hl + 0.05);
   slabAt(M.wall, xL + 0.8, r.width - 0.3, uy0 + 0.3, y1 - 3, 0, Hl - 1.3);                         // enclosed underneath
   const lensL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
   lensL.position.copy(P(xL - 0.05, yc, Hl - G.riserH * 0.55)); g.add(lensL); FX.stepLights.push(lensL);
@@ -1815,10 +1852,39 @@ function buildStairs() {
     const lens = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
     lens.position.copy(P(xe + 0.05, uyc, top - G.riserH * 0.55)); g.add(lens); FX.stepLights.push(lens);
   }
-  // the last step is the main floor
+  // the last step is the main floor: a stained nosing, then the same ceramic
+  const mfx = topX - 40;
   slabAt(M.stairWood, topX - 0.75, topX, uy0 + 0.3, uy1, Hm - G.riserH, Hm - 1.25);
-  slabAt(M.stairWood, topX - 30, topX + 1.2, uy0 + 0.3, uy1 + 0.5, Hm - 1.25, Hm);
-  slabAt(M.wall, topX - 30, topX - 0.8, uy0 + 0.3, uy1 - 0.3, H, Hm - 1.3);
+  slabAt(M.stairWood, mfx, topX + 1.2, uy0 + 0.3, uy1 + 0.5, Hm - 1.25, Hm);
+  slabAt(M.stairWood, topX - 3.5, topX + 1.2, uy0 + 0.3, uy1 + 0.5, Hm - 1.25, Hm + 0.12);
+  slabAt(M.wall, mfx, topX - 0.8, uy0 + 0.3, uy1 - 0.3, H, Hm - 1.3);
+  tilePlane([[mfx, uy0], [topX - 3.5, uy0], [topX - 3.5, uy1 + 0.5], [mfx, uy1 + 0.5]], topX - 3.5, Hm + 0.05);
+  // white baseboards round the landing and along the main floor, as on site (painted like the room's)
+  if (state.finish.baseboards !== false) {
+    baseRun([xL, uy0], [r.width, uy0], 0, 0, Hl, g);
+    baseRun([r.width, uy0], [r.width, -0.2], 0, 0, Hl, g);
+    baseRun([mfx, uy0], [topX, uy0], 0, 0, Hm, g);
+  }
+
+  // stained skirt boards along the walls: they follow the nosing line, 3″ above it to 8″ below
+  const skirt = (pts, yA, yB) => {
+    const geo = new THREE.ExtrudeGeometry(new THREE.Shape(pts.map(([a, b]) => new THREE.Vector2(a, b))), { depth: yB - yA, bevelEnabled: false });
+    const m = new THREE.Mesh(geo, M.stairWood); m.position.z = -yB; m.name = 'skirt'; g.add(m); return m;   // plan y from yA to yB
+  };
+  const zN = (x) => (x - r.stairStart) * slope + G.riserH;                     // lower flight nosing line
+  const zNu = (x) => Hl + ((xL - x) / R + 1) * G.riserH;                       // upper flight nosing line (rising west)
+  const sk0 = G.wallX - 2;                                                      // lower flight, beside the wall facing the TV
+  if (xL > sk0 + 1) skirt([[sk0, zN(sk0) - 8], [xL, zN(xL) - 8], [xL, zN(xL) + 3], [sk0, zN(sk0) + 3]], y1 - 3.2, y1 - 2.5);
+  skirt([[topX, zNu(topX) - 8], [xL, zNu(xL) - 8], [xL, zNu(xL) + 3], [topX, zNu(topX) + 3]], uy0 + 0.3, uy0 + 1.05);   // upper flight, wall side
+  // the upper flight's open side: a stained cut stringer, its saw-tooth under the treads and 9″ below their inner corners
+  const cut = [[xL, Hl - 9]];
+  cut.push([topX, Hl + (G.upperSteps - 1) * G.riserH - 9], [topX, Hm - 1.25]);
+  for (let k = G.upperSteps - 1; k >= 1; k--) {
+    const xe = xL - (k - 1) * R, xw = xe - R, top = Hl + k * G.riserH;
+    cut.push([xw, top - 1.25], [xe, top - 1.25]);
+  }
+  cut.push([xL, Hl]);
+  skirt(cut, uy1 - 0.2, uy1 + 0.7);
 
   // knee walls under the stringers: room side (faces north) and hallway side (faces south)
   const knee = (x0, x1, side) => {
@@ -1880,8 +1946,6 @@ function buildStairs() {
   const zU = (x) => Hl + ((xL - x) / R) * G.riserH;                                  // its nosing line, rising west
   const ulen = (xL - topX) / Math.cos(Math.atan(slope)), umid = (xL + topX) / 2, uyR = uy1 - 1.5;
   if (ulen > 1) {
-    const ust = new THREE.Mesh(new THREE.BoxGeometry(ulen, 9, 0.9), M.stairWood);
-    ust.rotation.z = -Math.atan(slope); ust.position.copy(P(umid, uy1 + 0.2, zU(umid) - 4)); g.add(ust);
     const uhr = new THREE.Mesh(new THREE.BoxGeometry(ulen, 2.6, 2.4), M.stairWood);
     uhr.rotation.z = -Math.atan(slope); uhr.position.copy(P(umid, uyR, zU(umid) + G.riserH + rail + 1)); g.add(uhr);
     for (const st of upSteps) for (const off of [0.25, 0.75]) {
@@ -1889,6 +1953,12 @@ function buildStairs() {
       bal.push([x, uyR, st.top, zU(x) + G.riserH + rail]);
     }
     slabAt(M.stairWood, topX - 3.8, topX + 0.2, uyR - 1.8, uyR + 1.8, Hm, Hm + rail + 6);         // top post on the main floor
+    // the guard rail along the main floor's open edge, from the top post to the wall
+    const gx0 = mfx + 0.5, gx1 = topX - 3.8, gh = Hm + 36;
+    if (gx1 - gx0 > 4) {
+      slabAt(M.stairWood, gx0, gx1, uyR - 1.2, uyR + 1.2, gh, gh + 2.6);
+      for (let x = gx1 - 4.5; x > gx0 + 1; x -= 4.5) bal.push([x, uyR, Hm, gh]);
+    }
   }
 
   const balusters = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.32, 0.32, 1, 8), iron, bal.length);
@@ -2148,6 +2218,12 @@ function buildLights() {
     zone((Math.max(r.beamDepth, 0) + r.width) / 2, G.mainY / 2, H - 12, 6, 0.35);                               // main room
     zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a');  // TV alcove
     zone((r.boxX + G.hallEnd) / 2, (G.hallY - r.stairWidth) / 2 + 12, H - 12, 2, 0.1);                         // landing + hallway
+  }
+  // the stairwell (landing, upper flight, main-floor landing) is lit from upstairs; it follows the pot-light dimmer
+  {
+    const l = new THREE.PointLight('#ffe2c0', 0, 0, 2);
+    l.position.copy(P((G.topX + r.width) / 2, G.uy0 / 2, r.floorToFloor + 50)); lightsGroup.add(l);
+    FX.zones.push({ light: l, pots: 1.6, led: 0.15 });
   }
 
   // bay: two pots in front of the bulkhead face, washing the TV wall
@@ -3975,6 +4051,17 @@ function updatePlanDensity() {
   $('#labels').classList.toggle('compact', mode === 'plan' && ortho.zoom / planFit < 1.6);
 }
 
+/** True when the camera looks down on the room from above the basement ceiling (dollhouse views), but not when it
+ *  stands inside the stairwell (on the landing or the upper flight), where the stairwell's walls must stay. */
+function viewFromAbove(cam = activeCam) {
+  CAP_MAT.visible = !inStairwell(cam);           // the dark wall-top caps are for the dollhouse view, not from inside the stairwell
+  return cam.position.y > state.room.ceiling + 1 && !inStairwell(cam);
+}
+function inStairwell(cam = activeCam) {
+  const c = cam.position, b = FX.stairwellBox;
+  return !!b && c.y > state.room.ceiling + 1 && c.x > b.x0 && c.x < b.x1 && -c.z > b.y0 && -c.z < b.y1 && c.y < b.top;
+}
+
 // ---------------- room visible above a bottom sheet ----------------
 let viewInset = 0;                                     // px of the stage covered from the bottom (phone menu sheet)
 /** Shift the picture up by half the covered height, so the middle of the room sits in the middle of what you can see. */
@@ -5653,7 +5740,7 @@ async function renderThumbs(view, onEach) {
       renderer.setPixelRatio(1); renderer.setSize(W, H, false); composer.setPixelRatio(1); composer.setSize(W, H);
       camera.aspect = W / H; camera.updateProjectionMatrix();
       camera.position.copy(pose.pos); camera.up.set(0, 1, 0); camera.lookAt(pose.target); camera.updateMatrixWorld();
-      const above = camera.position.y > state.room.ceiling + 1;
+      const above = viewFromAbove(camera);
       if (FX.stairwell) FX.stairwell.visible = !above;
       if (FX.screen) FX.screen.ceilingKit.visible = !above;
       ghostBulkheads(above);
@@ -6140,7 +6227,7 @@ async function takePhoto() {
     camera.aspect = W / H; camera.fov = vf / DEG;
     if (photo.shift) camera.setViewOffset(W, H, 0, -photo.shift * H / 2, W, H); else camera.clearViewOffset();
     camera.updateProjectionMatrix(); camera.updateMatrixWorld();
-    const above = camera.position.y > state.room.ceiling + 1;
+    const above = viewFromAbove(camera);
     if (FX.stairwell) FX.stairwell.visible = !above;
     if (FX.screen) FX.screen.ceilingKit.visible = !above;
     const glow = !isFast() && state.light.bloom;
@@ -6538,7 +6625,7 @@ function frame(now) {
   if (active) invalidate(1);
   if (dirty <= 0) { drewLast = false; return; }       // idle: no GPU work at all
   dirty--;
-  const above = activeCam.position.y > state.room.ceiling + 1;
+  const above = viewFromAbove(activeCam);
   if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && !above;
   if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
   ghostBulkheads(mode === 'plan' || above);
@@ -6574,7 +6661,7 @@ window.__cinema = {
   /** Draw one frame now and return it as an image (renders and print artwork). */
   capture(type = 'image/png', q, flameT = 0) {
     if (flameT && FX.fire) { flameUniforms.uTime.value = flameT; FX.fire.light.intensity = state.light.fire ? FIRE_CD : 0; }
-    const above = activeCam.position.y > state.room.ceiling + 1;
+    const above = viewFromAbove(activeCam);
     if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && !above;
     if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
     ghostBulkheads(mode === 'plan' || above);

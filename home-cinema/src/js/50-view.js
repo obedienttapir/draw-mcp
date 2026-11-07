@@ -49,6 +49,17 @@ function updatePlanDensity() {
   $('#labels').classList.toggle('compact', mode === 'plan' && ortho.zoom / planFit < 1.6);
 }
 
+/** True when the camera looks down on the room from above the basement ceiling (dollhouse views), but not when it
+ *  stands inside the stairwell (on the landing or the upper flight), where the stairwell's walls must stay. */
+function viewFromAbove(cam = activeCam) {
+  CAP_MAT.visible = !inStairwell(cam);           // the dark wall-top caps are for the dollhouse view, not from inside the stairwell
+  return cam.position.y > state.room.ceiling + 1 && !inStairwell(cam);
+}
+function inStairwell(cam = activeCam) {
+  const c = cam.position, b = FX.stairwellBox;
+  return !!b && c.y > state.room.ceiling + 1 && c.x > b.x0 && c.x < b.x1 && -c.z > b.y0 && -c.z < b.y1 && c.y < b.top;
+}
+
 // ---------------- room visible above a bottom sheet ----------------
 let viewInset = 0;                                     // px of the stage covered from the bottom (phone menu sheet)
 /** Shift the picture up by half the covered height, so the middle of the room sits in the middle of what you can see. */

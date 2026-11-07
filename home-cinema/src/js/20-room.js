@@ -159,11 +159,12 @@ function buildRoom() {
   roomGroup.add(wallQuad([G.hallEnd, G.uy0], [r.width, G.uy0], 0, H, M.wall)); roomGroup.add(wallCap([G.hallEnd, G.uy0], [r.width, G.uy0], H + 0.2));
   roomGroup.add(wallQuad([r.width, G.uy0], [r.width, -r.stairWidth], 0, H, M.wall)); roomGroup.add(wallCap([r.width, G.uy0], [r.width, -r.stairWidth], H + 0.2));
   // the stairwell above the ceiling: a box round both flights and the landing, with a lid (inward faces only)
-  const top = H + 110, sx0 = Math.min(stairOpenX, G.topX - 30), sy0 = G.uy0;
+  const top = H + 110, sx0 = Math.min(stairOpenX, G.topX - 40), sy0 = G.uy0;
   stairwell.add(wallQuad([r.width, 0], [sx0, 0], H, top, M.wall));
   stairwell.add(wallQuad([sx0, 0], [sx0, sy0], H, top, M.wall));
   stairwell.add(wallQuad([sx0, sy0], [r.width, sy0], H, top, M.wall));
   stairwell.add(wallQuad([r.width, sy0], [r.width, 0], H, top, M.wall));
+  FX.stairwellBox = { x0: sx0, x1: r.width, y0: sy0, y1: 0, top };
   const lid = new THREE.Mesh(new THREE.PlaneGeometry(r.width - sx0, -sy0), M.ceiling);
   lid.rotation.x = Math.PI / 2; lid.position.copy(P((sx0 + r.width) / 2, sy0 / 2, top));
   stairwell.add(lid);
@@ -239,7 +240,7 @@ const BASE_PROFILE = [[0, 0], [BASE_T, 0], [BASE_T, 2.95], [0.62, 3.0], [0.6, 3.
   [0.47, 3.72], [0.52, 3.88], [0.53, 4.02], [0.5, 4.16], [0.43, 4.28], [0.36, 4.36], [0.34, 4.4], [0.3, 4.5], [0.24, 4.62], [0.16, 4.7], [0.08, 4.74], [0, BASE_H]];
 const baseShape = () => cached('base-profile-geo', () => new THREE.Shape(BASE_PROFILE.map(([x, y]) => new THREE.Vector2(x, y))));
 /** One straight run of baseboard along the wall from plan point a to b (the room on the left of a→b), extended at either end. */
-function baseRun(a, b, ext0 = 0, ext1 = 0) {
+function baseRun(a, b, ext0 = 0, ext1 = 0, z = 0, parent = roomGroup) {
   const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy); if (len < 0.5) return;
   const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
   const geo = new THREE.ExtrudeGeometry(baseShape(), { depth: len + ext0 + ext1, bevelEnabled: false, curveSegments: 1 });
@@ -247,8 +248,8 @@ function baseRun(a, b, ext0 = 0, ext1 = 0) {
   // local X = out of the wall (into the room), Y = up, Z = along the wall
   const X = new THREE.Vector3(nx, 0, -ny), Y = new THREE.Vector3(0, 1, 0), Z = new THREE.Vector3(ux, 0, -uy);
   m.matrixAutoUpdate = false;
-  m.matrix.makeBasis(X, Y, Z).setPosition(P(a[0] - ux * ext0, a[1] - uy * ext0, 0));
-  m.name = 'baseboard'; roomGroup.add(m);
+  m.matrix.makeBasis(X, Y, Z).setPosition(P(a[0] - ux * ext0, a[1] - uy * ext0, z));
+  m.name = 'baseboard'; parent.add(m);
 }
 /** Run a wall's baseboard, leaving gaps (along-the-wall distances from a) for door casings. */
 function baseWall(a, b, gaps = [], ext0 = 0, ext1 = 0) {

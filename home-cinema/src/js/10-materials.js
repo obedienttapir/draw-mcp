@@ -216,6 +216,34 @@ function corduroyCanvas(asColor) {
   return cv;
 }
 
+/**
+ * The ceramic on the landing and the main floor: 24″ × 12″ porcelain with fine linear striations along the long side,
+ * laid in a ⅓ running bond with thin taupe grout (from the owner's photos). One repeat = 3 columns × one tile:
+ * 36″ across (u) × 24″ along (v); the long side runs along v.
+ */
+function tileCanvas() {
+  const W = 768, H = 512, ppi = W / 36, cw = W / 3, cv = mkCanvas(W, H), g = cv.getContext('2d'), r = rng(57);
+  const veins = ['#a99a83', '#b7a993', '#9e8d74', '#e7e0d3', '#efe9de', '#c2b49e'];
+  for (let c = 0; c < 3; c++) {
+    const t = mkCanvas(cw, H), tg = t.getContext('2d');
+    tg.fillStyle = css(shade('#d0c5b3', (r() - 0.5) * 0.06)); tg.fillRect(0, 0, cw, H);
+    for (let i = 0; i < 230; i++) {                                     // striations along the long side
+      const x = r() * cw, a = 0.6 + r() * 1.6, f = 0.004 + r() * 0.01, ph = r() * 6;
+      tg.strokeStyle = veins[Math.floor(r() * veins.length)]; tg.globalAlpha = 0.25 + r() * 0.45; tg.lineWidth = 0.5 + r() * 1.8;
+      tg.beginPath(); tg.moveTo(x, 0);
+      for (let y = 0; y <= H; y += 16) tg.lineTo(x + Math.sin(y * f + ph) * a, y);
+      tg.stroke();
+    }
+    tg.globalAlpha = 1;
+    const seam = Math.round((c * 8 * ppi) % H);                        // each column's joint is 8″ along from its neighbour's
+    g.drawImage(t, c * cw, seam); g.drawImage(t, c * cw, seam - H);
+    g.fillStyle = '#6f6557';                                            // ⅛″ grout
+    g.fillRect(c * cw, 0, 2, H); g.fillRect(c * cw, seam, cw, 2);
+  }
+  return cv;
+}
+const tileMat = () => cached('tile-porcelain', () => new THREE.MeshStandardMaterial({ map: canvasTex(tileCanvas(), true, [1 / 36, 1 / 24]), roughness: 0.38 }));
+
 function reededCanvas() {
   const cv = mkCanvas(256, 64), g = cv.getContext('2d');
   for (let x = 0; x < 256; x += 8) {

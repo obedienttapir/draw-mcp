@@ -232,6 +232,14 @@ function buildStairs() {
   const Hl = G.landingStep * G.riserH, xL = G.xL, uy0 = G.uy0, uy1 = G.uy1, topX = G.topX, Hm = r.floorToFloor, R = G.run;
   slabAt(M.stairWood, xL, xL + 0.75, y0 - 0.6, y1 - 2.5, Hl - G.riserH, Hl - 1.25);                  // its riser (the 10th)
   slabAt(M.stairWood, xL - 1.2, r.width - 0.3, uy0 + 0.3, y1 - 2.5, Hl - 1.25, Hl);                // the landing floor
+  slabAt(M.stairWood, xL - 1.2, xL + 3.5, y0 - 0.6, y1 - 2.5, Hl - 1.25, Hl + 0.12);               // its stained nosing
+  // ceramic on the landing: the long side of each tile runs along the nosing (as on site), a joint at the nosing
+  const tilePlane = (pts, x0, z) => {
+    const geo = new THREE.ShapeGeometry(shapeFrom(pts.map(([x, y]) => [x - x0, y])));
+    geo.rotateX(-Math.PI / 2); geo.translate(x0, z, 0);
+    const m = new THREE.Mesh(geo, tileMat()); m.name = 'tile floor'; g.add(m); return m;
+  };
+  tilePlane([[xL, uy0], [r.width, uy0], [r.width, -0.2], [xL + 3.5, -0.2], [xL + 3.5, uy1], [xL, uy1]], xL + 3.5, Hl + 0.05);
   slabAt(M.wall, xL + 0.8, r.width - 0.3, uy0 + 0.3, y1 - 3, 0, Hl - 1.3);                         // enclosed underneath
   const lensL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
   lensL.position.copy(P(xL - 0.05, yc, Hl - G.riserH * 0.55)); g.add(lensL); FX.stepLights.push(lensL);
@@ -250,10 +258,39 @@ function buildStairs() {
     const lens = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
     lens.position.copy(P(xe + 0.05, uyc, top - G.riserH * 0.55)); g.add(lens); FX.stepLights.push(lens);
   }
-  // the last step is the main floor
+  // the last step is the main floor: a stained nosing, then the same ceramic
+  const mfx = topX - 40;
   slabAt(M.stairWood, topX - 0.75, topX, uy0 + 0.3, uy1, Hm - G.riserH, Hm - 1.25);
-  slabAt(M.stairWood, topX - 30, topX + 1.2, uy0 + 0.3, uy1 + 0.5, Hm - 1.25, Hm);
-  slabAt(M.wall, topX - 30, topX - 0.8, uy0 + 0.3, uy1 - 0.3, H, Hm - 1.3);
+  slabAt(M.stairWood, mfx, topX + 1.2, uy0 + 0.3, uy1 + 0.5, Hm - 1.25, Hm);
+  slabAt(M.stairWood, topX - 3.5, topX + 1.2, uy0 + 0.3, uy1 + 0.5, Hm - 1.25, Hm + 0.12);
+  slabAt(M.wall, mfx, topX - 0.8, uy0 + 0.3, uy1 - 0.3, H, Hm - 1.3);
+  tilePlane([[mfx, uy0], [topX - 3.5, uy0], [topX - 3.5, uy1 + 0.5], [mfx, uy1 + 0.5]], topX - 3.5, Hm + 0.05);
+  // white baseboards round the landing and along the main floor, as on site (painted like the room's)
+  if (state.finish.baseboards !== false) {
+    baseRun([xL, uy0], [r.width, uy0], 0, 0, Hl, g);
+    baseRun([r.width, uy0], [r.width, -0.2], 0, 0, Hl, g);
+    baseRun([mfx, uy0], [topX, uy0], 0, 0, Hm, g);
+  }
+
+  // stained skirt boards along the walls: they follow the nosing line, 3″ above it to 8″ below
+  const skirt = (pts, yA, yB) => {
+    const geo = new THREE.ExtrudeGeometry(new THREE.Shape(pts.map(([a, b]) => new THREE.Vector2(a, b))), { depth: yB - yA, bevelEnabled: false });
+    const m = new THREE.Mesh(geo, M.stairWood); m.position.z = -yB; m.name = 'skirt'; g.add(m); return m;   // plan y from yA to yB
+  };
+  const zN = (x) => (x - r.stairStart) * slope + G.riserH;                     // lower flight nosing line
+  const zNu = (x) => Hl + ((xL - x) / R + 1) * G.riserH;                       // upper flight nosing line (rising west)
+  const sk0 = G.wallX - 2;                                                      // lower flight, beside the wall facing the TV
+  if (xL > sk0 + 1) skirt([[sk0, zN(sk0) - 8], [xL, zN(xL) - 8], [xL, zN(xL) + 3], [sk0, zN(sk0) + 3]], y1 - 3.2, y1 - 2.5);
+  skirt([[topX, zNu(topX) - 8], [xL, zNu(xL) - 8], [xL, zNu(xL) + 3], [topX, zNu(topX) + 3]], uy0 + 0.3, uy0 + 1.05);   // upper flight, wall side
+  // the upper flight's open side: a stained cut stringer, its saw-tooth under the treads and 9″ below their inner corners
+  const cut = [[xL, Hl - 9]];
+  cut.push([topX, Hl + (G.upperSteps - 1) * G.riserH - 9], [topX, Hm - 1.25]);
+  for (let k = G.upperSteps - 1; k >= 1; k--) {
+    const xe = xL - (k - 1) * R, xw = xe - R, top = Hl + k * G.riserH;
+    cut.push([xw, top - 1.25], [xe, top - 1.25]);
+  }
+  cut.push([xL, Hl]);
+  skirt(cut, uy1 - 0.2, uy1 + 0.7);
 
   // knee walls under the stringers: room side (faces north) and hallway side (faces south)
   const knee = (x0, x1, side) => {
@@ -315,8 +352,6 @@ function buildStairs() {
   const zU = (x) => Hl + ((xL - x) / R) * G.riserH;                                  // its nosing line, rising west
   const ulen = (xL - topX) / Math.cos(Math.atan(slope)), umid = (xL + topX) / 2, uyR = uy1 - 1.5;
   if (ulen > 1) {
-    const ust = new THREE.Mesh(new THREE.BoxGeometry(ulen, 9, 0.9), M.stairWood);
-    ust.rotation.z = -Math.atan(slope); ust.position.copy(P(umid, uy1 + 0.2, zU(umid) - 4)); g.add(ust);
     const uhr = new THREE.Mesh(new THREE.BoxGeometry(ulen, 2.6, 2.4), M.stairWood);
     uhr.rotation.z = -Math.atan(slope); uhr.position.copy(P(umid, uyR, zU(umid) + G.riserH + rail + 1)); g.add(uhr);
     for (const st of upSteps) for (const off of [0.25, 0.75]) {
@@ -324,6 +359,12 @@ function buildStairs() {
       bal.push([x, uyR, st.top, zU(x) + G.riserH + rail]);
     }
     slabAt(M.stairWood, topX - 3.8, topX + 0.2, uyR - 1.8, uyR + 1.8, Hm, Hm + rail + 6);         // top post on the main floor
+    // the guard rail along the main floor's open edge, from the top post to the wall
+    const gx0 = mfx + 0.5, gx1 = topX - 3.8, gh = Hm + 36;
+    if (gx1 - gx0 > 4) {
+      slabAt(M.stairWood, gx0, gx1, uyR - 1.2, uyR + 1.2, gh, gh + 2.6);
+      for (let x = gx1 - 4.5; x > gx0 + 1; x -= 4.5) bal.push([x, uyR, Hm, gh]);
+    }
   }
 
   const balusters = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.32, 0.32, 1, 8), iron, bal.length);

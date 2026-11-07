@@ -68,6 +68,12 @@ function buildLights() {
     zone(G.tvX, G.mainY + r.bayDepth * 0.45, r.soffitBottom - 8, state.light.bayPots ? 2 : 0, 0.9, '#ffcf9a');  // TV alcove
     zone((r.boxX + G.hallEnd) / 2, (G.hallY - r.stairWidth) / 2 + 12, H - 12, 2, 0.1);                         // landing + hallway
   }
+  // the stairwell (landing, upper flight, main-floor landing) is lit from upstairs; it follows the pot-light dimmer
+  {
+    const l = new THREE.PointLight('#ffe2c0', 0, 0, 2);
+    l.position.copy(P((G.topX + r.width) / 2, G.uy0 / 2, r.floorToFloor + 50)); lightsGroup.add(l);
+    FX.zones.push({ light: l, pots: 1.6, led: 0.15 });
+  }
 
   // bay: two pots in front of the bulkhead face, washing the TV wall
   // two pots in front of the bulkhead face: they scallop the bulkhead like a pair of eyes and glare on the screen

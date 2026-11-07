@@ -108,7 +108,7 @@ function frame(now) {
   if (active) invalidate(1);
   if (dirty <= 0) { drewLast = false; return; }       // idle: no GPU work at all
   dirty--;
-  const above = activeCam.position.y > state.room.ceiling + 1;
+  const above = viewFromAbove(activeCam);
   if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && !above;
   if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
   ghostBulkheads(mode === 'plan' || above);
@@ -144,7 +144,7 @@ window.__cinema = {
   /** Draw one frame now and return it as an image (renders and print artwork). */
   capture(type = 'image/png', q, flameT = 0) {
     if (flameT && FX.fire) { flameUniforms.uTime.value = flameT; FX.fire.light.intensity = state.light.fire ? FIRE_CD : 0; }
-    const above = activeCam.position.y > state.room.ceiling + 1;
+    const above = viewFromAbove(activeCam);
     if (FX.stairwell) FX.stairwell.visible = mode !== 'plan' && !above;
     if (FX.screen) FX.screen.ceilingKit.visible = mode !== 'plan' && !above;
     ghostBulkheads(mode === 'plan' || above);

@@ -141,7 +141,7 @@ async function takePhoto() {
     camera.aspect = W / H; camera.fov = vf / DEG;
     if (photo.shift) camera.setViewOffset(W, H, 0, -photo.shift * H / 2, W, H); else camera.clearViewOffset();
     camera.updateProjectionMatrix(); camera.updateMatrixWorld();
-    const above = camera.position.y > state.room.ceiling + 1;
+    const above = viewFromAbove(camera);
     if (FX.stairwell) FX.stairwell.visible = !above;
     if (FX.screen) FX.screen.ceilingKit.visible = !above;
     const glow = !isFast() && state.light.bloom;

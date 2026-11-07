@@ -146,7 +146,7 @@ async function renderThumbs(view, onEach) {
       renderer.setPixelRatio(1); renderer.setSize(W, H, false); composer.setPixelRatio(1); composer.setSize(W, H);
       camera.aspect = W / H; camera.updateProjectionMatrix();
       camera.position.copy(pose.pos); camera.up.set(0, 1, 0); camera.lookAt(pose.target); camera.updateMatrixWorld();
-      const above = camera.position.y > state.room.ceiling + 1;
+      const above = viewFromAbove(camera);
       if (FX.stairwell) FX.stairwell.visible = !above;
       if (FX.screen) FX.screen.ceilingKit.visible = !above;
       ghostBulkheads(above);
