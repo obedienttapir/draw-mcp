@@ -145,7 +145,7 @@ const VARIANTS = {
   },
 };
 VARIANTS.uSectional = {
-  tremee: { label: 'Tremee, as sold', desc: 'Latitude Run Tremee modular U-sectional: 5 storage seats, 3 storage ottomans and 2 arms (10 boxes); the ottomans pull together into a sleeper', H: 33.9, comfort: 4, hangout: 5, price: [1500, 2900], weeks: [1, 3] },
+  tremee: { label: 'Tremee, as sold', desc: 'Latitude Run Tremee modular U-sectional: 5 storage seats with 6 back cushions (one stands along the corner seat’s side), 3 storage ottomans and 2 arms (10 boxes); the ottomans pull together into a sleeper', H: 33.9, comfort: 4, hangout: 5, price: [1500, 2900], weeks: [1, 3] },
   cloud:  { label: 'Cloud pillow-back', desc: 'Same modules with overstuffed cloud cushions and a lower, plumper back', H: 32, comfort: 5, hangout: 5, price: [1900, 3400], weeks: [2, 5] },
 };
 VARIANTS.sofa = VARIANTS.sectional;                        // the straight sofa shares the sectional's styles

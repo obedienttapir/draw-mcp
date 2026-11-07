@@ -30,7 +30,7 @@ const CATALOG = {
   uSectional: {
     label: 'U-sectional · Tremee', note: 'Wayfair Latitude Run: 134″ modular, storage, sleeper',
     // sizes are fixed by the product (see TREMEE); only the module count and arrangement change
-    defaults: { seats: 5, chaise: 'both', ottoman: 'front', arms: 'both', layout: 'sofa', pillows: 'off' },
+    defaults: { seats: 5, chaise: 'both', ottoman: 'front', arms: 'both', layout: 'sofa', pillows: 'off', corner: 'left' },
     params: [['seats', 'Seats in the back row', 3, 7, 'n']],
     options: [
       ['layout', 'Mode', [['sofa', 'Sofa'], ['bed', 'Sleeper (bed)']]],
@@ -38,6 +38,7 @@ const CATALOG = {
         ['left', 'Left only'], ['right', 'Right only'], ['none', 'None']]],
       ['ottoman', 'Loose ottoman', [['front', 'In front'], ['none', 'Put away']]],
       ['arms', 'Arms', [['both', 'Both'], ['none', 'Armless']]],
+      ['corner', 'Side back cushion (corner seat)', [['left', 'Left end (as pictured)'], ['right', 'Right end'], ['none', 'None']]],
       ['pillows', 'Throw pillows', [['off', 'Off (as sold)'], ['on', 'On (as styled)']]],
     ],
   },
@@ -593,9 +594,9 @@ function makeBarCart(p, item, s) {
 const TREMEE = { mw: 24.8, depth: 30, arm: 5.1, seatUse: 18.9, seatH: 17.7, back: 33.9, backCushion: 18.1, armH: 27.2, ott: 24.8, foot: 2.4, deck: 11, ottomans: 3 };
 // one-tap arrangements of the boxed set (5 seats, 3 ottomans); left/right as you face the sofa
 const TREMEE_CONFIGS = [
-  { label: '1 · U + loose ottoman', note: 'A chaise at each end, the third ottoman free in front (listing photo)', p: { chaise: 'both', ottoman: 'front', layout: 'sofa' } },
-  { label: '2 · Long chaise, left', note: 'The loose ottoman joins the left chaise: 134″ × 80″ (dimension sheet)', p: { chaise: 'long-left', ottoman: 'none', layout: 'sofa' } },
-  { label: '3 · Long chaise, right', note: 'The same, mirrored', p: { chaise: 'long-right', ottoman: 'none', layout: 'sofa' } },
+  { label: '1 · U + loose ottoman', note: 'A chaise at each end, the third ottoman free in front (listing photo)', p: { chaise: 'both', ottoman: 'front', layout: 'sofa', corner: 'left' } },
+  { label: '2 · Long chaise, left', note: 'The loose ottoman joins the left chaise: 134″ × 80″ (dimension sheet)', p: { chaise: 'long-left', ottoman: 'none', layout: 'sofa', corner: 'left' } },
+  { label: '3 · Long chaise, right', note: 'The same, mirrored', p: { chaise: 'long-right', ottoman: 'none', layout: 'sofa', corner: 'right' } },
   { label: 'Sleeper', note: 'All three ottomans in front of the middle seats: one bed deck', p: { layout: 'bed' } },
 ];
 const U_GAP = 14;                                     // loose ottoman sits this far in front of the chaise line
@@ -622,7 +623,7 @@ function makeUSectional(p, item, s) {
   const z0 = -D / 2, zf = z0 + T.depth;                     // back of the sofa, front of the seats
   const shadows = [];
   const leg = (x, z) => meshAt(legGeo, legMat, x, T.foot / 2, z, g);
-  const seatTop = T.seatH + (cloud ? 1 : 0), backTop = (cloud ? T.back - 2 : T.back) - 0.3;   // the lean lifts the top corner ~0.3″
+  const seatTop = T.seatH + (cloud ? 1 : 0), backTop = (cloud ? T.back - 2 : T.back) - 0.45;   // the lean lifts the top corner ~0.45″
   const backZ = z0 + (T.depth - T.seatUse);                 // where the seat cushion starts (front face of the back cushion)
   const box4legs = (xa, xb, za, zb) => { for (const x of [xa + 2.2, xb - 2.2]) for (const z of [za + 2.2, zb - 2.2]) leg(x, z); };
   // ---- seat modules: storage box on legs, seat cushion, back frame, leaning back cushion ----
@@ -630,10 +631,11 @@ function makeUSectional(p, item, s) {
     const xa = -W / 2 + arm + i * mw, xb = xa + mw, xc = (xa + xb) / 2;
     span(g, fab, xa + 0.1, xb - 0.1, T.foot, T.deck, z0, zf, 1.2);                       // box
     span(g, seam, xa + 0.5, xb - 0.5, T.deck - 0.3, T.deck, zf - 0.35, zf + 0.02, 0.1);  // lid seam
-    span(g, fab, xa + 0.35, xb - 0.35, T.deck, seatTop, backZ - 1.5, zf + 0.5, cloud ? 3.4 : 2.6);   // seat cushion
+    span(g, fab, xa + 0.12, xb - 0.12, T.deck, seatTop, backZ - 1.5, zf + 0.5, cloud ? 3.4 : 2.2);   // seat cushion, butting its neighbours
     span(g, fab, xa + 0.1, xb - 0.1, T.deck, 24, z0, z0 + 4, 1.6);                      // back frame
-    const ch = backTop - (seatTop - 1.2), th = (backZ - z0) - 4 + (cloud ? 2 : 0);
-    const bk = meshAt(rbox(mw - 0.8, ch, th, cloud ? 4.5 : 3.4), fab, xc, seatTop - 1.2 + ch / 2, z0 + 4 + th / 2 - 0.6, g);
+    // back cushion: the full module width, packed edge to edge with its neighbours, leaning back (as in the listing photos)
+    const ch = backTop - (seatTop - 1.2), th = (backZ - z0) - 3 + (cloud ? 2 : 0);
+    const bk = meshAt(rbox(mw - 0.15, ch, th, cloud ? 4.5 : 2.8), fab, xc, seatTop - 1.2 + ch / 2, z0 + 3 + th / 2 - 0.6, g);
     bk.rotation.x = -0.1;
     box4legs(xa, xb, z0, zf);
   }
@@ -643,13 +645,22 @@ function makeUSectional(p, item, s) {
     span(g, fab, xa, xa + arm, T.foot, T.armH, z0, zf, 2.2);
     leg(xa + arm / 2, z0 + 2.2); leg(xa + arm / 2, zf - 2.2);
   }
+  // ---- the corner seat: a sixth back cushion stands along the end seat's side, against the arm, so that end
+  //      reads as a corner (lean on the side and stretch out along the chaise), as in both listing photos ----
+  if (p.corner === 'left' || p.corner === 'right') {
+    const sx = p.corner === 'left' ? -1 : 1, thk = 8.5, ch = backTop - (seatTop - 1.2);
+    const xIn = sx < 0 ? -W / 2 + arm : W / 2 - arm;                       // inner face of the arm (or the end, armless)
+    const len = zf - backZ + 0.8;                                           // the usable seat depth, front to the back cushion
+    const side = meshAt(rbox(thk, ch - 1, len, cloud ? 4 : 2.8), fab, xIn - sx * thk / 2, seatTop - 1.2 + (ch - 1) / 2, backZ + len / 2 - 0.4, g);
+    side.rotation.z = sx * -0.1;                                            // leans outward, against the arm
+  }
   shadows.push([0, z0 + T.depth / 2, W, T.depth]);
   // ---- ottomans: 24.8″ cubes, 17.7″ high ----
   const ottoman = (xc, zc) => {
     const xa = xc - ott / 2, za = zc - ott / 2;
     span(g, fab, xa + 0.15, xa + ott - 0.15, T.foot, T.deck, za + 0.15, za + ott - 0.15, 1.2);
     span(g, seam, xa + 0.5, xa + ott - 0.5, T.deck - 0.3, T.deck, za + ott - 0.5, za + ott - 0.13, 0.1);
-    span(g, fab, xa + 0.35, xa + ott - 0.35, T.deck, seatTop, za + 0.35, za + ott - 0.35, cloud ? 3.4 : 2.6);
+    span(g, fab, xa + 0.12, xa + ott - 0.12, T.deck, seatTop, za + 0.12, za + ott - 0.12, cloud ? 3.4 : 2.2);
     box4legs(xa, xa + ott, za, za + ott);
     shadows.push([xc, zc, ott, ott]);
   };

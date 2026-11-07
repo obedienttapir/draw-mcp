@@ -87,6 +87,7 @@ Built for phones first; on by default and switchable under **Furnish › Press a
 | Back cushion | 18.1″ tall, top at 33.9″ | back frame + cushion = 30 − 18.9 = 11.1″, so the 43.7″ label = 54.8 − 11.1 |
 | Arm | 5.1″ wide × 27.2″ high, full depth | |
 | Ottoman (×3) | 24.8″ square × 17.7″ high | the spec table says 25.6″; the drawing's 24.8″ is the one that adds up |
+| Back cushions | 6: one per seat, plus one standing along the corner seat's side against the arm, so that end is a corner (left as pictured; **Layout › Side back cushion** moves it right or removes it) | listing photos |
 | In the box | 10 packages: 5 seats, 3 ottomans, 2 arms | |
 
 The 79.6″ depth is the drawing's layout: a long chaise (seat + two ottomans) on one end and a single chaise on the other. The listing photo instead shows a chaise at each end and the third ottoman loose in front (93.5″ deep with a 14″ gap).
