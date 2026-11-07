@@ -39,6 +39,13 @@ Object.assign(PIECE_FALLBACK, {
 });
 UPHOLSTERED.acousticPanel = 1;
 
+// ---- Aether TV stand (Povison) ----
+VARIANTS.aetherStand = {
+  walnut: { label: 'Walnut & Black', desc: 'Walnut body, black sintered-stone top, integrated LED under the top; four fronts (two drawers, two flap doors)', price: [1934, 2149], weeks: [1, 2], sheen: 0.1 },
+  cream:  { label: 'Cream', desc: 'Cream body and top, integrated LED under the top; four fronts (two drawers, two flap doors)', price: [1599, 1999], weeks: [1, 2], sheen: 0.05 },
+};
+PIECE_FALLBACK.aetherStand = { variant: 'walnut' };
+
 // ---- Pretty sectional (Must Société) ----
 VARIANTS.prettySectional = {
   pretty: { label: 'Pretty, as sold', desc: 'Must Société Pretty modular sectional: low curved L with open rounded ends, tight seats, lumbar pillows', H: 26, comfort: 3, hangout: 5, price: [3037, 3796], weeks: [2, 6] },

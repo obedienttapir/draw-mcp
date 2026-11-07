@@ -345,7 +345,7 @@ function itemSheet() {
 }
 
 // ---------------- add here ----------------
-const ADD_ORDER = ['uSectional', 'prettySectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
+const ADD_ORDER = ['uSectional', 'prettySectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'aetherStand', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
 const artThumbs = {};
 const artThumb = (kind) => artThumbs[kind] || (artThumbs[kind] = artCanvas(kind === 'mixed' ? 'abstract' : kind, 0.75, kind === 'mixed' ? 3 : 1).toDataURL('image/jpeg', 0.7));
 const DECOR_ICON = { frame: '▭', gallery: '▦', mirror: '◯', shelf: '⎯', sconce: '✺', acousticPanel: '▥' };
@@ -359,11 +359,12 @@ function addSheet(at) {
   const FEATURED = [
     ['uSectional', 'From Wayfair', 'Tremee U-sectional', '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper', WAYFAIR_FABRICS],
     ['prettySectional', 'From Must Société', 'Pretty modular sectional', '127″ × 93″ × 26″ · curved L, rounded open ends', MUST_FABRICS],
+    ['aetherStand', 'From Povison', 'Aether TV stand with LED', '78.74″ × 15.75″ × 15.95″ · walnut & black or cream', AETHER_COLOURS],
   ];
   const featured = FEATURED.map(([type, tag, title, sub, fabrics]) => h('div', { class: 'feature' },
     h('button', { class: 'feature-main', onclick: () => pick(type) }, h('span', { class: 'tag' }, tag), h('b', {}, title), h('small', {}, sub)),
     h('div', { class: 'feature-sw' }, fabrics.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
-      onclick: () => pick(type, { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.')))))));
+      onclick: () => pick(type, f.variant ? { variant: f.variant } : { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.')))))));
   const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && !FEATURED.some(([f]) => f === t)).map((t) =>
     h('button', { class: 'opt card', onclick: () => pick(t) }, h('b', {}, CATALOG[t].label), h('small', {}, CATALOG[t].note))));
   return h('div', { class: 'sheet-inner' },

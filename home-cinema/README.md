@@ -122,6 +122,17 @@ Ready-made files in [`models/`](models/):
 - Price shown is the listed $3,796 (or $3,036.80 on the Black Friday sale), scaled for extra middles; lead time is a guess.
 - Ready-made 3D file: [`models/pretty-sectional-green.glb`](models/pretty-sectional-green.glb), 127″ × 93″ × 26″.
 
+## Povison Aether TV stand
+
+**TV stand · Aether** models the Povison *Aether 78.74″ Mid-Century Modern TV Stand* with its integrated LED, in both colourways: **Walnut & Black** (walnut body, black sintered-stone top) and **Cream**. Pick the colour under **Style**, or with the swatches on its card in **Add here**.
+
+- 78.74″ W × 15.75″ D × 15.95″ H (product page), modelled from the photos: a recessed base, a body with rounded front corners and four fronts, a set-back reveal under the top and a top slab slightly proud of the body.
+- The LED under the top glows with the **LED channels** dimmer, so it follows every lighting scene (Movie dims it, Evening brings it up) and blooms in high quality.
+- Indicative price: C$2,149 walnut & black, C$1,999 cream (C$1,599 on sale); ships in 48 hours. The cream finish bounces more light at the screen, which the **Screen contrast** score reflects.
+- Ready-made 3D files: [`models/aether-tv-stand-walnut.glb`](models/aether-tv-stand-walnut.glb), [`models/aether-tv-stand-cream.glb`](models/aether-tv-stand-cream.glb).
+
+**The soundbar, across the board**: every TV stand (the media console in all its styles, and the Aether) carries the 40″ soundbar on its own top, and the TV's details panel checks the clearance from the bottom of the TV to the top of the soundbar using that stand's real height (the Aether: 15.95″ + 2.6″ soundbar; a 75″ TV centred at 44″ clears it by 7″).
+
 ## Wall décor
 
 Six wall pieces, under **Furnish** or by holding a wall (or the floor: they go on the nearest wall):
@@ -192,6 +203,7 @@ src/js/25-fixtures.js stairs, slat walls, fireplace with animated flames, transo
 src/js/30-lights.js   pot lights, LED channels, lighting scenes
 src/js/40-furniture.js furniture catalogue and factories (every style variant)
 src/js/43-pretty.js    Must Société Pretty sectional (curved modular L)
+src/js/44-aether.js    Povison Aether TV stand with integrated LED; soundbar heights for every TV stand
 src/js/42-decor.js     wall décor: frames, gallery wall, mirrors, shelves, sconces, acoustic panels, procedural art
 src/js/45-styles.js    style sets, upholstery library, prices, lead times, scoring, spec sheet rows
 src/js/46-decor-styles.js wall décor variants, prices and default finishes

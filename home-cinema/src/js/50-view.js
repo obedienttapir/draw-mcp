@@ -254,9 +254,11 @@ function viewingStats() {
   const hAngle = 2 * Math.atan(w / 2 / dist) / DEG;
   const tilt = Math.atan((tv.z - eye) / dist) / DEG;
   const sizeFor = (deg) => 2 * dist * Math.tan(deg / 2 * DEG) * Math.hypot(16, 9) / 16;
-  // a console standing under the TV (close to the TV wall and overlapping it sideways)
-  const con = state.items.find((i) => i.type === 'console' && Math.abs(i.y - r.depth) < 30 && Math.abs(i.x - tv.x) < (i.p.w || 70) / 2 + w / 2);
-  const clearance = con && !onScreen ? (t.center - h / 2) - (CONSOLE_Y0 + CONSOLE_H + SOUNDBAR_H) : null;
+  // a TV stand under the TV (close to the TV wall and overlapping it sideways): the soundbar stands on its top
+  const standW = (i) => (itemObjects.get(i.id) || {}).w || i.p.w || 70;
+  const con = state.items.find((i) => STAND_TOP[i.type] != null && Math.abs(i.y - r.depth) < 30 && Math.abs(i.x - tv.x) < standW(i) / 2 + w / 2);
+  const standTop = con ? ((itemObjects.get(con.id) || {}).top ?? STAND_TOP[con.type]) : 0;
+  const clearance = con && !onScreen ? (t.center - h / 2) - (standTop + SOUNDBAR_H) : null;
   return { seat, tv, dist, hAngle, tilt, w, h, eye, fit: G.bay[3][0] - G.bay[2][0] - w, size30: sizeFor(30), size40: sizeFor(40), clearance, onScreen, screenFits: sd ? sd.fits : true };
 }
 

@@ -400,7 +400,7 @@ function makeConsole(p, item, s) {
     instances(g, new THREE.BoxGeometry(0.25, h - 2, 0.2), M.black, list);
   }
   span(g, M.black, -20, 20, y0 + h, y0 + h + SOUNDBAR_H, -2, 2, 1.2);   // soundbar
-  return { group: g, w, d, shadows: [[0, 0, w, d]] };
+  return { group: g, w, d, top: y0 + h, shadows: [[0, 0, w, d]] };
 }
 
 // ---------------- side table ----------------
@@ -697,7 +697,7 @@ function buildItem(item) {
   holder.traverse((o) => { o.userData.itemId = item.id; });
   placeItem(holder, item);
   itemsGroup.add(holder);
-  itemObjects.set(item.id, { group: holder, w: built.w, d: built.d, hv: built.hv || 0 });
+  itemObjects.set(item.id, { group: holder, w: built.w, d: built.d, hv: built.hv || 0, top: built.top });
 }
 function placeItem(holder, item) {
   holder.position.copy(P(item.x, item.y, CATALOG[item.type] && CATALOG[item.type].wall ? item.p.h : 0));   // wall pieces hang at their centre height

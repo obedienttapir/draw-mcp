@@ -255,7 +255,7 @@ function addItem(type, at, style) {
   const G = geom(), pos = at || { x: state.room.width * 0.55, y: G.mainY * 0.5 };
   const it = { id: uid(type), type, x: pos.x, y: pos.y, rot: 0, p: clone(def.defaults) };
   if (SEATING[type]) it.rot = squareFacing(it, G.tvX + state.tv.offset, state.room.depth);   // square to the TV wall
-  else if (type === 'console') it.rot = 180;
+  else if (STAND_TOP[type] != null) it.rot = 180;            // TV stands face into the room from the TV wall
   state.items.push(it);
   if (style) for (const [k, v] of Object.entries(style)) setStyleKey(it, k, v);
   buildItem(it);

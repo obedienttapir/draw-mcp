@@ -2498,7 +2498,7 @@ function makeConsole(p, item, s) {
     instances(g, new THREE.BoxGeometry(0.25, h - 2, 0.2), M.black, list);
   }
   span(g, M.black, -20, 20, y0 + h, y0 + h + SOUNDBAR_H, -2, 2, 1.2);   // soundbar
-  return { group: g, w, d, shadows: [[0, 0, w, d]] };
+  return { group: g, w, d, top: y0 + h, shadows: [[0, 0, w, d]] };
 }
 
 // ---------------- side table ----------------
@@ -2795,7 +2795,7 @@ function buildItem(item) {
   holder.traverse((o) => { o.userData.itemId = item.id; });
   placeItem(holder, item);
   itemsGroup.add(holder);
-  itemObjects.set(item.id, { group: holder, w: built.w, d: built.d, hv: built.hv || 0 });
+  itemObjects.set(item.id, { group: holder, w: built.w, d: built.d, hv: built.hv || 0, top: built.top });
 }
 function placeItem(holder, item) {
   holder.position.copy(P(item.x, item.y, CATALOG[item.type] && CATALOG[item.type].wall ? item.p.h : 0));   // wall pieces hang at their centre height
@@ -3156,6 +3156,77 @@ const MUST_FABRICS = [
   { label: 'Green', cover: 'boucle', color: '#626b58' },
 ];
 
+// ---- 44-aether.js ----
+// ===================================================================
+// 44 · Aether TV stand (Povison): a low floor-standing media console with
+//      an integrated LED band under its top, in two colourways:
+//        walnut  · walnut body, black sintered-stone top
+//        cream   · cream body and top
+//      From the product page: 78.74″ W × 15.75″ D × 15.95″ H. Modelled from the
+//      photos: recessed base, body with rounded front corners and four fronts,
+//      a set-back reveal under the top with the LED strip, and a slightly
+//      proud top slab. The LED follows the room's LED-channel dimmer (and
+//      blooms in high quality). Like every TV stand here it carries the soundbar.
+// ===================================================================
+const AETHER = { w: 78.74, d: 15.75, h: 15.95, base: 1.0, top: 1.2, reveal: 1.5, inset: 1.1, endR: 5 };
+/** Height of the surface a soundbar stands on, for each TV stand type (inches). */
+const STAND_TOP = { console: CONSOLE_Y0 + CONSOLE_H, aetherStand: AETHER.h };
+/** UVs of extruded shapes are in inches: scale them so a texture spans ~`per` inches, optionally turned 90°. */
+function uvInches(geo, per = 40, turn = false) {
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < uv.count; i++) {
+    const u = uv.getX(i) / per, v = uv.getY(i) / per;
+    if (turn) uv.setXY(i, v, u); else uv.setXY(i, u, v);
+  }
+  uv.needsUpdate = true; return geo;
+}
+/** A plan outline (planShape from 43-pretty) extruded from y0 to y1 with a small rounded edge. */
+function slab(g, mat, x0, x1, z0, z1, y0, y1, radii, b = 0.35, turn = true) {
+  const geo = new THREE.ExtrudeGeometry(planShape(x0 + b, x1 - b, z0 + b, z1 - b, radii.map((r) => Math.max(0.2, r - b))),
+    { depth: Math.max(0.05, y1 - y0 - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 3, curveSegments: 24 });
+  uvInches(geo, 40, turn);
+  const m = new THREE.Mesh(geo, mat); m.rotation.x = -Math.PI / 2; m.position.y = y0 + b; g.add(m); return m;
+}
+const AETHER_FINISH = {
+  walnut: { body: () => woodMat('#6a4c34'), top: () => cached('aether-stone-black', () => new THREE.MeshStandardMaterial({ color: '#1e1d1c', roughness: 0.42, metalness: 0.05 })) },
+  cream:  { body: () => cached('aether-cream', () => new THREE.MeshStandardMaterial({ color: '#e4dccf', roughness: 0.62 })),
+            top: () => cached('aether-cream-top', () => new THREE.MeshStandardMaterial({ color: '#ebe4d9', roughness: 0.4 })) },
+};
+function makeAether(p, item, s) {
+  const A = AETHER, g = new THREE.Group(), f = AETHER_FINISH[s.variant] || AETHER_FINISH.walnut;
+  const body = f.body(), top = f.top(), w = A.w, d = A.d, R = A.endR;
+  const x0 = -w / 2, x1 = w / 2, zb = -d / 2, zf = d / 2;
+  const yb = A.base, yr = A.h - A.top - A.reveal, yt = A.h - A.top;       // body from yb to yr, reveal yr..yt, top yt..h
+  // recessed base (a shadow gap at the floor)
+  slab(g, M.black, x0 + 2, x1 - 2, zb + 1.5, zf - 1.5, 0, yb + 0.2, [1, 1, R - 2, R - 2], 0.2);
+  // body: rounded front corners, square-ish at the wall
+  slab(g, body, x0 + 0.3, x1 - 0.3, zb, zf - 0.5, yb, yr, [1.2, 1.2, R, R], 0.4);
+  // four fronts: thin seams across the flat part of the front
+  const seam = cached('aether-seam', () => new THREE.MeshStandardMaterial({ color: '#141210', roughness: 0.9 }));
+  for (let i = 1; i < 4; i++) span(g, seam, x0 + (w * i) / 4 - 0.09, x0 + (w * i) / 4 + 0.09, yb + 0.6, yr - 0.6, zf - 0.56, zf - 0.42, 0.02);
+  // reveal under the top: the set-back core glows with the room's LED channel (as in the product photos),
+  // brightest in the strip just under the top's front and side edges
+  slab(g, M.bandGlow, x0 + A.inset, x1 - A.inset, zb + 0.5, zf - A.inset - 0.5, yr - 0.1, yt + 0.1, [0.8, 0.8, R - A.inset, R - A.inset], 0.1);
+  const led = slab(g, M.led, x0 + A.inset + 0.2, x1 - A.inset - 0.2, zb + 0.6, zf - A.inset - 0.3, yt - 0.55, yt - 0.05, [0.6, 0.6, R - A.inset - 0.2, R - A.inset - 0.2], 0.05);
+  led.name = 'led strip';
+  // top slab, a little proud of the body all round
+  slab(g, top, x0, x1, zb, zf, yt, A.h, [1.2, 1.2, R + 0.3, R + 0.3], 0.3);
+  // the soundbar on top, as on every TV stand in the planner
+  span(g, M.black, -20, 20, A.h, A.h + SOUNDBAR_H, -2, 2, 1.2);
+  return { group: g, w, d, hv: A.h, top: A.h, shadows: [[0, 0, w, d]] };
+}
+
+CATALOG.aetherStand = {
+  label: 'TV stand · Aether', note: 'Povison: 78.74″ with integrated LED, walnut or cream',
+  defaults: {}, params: [],
+};
+FACTORIES.aetherStand = makeAether;
+// the two colourways on the product page, as one-tap presets
+const AETHER_COLOURS = [
+  { label: 'Walnut & Black', variant: 'walnut', color: '#6a4c34' },
+  { label: 'Cream', variant: 'cream', color: '#e4dccf' },
+];
+
 // ---- 45-styles.js ----
 // ===================================================================
 // 45 · Furniture style study: curated sets, upholstery library, piece
@@ -3452,6 +3523,7 @@ function pieceSize(item, s) {
     }
     case 'ottoman': return { text: `${inch(p.w)} × ${inch(p.d)} × ${inch(v.H)} H` };
     case 'loungeChair': return { text: `${inch(v.W)} W × ${inch(v.D)} D × ${inch(v.H)} H` };
+    case 'aetherStand': return { text: '78.74″ W × 15.75″ D × 15.95″ H, LED under the top' };
     case 'console': return { text: `${inch(p.w)} W × 15″ D × ${s.variant === 'frame' || s.variant === 'credenza' ? '24″ H on legs' : '13″ H, wall-hung'}`, scale: p.w / 70 };
     case 'plant': return { text: `${inch(s.variant === 'snake' ? 30 : p.h)} tall` };
     case 'towerSpeaker': return { text: '9″ × 12″ × 41″ H' };
@@ -3526,6 +3598,7 @@ function luminance(hex) {
 function pieceTone(item, s) {                           // [luminance, sheen] of the surface the screen sees
   if (UPHOLSTERED[item.type]) return [luminance(s.color), (COVERS[s.cover] || {}).sheen || 0];
   if (item.type === 'rug') return [luminance(s.color) * 0.8 + luminance(s.color2 || s.color) * 0.2, 0];
+  if (item.type === 'aetherStand') return [luminance(s.variant === 'cream' ? '#e4dccf' : '#6a4c34'), (VARIANTS.aetherStand[s.variant] || {}).sheen || 0.1];
   if (item.type === 'console') return s.variant === 'lacquer' ? [luminance('#121110'), 0] : [luminance(WOOD_FINISHES[s.wood || 'walnut'].color), VARIANTS.console[s.variant].sheen || 0.1];
   if (item.type === 'roundTable') {
     if (s.stone) return [luminance(s.stone === 'marble' ? '#e8e4dc' : s.stone === 'travertine' ? '#d8c7ad' : '#2a2724'), s.stone === 'marble' ? 0.3 : 0.1];
@@ -3547,7 +3620,7 @@ function evaluateSet(setId, withOverrides = false) {
   const chairs = of('loungeChair'), foot = of('ottoman').length + of('pouf').length;
   const comfort = (main ? varOf(main).comfort * 0.6 : 2) + (chairs.length ? mean(chairs.map((r) => varOf(r).comfort)) * 0.25 : 0.75) + (foot ? 4 : 2.5) * 0.15;
   // screen contrast: luminance and sheen of what faces the screen, weighted by how much of it the screen sees
-  const W = { prettySectional: 3, uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
+  const W = { aetherStand: 3, prettySectional: 3, uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
   const tones = rows.map((r) => [pieceTone(r.it, r.s), W[r.it.type] || 0]).filter(([t, k]) => t && k);
   const glare = wmean(tones.map(([[L, sh], k]) => [L + sh * 0.35, k]));
   const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
@@ -3592,7 +3665,7 @@ const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
 /** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
 function specRows(setId, withOverrides) {
   const groups = new Map(), PREFIX = { prettySectional: 'SE', uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
-    roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', sconce: 'LT', plant: 'AC',
+    roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', aetherStand: 'ST', barCart: 'ST', floorLamp: 'LT', sconce: 'LT', plant: 'AC',
     frame: 'AC', gallery: 'AC', mirror: 'AC', shelf: 'AC', acousticPanel: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
   for (const it of state.items) {
     const s = resolveSpec(it, setId, withOverrides), size = pieceSize(it, s), spec = pieceSpecText(it, s);
@@ -3651,6 +3724,13 @@ Object.assign(PIECE_FALLBACK, {
   sconce: { variant: 'globe', metal: 'brass' }, acousticPanel: { variant: 'fabric', cover: 'weave', color: '#3a3836', wood: 'walnut' },
 });
 UPHOLSTERED.acousticPanel = 1;
+
+// ---- Aether TV stand (Povison) ----
+VARIANTS.aetherStand = {
+  walnut: { label: 'Walnut & Black', desc: 'Walnut body, black sintered-stone top, integrated LED under the top; four fronts (two drawers, two flap doors)', price: [1934, 2149], weeks: [1, 2], sheen: 0.1 },
+  cream:  { label: 'Cream', desc: 'Cream body and top, integrated LED under the top; four fronts (two drawers, two flap doors)', price: [1599, 1999], weeks: [1, 2], sheen: 0.05 },
+};
+PIECE_FALLBACK.aetherStand = { variant: 'walnut' };
 
 // ---- Pretty sectional (Must Société) ----
 VARIANTS.prettySectional = {
@@ -3919,9 +3999,11 @@ function viewingStats() {
   const hAngle = 2 * Math.atan(w / 2 / dist) / DEG;
   const tilt = Math.atan((tv.z - eye) / dist) / DEG;
   const sizeFor = (deg) => 2 * dist * Math.tan(deg / 2 * DEG) * Math.hypot(16, 9) / 16;
-  // a console standing under the TV (close to the TV wall and overlapping it sideways)
-  const con = state.items.find((i) => i.type === 'console' && Math.abs(i.y - r.depth) < 30 && Math.abs(i.x - tv.x) < (i.p.w || 70) / 2 + w / 2);
-  const clearance = con && !onScreen ? (t.center - h / 2) - (CONSOLE_Y0 + CONSOLE_H + SOUNDBAR_H) : null;
+  // a TV stand under the TV (close to the TV wall and overlapping it sideways): the soundbar stands on its top
+  const standW = (i) => (itemObjects.get(i.id) || {}).w || i.p.w || 70;
+  const con = state.items.find((i) => STAND_TOP[i.type] != null && Math.abs(i.y - r.depth) < 30 && Math.abs(i.x - tv.x) < standW(i) / 2 + w / 2);
+  const standTop = con ? ((itemObjects.get(con.id) || {}).top ?? STAND_TOP[con.type]) : 0;
+  const clearance = con && !onScreen ? (t.center - h / 2) - (standTop + SOUNDBAR_H) : null;
   return { seat, tv, dist, hAngle, tilt, w, h, eye, fit: G.bay[3][0] - G.bay[2][0] - w, size30: sizeFor(30), size40: sizeFor(40), clearance, onScreen, screenFits: sd ? sd.fits : true };
 }
 
@@ -4270,7 +4352,7 @@ function addItem(type, at, style) {
   const G = geom(), pos = at || { x: state.room.width * 0.55, y: G.mainY * 0.5 };
   const it = { id: uid(type), type, x: pos.x, y: pos.y, rot: 0, p: clone(def.defaults) };
   if (SEATING[type]) it.rot = squareFacing(it, G.tvX + state.tv.offset, state.room.depth);   // square to the TV wall
-  else if (type === 'console') it.rot = 180;
+  else if (STAND_TOP[type] != null) it.rot = 180;            // TV stands face into the room from the TV wall
   state.items.push(it);
   if (style) for (const [k, v] of Object.entries(style)) setStyleKey(it, k, v);
   buildItem(it);
@@ -4870,7 +4952,7 @@ function itemSheet() {
 }
 
 // ---------------- add here ----------------
-const ADD_ORDER = ['uSectional', 'prettySectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
+const ADD_ORDER = ['uSectional', 'prettySectional', 'sectional', 'sofa', 'loungeChair', 'recliner', 'ottoman', 'pouf', 'roundTable', 'sideTable', 'rug', 'console', 'aetherStand', 'floorLamp', 'plant', 'barCart', 'towerSpeaker', 'subwoofer'];
 const artThumbs = {};
 const artThumb = (kind) => artThumbs[kind] || (artThumbs[kind] = artCanvas(kind === 'mixed' ? 'abstract' : kind, 0.75, kind === 'mixed' ? 3 : 1).toDataURL('image/jpeg', 0.7));
 const DECOR_ICON = { frame: '▭', gallery: '▦', mirror: '◯', shelf: '⎯', sconce: '✺', acousticPanel: '▥' };
@@ -4884,11 +4966,12 @@ function addSheet(at) {
   const FEATURED = [
     ['uSectional', 'From Wayfair', 'Tremee U-sectional', '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper', WAYFAIR_FABRICS],
     ['prettySectional', 'From Must Société', 'Pretty modular sectional', '127″ × 93″ × 26″ · curved L, rounded open ends', MUST_FABRICS],
+    ['aetherStand', 'From Povison', 'Aether TV stand with LED', '78.74″ × 15.75″ × 15.95″ · walnut & black or cream', AETHER_COLOURS],
   ];
   const featured = FEATURED.map(([type, tag, title, sub, fabrics]) => h('div', { class: 'feature' },
     h('button', { class: 'feature-main', onclick: () => pick(type) }, h('span', { class: 'tag' }, tag), h('b', {}, title), h('small', {}, sub)),
     h('div', { class: 'feature-sw' }, fabrics.map((f) => h('button', { class: 'bigsw mini', style: `--c:${f.color}`, 'aria-label': `Add in ${f.label}`, title: f.label,
-      onclick: () => pick(type, { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.')))))));
+      onclick: () => pick(type, f.variant ? { variant: f.variant } : { cover: f.cover, color: f.color }) }, h('i'), h('small', {}, f.label.replace(' Corduroy', ' cord.')))))));
   const grid = h('div', { class: 'addgrid' }, ADD_ORDER.filter((t) => CATALOG[t] && !FEATURED.some(([f]) => f === t)).map((t) =>
     h('button', { class: 'opt card', onclick: () => pick(t) }, h('b', {}, CATALOG[t].label), h('small', {}, CATALOG[t].note))));
   return h('div', { class: 'sheet-inner' },
@@ -4957,7 +5040,9 @@ function exportItemGLB(it) {
   root.name = def.label; root.scale.setScalar(0.0254);                     // inches -> metres
   root.add(built.group); flattenInstances(root); root.updateMatrixWorld(true);
   const v = (VARIANTS[it.type] || {})[s.variant];
-  const name = fileSlug([def.label.replace('·', ''), UPHOLSTERED[it.type] ? colorName(s.color) : '', UPHOLSTERED[it.type] ? COVERS[s.cover].label : ''].filter(Boolean).join(' ')) + '.glb';
+  const v0 = (VARIANTS[it.type] || {})[s.variant], many = Object.keys(VARIANTS[it.type] || {}).length > 1;
+  const name = fileSlug([def.label.replace('·', ''), !UPHOLSTERED[it.type] && many && v0 ? v0.label : '',
+    UPHOLSTERED[it.type] ? colorName(s.color) : '', UPHOLSTERED[it.type] ? COVERS[s.cover].label : ''].filter(Boolean).join(' ')) + '.glb';
   root.userData = { source: 'Basement Cinema Planner', style: v ? v.label : '', size: pieceSize(it, s).text, units: 'metres' };
   toast('Building the 3D file…');
   new GLTFExporter().parse(root, (buf) => {

@@ -36,7 +36,9 @@ function exportItemGLB(it) {
   root.name = def.label; root.scale.setScalar(0.0254);                     // inches -> metres
   root.add(built.group); flattenInstances(root); root.updateMatrixWorld(true);
   const v = (VARIANTS[it.type] || {})[s.variant];
-  const name = fileSlug([def.label.replace('·', ''), UPHOLSTERED[it.type] ? colorName(s.color) : '', UPHOLSTERED[it.type] ? COVERS[s.cover].label : ''].filter(Boolean).join(' ')) + '.glb';
+  const v0 = (VARIANTS[it.type] || {})[s.variant], many = Object.keys(VARIANTS[it.type] || {}).length > 1;
+  const name = fileSlug([def.label.replace('·', ''), !UPHOLSTERED[it.type] && many && v0 ? v0.label : '',
+    UPHOLSTERED[it.type] ? colorName(s.color) : '', UPHOLSTERED[it.type] ? COVERS[s.cover].label : ''].filter(Boolean).join(' ')) + '.glb';
   root.userData = { source: 'Basement Cinema Planner', style: v ? v.label : '', size: pieceSize(it, s).text, units: 'metres' };
   toast('Building the 3D file…');
   new GLTFExporter().parse(root, (buf) => {

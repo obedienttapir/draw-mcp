@@ -293,6 +293,7 @@ function pieceSize(item, s) {
     }
     case 'ottoman': return { text: `${inch(p.w)} × ${inch(p.d)} × ${inch(v.H)} H` };
     case 'loungeChair': return { text: `${inch(v.W)} W × ${inch(v.D)} D × ${inch(v.H)} H` };
+    case 'aetherStand': return { text: '78.74″ W × 15.75″ D × 15.95″ H, LED under the top' };
     case 'console': return { text: `${inch(p.w)} W × 15″ D × ${s.variant === 'frame' || s.variant === 'credenza' ? '24″ H on legs' : '13″ H, wall-hung'}`, scale: p.w / 70 };
     case 'plant': return { text: `${inch(s.variant === 'snake' ? 30 : p.h)} tall` };
     case 'towerSpeaker': return { text: '9″ × 12″ × 41″ H' };
@@ -367,6 +368,7 @@ function luminance(hex) {
 function pieceTone(item, s) {                           // [luminance, sheen] of the surface the screen sees
   if (UPHOLSTERED[item.type]) return [luminance(s.color), (COVERS[s.cover] || {}).sheen || 0];
   if (item.type === 'rug') return [luminance(s.color) * 0.8 + luminance(s.color2 || s.color) * 0.2, 0];
+  if (item.type === 'aetherStand') return [luminance(s.variant === 'cream' ? '#e4dccf' : '#6a4c34'), (VARIANTS.aetherStand[s.variant] || {}).sheen || 0.1];
   if (item.type === 'console') return s.variant === 'lacquer' ? [luminance('#121110'), 0] : [luminance(WOOD_FINISHES[s.wood || 'walnut'].color), VARIANTS.console[s.variant].sheen || 0.1];
   if (item.type === 'roundTable') {
     if (s.stone) return [luminance(s.stone === 'marble' ? '#e8e4dc' : s.stone === 'travertine' ? '#d8c7ad' : '#2a2724'), s.stone === 'marble' ? 0.3 : 0.1];
@@ -388,7 +390,7 @@ function evaluateSet(setId, withOverrides = false) {
   const chairs = of('loungeChair'), foot = of('ottoman').length + of('pouf').length;
   const comfort = (main ? varOf(main).comfort * 0.6 : 2) + (chairs.length ? mean(chairs.map((r) => varOf(r).comfort)) * 0.25 : 0.75) + (foot ? 4 : 2.5) * 0.15;
   // screen contrast: luminance and sheen of what faces the screen, weighted by how much of it the screen sees
-  const W = { prettySectional: 3, uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
+  const W = { aetherStand: 3, prettySectional: 3, uSectional: 3, sectional: 3, sofa: 3, recliner: 3, console: 3, rug: 2, roundTable: 1, ottoman: 1, loungeChair: 0.5, pouf: 0.4 };
   const tones = rows.map((r) => [pieceTone(r.it, r.s), W[r.it.type] || 0]).filter(([t, k]) => t && k);
   const glare = wmean(tones.map(([[L, sh], k]) => [L + sh * 0.35, k]));
   const picture = clamp(5 - 4 * (glare - 0.03) / 0.42, 1, 5);
@@ -433,7 +435,7 @@ const moneyRange = (lo, hi) => `${money(lo)}–${money(hi)}`;
 /** Spec sheet rows for a set (as designed) or the current layout: identical pieces grouped with a quantity. */
 function specRows(setId, withOverrides) {
   const groups = new Map(), PREFIX = { prettySectional: 'SE', uSectional: 'SE', sectional: 'SE', sofa: 'SE', recliner: 'SE', loungeChair: 'SE', ottoman: 'SE', pouf: 'SE',
-    roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', barCart: 'ST', floorLamp: 'LT', sconce: 'LT', plant: 'AC',
+    roundTable: 'TB', sideTable: 'TB', rug: 'RG', console: 'ST', aetherStand: 'ST', barCart: 'ST', floorLamp: 'LT', sconce: 'LT', plant: 'AC',
     frame: 'AC', gallery: 'AC', mirror: 'AC', shelf: 'AC', acousticPanel: 'AC', towerSpeaker: 'AV', subwoofer: 'AV' };
   for (const it of state.items) {
     const s = resolveSpec(it, setId, withOverrides), size = pieceSize(it, s), spec = pieceSpecText(it, s);
