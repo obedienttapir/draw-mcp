@@ -6771,7 +6771,7 @@ function frame(now) {
   requestAnimationFrame(frame);
   if (paused) return;                                 // batch rendering: frames are drawn only by capture()
   const rafGap = now - lastRaf; lastRaf = now;
-  if (lastWasStill && rafGap < 1000) stillSlow = rafGap > 70;   // how long the GPU took over the last full frame
+  if (lastWasStill) stillSlow = rafGap > 70;          // how long the GPU took over the last full frame (any length counts)
   clock.update(now);
   const dt = Math.min(clock.getDelta(), 0.05), t = clock.getElapsed();
   let active = false, moving = false;                 // moving: the view or a piece is changing (quick frames)
@@ -6794,7 +6794,8 @@ function frame(now) {
   }
   // the flame animates only while it is on screen: with the quick frames while you move, and at a gentle rate on the
   // full-quality picture when you stop (slower still if the device takes long to draw a full frame)
-  const flameDt = inMove ? 1 / 30 : stillSlow ? 1 / 5 : isFast() ? 1 / 15 : 1 / 12;
+  // (a device that takes long over a full frame keeps the flame still until you move again: no work while idle)
+  const flameDt = inMove ? 1 / 30 : stillSlow ? Infinity : isFast() ? 1 / 15 : 1 / 12;
   if (FX.fire && state.light.fire && t - lastFlame > flameDt && fireInView()) {
     lastFlame = t;
     flameUniforms.uTime.value = t;
@@ -6822,6 +6823,7 @@ function frame(now) {
     else if (fastFrames > 40 && moveScale < 1 && now - lastScale > 1200) { moveScale = Math.min(1, moveScale * 1.12); fastFrames = 0; lastScale = now; sizeMove(); }
   }
   lastWasMove = which === 'move'; lastWasStill = which === 'still';
+  if (which === 'still') dirty = 0;                   // one full frame shows the change; redrawing it again adds nothing
   drewLast = true;
 }
 requestAnimationFrame(frame);
