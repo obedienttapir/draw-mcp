@@ -152,10 +152,18 @@ const MANTEL_NOTES = {
 };
 function renderFinishes() {
   const root = $('#tab-finish'), f = state.finish; root.replaceChildren();
-  root.append(group('Wall paint', swatches('Wall paint', WALL_COLORS, f.wall, (c) => { f.wall = c; applyFinishes(); queue(rebuildRoomOnly); }),
-    h('p', { class: 'note' }, `${(WALL_COLORS.find(([c]) => c.toLowerCase() === String(f.wall).toLowerCase()) || [, 'Custom'])[1]} · matte walls; the baseboards are painted to match in satin.`)));
-  root.append(group('Ceiling', swatches('Ceiling paint', [[SHOJI_WHITE, 'Shoji White SW 7042'], ['#f2f0ea', 'Ceiling white'], ['#efebe4', 'Soft white']], f.ceiling || SHOJI_WHITE,
-    (c) => { f.ceiling = c; applyFinishes(); queue(rebuildRoomOnly); }), h('p', { class: 'note' }, 'Flat finish.')));
+  // the notes name the colour actually picked, and follow the swatches as they change
+  const CEILING_COLORS = [[SHOJI_WHITE, 'Shoji White SW 7042'], ['#f2f0ea', 'Ceiling white'], ['#efebe4', 'Soft white']];
+  const nameOf = (list, c) => (list.find(([x]) => x.toLowerCase() === String(c).toLowerCase()) || [, 'Custom colour'])[1];
+  const wallNote = h('p', { class: 'note' }), ceilNote = h('p', { class: 'note' });
+  const notes = () => {
+    wallNote.textContent = `${nameOf(WALL_COLORS, f.wall)} · matte walls; the baseboards are painted to match in satin.`;
+    ceilNote.textContent = `${nameOf(CEILING_COLORS, f.ceiling || SHOJI_WHITE)} · flat finish.`;
+  };
+  notes();
+  root.append(group('Wall paint', swatches('Wall paint', WALL_COLORS, f.wall, (c) => { f.wall = c; applyFinishes(); notes(); queue(rebuildRoomOnly); }), wallNote));
+  root.append(group('Ceiling', swatches('Ceiling paint', CEILING_COLORS, f.ceiling || SHOJI_WHITE,
+    (c) => { f.ceiling = c; applyFinishes(); notes(); queue(rebuildRoomOnly); }), ceilNote));
   root.append(group('Baseboards', toggle('fin-base', 'Baseboards (Metrie 8095D, 4¾″ colonial)', f.baseboards !== false, (v) => { f.baseboards = v; queue(rebuildRoomOnly); }),
     h('p', { class: 'note' }, '23/32″ × 4-3/4″ primed MDF, painted to match the walls in satin. They stop at door casings and the open passage, and are left off slat walls.')));
   root.append(group('TV alcove walls', chips('TV alcove walls', [['paint-dark', 'Charcoal'], ['paint-navy', 'Navy'], ['paint-green', 'Forest'], ['paint-wall', 'Same as walls']], f.bayAccent,
@@ -177,7 +185,8 @@ function renderFinishes() {
       ['picture', 'Picture ledge + art'], ['slab', 'Stone slab surround'], ['shelves', 'Shelves either side']], f.mantel,
     (v) => { f.mantel = v; queue(rebuildFixturesAndLights); renderFinishes(); }),
     h('p', { class: 'note' }, MANTEL_NOTES[f.mantel] || '')));
-  root.append(group('Floor', chips('Floor', Object.entries(FLOORS).map(([k, d]) => [k, d.label]), f.floor, (v) => { f.floor = v; applyFinishes(); })));
+  root.append(group('Floor', chips('Floor', Object.entries(FLOORS).map(([k, d]) => [k, d.label]), f.floor, (v) => { f.floor = v; applyFinishes(); }),
+    h('p', { class: 'note' }, 'Kairos laminate · Sutton is the floor on site: 19 cm (7.5″) planks, water resistant.')));
   root.append(group('Wood slats', chips('Slat finish', Object.entries(SLATS).map(([k, d]) => [k, d.label]), f.slat, (v) => { f.slat = v; applyFinishes(); }),
     toggle('slatFire', 'Slats on fireplace wall', f.fireplaceSlats, (v) => { f.fireplaceSlats = v; queue(rebuildFixturesAndLights); }),
     toggle('slatTv', 'Slats behind the TV', f.tvSlats, (v) => { f.tvSlats = v; queue(rebuildFixturesAndLights); })));
@@ -210,6 +219,9 @@ function renderRoomTab() {
     rs('stairWall', 'Wall facing TV, solid part (pink)', 0, Math.round(r.width - r.stairStart - 12)),
     rs('stairPanel', 'Corner → stair panel at the floor (blue)', Math.round(r.stairWall || 0), Math.round(r.width - r.stairStart)),
     rs('stairKnee', 'Stair panel height where the wall ends (orange)', 12, 60),
+    slider('room-landingStep', 'Steps to the landing (intermediate floor)', 4, 14, 1, r.landingStep ?? 10, String, (v) => { r.landingStep = v; queue(rebuildAll); }),
+    slider('room-upperSteps', 'Steps from the landing to the main floor', 2, 8, 1, r.upperSteps ?? 5, String, (v) => { r.upperSteps = v; queue(rebuildAll); }),
+    rs('upperWidth', 'Upper flight width', 30, 54),
     rs('hallDepth', 'Hallway east wall, closet side (green)', 30, 140),
     rs('hallWidth', 'Hallway far wall, door side (red)', 30, Math.round(r.width - r.boxX - 1)),
     rs('closetDoor', 'Closet door opening from the far wall', 0, Math.max(1, Math.round(r.hallDepth - 32))),

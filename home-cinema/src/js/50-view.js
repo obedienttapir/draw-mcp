@@ -295,6 +295,8 @@ function updateLabels() {
     label('TV alcove', P(G.tvX, G.mainY + r.bayDepth * 0.55, zz), 'tag');
     if (r.beamDepth > 1) dimLine([0, G.westY + 14], [r.beamDepth, G.westY + 14], zz, `bulkhead at ${ftin(r.beamBottom)}`);
     label('Stairs ↑', P(r.stairStart + 14, -r.stairWidth * 0.7, zz), 'tag');
+    label(`Landing · step ${G.landingStep}`, P((G.xL + r.width) / 2, (G.uy0) / 2, zz), 'tag', -90);
+    label(`↑ ${G.upperSteps} to main floor`, P((G.topX + G.xL) / 2, (G.uy0 + G.uy1) / 2, zz), 'tag');
     dimLine([r.stairStart - 2, -r.stairWidth + 8], [r.width, -r.stairWidth + 8], zz, `tip of stairs ${ftin(r.width - r.stairStart + 2)}`);
     label('Exterior wall', P(r.width - 10, G.mainY / 2, zz), 'tag', 90);
     label('Fireplace', P(10, state.fireplace.center, zz), 'tag', -90);

@@ -25,7 +25,7 @@ function canvasTex(cv, srgb = true, rep = [1, 1]) {
 function mkCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
 /** Wood: planks (floor) or one long board face (slats). Grain runs along canvas Y. */
-function woodCanvas({ base, grain, plankCols = 0, plankRows = 0, seed = 7, size = 1024 }) {
+function woodCanvas({ base, grain, plankCols = 0, plankRows = 0, seed = 7, size = 1024, vary = 0.22 }) {
   const cv = mkCanvas(size, size), g = cv.getContext('2d'), r = rng(seed);
   g.fillStyle = base; g.fillRect(0, 0, size, size);
   const cols = Math.max(1, plankCols), colW = size / cols;
@@ -35,7 +35,7 @@ function woodCanvas({ base, grain, plankCols = 0, plankRows = 0, seed = 7, size 
     for (let k = 0; k <= rows; k++) {
       const y0 = (k * size / rows + offset) % size - (k === 0 ? 0 : 0);
       const h = size / rows;
-      const tint = (r() - 0.5) * 0.22;
+      const tint = (r() - 0.5) * vary;                    // plank-to-plank tone (laminate is more even than real wood)
       g.fillStyle = css(shade(base, tint));
       for (const yy of [y0, y0 - size]) g.fillRect(c * colW, yy, colW, h);
       if (plankRows) {                  // butt joint
@@ -236,6 +236,8 @@ function radialCanvas(inner = 'rgba(0,0,0,0.55)', outer = 'rgba(0,0,0,0)') {
 
 // ---------------- finishes ----------------
 const FLOORS = {
+  // the floor on site: Kairos 19 cm (7.5″) water-resistant laminate, colour Sutton (Costco item 1847995): a warm, mid-tone tan oak
+  sutton:  { label: 'Kairos laminate · Sutton', base: '#b39a72', grain: '#85704f', rough: 0.5, vary: 0.08 },
   walnut:  { label: 'Dark walnut', base: '#4f3322', grain: '#2c1a0f', rough: 0.55 },
   smoked:  { label: 'Smoked oak',  base: '#6f5a47', grain: '#3f3024', rough: 0.6 },
   oak:     { label: 'Natural oak', base: '#b38c60', grain: '#7d5a37', rough: 0.6 },
@@ -316,7 +318,7 @@ function initMaterials() {
 }
 
 function woodTexture(def, cols, rows, seed, rep) {
-  return canvasTex(woodCanvas({ base: def.base, grain: def.grain, plankCols: cols, plankRows: rows, seed }), true, rep);
+  return canvasTex(woodCanvas({ base: def.base, grain: def.grain, plankCols: cols, plankRows: rows, seed, vary: def.vary ?? 0.22 }), true, rep);
 }
 const _texCache = {};
 function cached(key, make) { return _texCache[key] || (_texCache[key] = make()); }

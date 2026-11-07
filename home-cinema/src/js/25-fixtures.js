@@ -198,10 +198,10 @@ function buildStairs() {
   const steps = [];
   // treads, risers and the mass under each step: three instanced draws instead of ~45 meshes
   const box = new THREE.BoxGeometry(1, 1, 1), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
-  const treads = new THREE.InstancedMesh(box, M.stairWood, G.treads), risers = new THREE.InstancedMesh(box, M.stairWood, G.treads);
-  const fills = new THREE.InstancedMesh(box, M.stairWood, G.treads);   // solid, dark: reads as a cut stringer from either side
+  const treads = new THREE.InstancedMesh(box, M.stairWood, G.treads + 1), risers = new THREE.InstancedMesh(box, M.stairWood, G.treads + 1);
+  const fills = new THREE.InstancedMesh(box, M.stairWood, G.treads + 1);   // solid, dark: reads as a cut stringer from either side
   let n = 0;
-  for (let i = 0; i < G.treads; i++) {
+  for (let i = 0; i < G.treads; i++) {                     // the lower flight: up to the landing
     const x0 = r.stairStart + i * G.run, top = (i + 1) * G.riserH;
     if (x0 >= r.width) break;
     const nose = i === 0 ? 2 : 1.2;                        // the starting step's bullnose is the tip of the stairs
@@ -223,6 +223,37 @@ function buildStairs() {
     n++;
   }
   for (const im of [treads, risers, fills]) { im.count = n; g.add(im); }
+
+  // ---- the intermediate floor (landing) at the top of the lower flight, across both flights ----
+  const slabAt = (mat, xa, xb, ya, yb, za, zb) => {
+    const m = new THREE.Mesh(box, mat); m.scale.set(Math.max(0.05, xb - xa), Math.max(0.05, zb - za), Math.max(0.05, yb - ya));
+    m.position.copy(P((xa + xb) / 2, (ya + yb) / 2, (za + zb) / 2)); g.add(m); return m;
+  };
+  const Hl = G.landingStep * G.riserH, xL = G.xL, uy0 = G.uy0, uy1 = G.uy1, topX = G.topX, Hm = r.floorToFloor, R = G.run;
+  slabAt(M.stairWood, xL, xL + 0.75, y0 - 0.6, y1 - 2.5, Hl - G.riserH, Hl - 1.25);                  // its riser (the 10th)
+  slabAt(M.stairWood, xL - 1.2, r.width - 0.3, uy0 + 0.3, y1 - 2.5, Hl - 1.25, Hl);                // the landing floor
+  slabAt(M.wall, xL + 0.8, r.width - 0.3, uy0 + 0.3, y1 - 3, 0, Hl - 1.3);                         // enclosed underneath
+  const lensL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
+  lensL.position.copy(P(xL - 0.05, yc, Hl - G.riserH * 0.55)); g.add(lensL); FX.stepLights.push(lensL);
+
+  // ---- the upper flight: back west from the landing, over the hallway closet, to the main floor ----
+  const upSteps = [], uyc = (uy0 + uy1) / 2;
+  for (let k = 1; k < G.upperSteps; k++) {
+    const xe = xL - (k - 1) * R, xw = xe - R, top = Hl + k * G.riserH;                 // step k: riser on its east (landing) side
+    slabAt(M.stairWood, xe - 0.75, xe, uy0 + 0.3, uy1, top - G.riserH, top - 1.25);
+    slabAt(M.stairWood, xw, xe + 1.2, uy0 + 0.3, uy1 + 0.5, top - 1.25, top);
+    // underneath: the closet behind the hallway's east wall (from the floor), or just the floor structure over the hallway
+    const xc = Math.max(xw, Math.min(xe - 0.8, G.hallEnd));
+    if (xe - 0.8 > xc) slabAt(M.wall, xc, xe - 0.8, uy0 + 0.3, uy1 - 0.3, 0, top - 1.3);
+    if (xc > xw) slabAt(M.wall, xw, xc, uy0 + 0.3, uy1 - 0.3, H, Math.max(H + 0.1, top - 1.3));
+    upSteps.push({ xw, xe, top });
+    const lens = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 4), M.stepLight);
+    lens.position.copy(P(xe + 0.05, uyc, top - G.riserH * 0.55)); g.add(lens); FX.stepLights.push(lens);
+  }
+  // the last step is the main floor
+  slabAt(M.stairWood, topX - 0.75, topX, uy0 + 0.3, uy1, Hm - G.riserH, Hm - 1.25);
+  slabAt(M.stairWood, topX - 30, topX + 1.2, uy0 + 0.3, uy1 + 0.5, Hm - 1.25, Hm);
+  slabAt(M.wall, topX - 30, topX - 0.8, uy0 + 0.3, uy1 - 0.3, H, Hm - 1.3);
 
   // knee walls under the stringers: room side (faces north) and hallway side (faces south)
   const knee = (x0, x1, side) => {
@@ -262,7 +293,39 @@ function buildStairs() {
     }
   };
   side(-1.8, G.wallX, true);                               // room side: open only up to the solid wall
-  if (openTo > r.stairStart + 4) side(y0 + 1.8, openTo);   // hallway side, open
+  if (openTo > r.stairStart + 4) side(y0 + 1.8, openTo, true);   // hallway side, open, with a post where the pony wall starts
+
+  // ---- the pony wall between the flights: from the end of the hallway railing to the landing, its top at the
+  //      lower flight's rail height and capped by the handrail; above it you see the upper flight (as on site) ----
+  const ponyTop = (x) => zAt(x) + G.riserH + rail;
+  if (xL > openTo + 1) {
+    const pts = [[openTo, 0], [xL, 0], [xL, ponyTop(xL)], [openTo, ponyTop(openTo)]].map(([a, b]) => new THREE.Vector2(a, b));
+    const pw = new THREE.Mesh(new THREE.ExtrudeGeometry(new THREE.Shape(pts), { depth: 4, bevelEnabled: false }), M.wall);
+    pw.position.z = -y0; pw.name = 'pony wall'; g.add(pw);                       // plan y from y0 - 4 to y0
+    const plen = (xL - openTo) / Math.cos(Math.atan(slope)), pmid = (openTo + xL) / 2;
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(plen, 2.6, 4.6), M.stairWood);
+    cap.rotation.z = Math.atan(slope); cap.position.copy(P(pmid, y0 - 2, ponyTop(pmid) + 1.3)); g.add(cap);
+  }
+  // the tall newel at the landing, where the pony wall ends and the upper flight starts
+  const nH = Hl + rail + 10;
+  slabAt(M.stairWood, xL - 0.2, xL + 3.8, y0 - 4, y0, 0, nH);
+  slabAt(M.stairWood, xL - 0.7, xL + 4.3, y0 - 4.5, y0 + 0.5, nH, nH + 1.2);
+
+  // ---- the upper flight's open side (facing the lower flight): stringer, balusters, handrail, posts ----
+  const zU = (x) => Hl + ((xL - x) / R) * G.riserH;                                  // its nosing line, rising west
+  const ulen = (xL - topX) / Math.cos(Math.atan(slope)), umid = (xL + topX) / 2, uyR = uy1 - 1.5;
+  if (ulen > 1) {
+    const ust = new THREE.Mesh(new THREE.BoxGeometry(ulen, 9, 0.9), M.stairWood);
+    ust.rotation.z = -Math.atan(slope); ust.position.copy(P(umid, uy1 + 0.2, zU(umid) - 4)); g.add(ust);
+    const uhr = new THREE.Mesh(new THREE.BoxGeometry(ulen, 2.6, 2.4), M.stairWood);
+    uhr.rotation.z = -Math.atan(slope); uhr.position.copy(P(umid, uyR, zU(umid) + G.riserH + rail + 1)); g.add(uhr);
+    for (const st of upSteps) for (const off of [0.25, 0.75]) {
+      const x = st.xw + R * off;
+      bal.push([x, uyR, st.top, zU(x) + G.riserH + rail]);
+    }
+    slabAt(M.stairWood, topX - 3.8, topX + 0.2, uyR - 1.8, uyR + 1.8, Hm, Hm + rail + 6);         // top post on the main floor
+  }
+
   const balusters = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.32, 0.32, 1, 8), iron, bal.length);
   bal.forEach(([x, yy, z0, z1], i) => balusters.setMatrixAt(i, m4.compose(P(x, yy, (z0 + z1) / 2), q, sc.set(1, z1 - z0, 1))));
   g.add(balusters);

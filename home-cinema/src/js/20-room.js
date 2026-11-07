@@ -112,6 +112,8 @@ function buildRoom() {
     if (isFireplaceWall) continue;                       // built with openings below
     const oe = G.openEdge;                               // the passage to the rest of the basement carries on: no wall there
     if (oe && p[0] === oe[0][0] && p[1] === oe[0][1] && q[0] === oe[1][0] && q[1] === oe[1][1]) continue;
+    // past the hallway the stairs' south side is the pony wall and the landing (built with the stairs), not a full wall
+    if (Math.abs(p[1] + r.stairWidth) < 0.01 && Math.abs(q[1] + r.stairWidth) < 0.01 && Math.min(p[0], q[0]) >= G.hallEnd - 0.01) continue;
     const inBay = G.bay.some((b) => b[0] === p[0] && b[1] === p[1]) && G.bay.some((b) => b[0] === q[0] && b[1] === q[1]);
     const mat = inBay && state.finish.bayAccent !== 'paint-wall' ? M.accent : M.wall;
     const segs = [[p, q]];
@@ -124,7 +126,6 @@ function buildRoom() {
       const quad = wallQuad(a, b, 0, H, mat);
       if (inBay) quad.userData.bay = true;
       roomGroup.add(quad);
-      if (inStrip(a) && inStrip(b) && Math.min(a[0], b[0]) >= stairOpenX - 0.01) stairwell.add(wallQuad(a, b, H, H + 110, M.wall));
     }
     roomGroup.add(wallCap(p, q, H + 0.2));
   }
@@ -154,14 +155,17 @@ function buildRoom() {
   const ceilMat = M.ceiling.clone(); ceilMat.side = THREE.BackSide;   // invisible from above
   const ceil = new THREE.Mesh(ceilGeo, ceilMat); ceil.position.y = H; ceil.name = 'ceiling';
   roomGroup.add(ceil); FX.ceiling = ceil;
-  // stairwell above the opening: header, west side and a lid (inward faces only)
-  const top = H + 110;
-  stairwell.add(wallQuad([r.width, 0], [stairOpenX, 0], H, top, M.wall));
-  stairwell.add(wallQuad([stairOpenX, 0], [stairOpenX, -r.stairWidth], H, top, M.wall));
-  // where the hallway is open below, the stairwell still has its south wall above the ceiling
-  if (G.hallEnd > stairOpenX) stairwell.add(wallQuad([stairOpenX, -r.stairWidth], [Math.min(G.hallEnd, r.width), -r.stairWidth], H, top, M.wall));
-  const lid = new THREE.Mesh(new THREE.PlaneGeometry(r.width - stairOpenX, r.stairWidth), M.ceiling);
-  lid.rotation.x = Math.PI / 2; lid.position.copy(P((stairOpenX + r.width) / 2, -r.stairWidth / 2, top));
+  // the U-stair's own walls below the ceiling: south (behind the upper flight and the landing) and east (beside the landing)
+  roomGroup.add(wallQuad([G.hallEnd, G.uy0], [r.width, G.uy0], 0, H, M.wall)); roomGroup.add(wallCap([G.hallEnd, G.uy0], [r.width, G.uy0], H + 0.2));
+  roomGroup.add(wallQuad([r.width, G.uy0], [r.width, -r.stairWidth], 0, H, M.wall)); roomGroup.add(wallCap([r.width, G.uy0], [r.width, -r.stairWidth], H + 0.2));
+  // the stairwell above the ceiling: a box round both flights and the landing, with a lid (inward faces only)
+  const top = H + 110, sx0 = Math.min(stairOpenX, G.topX - 30), sy0 = G.uy0;
+  stairwell.add(wallQuad([r.width, 0], [sx0, 0], H, top, M.wall));
+  stairwell.add(wallQuad([sx0, 0], [sx0, sy0], H, top, M.wall));
+  stairwell.add(wallQuad([sx0, sy0], [r.width, sy0], H, top, M.wall));
+  stairwell.add(wallQuad([r.width, sy0], [r.width, 0], H, top, M.wall));
+  const lid = new THREE.Mesh(new THREE.PlaneGeometry(r.width - sx0, -sy0), M.ceiling);
+  lid.rotation.x = Math.PI / 2; lid.position.copy(P((sx0 + r.width) / 2, sy0 / 2, top));
   stairwell.add(lid);
 
   // ---- bay bulkhead (soffit following the bay outline) ----

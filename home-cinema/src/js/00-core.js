@@ -75,6 +75,9 @@ const DEFAULT_STATE = {
     pilasterW: 18, pilasterD: 12,   // steel-beam bump: its face is 9'-11" from the south end of the fireplace pocket
     boxX: 45,              // wall the stairs face: fireplace alcove is 3'-9" deep from its corner
     stairWidth: 40, stairStart: 92, risers: 16, floorToFloor: 122,   // 3'-11" landing, tip 11'-6" from the exterior wall
+    // a U-shaped stair: the lower flight rises east to an intermediate floor (landing) at the 10th step, then 5 more
+    // steps rise back west over the hallway closet to the main floor (the 5th is the main floor itself)
+    landingStep: 10, upperSteps: 5, upperWidth: 42,
     // the wall facing the TV (the stairs' room side), from the exterior-wall corner:
     stairWall: 91,         // solid, floor to ceiling (pink): the stairwell opens west of it
     stairPanel: 128,       // to where the panel under the stairs meets the floor (blue): the 2nd riser
@@ -92,7 +95,7 @@ const DEFAULT_STATE = {
   },
   finish: {
     wall: '#e6dfcc', ceiling: '#e6dfcc', baseboards: true,   // Shoji White SW 7042: matte walls, flat ceiling, satin baseboards
-    floor: 'walnut', slat: 'walnut',
+    floor: 'sutton', floorOnSite: true, slat: 'walnut',   // Kairos laminate, colour Sutton: the floor on site
     fireplaceSlats: true, tvSlats: false, bayAccent: 'paint-dark',
     fabric: '#8f877c', boucle: '#e6dccb',
     transoms: 'windows',   // windows | slatted | hidden | framed | band | shade  (the two openings are already cut)
@@ -187,14 +190,20 @@ function geom(r = state.room) {
     [0, 0], [r.boxX, 0], ...westOpening, ...(westOpening.length && oy1 <= hallY + 0.5 ? [] : [[r.boxX, hallY]]), [hallEnd, hallY], [hallEnd, -r.stairWidth], [r.width, -r.stairWidth],
     [r.width, mainY], [r.bayRight, mainY], bay[4], bay[3], bay[2], bay[1], bay[0], [0, westY],
   ];
-  const riserH = r.floorToFloor / r.risers;
-  const treads = r.risers - 1;
+  const landingStep = clamp(Math.round(r.landingStep ?? 10), 3, 20), upperSteps = clamp(Math.round(r.upperSteps ?? 5), 2, 12);
+  const riserH = r.floorToFloor / (landingStep + upperSteps);
+  const treads = landingStep - 1;                          // treads in the lower flight, below the landing
   // the wall facing the TV: solid from wallX to the exterior wall; under the stairs a panel from kneeX
   const wallX = clamp(r.width - (r.stairWall ?? 0), r.stairStart + 12, r.width);
   const kneeX = clamp(r.width - (r.stairPanel ?? r.width - r.stairStart), r.stairStart, wallX);
   // tread run: the panel top (bottom of the 9″ stringer, 8½″ under the nosing line) is stairKnee up at wallX
   const run = r.stairKnee ? clamp(riserH * (wallX - r.stairStart) / (r.stairKnee + 8.5), 7, 12) : Math.min((r.width - r.stairStart) / treads, 11);
-  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX, openEdge, oy0, oy1, runX };
+  // the landing (intermediate floor) spans both flights at the east end; the upper flight runs west beside the lower
+  // one, behind a 4″ pony wall, and arrives at the main floor at topX
+  const xL = Math.min(r.width - 24, r.stairStart + treads * run), topX = xL - (upperSteps - 1) * run;
+  const uy1 = -r.stairWidth - 4, uy0 = uy1 - clamp(r.upperWidth ?? 42, 30, 54);
+  return { mainY, westY, a, ret, bay, tvX, outline, riserH, treads, run, hallY, hallEnd, wallX, kneeX, openEdge, oy0, oy1, runX,
+    landingStep, upperSteps, xL, topX, uy0, uy1 };
 }
 
 // ---------------- persistence + history ----------------
@@ -236,6 +245,8 @@ function applyState(obj, record = true) {
   if (!obj.style) migrateLegacyStyle();
   // the planner's old default wall colour moves to the new default, Shoji White
   if (state.finish.wall === '#cbc2b3') state.finish.wall = '#e6dfcc';
+  // once: a layout still on the old default floor (dark walnut) moves to the floor on site, Kairos Sutton
+  if (!(obj.finish && obj.finish.floorOnSite)) { if (state.finish.floor === 'walnut') state.finish.floor = 'sutton'; state.finish.floorOnSite = true; }
   return true;
 }
 
