@@ -36,23 +36,23 @@ function attachHover(cv, tip, onPick) {
   cv.addEventListener('pointerleave', () => tip.classList.remove('on'));
   cv.addEventListener('click', (e) => { if (!cv._ax) return; const r = cv.getBoundingClientRect(); const f = cv._ax.inv(e.clientX - r.left); if (f >= 15 && f <= 200) onPick(f); });
 }
+/** Seat responses relative to the calibrated target: 0 = exactly right, the green band = sounds even. */
 function drawResponse(cv, tip, V) {
   const { c, W, H } = chartCtx(cv), F = V.ctx.F, t = state.tune, sm = (d) => smoothDb(d, TV.smooth);
-  const series = V.resp.map((r) => sm(r.db)), mean = sm(V.m.mean);
-  const all = series.flat ? [].concat(...series.map((s) => Array.from(s))) : [];
-  const hi = Math.ceil((Math.max(...all) + 3) / 5) * 5, lo = Math.max(hi - 45, Math.floor((Math.min(...all) - 2) / 5) * 5);
-  const ax = freqAxes(c, W, H, { y0: lo, y1: hi });
-  // target band ±3 dB around the level
-  c.fillStyle = 'rgba(214,164,99,0.10)'; c.beginPath();
-  F.forEach((f, i) => { const y = ax.Y(V.m.level + targetAt(f) + 3); if (i) c.lineTo(ax.X(f), y); else c.moveTo(ax.X(f), y); });
-  for (let i = F.length - 1; i >= 0; i--) c.lineTo(ax.X(F[i]), ax.Y(V.m.level + targetAt(F[i]) - 3)); c.closePath(); c.fill();
-  const [b0, b1] = bassBand(); c.fillStyle = 'rgba(255,255,255,0.03)'; c.fillRect(ax.l, ax.t, ax.X(b0) - ax.l, H - ax.t - ax.b); c.fillRect(ax.X(b1), ax.t, W - ax.r - ax.X(b1), H - ax.t - ax.b);
+  const rel = (d) => { const s2 = sm(d); return Float64Array.from(s2, (v, i) => clamp(v - V.m.level - targetAt(F[i]), -19, 13)); };
+  const series = V.resp.map((r) => rel(r.db)), mean = rel(V.m.mean);
+  const ax = freqAxes(c, W, H, { y0: -18, y1: 12, ystep: 6, unit: 'dB' });
+  c.fillStyle = 'rgba(143,191,138,0.13)'; c.fillRect(ax.l, ax.Y(3), W - ax.l - ax.r, ax.Y(-3) - ax.Y(3));
+  c.strokeStyle = 'rgba(143,191,138,0.55)'; c.beginPath(); c.moveTo(ax.l, ax.Y(0)); c.lineTo(W - ax.r, ax.Y(0)); c.stroke();
+  c.fillStyle = 'rgba(169,156,138,0.75)'; c.textAlign = 'left'; c.fillText('▲ boomy', ax.l + 6, ax.Y(10)); c.fillText('▼ thin / missing', ax.l + 6, ax.Y(-15));
+  c.fillStyle = 'rgba(143,191,138,0.8)'; c.textAlign = 'right'; c.fillText('sounds even', W - ax.r - 6, ax.Y(2));
+  const [b0, b1] = bassBand(); c.fillStyle = 'rgba(0,0,0,0.25)'; c.fillRect(ax.l, ax.t, ax.X(b0) - ax.l, H - ax.t - ax.b); c.fillRect(ax.X(b1), ax.t, W - ax.r - ax.X(b1), H - ax.t - ax.b);
   V.resp.forEach((r, i) => { if (!r.seat.mlp) polyline(c, F, series[i], ax.X, ax.Y, seatColor(r.seat, i) + (r.seat.main || t.allSeats ? 'cc' : '44'), 1.1); });
   const mi = V.resp.findIndex((r) => r.seat.mlp); if (mi >= 0) polyline(c, F, series[mi], ax.X, ax.Y, '#d6a463', 2.2);
-  polyline(c, F, mean, ax.X, ax.Y, '#efe6d8', 1.4, [5, 4]);
-  if (!TV.band) { c.strokeStyle = 'rgba(239,230,216,0.5)'; c.beginPath(); c.moveTo(ax.X(TV.f), ax.t); c.lineTo(ax.X(TV.f), H - ax.b); c.stroke(); }
+  polyline(c, F, mean, ax.X, ax.Y, '#efe6d8', 1.3, [5, 4]);
+  if (TV.mapKind === 'note') { c.strokeStyle = 'rgba(239,230,216,0.5)'; c.beginPath(); c.moveTo(ax.X(TV.f), ax.t); c.lineTo(ax.X(TV.f), H - ax.b); c.stroke(); }
   cv._ax = ax;
-  cv._read = (f) => { const i = Math.min(F.length - 1, Math.max(0, Math.round(AC.ppo * Math.log2(f / F[0])))); return `<b>${fmtF(F[i])}</b>` + V.resp.map((r, k) => `<span style="color:${seatColor(r.seat, k)}">${r.seat.label} ${series[k][i].toFixed(1)}</span>`).join('') + `<span>avg ${mean[i].toFixed(1)} dB</span>`; };
+  cv._read = (f) => { const i = Math.min(F.length - 1, Math.max(0, Math.round(AC.ppo * Math.log2(f / F[0])))); return `<b>${fmtF(F[i])} · ${noteName(F[i])}</b>` + V.resp.map((r, k) => `<span style="color:${seatColor(r.seat, k)}">${r.seat.label} ${sgn(series[k][i])} dB</span>`).join('') + `<span>sofa average ${sgn(mean[i])} dB</span>`; };
 }
 function drawWaterfall(cv, V) {
   const { c, W, H } = chartCtx(cv), mlp = V.ctx.seats.find((s) => s.mlp) || V.ctx.seats[0];
@@ -80,14 +80,14 @@ function drawDecay(cv) {
   for (let v = 0; v <= ymax; v += 0.2) { c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(W - r, Y(v)); c.stroke(); c.textAlign = 'right'; c.fillText(v.toFixed(1), l - 5, Y(v)); }
   c.textAlign = 'left'; c.fillText('s', 4, t + 4);
   d.forEach((q, i) => {
-    const x = l + i * bw, tg = decayTarget(q.fc, TA.rt.rtMid);
+    const x = l + i * bw, tg = decayTarget(q.fc);
     if (q.t60) { c.fillStyle = q.t60 > tg + 0.1 ? '#e07a62' : q.t60 > tg ? '#e2b55a' : '#8fbf8a'; c.fillRect(x + bw * 0.2, Y(q.t60), bw * 0.6, Y(0) - Y(q.t60)); }
     c.strokeStyle = '#efe6d8'; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(x + 2, Y(tg)); c.lineTo(x + bw - 2, Y(tg)); c.stroke(); c.setLineDash([]);
     c.fillStyle = CH_INK.text; c.textAlign = 'center'; c.fillText(String(q.fc), x + bw / 2, H - 9);
   });
 }
-function drawSweep(cv) {
-  const { c, W, H } = chartCtx(cv), s = TA.sweep, pts = s.pts, l = 36, r = 10, t = 10, b = 20;
+function drawSweep(cv, s) {
+  const { c, W, H } = chartCtx(cv), pts = s.pts, l = 36, r = 10, t = 10, b = 20;
   const ymax = Math.ceil(Math.max(...pts.map((p) => Math.max(p.flat, p.ssv))) + 1), X = (o) => l + (W - l - r) * (o + 42) / 84, Y = (v) => t + (H - t - b) * (1 - v / ymax);
   c.fillStyle = 'rgba(255,255,255,0.05)'; for (const p of pts) if (!p.fits) c.fillRect(X(p.off) - (W - l - r) / 56, t, (W - l - r) / 28, H - t - b);
   c.strokeStyle = CH_INK.grid; c.fillStyle = CH_INK.text;
@@ -149,7 +149,7 @@ function fieldAt(S, damp, subs, f, z) {
 /** dB relative to the room average (cinema cells) for one frequency or a band. */
 function mapDb(S, damp, subs, z) {
   const g = S.grid, pw = new Float64Array(g.N);
-  const fs = TV.band ? logFreqs(20, 80, 12) : [TV.f];
+  const fs = [TV.f];
   for (const f of fs) { const { re, im } = fieldAt(S, damp, subs, f, z); for (let i = 0; i < g.N; i++) pw[i] += re[i] * re[i] + im[i] * im[i]; }
   let m = 0, n = 0; for (let i = 0; i < g.N; i++) if (g.room[i]) { m += pw[i]; n++; }
   const ref = m / n, out = new Float32Array(g.N); for (let i = 0; i < g.N; i++) out[i] = 10 * Math.log10(pw[i] / ref + 1e-12);
@@ -177,70 +177,110 @@ function paintGrid(S, val, colorOf, contour = 3) {
   c.putImageData(img, 0, 0);
   return cv;
 }
+// "where the bass is good": how far each spot strays from the target, 20–100 Hz, level-matched on the sofa
+const QSTOPS = [[1.5, [88, 176, 132]], [3, [146, 196, 118]], [4.5, [222, 196, 98]], [6, [232, 146, 78]], [8.5, [214, 92, 78]]];
+function qualColor(v) {
+  if (v <= QSTOPS[0][0]) return QSTOPS[0][1];
+  for (let i = 1; i < QSTOPS.length; i++) if (v <= QSTOPS[i][0]) { const [a, ca] = QSTOPS[i - 1], [b, cb] = QSTOPS[i], u = (v - a) / (b - a); return ca.map((x, k) => x + (cb[k] - x) * u); }
+  return QSTOPS[QSTOPS.length - 1][1];
+}
+const qualWord = (v) => spotWord(v);
+let QCACHE = null;
+function qualityVals(S, ctx, subs, eq) {
+  const key = JSON.stringify([ctx.key, subs, eq]); if (QCACHE && QCACHE.key === key) return QCACHE.v;
+  const g = S.grid, t = state.tune, F = logFreqs(20, 100, 12), nf = F.length, N = g.N, D = new Float32Array(N * nf);
+  F.forEach((f, j) => {
+    const { re, im } = fieldAt(S, ctx.damp, subs, f, AC.ear);
+    let ch = cmul(subResp(t.sub, f), lr4('lp', t.signal === 'managed' ? t.xo : 120, f)); if (eq && eq.length) ch = cmul(ch, eqResp(eq, f));
+    const cd = 10 * Math.log10(ch[0] ** 2 + ch[1] ** 2) + 20 * Math.log10(FF) - targetAt(f);
+    for (let i = 0; i < N; i++) D[i * nf + j] = 10 * Math.log10(re[i] * re[i] + im[i] * im[i] + 1e-30) + cd;
+  });
+  // 1/6-octave smoothing (power), as for the seats
+  for (let i = 0; i < N; i++) {
+    const row = Array.from({ length: nf }, (_, j) => 10 ** (D[i * nf + j] / 10));
+    for (let j = 0; j < nf; j++) { const a = row[Math.max(0, j - 1)], b = row[j], c = row[Math.min(nf - 1, j + 1)]; D[i * nf + j] = 10 * Math.log10((a + 2 * b + c) / 4); }
+  }
+  const M = new Float32Array(N); for (let i = 0; i < N; i++) { let s2 = 0; for (let j = 0; j < nf; j++) s2 += D[i * nf + j]; M[i] = s2 / nf; }
+  const seats = ctx.seats.filter((q) => q.main); let ref = 0;
+  for (const s2 of seats) for (const [k, w] of acProbe(g, s2.x, s2.y)) ref += w * M[k] / seats.length;
+  const v = new Float32Array(N); for (let i = 0; i < N; i++) { let e = 0; for (let j = 0; j < nf; j++) e += (D[i * nf + j] - ref) ** 2; v[i] = Math.sqrt(e / nf); }
+  QCACHE = { key, v };
+  return v;
+}
 const TUNE_LINE = new THREE.LineBasicMaterial({ color: '#7fb3d5', transparent: true, opacity: 0.6, depthTest: false });
-/** Rebuild everything the tuning studio draws in the room for the current tab. */
 function disposeTune() {
-  tuneGroup.traverse((o) => { if (o.material && !o.material.isShared) { if (o.material.map) o.material.map.dispose(); if (o.material !== TUNE_LINE) o.material.dispose(); } });
+  tuneGroup.traverse((o) => { if (o.material) { if (o.material.map) o.material.map.dispose(); if (o.material !== TUNE_LINE) o.material.dispose(); } });
   disposeGroup(tuneGroup); invalidate(2);
 }
+/** Rebuild everything the tuning studio draws in the room for the current tab. */
 function drawTuneOverlay() {
   disposeTune();
   if (!TV.open || !ACS || !TA) return;
-  const S = ACS, g = S.grid, plan = mode === 'plan', ctx = TA.ctx, subs = previewOrCurrent();
+  const S = ACS, g = S.grid, plan = mode === 'plan', ctx = TA.ctx, subs = previewOrCurrent(), tab = TV.tab;
   const top = plan ? state.room.ceiling + 6 : null;
   const addLabel = (text, pos, cls) => { const el = document.createElement('div'); const inner = document.createElement('div'); inner.className = cls; inner.textContent = text; el.append(inner); const o = new CSS2DObject(el); o.position.copy(pos); tuneGroup.add(o); return inner; };
-  // floor map: bass (overview, bass) or a mode shape (modes)
-  let vals = null, color = mapColor, contour = 3;
-  if (TV.tab === 'modes' && TV.modeSel != null) {
-    const md = S.modes3[TV.modeSel], psi = S.modes2[md.m].psi, mx = Math.max(...Array.from(psi, Math.abs));
-    vals = Float32Array.from(psi, (v) => v / mx); contour = 0;
-    color = (v) => (Math.abs(v) < 0.04 ? [240, 236, 226] : v > 0 ? mapColor(lerp(0, 10, v)) : mapColor(lerp(0, -15, -v)));
-  } else if (TV.tab === 'bass' || TV.tab === 'overview') vals = mapDb(S, ctx.damp, subs, AC.ear);
+  const mapTabs = { summary: 1, plan: 1, bass: 1, report: 1 };
+  // the floor map
+  let vals = null, color = mapColor, contour = 3, kind = TV.mapKind;
+  if (mapTabs[tab]) {
+    if (kind === 'mode' && TV.modeSel != null && S.modes3[TV.modeSel]) {
+      const md = S.modes3[TV.modeSel], psi = S.modes2[md.m].psi, mx = Math.max(...Array.from(psi, Math.abs));
+      vals = Float32Array.from(psi, (v) => v / mx); contour = 0;
+      color = (v) => (Math.abs(v) < 0.04 ? [240, 236, 226] : v > 0 ? mapColor(lerp(0, 10, v)) : mapColor(lerp(0, -15, -v)));
+    } else if (kind === 'note') vals = mapDb(S, ctx.damp, subs, AC.ear);
+    else { kind = 'quality'; vals = qualityVals(S, ctx, subs, TV.preview ? autoEQ(ctx, subs) : TA.eq); color = qualColor; contour = 1.5; }
+  }
   if (vals) {
     const tex = new THREE.CanvasTexture(paintGrid(S, vals, color, contour)); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     const w = g.nx * g.g, hh = g.ny * g.g;
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: !plan, opacity: plan ? 0.82 : 0.85, toneMapped: false }));
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: !plan, opacity: plan ? 0.8 : 0.85, toneMapped: false }));
     mesh.rotation.x = -Math.PI / 2; mesh.position.copy(P(g.x0 + w / 2, g.y0 + hh / 2, plan ? state.room.ceiling + 2 : 0.7)); mesh.renderOrder = plan ? 30 : 2; mesh.userData.noShadow = true;
     tuneGroup.add(mesh);
-    // seat values
-    if (TV.tab !== 'modes') {
-      const probe = (x, y) => { const pr = acProbe(g, x, y); let s = 0; for (const [k, w2] of pr) s += w2 * vals[k]; return s; };
-      ctx.seats.forEach((s) => { const v = probe(s.x, s.y), txt = sgn(v, 0) || '0'; addLabel(s.mlp ? `MLP ${txt}` : txt, P(s.x, s.y, plan ? top : AC.ear + 4), 'dim tseat' + (s.mlp ? ' mlp' : '') + (v < -6 ? ' null' : v > 4 ? ' peak' : '')).title = s.label; });
+    if (kind !== 'mode') {
+      const probe = (x, y) => { const pr = acProbe(g, x, y); let s2 = 0; for (const [k, w2] of pr) s2 += w2 * vals[k]; return s2; };
+      ctx.seats.forEach((s) => {
+        const v = probe(s.x, s.y), pos = P(s.x, s.y, plan ? top : AC.ear + 4);
+        if (kind === 'quality') { const wd = qualWord(v), short = s.mlp ? 'MLP' : s.label.replace(/^Seat /, '').replace(/^Chair /, 'C'); addLabel(short, pos, `dim tseat q${wd[0]}${s.mlp ? ' mlp' : ''}`).title = `${s.label}: ${wd} (strays ±${v.toFixed(1)} dB from the target)`; }
+        else addLabel(s.mlp ? `MLP ${sgn(v, 0) || '0'}` : sgn(v, 0) || '0', pos, 'dim tseat' + (s.mlp ? ' mlp' : '') + (v < -6 ? ' null' : v > 4 ? ' peak' : '')).title = s.label;
+      });
     }
+    subs.forEach((s, i) => addLabel(`SW${i + 1}${TV.preview ? '?' : ''}`, P(s.x, s.y, plan ? top : 18), 'dim tsub'));
   }
-  // subwoofers
-  if (TV.tab === 'bass' || TV.tab === 'overview' || TV.tab === 'modes') subs.forEach((s, i) => addLabel(`SW${i + 1}${TV.preview ? '?' : ''}`, P(s.x, s.y, plan ? top : 18), 'dim tsub'));
   // planned treatment (outlines)
   const t = state.tune, mat = new THREE.MeshBasicMaterial({ color: '#d6a463', transparent: true, opacity: 0.28, depthWrite: false });
   const edge = new THREE.LineBasicMaterial({ color: '#d6a463', transparent: true, opacity: 0.9 });
   const box = (x, y, z, w, d, hh, rotY = 0) => { const geo = new THREE.BoxGeometry(w, hh, d), m = new THREE.Mesh(geo, mat); m.position.copy(P(x, y, z)); m.rotation.y = rotY; m.userData.noShadow = true; const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edge); m.add(e); tuneGroup.add(m); };
-  if (TV.tab !== 'speakers') {
+  if (tab !== 'speakers') {
     for (const s of acTrapSpots().slice(0, t.traps || 0)) box(s.x, s.y, state.room.ceiling / 2, 16, 16, state.room.ceiling - 2, Math.PI / 4);
     const wallBox = (s, thick) => { const w = roomWalls().reduce((b, q) => { const d = Math.abs((s.x - q.a[0]) * q.n[0] + (s.y - q.a[1]) * q.n[1]); return d < b.d ? { d, q } : b; }, { d: Infinity }).q; if (!w) return; box(s.x + w.n[0] * thick / 2, s.y + w.n[1] * thick / 2, s.z, 24, thick, 48, Math.atan2(w.n[0], w.n[1])); };
-    if (t.reflPanels) for (const s of acReflectionPanelSpots()) wallBox(s, 2);
+    if (t.reflPanels || tab === 'dialogue') for (const s of acReflectionPanelSpots()) wallBox(s, t.reflPanels ? 2 : 0.6);
     if (t.rearPanels) for (const s of acRearSpots()) wallBox(s, 4);
-    if (t.cloud) { const m = mainSeat(); if (m) box(m.x, m.y + 20, state.room.ceiling - 4, 72, 48, 4); }
+    const cl = t.cloud && acCloudSpot(); if (cl) box(cl.x, cl.y, state.room.ceiling - 4, cl.w, cl.d, 4);
   }
+  const mlp = TA.mlp, eye = P(mlp.x, mlp.y, plan ? top : AC.ear);
   // speakers
-  if (TV.tab === 'speakers' || TV.tab === 'refl') {
+  if (tab === 'speakers') {
     const disc = new THREE.MeshBasicMaterial({ color: '#7fb3d5', depthTest: false, transparent: true, opacity: 0.95 });
-    const mlp = TA.mlp, eye = P(mlp.x, mlp.y, plan ? top : AC.ear);
     for (const ch of TA.lay) {
       const pos = P(ch.p[0], ch.p[1], plan ? top : ch.z), sp = new THREE.Mesh(new THREE.SphereGeometry(3.2, 16, 12), disc); sp.position.copy(pos); sp.renderOrder = 31; tuneGroup.add(sp);
       const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([eye, pos]), TUNE_LINE); ln.renderOrder = 30; tuneGroup.add(ln);
-      addLabel(ch.k, pos, 'dim spk' + (ch.ok ? '' : ' bad'));
+      addLabel(ch.k, pos, 'dim spk' + (ch.ok ? '' : ' bad')).title = `${ch.name}: ${ch.actual} (Dolby ${ch.target})`;
+    }
+  }
+  // the first bounces of the front three (or the chosen speaker) at the main seat
+  if (tab === 'dialogue') {
+    const chans = TA.lay.filter((c) => (TV.reflCh === 'front' ? ['L', 'C', 'R'].includes(c.k) : c.k === TV.reflCh));
+    for (const ch of chans) {
+      const spk = P(ch.p[0], ch.p[1], plan ? top : ch.z);
+      addLabel(ch.k, spk, 'dim spk');
+      for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: mlp.x, y: mlp.y, z: AC.ear })) {
+        if (q.delay > 15 || q.kind === 'floor') continue;
+        const bad = q.level > -10, pt = P(q.x, q.y, plan ? top : q.z);
+        const lm = new THREE.LineDashedMaterial({ color: bad ? '#e07a62' : '#8fbf8a', dashSize: 3, gapSize: 2, transparent: true, opacity: 0.8, depthTest: false });
+        const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([spk, pt, eye]), lm); ln.computeLineDistances(); ln.renderOrder = 30; tuneGroup.add(ln);
+        addLabel(bad ? `${q.level.toFixed(0)} dB` : 'ok', pt, 'dim trefl' + (bad ? ' bad' : ''));
+      }
     }
     const dot = new THREE.Mesh(new THREE.SphereGeometry(2.4, 16, 12), new THREE.MeshBasicMaterial({ color: '#d6a463', depthTest: false })); dot.position.copy(eye); dot.renderOrder = 31; tuneGroup.add(dot);
-  }
-  // reflection points of the chosen speaker
-  if (TV.tab === 'refl') {
-    const ch = TA.lay.find((c) => c.k === TV.reflCh) || TA.lay[0], spk = P(ch.p[0], ch.p[1], plan ? top : ch.z), eye = P(TA.mlp.x, TA.mlp.y, plan ? top : AC.ear);
-    for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: TA.mlp.x, y: TA.mlp.y, z: AC.ear })) {
-      if (q.delay > 25) continue;
-      const bad = q.delay < 15 && q.level > -10, pt = P(q.x, q.y, plan ? top : q.z);
-      const lm = new THREE.LineDashedMaterial({ color: bad ? '#e07a62' : '#8fbf8a', dashSize: 3, gapSize: 2, transparent: true, opacity: 0.8, depthTest: false });
-      const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([spk, pt, eye]), lm); ln.computeLineDistances(); ln.renderOrder = 30; tuneGroup.add(ln);
-      addLabel(`${q.surface} ${q.level.toFixed(0)} dB`, pt, 'dim trefl' + (bad ? ' bad' : ''));
-    }
   }
 }

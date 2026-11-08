@@ -95,24 +95,62 @@ The same gestures work with a finger or a mouse, in 3D and in Plan.
 
 ## Cinema tuning (◎ Tune, or `T`)
 
-An acoustic model of this basement, with the tools a home-cinema design firm uses to plan the bass, the room and the speakers. It opens beside the room (below it on a phone) and draws its results in the room: the bass map on the floor, seats with their level, the subwoofers, planned treatment, speakers and reflection points. Every change to the layout is re-analysed straight away.
+An acoustic model of this basement that answers the questions a homeowner actually has: *how will it sound, what should I do first, what will it cost, and what do I buy?* The engineering behind it (wave-equation bass model, room EQ, waterfall, decay, room modes, energy-time charts, RT60 tables) is one switch away under **Pro detail**. It opens beside the room (below it on a phone), draws its results in the room, and re-analyses every change.
+
+**Summary** gives one line on what's wrong, a score today and with the plan (out of 100), and five qualities anyone can judge by ear. Each one has a verdict (Poor / Fair / Good / Excellent), a meter (● today, ○ with the plan) and a sentence about what you'd hear, written to match the verdict:
+- **Bass at every seat**: does everyone on the sofa get the same bass? e.g. *"Seat 4 gets 9 dB less bass than the rest of the sofa around 45 Hz (F1: the lowest bass-guitar and synth notes)."*
+- **Tight, clean bass**: punchy, or boomy and one-note? Peaks, notes that ring on, and nulls that EQ can't fill.
+- **Clear dialogue**: early echoes off the walls and ceiling at every seat, and the echo time.
+- **Surround immersion**: how many speakers sit at Dolby's angles, and why the others can't.
+- **Keeps the movie downstairs**: the open stairwell, and what a door does.
+
+It also lists what the analysis assumes (for example, where a sub is assumed when none is placed yet) and lets you choose the listening level: **Cinema loud** (reference), **Loud** or **Comfortable**.
+
+**Hear the difference** plays a bass line with drums, a movie rumble or a slow sweep through the room model at any seat. You can A/B **Today**, **With the plan** and an **Ideal room**, each level-matched as after calibration, so what changes is the evenness, the boom and the ringing, not the volume. During the sweep the floor map follows the note. Use headphones or a good speaker.
+
+**Plan** lists the steps in order of what helps most. They are tried one after another on a copy of your room, so the effects add up as shown. Each step has why it helps, which qualities move (e.g. *Bass at every seat Fair → Excellent*), the score before and after, a typical cost and the time it takes. Steps include:
+- the best one or two subwoofer spots, with their gain, delay and polarity;
+- room EQ;
+- sliding the sofa out of a null;
+- bass traps;
+- one package of dialogue treatment: side-wall panels sized to cover every seat, a ceiling cloud where the front speakers' ceiling bounce lands, and thick panels behind the sofa. Early bounces add up, so treating one of several barely helps;
+- a rug;
+- a speaker layout that fits;
+- a door at the stairs.
+
+**Do it** applies one step, **Apply the whole plan** applies them all in one undoable step, and the subwoofer step can be previewed first.
+
+**Bass**:
+- every seat's verdict and its biggest problem (*thin around 45 Hz*, *boomy around 58 Hz*);
+- a floor map of **where in the room the bass is good**, or **one note at a time** with note names and what lives there (explosions, a bass guitar's low E, kick drums);
+- subwoofer options as cards with the recommended one first, each with a preview, and a search of every spot for 1–4 subs;
+- **how much subwoofer you need** for your listening level: one or two of three classes, with whether each is enough for the bass peaks and the deepest rumble at your seat, and a typical price.
+
+**Dialogue**:
+- where the panels go, wall by wall: how many, how wide a zone and how high, covering the bounces for every seat on the sofa, with one button to hang them;
+- the bounces drawn in the room (red: too loud);
+- the mirror trick to confirm it on site;
+- echo time for bass, voices and treble in plain words, plus treatment switches and the door.
+
+**Speakers**:
+- layouts from 2.1 to 9.1.6 as cards, saying what each adds and whether it fits this room;
+- where every speaker goes and whether it meets Dolby's angle;
+- **what to buy**: the sensitivity each group of speakers needs at 100 W and 200 W for your listening level, in plain words ("most bookshelf and in-wall speakers").
+
+The chosen layout is also the **speaker pre-wire plan** (Room tab › Overlays).
+
+**Report**:
+- a **shopping list** with specs and typical prices: subwoofers, speakers, receiver, treatment, door, and a measurement microphone;
+- a downloadable one-page report for your installer, with the qualities, the plan, the shopping list, the charts and the installer settings (sub positions and DSP, room EQ, each speaker's distance, delay and trim);
+- the same as text.
 
 **How the bass is modelled.** Below ~200 Hz a room is a set of standing waves, so the planner solves the actual floor plan rather than assuming a box:
-- the floor (room, TV alcove, fireplace lounge, pilaster, stairs, hall and the passage to the rest of the basement) is cut into 5″ cells and its modes are solved from the wave equation (shift-invert Lanczos on the grid); the flat 9′ ceiling adds the vertical modes exactly, so every 3-D mode is a 2-D mode × a vertical one;
-- each mode gets its own damping from where its pressure meets the boundaries: drywall walls and ceiling (membrane absorbers), the floor, the open passage, the stairwell that opens to the floor above, the seats, and any traps or panels. A trap in a corner works on almost every mode; one at a node does nothing, as in a real room;
-- seat responses, the bass map, the impulse response, waterfall and decay all come from the same modal sum, with each sub's roll-off, the crossover, gain, delay, polarity and EQ, in level relative to the sub's own output at 1 m.
-- Checked against a plain rectangle: the first 40 modes land within 0.4 % of the exact values (degenerate pairs included).
+- The floor (room, TV alcove, fireplace lounge, pilaster, stairs, hall and the passage to the rest of the basement) is cut into 5″ cells. Its modes are solved from the wave equation (shift-invert Lanczos), and the flat 9′ ceiling adds the vertical modes.
+- Each mode is damped by what its pressure meets: drywall, floor, the openings, the seats, and any traps or panels. So a corner trap works on almost every mode, as in a real room.
+- Seat responses, maps, impulse responses and what you hear all come from the same modal sum, including each sub's roll-off, the crossover, DSP and EQ.
+- Checked against a plain rectangle: the first 40 modes land within 0.4 % of the exact values.
 
-**Tabs**
-- **Overview**: a 0–100 score and a scorecard graded A–D: bass seat-to-seat consistency, bass smoothness, modal ringing, bass headroom, reverberation, early reflections, Dolby speaker angles, speaker headroom and sound reaching the floor above. Then the advice, in order, each with its predicted effect and a button that does it (place subs, move the sofa, add traps, panels or a cloud, plan a door). Everything is undoable.
-- **Bass**: responses at every seat (smoothing, LFE or bass-managed with a 60–120 Hz crossover, three subwoofer classes, three target curves, room EQ on or off); seat-to-seat variation, smoothness, main-seat smoothness and extension; the **bass map** on the floor at any frequency or as a 20–80 Hz average, with a sweep you can play; **subwoofer layouts** (1–4 subs: corners, mid-walls, front/back, alcove sides, near-field) compared side by side, and an **optimiser** that searches every spot along the walls and behind the seats for 1–4 subs, then tunes each sub's gain, delay and polarity (lowest seat-to-seat variation first, then a smooth average, without throwing away output) — preview any result, then place it; per-sub **DSP** steppers; an automatic **parametric room EQ** (cuts, at most one broad boost; copy it in REW/miniDSP format); a **waterfall** and **low-frequency decay (T30) per third octave** at the main seat from the modelled impulse response; and **where the sofa sits**: the bass at the seats as the whole sofa slides toward or away from the TV, with the best spot it can reach.
-- **Modes**: every mode below 200 Hz with its shape, decay time, Q and how hard the subs drive it at the main seat; click one to see its pressure on the floor (nodes in white). The lowest, near 20 Hz, is the room breathing against the hall and stairs.
-- **Reverb**: RT60 per octave (Eyring and Sabine) against a 0.2–0.4 s target, from the real surfaces, glass, fireplace, TV, slats, rugs, seats and people; treatment switches (corner bass traps, panels at the reflection points, rear-wall panels, a ceiling cloud, people in the room, a door at the stairs) and a table of what absorbs the sound.
-- **Reflections**: for each speaker, the first reflections at the main seat off the walls, ceiling and floor (image sources on the real geometry, the speaker's directivity, the absorption where each lands) as an energy-time chart against the "nothing above −10 dB in the first 15 ms" target, drawn in the room. One button hangs acoustic panels at the side-wall points (real wall pieces you can move).
-- **Speakers**: 2.1, 3.1, 5.1, 7.1, 5.1.2, 5.1.4, 7.1.4 or 9.1.6 placed on this room's walls and ceiling at Dolby's angles from the main seat, with the actual angle, distance, the delay and trim an AV receiver would set, and headroom for reference, −5 or −10 dB peaks with the speaker class and amplifier you pick. Where a direction points into the stair opening it falls back to an angled in-ceiling speaker and says so. The chosen layout is also the **speaker pre-wire plan** (Room tab › Overlays).
-- **Report**: download a one-page HTML report (charts, scorecard, sub positions and DSP, EQ, speaker distances, delays and trims, treatment and advice) or copy the settings as text.
-
-It is a model, not a measurement: walls are treated as rigid with an absorption-based loss, furniture doesn't block bass, and absorption figures are typical published values. The grading follows targets common in professional home-cinema design (in the spirit of the CEDIA/CTA RP22 levels, not a certification). Confirm with a measurement microphone; the EQ and DSP workflow is the same.
+It is a model, not a measurement. Walls are treated as rigid with an absorption-based loss, furniture doesn't block bass, and absorption figures and prices are typical. Scores use targets common in professional home-cinema design, in the spirit of the CEDIA/CTA RP22 levels, but are not a certification. Confirm with a measurement microphone; the EQ and DSP workflow is the same.
 
 ## Wayfair Tremee U-sectional
 
@@ -258,8 +296,9 @@ src/js/62-style-ui.js  Style tab, per-piece style controls, compare view, spec s
 src/js/63-acoustics.js  acoustics: room grid, wave-equation modes (Lanczos), per-mode damping, transfer functions, filters
 src/js/64-bass.js       seats, subwoofer spots, layouts and optimiser, metrics, room EQ, impulse, waterfall, decay, sofa sweep
 src/js/65-inspector.js details panel, layout code dialog
-src/js/66-room-acoustics.js  RT60, first reflections, speaker layouts, headroom, scorecard and advice
-src/js/67-tune-*.js     the Cinema tuning studio: panel, charts, bass map and overlays, report
+src/js/66-room-acoustics.js  RT60, first reflections and panel spots, speaker layouts, headroom
+src/js/66-tune-model.js  the customer view: five qualities, findings in words, the cumulative plan, sizing
+src/js/67-tune-*.js     the Cinema tuning studio: panel, charts, maps and overlays, Hear the difference, report
 src/js/68-photo.js     photo mode: lenses, framing, straight verticals, shutter, share and scene export
 src/js/70-main.js     boot and render loop
 presentation/         design review: renders, slide sources and a readable README

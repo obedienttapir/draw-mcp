@@ -169,7 +169,7 @@ window.__cinema = {
     if (!o) return null; activeCam.updateMatrixWorld(); const v = o.project(activeCam);
     return { x: ((v.x + 1) / 2) * stage.clientWidth, y: (1 - (v.y + 1) / 2) * stage.clientHeight };
   },
-  tune: { solve: (cb) => acSolve(cb), analyse: () => analyseRoom(), optimise: (o) => optimiseSubs(o), presets: () => subPresets(), compare: (c) => compareConfigs(c),
+  tune: { solve: (cb) => acSolve(cb), analyse: () => assess(), plan: () => buildPlan(), optimise: (o) => optimiseSubs(o), presets: () => subPresets(), compare: (c) => compareConfigs(c),
     layout: (k) => tuneLayout(k), rt: () => rtModel(), seats: () => acSeats(), cands: () => subCandidates(), apply: (s) => applySubConfig(s), ctx: () => bassCtx(), S: () => ACS },
   idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
   perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,

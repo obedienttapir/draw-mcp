@@ -287,7 +287,7 @@ function acAbsorbers() {
   }
   if (t.reflPanels) for (const s of acReflectionPanelSpots()) panels.push({ ...s, area: acM(24) * acM(48), mat: 'panel2', virtual: true });
   if (t.rearPanels) for (const s of acRearSpots()) panels.push({ ...s, area: acM(24) * acM(48), mat: 'panel4', virtual: true });
-  if (t.cloud) { const m = mainSeat() || { x: G.tvX, y: 60 }; panels.push({ x: m.x, y: m.y + 20, z: r.ceiling - 4, area: acM(48) * acM(72), mat: 'panel4', ceiling: true, virtual: true }); }
+  const cl = t.cloud && acCloudSpot(); if (cl) { panels.push({ x: cl.x, y: cl.y, z: r.ceiling - 4, area: acM(cl.w) * acM(cl.d), mat: 'panel4', ceiling: true, virtual: true }); }
   let rugA = 0;
   for (const it of state.items) if (it.type === 'rug') rugA += acM(it.p.w || 96) * acM(it.p.d || 72);
   return { seats, people: Math.min(t.people || 0, seats), traps, panels, rugA };

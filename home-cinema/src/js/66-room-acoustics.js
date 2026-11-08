@@ -32,7 +32,7 @@ function rtModel() {
   const wallA = Math.max(0, wallIn * AC.IN * H - tr - fpA - tvA - fpSlats - tvSlats - panelArea.panel2 - panelArea.slatPanel - panelArea.panel4);
   let rugA = 0; for (const it of state.items) if (it.type === 'rug') rugA += sq(it.p.w || 96, it.p.d || 72);
   rugA = Math.min(rugA, Fl * 0.8);
-  const cloudA = t.cloud ? sq(48, 72) : 0;
+  const cl = t.cloud && acCloudSpot(), cloudA = cl ? sq(cl.w, cl.d) : 0;
   add('walls', 'Walls · drywall on studs', wallA, 'drywall');
   add('ceiling', 'Ceiling · drywall', Fl - cloudA, 'ceiling');
   add('floor', 'Floor · laminate on the slab', Fl - rugA, 'laminate');
@@ -98,13 +98,13 @@ function surfaceAt(kind, x, y, z, wall) {
   const r = state.room, G = geom(), f = state.finish, t = state.tune;
   const near = (spots, rad) => spots.some((s) => Math.hypot(s.x - x, s.y - y) < rad && Math.abs((s.z ?? z) - z) < 26);
   if (kind === 'floor') return state.items.some((it) => it.type === 'rug' && footprint(it) && pointInPoly([x, y], footprint(it))) ? 'rug' : 'laminate';
-  if (kind === 'ceiling') { const m = mainSeat(); return t.cloud && m && Math.abs(x - m.x) < 36 && Math.abs(y - (m.y + 20)) < 24 ? 'panel4' : 'ceiling'; }
+  if (kind === 'ceiling') { const c = t.cloud && acCloudSpot(); return c && Math.abs(x - c.x) <= c.w / 2 && Math.abs(y - c.y) <= c.d / 2 ? 'panel4' : 'ceiling'; }
   for (const it of state.items) if (it.type === 'acousticPanel') {
     const p = { ...CATALOG.acousticPanel.defaults, ...it.p };
     if (Math.hypot(it.x - x, it.y - y) < p.w / 2 + 2 && Math.abs(z - p.h) < p.hgt / 2 + 2) return resolveSpec(it).variant === 'slat' ? 'slatPanel' : 'panel2';
   }
-  if (t.reflPanels && near(acReflectionPanelSpots(), 14)) return 'panel2';
-  if (t.rearPanels && near(acRearSpots(), 14)) return 'panel4';
+  if (t.reflPanels && wall && acReflectionPanelSpots().some((s2) => s2.run.wall === wall.name && covers(s2.run, x, y, z))) return 'panel2';
+  if (t.rearPanels && wall && wall.name === 'back wall' && acRearSpots().some((s2) => x >= s2.x0 - 1 && x <= s2.x1 + 1 && Math.abs(s2.z - z) <= 24)) return 'panel4';
   if (wall && wall.name === 'left wall' && x < 2) {                          // the fireplace wall
     const fp = state.fireplace;
     if (Math.abs(y - fp.center) < fp.width / 2 && z > fp.bottom && z < fp.bottom + fp.height) return 'stone';
@@ -159,29 +159,85 @@ function firstReflections(spk, lis, aim = lis) {
   }
   return out.sort((p, q) => p.delay - q.delay);
 }
-/** Where 2″ panels would catch the side-wall first reflections of the front three to the main seat. */
+/** Where 2″ panels would catch the side-wall first reflections of the front three, for every seat. */
 let spotGuard = false, spotCache = null;
 function acReflectionPanelSpots() {
   const m = mainSeat(); if (!m || spotGuard) return [];
   const key = JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot]), state.tune.layout, state.room, state.tv]);
   if (spotCache && spotCache.key === key) return spotCache.spots;
   spotGuard = true;
-  try { spotCache = { key, spots: reflSpots(m) }; } finally { spotGuard = false; }
+  try { spotCache = { key, spots: reflSpots() }; } finally { spotGuard = false; }
   return spotCache.spots;
 }
-function reflSpots(m) {
-  const lis = { x: m.x, y: m.y, z: AC.ear }, out = [];
+/** Panels that cover the side-wall first reflections of the front three speakers for every seat on the sofa:
+ *  one 2 × 4 ft panel per 2 ft of the reflection zone on each wall (at most 4 a wall). */
+function reflSpots() {
+  const seats = acSeats().filter((s) => s.main), walls = roomWalls(), byWall = new Map();
   for (const ch of tuneLayout(state.tune.layout, true).filter((c) => ['L', 'C', 'R'].includes(c.k))) {
     const spk = { x: ch.p[0], y: ch.p[1], z: ch.z };
-    for (const q of firstReflections(spk, lis)) if (q.kind === 'wall' && /left|right|alcove side/.test(q.surface) && q.delay < 20 && out.every((o) => Math.hypot(o.x - q.x, o.y - q.y) > 20)) out.push({ x: q.x, y: q.y, z: clamp(q.z, 30, 72), surface: q.surface });
+    for (const s of seats) for (const q of firstReflections(spk, { x: s.x, y: s.y, z: AC.ear })) {
+      if (q.kind !== 'wall' || !/left|right|alcove side/.test(q.surface) || q.delay > 20) continue;
+      const w = walls.reduce((b, ww) => { const d = Math.abs((q.x - ww.a[0]) * ww.n[0] + (q.y - ww.a[1]) * ww.n[1]); return d < b.d ? { d, ww } : b; }, { d: Infinity }).ww;
+      const ux = (w.b[0] - w.a[0]) / w.len, uy = (w.b[1] - w.a[1]) / w.len, u = (q.x - w.a[0]) * ux + (q.y - w.a[1]) * uy;
+      const e = byWall.get(w) || { w, ux, uy, us: [], zs: [], seats: new Set(), chs: new Set() };
+      e.us.push(u); e.zs.push(q.z); e.seats.add(s.label); e.chs.add(ch.k); byWall.set(w, e);
+    }
+  }
+  const out = [];
+  for (const e of byWall.values()) {
+    const u0 = clamp(Math.min(...e.us) - 8, 0, e.w.len), u1 = clamp(Math.max(...e.us) + 8, 0, e.w.len), n = clamp(Math.ceil((u1 - u0) / 24), 1, 4);
+    const z = clamp(e.zs.reduce((a, b) => a + b, 0) / e.zs.length, 40, 56);
+    for (let k = 0; k < n; k++) {
+      const u = u0 + (u1 - u0) * (k + 0.5) / n;
+      out.push({ x: e.w.a[0] + e.ux * u + e.w.n[0] * 1, y: e.w.a[1] + e.uy * u + e.w.n[1] * 1, z, surface: e.w.name, run: { wall: e.w.name, len: u1 - u0, n, seats: [...e.seats], chs: [...e.chs], a: e.w.a, ux: e.ux, uy: e.uy, u0: Math.min(u0, (u0 + u1) / 2 - n * 12), u1: Math.max(u1, (u0 + u1) / 2 + n * 12), z } });
+    }
   }
   return out;
 }
-/** Two spots on the wall behind the seats for 4″ panels (the solid part beside the stairs). */
+/** Is a point on a wall inside a panel run (along the wall, and within the 4 ft panel height)? */
+function covers(run, x, y, z) { const u = (x - run.a[0]) * run.ux + (y - run.a[1]) * run.uy; return u >= run.u0 - 1 && u <= run.u1 + 1 && Math.abs(z - run.z) <= 24; }
+/** The ceiling cloud: where the front speakers' ceiling bounces land for the seats (4 ft wide, 6 ft or longer). */
+let cloudCache = null;
+function acCloudSpot() {
+  if (spotGuard || !mainSeat()) return null;
+  const key = JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot]), state.tune.layout, state.room, state.tv]);
+  if (cloudCache && cloudCache.key === key) return cloudCache.c;
+  spotGuard = true; const pts = [];
+  try {
+    for (const ch of tuneLayout(state.tune.layout, true).filter((c) => ['L', 'C', 'R'].includes(c.k))) for (const s of acSeats().filter((q) => q.main)) {
+      for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: s.x, y: s.y, z: AC.ear })) if (q.kind === 'ceiling' && q.delay < 20) pts.push(q);
+    }
+  } finally { spotGuard = false; }
+  let c = null;
+  if (pts.length) {
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    c = { x: (x0 + x1) / 2, y: (y0 + y1) / 2, w: clamp(Math.ceil((x1 - x0 + 12) / 12) * 12, 48, 132), d: clamp(Math.ceil((y1 - y0 + 12) / 12) * 12, 48, 96) };
+    if (c.w < 72 && c.d < 72) c.w = 72;
+  }
+  cloudCache = { key, c };
+  return c;
+}
+/** 4″ panels on the solid wall behind the sofa: where the front speakers' bounces land for the seats, else two. */
+let rearCache = null;
 function acRearSpots() {
-  const r = state.room, G = geom(), m = mainSeat(); if (!m) return [];
-  const xs = [G.wallX + (r.width - G.wallX) * 0.3, G.wallX + (r.width - G.wallX) * 0.7];
-  return xs.map((x) => ({ x, y: 1, z: AC.ear + 6 }));
+  const r = state.room, G = geom(), m = mainSeat(); if (!m || spotGuard) return [];
+  const key = JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot]), state.tune.layout, state.room, state.tv]);
+  if (rearCache && rearCache.key === key) return rearCache.spots;
+  spotGuard = true;
+  let xs = [];
+  try {
+    for (const ch of tuneLayout(state.tune.layout, true).filter((c) => ['L', 'C', 'R'].includes(c.k))) for (const s of acSeats().filter((q) => q.main)) {
+      for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: s.x, y: s.y, z: AC.ear })) if (q.surface === 'back wall' && q.delay < 20 && q.x >= G.wallX) xs.push(q.x);
+    }
+  } finally { spotGuard = false; }
+  let spots;
+  if (xs.length) {
+    const x0 = clamp(Math.min(...xs) - 8, G.wallX, r.width), x1 = clamp(Math.max(...xs) + 8, G.wallX, r.width), n = clamp(Math.ceil((x1 - x0) / 24), 1, 4);
+    const w = Math.max(x1 - x0, n * 24), c = (x0 + x1) / 2;
+    spots = Array.from({ length: n }, (_, k) => ({ x: c - w / 2 + w * (k + 0.5) / n, y: 1, z: AC.ear + 4, x0: c - w / 2, x1: c + w / 2 }));
+  } else spots = [G.wallX + (r.width - G.wallX) * 0.3, G.wallX + (r.width - G.wallX) * 0.7].map((x) => ({ x, y: 1, z: AC.ear + 6, x0: x - 12, x1: x + 12 }));
+  rearCache = { key, spots };
+  return spots;
 }
 
 // ---------------- speaker layouts ----------------
@@ -279,82 +335,3 @@ function tuneLayout(key = state.tune.layout, quick = false) {
   return out;
 }
 
-// ---------------- the whole analysis ----------------
-let TA = null;                                         // last analysis
-function analyseRoom() {
-  const ctx = bassCtx(); if (!ctx) return null;
-  const t = state.tune, subs = currentSubs(), F = ctx.F;
-  const raw = bassResponses(ctx, subs, { eq: null }), mRaw = bassMetrics(raw, F);
-  const eq = t.eqOn ? (t.eq && t.eq.length ? t.eq : autoEQ(ctx, subs)) : [];
-  const resp = eq.length ? bassResponses(ctx, subs, { eq }) : raw, m = eq.length ? bassMetrics(resp, F) : mRaw;
-  // headroom at the main seat: in-room maximum vs 115 dB LFE peaks
-  const mlpSeat = ctx.seats.find((s) => s.mlp) || ctx.seats[0];
-  const lfe = bassResponses(ctx, subs, { eq: eq.length ? eq : null, signal: 'lfe', seats: [mlpSeat] })[0];
-  const gmax = Math.max(...subs.map((s) => 10 ** ((s.g || 0) / 20)));
-  const maxSpl = F.map((f, i) => { const boost = eq.length ? Math.max(0, 20 * Math.log10(Math.hypot(...eqResp(eq, f)))) : 0; return lfe.db[i] - 20 * Math.log10(Math.hypot(...lr4('lp', 120, f)) + 1e-9) + subMax(t.sub, f) - boost - 20 * Math.log10(gmax); });
-  const hrIdx = F.map((f, i) => i).filter((i) => F[i] >= 25 && F[i] <= 80);
-  const headroom = Math.min(...hrIdx.map((i) => smoothDb(maxSpl, 6)[i])) - (115 + (t.refLvl ?? -5));
-  const rt = rtModel();
-  const ir = bassImpulse(ctx, subs, mlpSeat, eq.length ? eq : null), decay = bandDecay(ir);
-  const lay = tuneLayout(t.layout);
-  const mlp = { x: mlpSeat.x, y: mlpSeat.y, z: AC.ear };
-  const refl = lay.filter((c) => !c.k.startsWith('T')).map((c) => ({ ch: c, list: firstReflections({ x: c.p[0], y: c.p[1], z: c.z }, mlp) }));
-  const early = refl.flatMap((r) => r.list.filter((q) => q.delay < 15).map((q) => ({ ...q, ch: r.ch.k })));
-  // the floor bounce is graded on its own: only a rug treats it, and every room has one
-  const worstOf = (l) => (l.length ? l.reduce((a, b) => (b.level > a.level ? b : a)) : null);
-  const worst = worstOf(early.filter((q) => q.kind !== 'floor')), floorWorst = worstOf(early.filter((q) => q.kind === 'floor'));
-  const sweep = rowSweep(ctx, subs);
-  // modal ringing: decay of the bass third-octaves vs target
-  const ring = decay.filter((d) => d.t60 && d.fc <= 125).map((d) => d.t60 - decayTarget(d.fc, rt.rtMid));
-  TA = { ctx, subs, raw, mRaw, eq, resp, m, maxSpl, headroom, rt, ir, decay, ring: ring.length ? Math.max(...ring) : 0, lay, refl, early, worst, floorWorst, sweep, mlp: mlpSeat, at: Date.now() };
-  TA.score = tuneScore(TA); TA.advice = tuneAdvice(TA);
-  return TA;
-}
-const REF_LEVELS = { 0: 'Reference', '-5': 'Reference −5 dB', '-10': 'Reference −10 dB' };
-const refName = () => `${REF_LEVELS[state.tune.refLvl ?? -5] || 'Reference'}`;
-const grade = (v, cuts) => (v <= cuts[0] ? 'A' : v <= cuts[1] ? 'B' : v <= cuts[2] ? 'C' : 'D');
-const GRADE_PTS = { A: 100, B: 78, C: 55, D: 30 };
-/** The scorecard: each line as a pro would grade it. */
-function tuneScore(A) {
-  const t = state.tune, rows = [];
-  const rtDev = Math.max(0, A.rt.rtMid - 0.4, 0.2 - A.rt.rtMid);
-  const lay = A.lay, okN = lay.filter((c) => c.ok).length, minHr = Math.min(...lay.map((c) => c.headroom));
-  rows.push({ key: 'ssv', label: 'Bass, seat to seat', value: `±${A.m.ssv.toFixed(1)} dB`, g: grade(A.m.ssv, [2.5, 3.5, 5]), note: 'How alike the bass sounds across the sofa (20–100 Hz). Fixed by sub placement, not EQ.' });
-  rows.push({ key: 'flat', label: 'Bass smoothness', value: `±${A.m.flat.toFixed(1)} dB`, g: grade(A.m.flat, [2, 3, 4.5]), note: `Seating-area average against the ${TARGETS[t.target].label.toLowerCase()}${A.eq.length ? `, with ${A.eq.length} EQ filters` : ''}.` });
-  rows.push({ key: 'ring', label: 'Bass decay (ringing)', value: `${A.ring > 0 ? '+' : ''}${A.ring.toFixed(2)} s`, g: grade(A.ring, [0, 0.1, 0.25]), note: 'Worst third octave below 125 Hz against the decay target. Bass traps shorten it.' });
-  rows.push({ key: 'head', label: 'Bass headroom', value: `${A.headroom >= 0 ? '+' : ''}${A.headroom.toFixed(1)} dB`, g: grade(-A.headroom, [-3, 0, 4]), note: `${115 + (t.refLvl ?? -5)} dB LFE peaks at the main seat (${refName()}), 25–80 Hz, after EQ.` });
-  rows.push({ key: 'rt', label: 'Reverberation', value: `${A.rt.rtMid.toFixed(2)} s`, g: grade(rtDev, [0, 0.05, 0.15]), note: 'Mid-band RT60 (500 Hz–2 kHz, Eyring). Target 0.2–0.4 s for a room this size.' });
-  rows.push({ key: 'refl', label: 'Early reflections', value: A.worst ? `${A.worst.level.toFixed(1)} dB` : 'none', g: grade(A.worst ? A.worst.level : -30, [-15, -10, -6]), note: A.worst ? `Loudest in the first 15 ms: ${CHANNELS[A.worst.ch].name.toLowerCase()} off the ${A.worst.surface}, ${A.worst.delay.toFixed(1)} ms late.` : 'No early reflections at the main seat.' });
-  rows.push({ key: 'angles', label: 'Speaker placement', value: `${okN} of ${lay.length}`, g: grade(lay.length - okN, [0, 1, 3]), note: `Channels inside Dolby's recommended angles for ${t.layout}.` });
-  rows.push({ key: 'spl', label: 'Speaker headroom', value: `${minHr >= 0 ? '+' : ''}${minHr.toFixed(1)} dB`, g: grade(-minHr, [-3, 0, 4]), note: `${105 + (t.refLvl ?? -5)} dB peaks at the main seat from every channel (${refName()}; ${SPK_CLASSES[t.spk].label.toLowerCase()}, ${t.amp} W).` });
-  rows.push({ key: 'iso', label: 'Sound to the floor above', value: t.door ? 'door' : 'open stairwell', g: t.door ? 'B' : 'D', note: t.door ? 'A solid-core door with seals at the stairs: roughly 25–30 dB less sound upstairs.' : 'The stairwell is open to the main floor: bass and dialogue go straight up.' });
-  rows.forEach((r) => { r.pts = GRADE_PTS[r.g]; });
-  const W = { ssv: 2, flat: 1.5, ring: 1, head: 1, rt: 1.2, refl: 1.2, angles: 1, spl: 0.8, iso: 0.5 };
-  const total = rows.reduce((s, r) => s + r.pts * W[r.key], 0) / rows.reduce((s, r) => s + W[r.key], 0);
-  return { rows, total: Math.round(total) };
-}
-/** Prioritised advice, each with its predicted effect. */
-function tuneAdvice(A) {
-  const t = state.tune, out = [], ctx = A.ctx;
-  // subs: what would two or more, placed well, do?
-  const presets = compareConfigs(subPresets());
-  const best = presets.slice().sort((a, b) => a.score - b.score)[0];
-  if (best && best.ssv < A.m.ssv - 1) out.push({ pri: A.m.ssv - best.ssv, title: `Subwoofers: ${best.label.replace(/^\d · /, `${best.subs.length} `)}`, detail: `Seat-to-seat variation ${A.m.ssv.toFixed(1)} → ${best.ssv.toFixed(1)} dB. ${best.subs.map((s) => s.label).join(' + ')}. The optimiser on the Bass tab can do better still.`, act: { kind: 'subs', subs: best.subs, label: 'Place them' } });
-  if (A.sweep && A.sweep.best && A.sweep.best.off !== 0 && A.sweep.cur && A.sweep.cur.score - A.sweep.best.score > 0.8) {
-    const b = A.sweep.best; out.push({ pri: (A.sweep.cur.score - b.score) * 0.8, title: `Move the sofa ${Math.abs(b.off)}″ ${b.off > 0 ? 'forward' : 'back'}`, detail: `Main-seat bass ±${A.sweep.cur.flat.toFixed(1)} → ±${b.flat.toFixed(1)} dB: the seats move off a null.`, act: { kind: 'row', off: b.off, label: 'Move it' } });
-  }
-  if (A.ring > 0.08 && (t.traps || 0) < 4) out.push({ pri: A.ring * 8, title: `Bass traps in the ${(t.traps || 0) < 2 ? 'two front corners' : 'rear corners'}`, detail: `Modal ringing is ${A.ring.toFixed(2)} s over target. Floor-to-ceiling corner traps damp almost every mode at once.`, act: { kind: 'traps', n: Math.min(4, (t.traps || 0) + 2), label: 'Add traps' } });
-  if (A.worst && A.worst.level > -10 && !t.reflPanels) out.push({ pri: (A.worst.level + 10) * 0.6 + 1, title: '2″ panels at the side-wall reflection points', detail: `Worst early reflection ${A.worst.level.toFixed(1)} dB (${A.worst.surface}). Panels there bring the side walls below −10 dB and sharpen dialogue and imaging.`, act: { kind: 'refl', label: 'Add panels' } });
-  if (A.floorWorst && A.floorWorst.level > -6) out.push({ pri: 0.9, title: 'Rug between the speakers and the seats', detail: `The floor bounce from the ${CHANNELS[A.floorWorst.ch].name.toLowerCase()} lands ${ftin(Math.hypot(A.floorWorst.x - A.mlp.x, A.floorWorst.y - A.mlp.y))} in front of the main seat at ${A.floorWorst.level.toFixed(1)} dB. A thick rug with a felt pad there takes the edge off it.` });
-  if (A.early.some((q) => q.kind === 'ceiling' && q.level > -10) && !t.cloud) out.push({ pri: 1.2, title: 'A ceiling cloud over the seats', detail: 'The ceiling bounce from the front speakers arrives within 5 ms. A 4″ cloud (4 × 6 ft) absorbs it.', act: { kind: 'cloud', label: 'Add a cloud' } });
-  if (A.rt.rtMid > 0.42) out.push({ pri: (A.rt.rtMid - 0.4) * 10, title: 'Add absorption: the room is live', detail: `RT60 ${A.rt.rtMid.toFixed(2)} s. Rear-wall 4″ panels and a large rug bring it toward 0.3 s.`, act: !t.rearPanels ? { kind: 'rear', label: 'Add rear panels' } : null });
-  if (A.rt.rtMid < 0.18) out.push({ pri: 1, title: 'The room is too dead', detail: `RT60 ${A.rt.rtMid.toFixed(2)} s: swap some absorption for diffusion (slats, bookshelves) to keep it lively.` });
-  if (A.m.flat > 2.5 && !t.eqOn) out.push({ pri: 2, title: 'Turn on the room EQ', detail: 'Automatic parametric EQ cuts the room\'s peaks at the seats.', act: { kind: 'eq', label: 'Turn on' } });
-  const fb = A.lay.filter((c) => c.fallback);
-  if (fb.length) out.push({ pri: 0.8, title: `${fb.map((c) => c.name).join(' and ')}: no wall at the right angle`, detail: 'Those directions point into the stair opening; the plan uses angled in-ceiling speakers there.' });
-  const lowHr = A.lay.filter((c) => c.headroom < 0);
-  if (lowHr.length) out.push({ pri: 1, title: 'More amplifier or more sensitive speakers', detail: `${lowHr.map((c) => c.k).join(', ')} can't reach 105 dB peaks. Try ${t.amp < 200 ? '200 W per channel' : 'higher-sensitivity speakers'}.` });
-  if (A.headroom < 0) out.push({ pri: -A.headroom / 3 + 0.5, title: 'More bass output', detail: `${(-A.headroom).toFixed(1)} dB short of 115 dB LFE peaks between 25 and 80 Hz. A second sub adds about 6 dB; a larger model adds more.` });
-  if (!t.door) out.push({ pri: 0.3, title: 'Keep the movie downstairs', detail: 'A solid-core door with seals at the top or bottom of the stairs cuts sound to the main floor by roughly 25–30 dB.', act: { kind: 'door', label: 'Plan a door' } });
-  return out.sort((a, b) => b.pri - a.pri);
-}

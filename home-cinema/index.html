@@ -537,43 +537,6 @@ select.ph-pill { padding-right: 8px; width: auto; flex: none; }
 .tprog { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; }
 .tprog i { display: block; height: 100%; width: calc(var(--p, 0.02) * 100%); background: var(--brass); transition: width .2s; }
 .tune-busy p { margin: 0; font-family: var(--font-num); font-size: 12px; color: var(--fg); }
-/* overview */
-.tov { display: grid; grid-template-columns: 116px 1fr; gap: 16px; align-items: center; }
-.scoring { width: 108px; height: 108px; border-radius: 50%; display: grid; place-content: center; text-align: center; position: relative;
-  background: conic-gradient(var(--brass) calc(var(--s) * 1%), rgba(255,255,255,0.08) 0); }
-.scoring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: #191512; }
-.scoring b, .scoring small { position: relative; }
-.scoring b { font-family: var(--font-mark); font-size: 40px; font-weight: 400; line-height: 1; color: var(--fg); }
-.scoring small { color: var(--muted); font-size: 11px; }
-.kvs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
-.kvs.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.kv span { display: block; font-size: 11px; color: var(--muted); }
-.kv b { font-family: var(--font-num); font-weight: 500; font-size: 15px; color: var(--fg); }
-.kv small { display: block; color: var(--faint); font-size: 10.5px; line-height: 1.3; }
-.scorecard { display: grid; gap: 2px; }
-.srow summary { display: grid; grid-template-columns: 1fr auto 26px; gap: 10px; align-items: center; padding: 7px 4px; cursor: pointer; list-style: none; border-radius: 8px; }
-.srow summary::-webkit-details-marker { display: none; }
-.srow summary:hover { background: rgba(255,255,255,0.03); }
-.srow .sv { font-family: var(--font-num); font-size: 12px; color: var(--muted); }
-.srow p { margin: 0 4px 8px; color: var(--muted); font-size: 12px; }
-.grade { display: inline-grid; place-items: center; width: 24px; height: 22px; border-radius: 6px; font-weight: 700; font-size: 12px; font-family: var(--font-num); }
-.grade.gA { background: rgba(143,191,138,0.18); color: var(--ok); } .grade.gB { background: rgba(214,164,99,0.16); color: var(--brass); }
-.grade.gC { background: rgba(226,181,90,0.16); color: var(--warn); } .grade.gD { background: rgba(224,122,98,0.18); color: var(--bad); }
-.advice { display: grid; gap: 8px; }
-.adv { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02); }
-.adv-n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--brass-dim); color: var(--brass); font-size: 11.5px; font-weight: 600; }
-.adv b { font-weight: 600; } .adv p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
-.adv .btn { white-space: nowrap; }
-/* bass */
-.preview-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; margin: 8px 0 0; padding: 8px 10px; border-radius: 10px;
-  background: var(--brass-dim); border: 1px solid var(--brass); }
-.preview-bar span { flex: 1; color: var(--brass); font-weight: 500; }
-.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-.metric { position: relative; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.02); }
-.metric small { display: block; color: var(--muted); font-size: 11px; }
-.metric b { font-family: var(--font-num); font-weight: 500; font-size: 18px; }
-.metric b i { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 3px; }
-.metric .grade { position: absolute; top: 8px; right: 8px; transform: scale(0.85); }
 .chartwrap { position: relative; }
 canvas.chart { display: block; width: 100%; height: 230px; border-radius: 10px; cursor: crosshair; }
 canvas.chart.tall { height: 290px; cursor: default; } canvas.chart.short { height: 170px; cursor: default; }
@@ -596,10 +559,10 @@ canvas.chart.tall { height: 290px; cursor: default; } canvas.chart.short { heigh
 .subrow > b { font-family: var(--font-num); color: var(--brass); }
 .subrow .sname { flex: 1; min-width: 140px; color: var(--muted); font-size: 12px; }
 .dsp { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.step { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
-.step small { color: var(--faint); margin-right: 2px; }
-.step button { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--line-strong); background: transparent; padding: 0; }
-.step b { font-family: var(--font-num); font-weight: 500; min-width: 56px; text-align: center; font-size: 12px; }
+.step-c { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+.step-c small { color: var(--faint); margin-right: 2px; }
+.step-c button { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--line-strong); background: transparent; padding: 0; }
+.step-c b { font-family: var(--font-num); font-weight: 500; min-width: 56px; text-align: center; font-size: 12px; }
 .optctl { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .ttable { width: 100%; border-collapse: collapse; font-size: 12px; }
 .ttable th { text-align: left; font-weight: 500; color: var(--faint); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 6px; border-bottom: 1px solid var(--line); }
@@ -631,12 +594,112 @@ canvas.chart.tall { height: 290px; cursor: default; } canvas.chart.short { heigh
   .trow .tl, .optctl .tl { width: 68px; }
   .tune { top: auto; bottom: 0; left: 0; right: 0; width: auto; height: 56%; border-radius: 18px 18px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
   #app.tuning .dock { display: none; }
-  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tov { grid-template-columns: 96px 1fr; } .scoring { width: 92px; height: 92px; } .scoring b { font-size: 32px; }
-  .kvs.three { grid-template-columns: 1fr 1fr; }
   canvas.chart { height: 200px; }
-  .adv { grid-template-columns: 22px 1fr; } .adv .btn { grid-column: 2; justify-self: start; }
+  .step { grid-template-columns: 24px 1fr; } .step-acts { grid-column: 2; flex-direction: row; }
+  .hero b { font-size: 34px; } .opt-cards { grid-template-columns: 1fr; } .layouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .size-row { grid-template-columns: 1fr; }
 }
+
+/* ---------- tuning studio: customer views ---------- */
+.pro-toggle { margin: 6px 4px 0 0; white-space: nowrap; }
+.vchip { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; padding: 1px 8px; border-radius: 999px; white-space: nowrap; vertical-align: 1px; }
+.vchip.qE { background: rgba(88,176,132,0.2); color: #8fd6ae; } .vchip.qG { background: rgba(146,196,118,0.18); color: #b7da9b; }
+.vchip.qF { background: rgba(226,181,90,0.18); color: var(--warn); } .vchip.qP { background: rgba(224,122,98,0.2); color: var(--bad); }
+.hero { display: flex; align-items: center; gap: 18px; padding: 6px 0 2px; }
+.hero-col { display: grid; gap: 2px; justify-items: start; }
+.hero-col small { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+.hero-col b { font-family: var(--font-mark); font-weight: 400; font-size: 46px; line-height: 1; }
+.hero-col b.busy { font-family: var(--font-ui); font-size: 13px; color: var(--muted); line-height: 1.4; }
+.hero-arrow { color: var(--brass); font-size: 26px; }
+.lead { margin: 4px 0 0; font-size: 14px; line-height: 1.5; color: var(--fg); }
+.qcards { display: grid; gap: 8px; }
+.qcard { text-align: left; display: grid; gap: 5px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02); cursor: pointer; }
+.qcard:hover { border-color: var(--line-strong); background: rgba(255,255,255,0.035); }
+.qhead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .qhead > b { font-weight: 600; font-size: 13.5px; }
+.qto { color: var(--muted); font-size: 12px; }
+.qask { color: var(--faint); font-size: 11.5px; }
+.qcard p { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.meter { position: relative; height: 14px; margin: 2px 0; }
+.meter .m-scale { position: absolute; left: 0; right: 0; top: 5px; height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(224,122,98,0.55) 0 50%, rgba(226,181,90,0.55) 50% 70%, rgba(146,196,118,0.55) 70% 85%, rgba(88,176,132,0.7) 85%); }
+.meter .m-gain { position: absolute; top: 5px; height: 4px; background: var(--fg); opacity: 0.35; }
+.meter .m-now, .meter .m-after { position: absolute; top: 1px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; }
+.meter .m-now { background: var(--fg); box-shadow: 0 0 0 2px #191512; } .meter .m-after { border: 2px solid var(--fg); background: #191512; }
+.assume { margin: 0; padding-left: 18px; display: grid; gap: 7px; color: var(--muted); font-size: 12.5px; }
+.assume .trow { margin-top: 2px; } .tnote { flex-basis: 100%; color: var(--faint); font-size: 11px; padding-left: 90px; }
+.say { margin: 0; font-size: 13px; line-height: 1.5; }
+/* plan */
+.plan-head { display: flex; align-items: center; gap: 12px; justify-content: space-between; flex-wrap: wrap; }
+.plan-head b { font-size: 16px; font-weight: 600; } .plan-head small { display: block; color: var(--muted); font-size: 12px; }
+.steps { display: grid; gap: 10px; }
+.step { display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02); }
+.step.info { border-style: dashed; }
+.step-n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--brass-dim); color: var(--brass); font-weight: 600; font-size: 12.5px; }
+.step-b { display: grid; gap: 5px; min-width: 0; } .step-b > b { font-size: 13.5px; font-weight: 600; }
+.step-b p { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; } .step-b p.step-note { color: var(--faint); font-size: 12px; }
+.deltas { display: flex; flex-wrap: wrap; gap: 6px; } .delta { font-size: 11.5px; color: var(--muted); padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px; }
+.step-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px; color: var(--faint); font-family: var(--font-num); }
+.step-acts { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.tprog.indet i { width: 40%; animation: indet 1.2s ease-in-out infinite alternate; }
+@keyframes indet { from { margin-left: 0; } to { margin-left: 60%; } }
+/* bass */
+.seatlist { display: grid; gap: 4px; }
+.seatrow { display: grid; grid-template-columns: 62px 74px 1fr minmax(0, 1.4fr); align-items: center; gap: 8px; font-size: 12.5px; }
+.seatrow b { font-weight: 600; } .seatrow small { color: var(--muted); font-size: 11.5px; }
+.sbar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.07); overflow: hidden; } .sbar i { display: block; height: 100%; background: var(--brass); border-radius: 3px; }
+.qlegend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); }
+.qlegend span { display: inline-flex; align-items: center; gap: 5px; } .qlegend i { width: 14px; height: 10px; border-radius: 3px; display: inline-block; }
+.mapwhat { color: var(--muted); font-size: 12px; }
+.opt-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.opt-card { display: grid; gap: 7px; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02); align-content: start; }
+.opt-card.rec { border-color: var(--brass); background: var(--brass-dim); } .opt-card.on { box-shadow: 0 0 0 2px var(--fg) inset; }
+.oc-t b { font-weight: 600; font-size: 12.5px; display: block; } .oc-v { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11.5px; color: var(--muted); align-items: center; }
+.oc-v small { flex-basis: 100%; color: var(--faint); font-family: var(--font-num); font-size: 10.5px; }
+.oc-a { display: flex; gap: 6px; } .oc-a .btn { padding: 5px 9px; font-size: 12px; }
+.rec-tag { display: inline-block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #1c1612; background: var(--brass); padding: 1px 6px; border-radius: 4px; margin-bottom: 3px; font-weight: 700; }
+.optctl .btn { white-space: nowrap; }
+/* dialogue */
+.runs { display: grid; gap: 6px; } .run { padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 2px; }
+.run b { font-weight: 600; font-size: 12.5px; } .run small { color: var(--muted); font-size: 12px; }
+.echo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.echo-b { padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 2px; }
+.echo-b small { color: var(--muted); font-size: 11px; } .echo-b b { font-family: var(--font-num); font-weight: 500; font-size: 16px; }
+.echo-w { font-size: 11.5px; font-weight: 600; } .echo-w.just-right { color: #8fd6ae; } .echo-w.a-bit-lively { color: var(--warn); } .echo-w.echoey { color: var(--bad); } .echo-w.dead { color: #9ccbf0; }
+/* speakers */
+.layouts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.lay-card { text-align: left; display: grid; gap: 3px; padding: 9px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.02); align-content: start; }
+.lay-card[aria-pressed="true"] { border-color: var(--brass); background: var(--brass-dim); }
+.lay-card b { font-family: var(--font-num); font-size: 15px; font-weight: 500; } .lay-card small { color: var(--muted); font-size: 11px; line-height: 1.35; }
+.lay-fit { font-size: 10.5px; font-weight: 600; } .lay-fit.ok { color: #8fd6ae; } .lay-fit.no { color: var(--warn); }
+.spklist { display: grid; gap: 2px; }
+.spk-row { display: grid; grid-template-columns: 42px 1fr auto; gap: 10px; align-items: center; padding: 6px 4px; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.spk-row > b { font-family: var(--font-num); color: var(--brass); } .spk-row small { display: block; color: var(--faint); font-size: 11px; }
+.spk-row.off .spk-ang { color: var(--warn); } .spk-ang { text-align: right; font-family: var(--font-num); font-size: 12px; white-space: nowrap; }
+.sizing { display: grid; gap: 6px; }
+.size-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.size-row b { font-weight: 600; font-size: 12.5px; } .size-row small { display: block; color: var(--muted); font-size: 11px; }
+.size-need { display: flex; gap: 14px; } .size-need span { font-family: var(--font-num); font-size: 15px; color: var(--brass); }
+.size-hint { grid-column: 1 / -1; color: var(--faint); }
+/* pro detail */
+.pros { display: grid; gap: 6px; padding: 12px 0 4px; }
+details.pro { border: 1px solid var(--line); border-radius: 10px; background: rgba(0,0,0,0.12); }
+details.pro > summary { cursor: pointer; padding: 9px 10px; list-style: none; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+details.pro > summary::-webkit-details-marker { display: none; }
+details.pro[open] > summary { color: var(--fg); border-bottom: 1px solid var(--line); }
+.pro-tag { font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #9ccbf0; border: 1px solid rgba(127,179,213,0.5); border-radius: 4px; padding: 0 5px; }
+.pro-body { padding: 10px; display: grid; gap: 9px; } .pro-ctl { display: grid; gap: 7px; }
+.ttable.shop td:nth-child(2) { font-family: var(--font-ui); color: var(--muted); } .ttable.shop td:nth-child(3) { white-space: nowrap; }
+/* hear it */
+.listen { display: grid; gap: 9px; padding: 12px; border: 1px solid var(--line-strong); border-radius: 14px; background: linear-gradient(135deg, rgba(214,164,99,0.10), rgba(127,179,213,0.06)); }
+.lhead { display: flex; align-items: center; gap: 12px; } .lhead b { font-weight: 600; font-size: 14px; display: block; } .lhead small { color: var(--muted); font-size: 11.5px; }
+.lplay { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--brass); color: #1c1612; font-size: 16px; display: grid; place-items: center; cursor: pointer; }
+.lplay.on { background: var(--fg); }
+.seg.lab { display: flex; width: 100%; } .seg.lab button { flex: 1; }
+.seg.lab button[aria-pressed="true"] { background: var(--brass); color: #1c1612; }
+.seg.lab button:disabled { opacity: 0.4; }
+/* seat labels on the quality map */
+.dim.tseat.qE { border-color: rgb(88,176,132); color: #a6e2c0; } .dim.tseat.qG { border-color: rgb(146,196,118); color: #c4e3ad; }
+.dim.tseat.qF { border-color: var(--warn); color: var(--warn); } .dim.tseat.qP { border-color: var(--bad); color: var(--bad); }
 
 </style>
 <script type="importmap">
@@ -6806,7 +6869,7 @@ function acAbsorbers() {
   }
   if (t.reflPanels) for (const s of acReflectionPanelSpots()) panels.push({ ...s, area: acM(24) * acM(48), mat: 'panel2', virtual: true });
   if (t.rearPanels) for (const s of acRearSpots()) panels.push({ ...s, area: acM(24) * acM(48), mat: 'panel4', virtual: true });
-  if (t.cloud) { const m = mainSeat() || { x: G.tvX, y: 60 }; panels.push({ x: m.x, y: m.y + 20, z: r.ceiling - 4, area: acM(48) * acM(72), mat: 'panel4', ceiling: true, virtual: true }); }
+  const cl = t.cloud && acCloudSpot(); if (cl) { panels.push({ x: cl.x, y: cl.y, z: r.ceiling - 4, area: acM(cl.w) * acM(cl.d), mat: 'panel4', ceiling: true, virtual: true }); }
   let rugA = 0;
   for (const it of state.items) if (it.type === 'rug') rugA += acM(it.p.w || 96) * acM(it.p.d || 72);
   return { seats, people: Math.min(t.people || 0, seats), traps, panels, rugA };
@@ -7381,8 +7444,9 @@ function bandDecay(ir) {
     return { fc, t60: slope < 0 ? -60 / slope : null, span };
   });
 }
-/** Target for the low-frequency decay: about the mid-band reverb time + 0.1 s, allowed to rise below 63 Hz. */
-const decayTarget = (fc, rtMid) => (rtMid + 0.1) * (fc >= 63 ? 1 : 1 + 0.6 * Math.log2(63 / fc) / Math.log2(63 / 20));
+/** Target for the low-frequency decay: 0.4 s down to 63 Hz, allowed to rise to 0.65 s at 20 Hz (small-room practice).
+ *  Fixed, so absorbing the mids never makes the bass look worse. */
+const decayTarget = (fc) => (fc >= 63 ? 0.4 : 0.4 + 0.25 * Math.log2(63 / fc) / Math.log2(63 / 20));
 
 // ---------------- the sofa's position in the room ----------------
 /** Move the main seating forward / back and see what the bass does at the seats (subs stay put). */
@@ -7400,8 +7464,8 @@ function rowSweep(ctx, subs) {
   return { pts: out, best, cur: out.find((o) => o.off === 0), dir: L.ez };
 }
 /** Put the subs from a configuration into the layout (replacing the current ones). */
-function applySubConfig(subs) {
-  pushHistory();
+function applySubConfig(subs, record = true) {
+  if (record) pushHistory();
   for (const it of state.items.filter((i) => i.type === 'subwoofer')) {
     const obj = itemObjects.get(it.id); if (obj) { itemsGroup.remove(obj.group); disposeGroup(obj.group); itemObjects.delete(it.id); }
     delete state.tune.dsp[it.id];
@@ -7648,7 +7712,7 @@ function rtModel() {
   const wallA = Math.max(0, wallIn * AC.IN * H - tr - fpA - tvA - fpSlats - tvSlats - panelArea.panel2 - panelArea.slatPanel - panelArea.panel4);
   let rugA = 0; for (const it of state.items) if (it.type === 'rug') rugA += sq(it.p.w || 96, it.p.d || 72);
   rugA = Math.min(rugA, Fl * 0.8);
-  const cloudA = t.cloud ? sq(48, 72) : 0;
+  const cl = t.cloud && acCloudSpot(), cloudA = cl ? sq(cl.w, cl.d) : 0;
   add('walls', 'Walls · drywall on studs', wallA, 'drywall');
   add('ceiling', 'Ceiling · drywall', Fl - cloudA, 'ceiling');
   add('floor', 'Floor · laminate on the slab', Fl - rugA, 'laminate');
@@ -7714,13 +7778,13 @@ function surfaceAt(kind, x, y, z, wall) {
   const r = state.room, G = geom(), f = state.finish, t = state.tune;
   const near = (spots, rad) => spots.some((s) => Math.hypot(s.x - x, s.y - y) < rad && Math.abs((s.z ?? z) - z) < 26);
   if (kind === 'floor') return state.items.some((it) => it.type === 'rug' && footprint(it) && pointInPoly([x, y], footprint(it))) ? 'rug' : 'laminate';
-  if (kind === 'ceiling') { const m = mainSeat(); return t.cloud && m && Math.abs(x - m.x) < 36 && Math.abs(y - (m.y + 20)) < 24 ? 'panel4' : 'ceiling'; }
+  if (kind === 'ceiling') { const c = t.cloud && acCloudSpot(); return c && Math.abs(x - c.x) <= c.w / 2 && Math.abs(y - c.y) <= c.d / 2 ? 'panel4' : 'ceiling'; }
   for (const it of state.items) if (it.type === 'acousticPanel') {
     const p = { ...CATALOG.acousticPanel.defaults, ...it.p };
     if (Math.hypot(it.x - x, it.y - y) < p.w / 2 + 2 && Math.abs(z - p.h) < p.hgt / 2 + 2) return resolveSpec(it).variant === 'slat' ? 'slatPanel' : 'panel2';
   }
-  if (t.reflPanels && near(acReflectionPanelSpots(), 14)) return 'panel2';
-  if (t.rearPanels && near(acRearSpots(), 14)) return 'panel4';
+  if (t.reflPanels && wall && acReflectionPanelSpots().some((s2) => s2.run.wall === wall.name && covers(s2.run, x, y, z))) return 'panel2';
+  if (t.rearPanels && wall && wall.name === 'back wall' && acRearSpots().some((s2) => x >= s2.x0 - 1 && x <= s2.x1 + 1 && Math.abs(s2.z - z) <= 24)) return 'panel4';
   if (wall && wall.name === 'left wall' && x < 2) {                          // the fireplace wall
     const fp = state.fireplace;
     if (Math.abs(y - fp.center) < fp.width / 2 && z > fp.bottom && z < fp.bottom + fp.height) return 'stone';
@@ -7775,29 +7839,85 @@ function firstReflections(spk, lis, aim = lis) {
   }
   return out.sort((p, q) => p.delay - q.delay);
 }
-/** Where 2″ panels would catch the side-wall first reflections of the front three to the main seat. */
+/** Where 2″ panels would catch the side-wall first reflections of the front three, for every seat. */
 let spotGuard = false, spotCache = null;
 function acReflectionPanelSpots() {
   const m = mainSeat(); if (!m || spotGuard) return [];
   const key = JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot]), state.tune.layout, state.room, state.tv]);
   if (spotCache && spotCache.key === key) return spotCache.spots;
   spotGuard = true;
-  try { spotCache = { key, spots: reflSpots(m) }; } finally { spotGuard = false; }
+  try { spotCache = { key, spots: reflSpots() }; } finally { spotGuard = false; }
   return spotCache.spots;
 }
-function reflSpots(m) {
-  const lis = { x: m.x, y: m.y, z: AC.ear }, out = [];
+/** Panels that cover the side-wall first reflections of the front three speakers for every seat on the sofa:
+ *  one 2 × 4 ft panel per 2 ft of the reflection zone on each wall (at most 4 a wall). */
+function reflSpots() {
+  const seats = acSeats().filter((s) => s.main), walls = roomWalls(), byWall = new Map();
   for (const ch of tuneLayout(state.tune.layout, true).filter((c) => ['L', 'C', 'R'].includes(c.k))) {
     const spk = { x: ch.p[0], y: ch.p[1], z: ch.z };
-    for (const q of firstReflections(spk, lis)) if (q.kind === 'wall' && /left|right|alcove side/.test(q.surface) && q.delay < 20 && out.every((o) => Math.hypot(o.x - q.x, o.y - q.y) > 20)) out.push({ x: q.x, y: q.y, z: clamp(q.z, 30, 72), surface: q.surface });
+    for (const s of seats) for (const q of firstReflections(spk, { x: s.x, y: s.y, z: AC.ear })) {
+      if (q.kind !== 'wall' || !/left|right|alcove side/.test(q.surface) || q.delay > 20) continue;
+      const w = walls.reduce((b, ww) => { const d = Math.abs((q.x - ww.a[0]) * ww.n[0] + (q.y - ww.a[1]) * ww.n[1]); return d < b.d ? { d, ww } : b; }, { d: Infinity }).ww;
+      const ux = (w.b[0] - w.a[0]) / w.len, uy = (w.b[1] - w.a[1]) / w.len, u = (q.x - w.a[0]) * ux + (q.y - w.a[1]) * uy;
+      const e = byWall.get(w) || { w, ux, uy, us: [], zs: [], seats: new Set(), chs: new Set() };
+      e.us.push(u); e.zs.push(q.z); e.seats.add(s.label); e.chs.add(ch.k); byWall.set(w, e);
+    }
+  }
+  const out = [];
+  for (const e of byWall.values()) {
+    const u0 = clamp(Math.min(...e.us) - 8, 0, e.w.len), u1 = clamp(Math.max(...e.us) + 8, 0, e.w.len), n = clamp(Math.ceil((u1 - u0) / 24), 1, 4);
+    const z = clamp(e.zs.reduce((a, b) => a + b, 0) / e.zs.length, 40, 56);
+    for (let k = 0; k < n; k++) {
+      const u = u0 + (u1 - u0) * (k + 0.5) / n;
+      out.push({ x: e.w.a[0] + e.ux * u + e.w.n[0] * 1, y: e.w.a[1] + e.uy * u + e.w.n[1] * 1, z, surface: e.w.name, run: { wall: e.w.name, len: u1 - u0, n, seats: [...e.seats], chs: [...e.chs], a: e.w.a, ux: e.ux, uy: e.uy, u0: Math.min(u0, (u0 + u1) / 2 - n * 12), u1: Math.max(u1, (u0 + u1) / 2 + n * 12), z } });
+    }
   }
   return out;
 }
-/** Two spots on the wall behind the seats for 4″ panels (the solid part beside the stairs). */
+/** Is a point on a wall inside a panel run (along the wall, and within the 4 ft panel height)? */
+function covers(run, x, y, z) { const u = (x - run.a[0]) * run.ux + (y - run.a[1]) * run.uy; return u >= run.u0 - 1 && u <= run.u1 + 1 && Math.abs(z - run.z) <= 24; }
+/** The ceiling cloud: where the front speakers' ceiling bounces land for the seats (4 ft wide, 6 ft or longer). */
+let cloudCache = null;
+function acCloudSpot() {
+  if (spotGuard || !mainSeat()) return null;
+  const key = JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot]), state.tune.layout, state.room, state.tv]);
+  if (cloudCache && cloudCache.key === key) return cloudCache.c;
+  spotGuard = true; const pts = [];
+  try {
+    for (const ch of tuneLayout(state.tune.layout, true).filter((c) => ['L', 'C', 'R'].includes(c.k))) for (const s of acSeats().filter((q) => q.main)) {
+      for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: s.x, y: s.y, z: AC.ear })) if (q.kind === 'ceiling' && q.delay < 20) pts.push(q);
+    }
+  } finally { spotGuard = false; }
+  let c = null;
+  if (pts.length) {
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    c = { x: (x0 + x1) / 2, y: (y0 + y1) / 2, w: clamp(Math.ceil((x1 - x0 + 12) / 12) * 12, 48, 132), d: clamp(Math.ceil((y1 - y0 + 12) / 12) * 12, 48, 96) };
+    if (c.w < 72 && c.d < 72) c.w = 72;
+  }
+  cloudCache = { key, c };
+  return c;
+}
+/** 4″ panels on the solid wall behind the sofa: where the front speakers' bounces land for the seats, else two. */
+let rearCache = null;
 function acRearSpots() {
-  const r = state.room, G = geom(), m = mainSeat(); if (!m) return [];
-  const xs = [G.wallX + (r.width - G.wallX) * 0.3, G.wallX + (r.width - G.wallX) * 0.7];
-  return xs.map((x) => ({ x, y: 1, z: AC.ear + 6 }));
+  const r = state.room, G = geom(), m = mainSeat(); if (!m || spotGuard) return [];
+  const key = JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot]), state.tune.layout, state.room, state.tv]);
+  if (rearCache && rearCache.key === key) return rearCache.spots;
+  spotGuard = true;
+  let xs = [];
+  try {
+    for (const ch of tuneLayout(state.tune.layout, true).filter((c) => ['L', 'C', 'R'].includes(c.k))) for (const s of acSeats().filter((q) => q.main)) {
+      for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: s.x, y: s.y, z: AC.ear })) if (q.surface === 'back wall' && q.delay < 20 && q.x >= G.wallX) xs.push(q.x);
+    }
+  } finally { spotGuard = false; }
+  let spots;
+  if (xs.length) {
+    const x0 = clamp(Math.min(...xs) - 8, G.wallX, r.width), x1 = clamp(Math.max(...xs) + 8, G.wallX, r.width), n = clamp(Math.ceil((x1 - x0) / 24), 1, 4);
+    const w = Math.max(x1 - x0, n * 24), c = (x0 + x1) / 2;
+    spots = Array.from({ length: n }, (_, k) => ({ x: c - w / 2 + w * (k + 0.5) / n, y: 1, z: AC.ear + 4, x0: c - w / 2, x1: c + w / 2 }));
+  } else spots = [G.wallX + (r.width - G.wallX) * 0.3, G.wallX + (r.width - G.wallX) * 0.7].map((x) => ({ x, y: 1, z: AC.ear + 6, x0: x - 12, x1: x + 12 }));
+  rearCache = { key, spots };
+  return spots;
 }
 
 // ---------------- speaker layouts ----------------
@@ -7895,85 +8015,307 @@ function tuneLayout(key = state.tune.layout, quick = false) {
   return out;
 }
 
-// ---------------- the whole analysis ----------------
-let TA = null;                                         // last analysis
-function analyseRoom() {
+
+// ---- 66-tune-model.js ----
+// ===================================================================
+// 66 · Cinema tuning, the customer's view of the analysis.
+//  - five qualities anyone can judge by ear (bass at every seat, tight bass, clear dialogue, surround
+//    immersion, keeping the movie downstairs), each scored, with plain sentences about what you'd hear
+//  - a plan: the steps that fix the most for the least, simulated one after another on a copy of the
+//    layout, so every step shows what it changes, what it costs and how long it takes
+//  - what to buy: subwoofer and speaker sizing for the loudness you want, and a shopping list
+// The engineering numbers behind all of it stay available as "Pro detail".
+// ===================================================================
+const LOUDNESS = {
+  0: { label: 'Cinema loud', note: 'reference level: dialogue as loud as a commercial cinema, 105 dB peaks per speaker and 115 dB bass peaks' },
+  '-5': { label: 'Loud', note: '5 dB under reference: how most enthusiasts watch at home' },
+  '-10': { label: 'Comfortable', note: '10 dB under reference: family evenings and late nights' },
+};
+const loudness = () => LOUDNESS[state.tune.refLvl ?? -5] || LOUDNESS['-5'];
+const refName = () => loudness().label;
+const QUALITIES = [
+  { key: 'seats', title: 'Bass at every seat', ask: 'Does everyone on the sofa get the same bass?', tab: 'bass' },
+  { key: 'tight', title: 'Tight, clean bass', ask: 'Punchy and tuneful, or boomy and one-note?', tab: 'bass' },
+  { key: 'clarity', title: 'Clear dialogue', ask: 'Can you follow every word without turning it up?', tab: 'dialogue' },
+  { key: 'immersion', title: 'Surround immersion', ask: 'Does each sound come from the right place?', tab: 'speakers' },
+  { key: 'privacy', title: 'Keeps the movie downstairs', ask: 'How much of it reaches the main floor?', tab: 'dialogue' },
+];
+const Q_WEIGHT = { seats: 1.4, tight: 1.2, clarity: 1.2, immersion: 1, privacy: 0.4 };
+const lin = (v, good, bad) => clamp(100 - 90 * (v - good) / (bad - good), 10, 100);
+/** One spot's bass, from how far it strays from the target (rms dB, 20–100 Hz, 1/6 octave): same scale for seats and the map. */
+const spotWord = (rms) => (rms <= 2.5 ? 'Excellent' : rms <= 4 ? 'Good' : rms <= 6 ? 'Fair' : 'Poor');
+const verdictOf = (s) => (s >= 85 ? 'Excellent' : s >= 70 ? 'Good' : s >= 50 ? 'Fair' : 'Poor');
+const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+/** Musical note nearest to f (E1 is a bass guitar's open low string, 41 Hz). */
+function noteName(f) { const m = Math.round(69 + 12 * Math.log2(f / 440)); return `${NOTE_NAMES[((m % 12) + 12) % 12]}${Math.floor(m / 12) - 1}`; }
+/** What lives at that frequency, in words. */
+const bassWhat = (f) => (f < 31 ? 'the deep rumble of explosions and organ pedals' : f < 45 ? 'the lowest bass-guitar and synth notes' : f < 70 ? 'kick drums and the body of bass lines'
+  : f < 110 ? 'upper bass: the warmth of cellos and male voices' : 'the low end of voices and instruments');
+const hz = (f) => `${Math.round(f)} Hz`;
+const usd = (a, b) => (b == null ? `$${a.toLocaleString()}` : a === b ? `$${a.toLocaleString()}` : `$${a.toLocaleString()}–${b.toLocaleString()}`);
+const SUB_PRICE = { '12s': [500, 900], '15p': [800, 1500], '18p': [1500, 2500] };
+
+/** Run fn with the planner looking at another state (a what-if copy), then put everything back. */
+function withState(st, fn) {
+  const saved = state, savedCtx = BCTX;
+  state = st; BCTX = null;
+  try { return fn(); } finally { state = saved; BCTX = savedCtx; }
+}
+
+// ---------------- the assessment ----------------
+let TA = null;                                         // the current assessment (see assess)
+/** Everything the studio shows, for the current state. */
+function assess() {
   const ctx = bassCtx(); if (!ctx) return null;
   const t = state.tune, subs = currentSubs(), F = ctx.F;
   const raw = bassResponses(ctx, subs, { eq: null }), mRaw = bassMetrics(raw, F);
-  const eq = t.eqOn ? (t.eq && t.eq.length ? t.eq : autoEQ(ctx, subs)) : [];
+  const eq = t.eqOn ? autoEQ(ctx, subs) : [];
   const resp = eq.length ? bassResponses(ctx, subs, { eq }) : raw, m = eq.length ? bassMetrics(resp, F) : mRaw;
-  // headroom at the main seat: in-room maximum vs 115 dB LFE peaks
-  const mlpSeat = ctx.seats.find((s) => s.mlp) || ctx.seats[0];
-  const lfe = bassResponses(ctx, subs, { eq: eq.length ? eq : null, signal: 'lfe', seats: [mlpSeat] })[0];
-  const gmax = Math.max(...subs.map((s) => 10 ** ((s.g || 0) / 20)));
-  const maxSpl = F.map((f, i) => { const boost = eq.length ? Math.max(0, 20 * Math.log10(Math.hypot(...eqResp(eq, f)))) : 0; return lfe.db[i] - 20 * Math.log10(Math.hypot(...lr4('lp', 120, f)) + 1e-9) + subMax(t.sub, f) - boost - 20 * Math.log10(gmax); });
-  const hrIdx = F.map((f, i) => i).filter((i) => F[i] >= 25 && F[i] <= 80);
-  const headroom = Math.min(...hrIdx.map((i) => smoothDb(maxSpl, 6)[i])) - (115 + (t.refLvl ?? -5));
+  const mlp = ctx.seats.find((s) => s.mlp) || ctx.seats[0];
+  const ir = bassImpulse(ctx, subs, mlp, eq.length ? eq : null), decay = bandDecay(ir);
   const rt = rtModel();
-  const ir = bassImpulse(ctx, subs, mlpSeat, eq.length ? eq : null), decay = bandDecay(ir);
+  const rings = decay.filter((d) => d.t60 && d.fc <= 125).map((d) => ({ ...d, over: d.t60 - decayTarget(d.fc) }));
+  const ringWorst = rings.length ? rings.reduce((a, b) => (b.over > a.over ? b : a)) : null;
+  const ring = ringWorst ? Math.max(0, ringWorst.over) : 0;
   const lay = tuneLayout(t.layout);
-  const mlp = { x: mlpSeat.x, y: mlpSeat.y, z: AC.ear };
-  const refl = lay.filter((c) => !c.k.startsWith('T')).map((c) => ({ ch: c, list: firstReflections({ x: c.p[0], y: c.p[1], z: c.z }, mlp) }));
-  const early = refl.flatMap((r) => r.list.filter((q) => q.delay < 15).map((q) => ({ ...q, ch: r.ch.k })));
-  // the floor bounce is graded on its own: only a rug treats it, and every room has one
+  // early reflections at every seat on the sofa from the dialogue speakers (left, centre, right): that's what
+  // decides clarity; bounces of the surrounds add envelopment and aren't treated in a home cinema
+  const early = [];
+  for (const c of lay.filter((q) => ['L', 'C', 'R'].includes(q.k))) for (const s of ctx.seats.filter((q) => q.main)) {
+    for (const q of firstReflections({ x: c.p[0], y: c.p[1], z: c.z }, { x: s.x, y: s.y, z: AC.ear })) if (q.delay < 15) early.push({ ...q, ch: c.k, seat: s.label });
+  }
   const worstOf = (l) => (l.length ? l.reduce((a, b) => (b.level > a.level ? b : a)) : null);
   const worst = worstOf(early.filter((q) => q.kind !== 'floor')), floorWorst = worstOf(early.filter((q) => q.kind === 'floor'));
-  const sweep = rowSweep(ctx, subs);
-  // modal ringing: decay of the bass third-octaves vs target
-  const ring = decay.filter((d) => d.t60 && d.fc <= 125).map((d) => d.t60 - decayTarget(d.fc, rt.rtMid));
-  TA = { ctx, subs, raw, mRaw, eq, resp, m, maxSpl, headroom, rt, ir, decay, ring: ring.length ? Math.max(...ring) : 0, lay, refl, early, worst, floorWorst, sweep, mlp: mlpSeat, at: Date.now() };
-  TA.score = tuneScore(TA); TA.advice = tuneAdvice(TA);
-  return TA;
+  const sideWorst = worstOf(early.filter((q) => q.kind === 'wall' && q.surface !== 'back wall')), ceilWorst = worstOf(early.filter((q) => q.kind === 'ceiling'));
+  const backWorst = worstOf(early.filter((q) => q.surface === 'back wall'));
+  const rtDev = Math.max(0, rt.rtMid - 0.4, 0.2 - rt.rtMid);
+  const eSum = (l) => { const v = l.reduce((a, q) => a + 10 ** (q.level / 10), 0); return v ? 10 * Math.log10(v) : -30; };
+  const nfl = early.filter((q) => q.kind !== 'floor'), others = ctx.seats.filter((q) => q.main && !q.mlp);
+  const eMlp = eSum(nfl.filter((q) => q.seat === 'MLP')), eRest = others.length ? others.reduce((a, s) => a + eSum(nfl.filter((q) => q.seat === s.label)), 0) / others.length : eMlp;
+  const q = {
+    seats: lin(m.ssv, 2, 7),
+    tight: 0.6 * lin(m.flat, 1.5, 5) + 0.4 * lin(ring, 0, 0.35),
+    // early reflected energy against the direct sound (all bounces in the first 15 ms, not the floor): the main seat
+    // counts most (70 %), the rest of the sofa too (30 %)
+    clarity: 0.65 * (0.7 * lin(eMlp, -10, 2) + 0.3 * lin(eRest, -10, 2)) + 0.35 * lin(rtDev, 0, 0.25),
+    immersion: clamp(100 * lay.filter((c) => c.ok).length / Math.max(1, lay.length) - 4 * lay.filter((c) => c.fallback).length, 10, 100),
+    privacy: t.door ? 72 : 22,
+  };
+  const overall = Math.round(Object.entries(q).reduce((s, [k, v]) => s + v * Q_WEIGHT[k], 0) / Object.values(Q_WEIGHT).reduce((a, b) => a + b, 0));
+  const A = { ctx, subs, raw, mRaw, eq, resp, m, mlp, ir, decay, ring, ringWorst, rt, lay, early, worst, floorWorst, sideWorst, ceilWorst, backWorst, q, overall };
+  A.seatsQ = seatReport(A);
+  A.say = findings(A);
+  return A;
 }
-const REF_LEVELS = { 0: 'Reference', '-5': 'Reference −5 dB', '-10': 'Reference −10 dB' };
-const refName = () => `${REF_LEVELS[state.tune.refLvl ?? -5] || 'Reference'}`;
-const grade = (v, cuts) => (v <= cuts[0] ? 'A' : v <= cuts[1] ? 'B' : v <= cuts[2] ? 'C' : 'D');
-const GRADE_PTS = { A: 100, B: 78, C: 55, D: 30 };
-/** The scorecard: each line as a pro would grade it. */
-function tuneScore(A) {
-  const t = state.tune, rows = [];
-  const rtDev = Math.max(0, A.rt.rtMid - 0.4, 0.2 - A.rt.rtMid);
-  const lay = A.lay, okN = lay.filter((c) => c.ok).length, minHr = Math.min(...lay.map((c) => c.headroom));
-  rows.push({ key: 'ssv', label: 'Bass, seat to seat', value: `±${A.m.ssv.toFixed(1)} dB`, g: grade(A.m.ssv, [2.5, 3.5, 5]), note: 'How alike the bass sounds across the sofa (20–100 Hz). Fixed by sub placement, not EQ.' });
-  rows.push({ key: 'flat', label: 'Bass smoothness', value: `±${A.m.flat.toFixed(1)} dB`, g: grade(A.m.flat, [2, 3, 4.5]), note: `Seating-area average against the ${TARGETS[t.target].label.toLowerCase()}${A.eq.length ? `, with ${A.eq.length} EQ filters` : ''}.` });
-  rows.push({ key: 'ring', label: 'Bass decay (ringing)', value: `${A.ring > 0 ? '+' : ''}${A.ring.toFixed(2)} s`, g: grade(A.ring, [0, 0.1, 0.25]), note: 'Worst third octave below 125 Hz against the decay target. Bass traps shorten it.' });
-  rows.push({ key: 'head', label: 'Bass headroom', value: `${A.headroom >= 0 ? '+' : ''}${A.headroom.toFixed(1)} dB`, g: grade(-A.headroom, [-3, 0, 4]), note: `${115 + (t.refLvl ?? -5)} dB LFE peaks at the main seat (${refName()}), 25–80 Hz, after EQ.` });
-  rows.push({ key: 'rt', label: 'Reverberation', value: `${A.rt.rtMid.toFixed(2)} s`, g: grade(rtDev, [0, 0.05, 0.15]), note: 'Mid-band RT60 (500 Hz–2 kHz, Eyring). Target 0.2–0.4 s for a room this size.' });
-  rows.push({ key: 'refl', label: 'Early reflections', value: A.worst ? `${A.worst.level.toFixed(1)} dB` : 'none', g: grade(A.worst ? A.worst.level : -30, [-15, -10, -6]), note: A.worst ? `Loudest in the first 15 ms: ${CHANNELS[A.worst.ch].name.toLowerCase()} off the ${A.worst.surface}, ${A.worst.delay.toFixed(1)} ms late.` : 'No early reflections at the main seat.' });
-  rows.push({ key: 'angles', label: 'Speaker placement', value: `${okN} of ${lay.length}`, g: grade(lay.length - okN, [0, 1, 3]), note: `Channels inside Dolby's recommended angles for ${t.layout}.` });
-  rows.push({ key: 'spl', label: 'Speaker headroom', value: `${minHr >= 0 ? '+' : ''}${minHr.toFixed(1)} dB`, g: grade(-minHr, [-3, 0, 4]), note: `${105 + (t.refLvl ?? -5)} dB peaks at the main seat from every channel (${refName()}; ${SPK_CLASSES[t.spk].label.toLowerCase()}, ${t.amp} W).` });
-  rows.push({ key: 'iso', label: 'Sound to the floor above', value: t.door ? 'door' : 'open stairwell', g: t.door ? 'B' : 'D', note: t.door ? 'A solid-core door with seals at the stairs: roughly 25–30 dB less sound upstairs.' : 'The stairwell is open to the main floor: bass and dialogue go straight up.' });
-  rows.forEach((r) => { r.pts = GRADE_PTS[r.g]; });
-  const W = { ssv: 2, flat: 1.5, ring: 1, head: 1, rt: 1.2, refl: 1.2, angles: 1, spl: 0.8, iso: 0.5 };
-  const total = rows.reduce((s, r) => s + r.pts * W[r.key], 0) / rows.reduce((s, r) => s + W[r.key], 0);
-  return { rows, total: Math.round(total) };
+/** Each seat's bass: how far it strays from the target (after EQ), and its biggest problem. */
+function seatReport(A) {
+  const F = A.ctx.F, [lo, hi] = [20, 100];
+  return A.resp.map((r) => {
+    const sm = smoothDb(r.db, 6), dev = []; F.forEach((f, i) => { if (f >= lo && f <= hi) dev.push({ f, d: sm[i] - A.m.level - targetAt(f) }); });
+    const rms = Math.sqrt(dev.reduce((a, b) => a + b.d * b.d, 0) / dev.length);
+    const big = dev.reduce((a, b) => (Math.abs(b.d) > Math.abs(a.d) ? b : a));
+    return { seat: r.seat, rms, score: lin(rms, 1.5, 7), verdict: spotWord(rms), issue: Math.abs(big.d) >= 3 ? big : null };
+  });
 }
-/** Prioritised advice, each with its predicted effect. */
-function tuneAdvice(A) {
-  const t = state.tune, out = [], ctx = A.ctx;
-  // subs: what would two or more, placed well, do?
-  const presets = compareConfigs(subPresets());
-  const best = presets.slice().sort((a, b) => a.score - b.score)[0];
-  if (best && best.ssv < A.m.ssv - 1) out.push({ pri: A.m.ssv - best.ssv, title: `Subwoofers: ${best.label.replace(/^\d · /, `${best.subs.length} `)}`, detail: `Seat-to-seat variation ${A.m.ssv.toFixed(1)} → ${best.ssv.toFixed(1)} dB. ${best.subs.map((s) => s.label).join(' + ')}. The optimiser on the Bass tab can do better still.`, act: { kind: 'subs', subs: best.subs, label: 'Place them' } });
-  if (A.sweep && A.sweep.best && A.sweep.best.off !== 0 && A.sweep.cur && A.sweep.cur.score - A.sweep.best.score > 0.8) {
-    const b = A.sweep.best; out.push({ pri: (A.sweep.cur.score - b.score) * 0.8, title: `Move the sofa ${Math.abs(b.off)}″ ${b.off > 0 ? 'forward' : 'back'}`, detail: `Main-seat bass ±${A.sweep.cur.flat.toFixed(1)} → ±${b.flat.toFixed(1)} dB: the seats move off a null.`, act: { kind: 'row', off: b.off, label: 'Move it' } });
+/** Plain sentences for each quality. */
+function findings(A) {
+  const F = A.ctx.F, t = state.tune, out = {};
+  // bass at every seat: the seat and note that differ most from the rest of the sofa
+  const main = A.resp.filter((r) => r.seat.main || t.allSeats);
+  if (A.m.ssv <= 2.5 || main.length < 2) out.seats = `Everyone on the sofa hears much the same bass: within ±${A.m.ssv.toFixed(1)} dB of each other (pros aim for ±3).`;
+  else {
+    const sm = main.map((r) => smoothDb(r.db, 3)); let best = { d: 0 };
+    F.forEach((f, i) => { if (f < 25 || f > 100) return; const avg = 10 * Math.log10(sm.reduce((a, s) => a + 10 ** (s[i] / 10), 0) / sm.length); sm.forEach((s, k) => { const d = s[i] - avg; if (Math.abs(d) > Math.abs(best.d)) best = { d, f, seat: main[k].seat }; }); });
+    out.seats = `${best.seat.mlp ? 'The main seat' : best.seat.label} gets ${Math.abs(best.d).toFixed(0)} dB ${best.d < 0 ? 'less' : 'more'} bass than the rest of the sofa around ${hz(best.f)} (${noteName(best.f)}: ${bassWhat(best.f)}). Seat to seat the bass varies by ±${A.m.ssv.toFixed(1)} dB; pros aim for ±3.`;
   }
-  if (A.ring > 0.08 && (t.traps || 0) < 4) out.push({ pri: A.ring * 8, title: `Bass traps in the ${(t.traps || 0) < 2 ? 'two front corners' : 'rear corners'}`, detail: `Modal ringing is ${A.ring.toFixed(2)} s over target. Floor-to-ceiling corner traps damp almost every mode at once.`, act: { kind: 'traps', n: Math.min(4, (t.traps || 0) + 2), label: 'Add traps' } });
-  if (A.worst && A.worst.level > -10 && !t.reflPanels) out.push({ pri: (A.worst.level + 10) * 0.6 + 1, title: '2″ panels at the side-wall reflection points', detail: `Worst early reflection ${A.worst.level.toFixed(1)} dB (${A.worst.surface}). Panels there bring the side walls below −10 dB and sharpen dialogue and imaging.`, act: { kind: 'refl', label: 'Add panels' } });
-  if (A.floorWorst && A.floorWorst.level > -6) out.push({ pri: 0.9, title: 'Rug between the speakers and the seats', detail: `The floor bounce from the ${CHANNELS[A.floorWorst.ch].name.toLowerCase()} lands ${ftin(Math.hypot(A.floorWorst.x - A.mlp.x, A.floorWorst.y - A.mlp.y))} in front of the main seat at ${A.floorWorst.level.toFixed(1)} dB. A thick rug with a felt pad there takes the edge off it.` });
-  if (A.early.some((q) => q.kind === 'ceiling' && q.level > -10) && !t.cloud) out.push({ pri: 1.2, title: 'A ceiling cloud over the seats', detail: 'The ceiling bounce from the front speakers arrives within 5 ms. A 4″ cloud (4 × 6 ft) absorbs it.', act: { kind: 'cloud', label: 'Add a cloud' } });
-  if (A.rt.rtMid > 0.42) out.push({ pri: (A.rt.rtMid - 0.4) * 10, title: 'Add absorption: the room is live', detail: `RT60 ${A.rt.rtMid.toFixed(2)} s. Rear-wall 4″ panels and a large rug bring it toward 0.3 s.`, act: !t.rearPanels ? { kind: 'rear', label: 'Add rear panels' } : null });
-  if (A.rt.rtMid < 0.18) out.push({ pri: 1, title: 'The room is too dead', detail: `RT60 ${A.rt.rtMid.toFixed(2)} s: swap some absorption for diffusion (slats, bookshelves) to keep it lively.` });
-  if (A.m.flat > 2.5 && !t.eqOn) out.push({ pri: 2, title: 'Turn on the room EQ', detail: 'Automatic parametric EQ cuts the room\'s peaks at the seats.', act: { kind: 'eq', label: 'Turn on' } });
-  const fb = A.lay.filter((c) => c.fallback);
-  if (fb.length) out.push({ pri: 0.8, title: `${fb.map((c) => c.name).join(' and ')}: no wall at the right angle`, detail: 'Those directions point into the stair opening; the plan uses angled in-ceiling speakers there.' });
-  const lowHr = A.lay.filter((c) => c.headroom < 0);
-  if (lowHr.length) out.push({ pri: 1, title: 'More amplifier or more sensitive speakers', detail: `${lowHr.map((c) => c.k).join(', ')} can't reach 105 dB peaks. Try ${t.amp < 200 ? '200 W per channel' : 'higher-sensitivity speakers'}.` });
-  if (A.headroom < 0) out.push({ pri: -A.headroom / 3 + 0.5, title: 'More bass output', detail: `${(-A.headroom).toFixed(1)} dB short of 115 dB LFE peaks between 25 and 80 Hz. A second sub adds about 6 dB; a larger model adds more.` });
-  if (!t.door) out.push({ pri: 0.3, title: 'Keep the movie downstairs', detail: 'A solid-core door with seals at the top or bottom of the stairs cuts sound to the main floor by roughly 25–30 dB.', act: { kind: 'door', label: 'Plan a door' } });
-  return out.sort((a, b) => b.pri - a.pri);
+  // tight bass: the worst peak, null and ring at the main seat, as you'd hear them (after the room EQ)
+  const mi = Math.max(0, A.resp.findIndex((r) => r.seat.mlp)), s0 = smoothDb(A.resp[mi].db, 12), s1 = smoothDb(A.raw[mi].db, 12);
+  let pk = { d: -99 }, nl = { d: 99 }, pk0 = { d: -99 };
+  F.forEach((f, i) => { if (f < 20 || f > 120) return; const d = s0[i] - A.m.level - targetAt(f), d0 = s1[i] - A.mRaw.level - targetAt(f); if (d > pk.d) pk = { d, f }; if (d < nl.d) nl = { d, f }; if (d0 > pk0.d) pk0 = { d: d0, f }; });
+  const tightOk = A.q.tight >= 85, parts = [];
+  if (tightOk) parts.push(`Tight and even at the main seat (±${A.m.flatMlp.toFixed(1)} dB)${A.eq.length && pk0.d > 4 ? `: the room EQ takes care of its ${hz(pk0.f)} peak` : ''}.`);
+  else {
+    if (pk.d > 4) parts.push(`At the main seat ${hz(pk.f)} (${noteName(pk.f)}) is ${pk.d.toFixed(0)} dB too loud, even with room EQ: bass lines boom on that note.`);
+    else if (A.eq.length && pk0.d > 4) parts.push(`The room EQ tames a ${pk0.d.toFixed(0)} dB peak at ${hz(pk0.f)} (${noteName(pk0.f)}).`);
+    if (A.ringWorst && A.ring > 0.08) parts.push(`Around ${hz(A.ringWorst.fc)} the bass keeps ringing for ${A.ringWorst.t60.toFixed(2)} s after the note stops (${A.ring.toFixed(2)} s too long): kick drums blur into a hum.`);
+    if (nl.d < -8) parts.push(`${hz(nl.f)} drops ${(-nl.d).toFixed(0)} dB: notes there go missing. EQ can't fill a hole like that; sub placement can.`);
+    if (!parts.length) parts.push(`Mostly even at the main seat (±${A.m.flatMlp.toFixed(1)} dB).`);
+  }
+  out.tight = parts.join(' ');
+  // dialogue
+  const w = A.worst, rtTxt = A.rt.rtMid < 0.2 ? 'very dead: it can feel lifeless' : A.rt.rtMid <= 0.4 ? 'just right for a room this size' : 'lively: dialogue blurs as you turn it up';
+  const who = w ? (w.seat === 'MLP' ? 'the main seat' : w.seat.toLowerCase()) : '';
+  const effect = !w ? '' : w.kind === 'ceiling' ? 'Your ear can\'t separate the two, so voices sound harder and flatter.'
+    : w.surface === 'back wall' ? 'Heads close to the wall get its bounce almost with the direct sound, which colours voices and makes them boxy.'
+      : /TV|front/.test(w.surface) ? 'It bounces back from behind the speakers and softens the attack of voices.'
+        : 'Your ear can\'t separate the two, so voices smear and seem to come from the wall instead of the screen.';
+  const cq = A.q.clarity;
+  out.clarity = cq >= 85 ? `Voices stay clear and anchored to the screen: early bounces are well under control${w ? ` (the strongest left, off the ${w.kind === 'ceiling' ? 'ceiling' : w.surface} at ${who}, is ${(-w.level).toFixed(0)} dB down)` : ''}. The echo time (${A.rt.rtMid.toFixed(2)} s) is ${rtTxt}.`
+    : (w && w.level > -10
+    ? `${cq >= 70 ? 'Mostly clear, but s' : 'S'}ound from the ${CHANNELS[w.ch].name.toLowerCase()} bounces off the ${w.kind === 'ceiling' ? 'ceiling' : w.surface} and reaches ${who} ${w.delay.toFixed(0)} ms after the direct sound, only ${(-w.level).toFixed(0)} dB quieter. ${effect} `
+    : 'No strong early echoes reach the sofa: voices stay crisp and anchored to the screen. ') + `The echo time (${A.rt.rtMid.toFixed(2)} s) is ${rtTxt}.`;
+  // immersion
+  const bad = A.lay.filter((c) => !c.ok), n = A.lay.length;
+  if (!bad.length) out.immersion = `All ${n} speakers of the ${t.layout} layout sit at the angles Dolby recommends from the main seat, so effects move smoothly around and over you.`;
+  else {
+    const why = bad.map((c) => (c.k.startsWith('TR') ? `${c.name.toLowerCase()} (the sofa is too close to the back wall to put them far enough behind you)` : c.fallback ? `${c.name.toLowerCase()} (that direction points into the stair opening, so it goes in the ceiling)` : `${c.name.toLowerCase()} (${c.actual} instead of ${c.target})`));
+    out.immersion = `${n - bad.length} of ${n} speakers sit at Dolby's angles. Off: ${why.join('; ')}.`;
+  }
+  out.privacy = t.door ? 'A solid-core door with seals at the stairs keeps most of the movie downstairs (roughly 25–30 dB quieter upstairs).'
+    : 'The stairwell is open to the main floor, so dialogue and bass carry straight up: anyone upstairs hears the movie almost as well as you do.';
+  return out;
 }
+
+// ---------------- the plan ----------------
+let PLAN = null, planJob = null;
+const planKey = () => JSON.stringify([state.items.map((i) => [i.id, i.type, i.x, i.y, i.rot, i.p]), state.tune, state.room, state.tv, state.finish]);
+function subLabel(subs) { return subs.map((s) => s.label).join(' and '); }
+/** Work out the plan (async: the subwoofer search takes a moment). Resolves to null if the layout changed meanwhile. */
+function buildPlan(onProgress = () => {}) {
+  const key = planKey();
+  if (PLAN && PLAN.key === key) return Promise.resolve(PLAN);
+  if (planJob && planJob.key === key) return planJob.p;
+  const p = (async () => {
+    const before = TA && TA.key === key ? TA : assess(); if (!before) return null;
+    onProgress('Comparing subwoofer layouts'); await tick();
+    const presets = compareConfigs(subPresets());
+    const o1 = await optimiseSubs({ n: 1 }); onProgress('Searching spots for two subwoofers'); await tick();
+    const o2 = await optimiseSubs({ n: 2 });
+    if (planKey() !== key) return null;
+    const pick = (list) => list.filter(Boolean).sort((a, b) => a.score - b.score)[0];
+    const best1 = pick([...(o1 || []).slice(0, 1), ...presets.filter((c) => c.subs.length === 1)]);
+    const best2 = pick([...(o2 || []).slice(0, 1), ...presets.filter((c) => c.subs.length === 2)]);
+    const work = clone(state), steps = [];
+    let prev = before;
+    const sim = (mutate) => withState(work, () => { mutate(work); return assess(); });
+    const step = (s, after) => { s.before = prev.q; s.after = after.q; s.gain = after.overall - prev.overall; steps.push(s); prev = after; };
+    const realSubs = state.items.filter((i) => i.type === 'subwoofer').length;
+    // 1 · subwoofers
+    {
+      const two = best2 && best1 && best2.ssv < best1.ssv - 0.8, cfg = two ? best2 : best1;
+      if (cfg && (!realSubs || cfg.ssv < before.m.ssv - 1)) {
+        const n = cfg.subs.length, ids = [];
+        const after = sim((w) => {
+          w.items = w.items.filter((i) => i.type !== 'subwoofer');
+          cfg.subs.forEach((s) => { const id = uid('sub'); ids.push(id); w.items.push({ id, type: 'subwoofer', x: s.x, y: s.y, rot: 0, p: {} }); w.tune.dsp[id] = { g: s.g || 0, d: s.d || 0, pol: s.pol || 1 }; });
+        });
+        const dsp = cfg.subs.map((s, i) => (s.g || s.d || s.pol === -1 ? `SW${i + 1}: ${s.g ? `${sgn(s.g)} dB` : ''}${s.d ? ` ${s.d} ms delay` : ''}${s.pol === -1 ? ' polarity inverted' : ''}`.trim() : null)).filter(Boolean);
+        const more = Math.max(0, n - realSubs), price = SUB_PRICE[state.tune.sub];
+        step({ key: 'subs', icon: 'sub', title: realSubs ? `Move the subwoofer${n > 1 ? 's' : ''}: ${subLabel(cfg.subs)}` : n === 2 ? `Two subwoofers: ${subLabel(cfg.subs)}` : `One subwoofer: ${subLabel(cfg.subs)}`,
+          why: n === 2 ? 'Two subs at these spots drive the room\'s standing waves against each other, so one sub fills the dips the other leaves. That evens out the bass along the whole sofa, which no EQ can do.'
+            : 'From this spot the subwoofer drives the room\'s standing waves evenly enough that every seat gets similar bass.',
+          note: [dsp.length ? `Settings: ${dsp.join(' · ')} (on your receiver's sub outputs, or a miniDSP).` : '', 'Then let the receiver\'s room correction (or the EQ in the report) tidy what\'s left.'].filter(Boolean).join(' '),
+          cost: more ? `${usd(price[0] * more, price[1] * more)} for ${more === 1 ? 'a' : more === 2 ? 'two' : more} ${SUB_MODELS[state.tune.sub].label} sub${more > 1 ? 's' : ''}` : 'free', effort: '1 hour', act: { kind: 'subs', subs: cfg.subs } }, after);
+      }
+    }
+    // 2 · room EQ
+    if (!state.tune.eqOn) step({ key: 'eq', icon: 'eq', title: 'Turn on room EQ', why: 'Cuts the room\'s bass peaks at the seats so no note booms.', note: 'Dirac Live or Audyssey in most AV receivers does this; the filters are in the report.', cost: '$0–250', effort: '30 minutes', act: { kind: 'tune', patch: { eqOn: true } } }, sim((w) => { w.tune.eqOn = true; }));
+    // 3 · the sofa's position
+    {
+      const L = withState(work, () => mainSeatLine()), sw = L && withState(work, () => rowSweep(bassCtx(), currentSubs()));
+      if (sw && sw.best && sw.best.off !== 0 && sw.cur && sw.cur.score - sw.best.score > 0.6) {
+        const off = sw.best.off;
+        const after = sim((w) => { const it = w.items.find((i) => i.id === L.it.id); it.x += L.ez[0] * off; it.y += L.ez[1] * off; });
+        step({ key: 'sofa', icon: 'sofa', title: `Slide the sofa ${Math.abs(off)}″ ${off > 0 ? 'toward the TV' : 'back'}`, why: `The seats move out of a spot where the room's standing waves cancel: main-seat bass goes from ±${sw.cur.flat.toFixed(1)} to ±${sw.best.flat.toFixed(1)} dB.`, cost: 'free', effort: '10 minutes', act: { kind: 'row', off } }, after);
+      }
+    }
+    // 4 · bass traps
+    if (prev.ring > 0.05 || prev.q.tight < 75) {
+      let n = 2, after = sim((w) => { w.tune.traps = Math.max(w.tune.traps || 0, 2); });
+      if (after.ring > 0.1) { const a4 = sim((w) => { w.tune.traps = 4; }); if (a4.q.tight > after.q.tight + 3) { n = 4; after = a4; } else work.tune.traps = 2; }
+      if (after.q.tight > prev.q.tight + 2 || after.ring < prev.ring - 0.04) {
+        step({ key: 'traps', icon: 'trap', title: `Bass traps in the ${n === 2 ? 'two front corners' : 'four corners'}`, why: `Corners are where every standing wave is loudest, so thick floor-to-ceiling traps there soak up the ringing${prev.ringWorst ? `: the ${hz(prev.ringWorst.fc)} hang goes from ${prev.ringWorst.t60.toFixed(2)} s toward ${decayTarget(prev.ringWorst.fc).toFixed(2)} s` : ''}.`, cost: usd(150 * n, 300 * n), effort: 'an afternoon', act: { kind: 'tune', patch: { traps: n } } }, after);
+      } else work.tune.traps = state.tune.traps;
+    }
+    // 5 · treatment for dialogue: the early bounces add up, so treating one of several barely helps and treating all
+    // of them helps a lot. Like a pro, it's one package: side-wall panels, a ceiling cloud, thick panels behind the sofa
+    {
+      const parts = [];
+      if (prev.sideWorst && prev.sideWorst.level > -10 && !work.tune.reflPanels) {
+        const spots = withState(work, () => acReflectionPanelSpots()), walls = [...new Set(spots.map((s) => s.run.wall))];
+        const where = walls.filter((w) => /left|right/.test(w)).length === 2 && walls.length === 2 ? 'left and right walls' : walls.length > 2 ? `${walls.slice(0, -1).join(', ')} and ${walls[walls.length - 1]}` : walls.join(' and ');
+        parts.push({ flag: 'reflPanels', text: `${spots.length} 2″ panels (2 × 4 ft) on the ${where}, where the front speakers' first bounce lands for every seat`, lo: 60 * spots.length, hi: 150 * spots.length });
+      }
+      if (prev.ceilWorst && prev.ceilWorst.level > -10 && !work.tune.cloud) {
+        const c = withState(work, () => acCloudSpot());
+        parts.push({ flag: 'cloud', text: `a 4″ ceiling cloud${c ? `, ${Math.round(c.w / 12)} × ${Math.round(c.d / 12)} ft, halfway between the screen and the sofa` : ''}`, lo: 250, hi: c && c.w > 72 ? 800 : 500 });
+      }
+      if (((prev.backWorst && prev.backWorst.level > -10) || prev.rt.rtMid > 0.42) && !work.tune.rearPanels) {
+        const n = withState(work, () => acRearSpots()).length;
+        parts.push({ flag: 'rearPanels', text: `${n} thick (4″) panels on the wall right behind your heads`, lo: 100 * n, hi: 200 * n });
+      }
+      if (parts.length) {
+        const why = [prev.backWorst && prev.backWorst.level > -10 ? 'The sofa sits against the back wall, so its bounce arrives almost with the direct sound and colours voices.' : '',
+          prev.sideWorst && prev.sideWorst.level > -10 ? 'The side walls and ceiling bounce the front speakers back within a few milliseconds, which smears dialogue and pulls voices off the screen.' : '',
+          'Several bounces of similar strength add up, so they\'re treated together: fixing one alone barely helps.'].filter(Boolean).join(' ');
+        const lo = parts.reduce((a, q) => a + q.lo, 0), hi = parts.reduce((a, q) => a + q.hi, 0);
+        const patch = Object.fromEntries(parts.map((q) => [q.flag, true]));
+        step({ key: 'treat', icon: 'panel', title: 'Acoustic treatment for clear dialogue', why, note: `What goes where: ${parts.map((q) => `${q.text} (${usd(q.lo, q.hi)})`).join('; ')}. The Dialogue tab shows each spot.`,
+          parts, cost: usd(lo, hi), effort: 'a weekend', act: { kind: 'tune', patch } }, sim((w) => Object.assign(w.tune, patch)));
+      }
+    }
+    // 8 · the floor bounce (a rug can't be simulated as a spot treatment: advice only)
+    if (prev.floorWorst && prev.floorWorst.level > -6 && prev.floorWorst.mat !== 'rug') steps.push({ key: 'rug', icon: 'rug', title: 'Rug between the screen and the sofa', why: `The bounce off the bare floor ${ftin(Math.hypot(prev.floorWorst.x - prev.mlp.x, prev.floorWorst.y - prev.mlp.y))} in front of the main seat is loud (${prev.floorWorst.level.toFixed(0)} dB). A thick rug with a felt pad there softens it.`, cost: usd(150, 400), effort: '10 minutes', before: prev.q, after: prev.q, gain: 0, info: true });
+    // 9 · a layout that fits
+    if (prev.lay.some((c) => !c.ok)) {
+      const order = ['9.1.6', '7.1.4', '5.1.4', '7.1', '5.1.2', '5.1'];
+      const cur = work.tune.layout, okCount = (k) => withState(work, () => tuneLayout(k)).filter((c) => c.ok).length;
+      const alt = order.find((k) => k !== cur && withState(work, () => tuneLayout(k)).every((c) => c.ok) && LAYOUTS[k].length >= okCount(cur) - 1);
+      if (alt) step({ key: 'layout', icon: 'spk', title: `Use a ${alt} layout instead of ${cur}`, why: `Every speaker of ${alt} can sit at Dolby's angles in this room; ${prev.lay.filter((c) => !c.ok).map((c) => c.k).join(', ')} of ${cur} can't.`, cost: LAYOUTS[alt].length < LAYOUTS[cur].length ? 'saves speakers' : 'more speakers', effort: 'planning', act: { kind: 'tune', patch: { layout: alt } } }, sim((w) => { w.tune.layout = alt; }));
+    }
+    // 10 · the door
+    if (!work.tune.door) step({ key: 'door', icon: 'door', title: 'A solid-core door at the stairs', why: 'An open stairwell carries the movie to the main floor. A solid-core door with perimeter seals and a drop seal cuts it by roughly 25–30 dB.', cost: usd(600, 1200) + ' installed', effort: 'a day (pro)', act: { kind: 'tune', patch: { door: true } } }, sim((w) => { w.tune.door = true; }));
+    const res = { key, before, after: prev, steps, work, best1, best2, presets };
+    PLAN = res; planJob = null;
+    return res;
+  })();
+  planJob = { key, p };
+  p.catch(() => { planJob = null; });
+  return p;
+}
+
+// ---------------- what to buy ----------------
+/** In-room maximum bass at the main seat for a subwoofer model and positions (dB SPL per frequency). */
+function inRoomMax(ctx, subs, model, eq) {
+  const F = ctx.F, seat = ctx.seats.find((s) => s.mlp) || ctx.seats[0], gmax = Math.max(...subs.map((s) => 10 ** ((s.g || 0) / 20)));
+  const tr = subs.map((s) => ctxTransfer(ctx, s.x, s.y, AC.subZ, seat));
+  const out = F.map((f, i) => {
+    let re = 0, im = 0;
+    subs.forEach((s, k) => { const w = subW(s, f); re += (tr[k][2 * i] * w[0] - tr[k][2 * i + 1] * w[1]) / gmax; im += (tr[k][2 * i] * w[1] + tr[k][2 * i + 1] * w[0]) / gmax; });
+    const boost = eq && eq.length ? Math.max(0, 20 * Math.log10(Math.hypot(...eqResp(eq, f)))) : 0;
+    return subMax(model, f) + db(re * FF, im * FF) - boost;
+  });
+  return smoothDb(out, 6);
+}
+/** Which subwoofers (one or two of each class) reach the bass peaks the chosen loudness asks for. */
+function subSizing(A, plan) {
+  const need = 115 + (state.tune.refLvl ?? -5), F = A.ctx.F, rows = [];
+  const pos = { 1: plan && plan.best1 ? plan.best1.subs : A.subs.slice(0, 1), 2: plan && plan.best2 ? plan.best2.subs : null };
+  for (const n of [1, 2]) for (const [k, mdl] of Object.entries(SUB_MODELS)) {
+    if (!pos[n]) continue;
+    const mx = inRoomMax(A.ctx, pos[n], k, A.eq);
+    const band = F.map((f, i) => [f, mx[i]]).filter(([f]) => f >= 25 && f <= 80), low = Math.min(...band.map((b) => b[1]));
+    const at20 = mx[F.findIndex((f) => f >= 20)];
+    rows.push({ n, model: k, label: `${n === 2 ? 'Two' : 'One'} ${mdl.label}`, margin: low - need, deep: at20 - need, price: SUB_PRICE[k].map((v) => v * n) });
+  }
+  rows.sort((a, b) => a.price[0] - b.price[0]);
+  const pickRow = rows.find((r) => r.margin >= 0 && r.deep >= -6) || rows.find((r) => r.margin >= 0) || rows.reduce((a, b) => (b.margin > a.margin ? b : a));
+  return { need, rows, pick: pickRow };
+}
+/** Speaker sensitivity needed per group for the chosen loudness, at 100 W and 200 W. */
+function speakerSizing(A) {
+  const need = 105 + (state.tune.refLvl ?? -5), groups = [
+    ['Front left and right', (c) => c.k === 'L' || c.k === 'R'], ['Centre', (c) => c.k === 'C'],
+    ['Surrounds', (c) => /^(S|B|W)/.test(c.k)], ['Ceiling (Atmos)', (c) => c.k.startsWith('T')],
+  ];
+  return groups.map(([label, f]) => {
+    const cs = A.lay.filter(f); if (!cs.length) return null;
+    const d = Math.max(...cs.map((c) => c.dist)), dm = d * AC.IN;
+    const sens = (P) => Math.ceil(need - 10 * Math.log10(P) + 20 * Math.log10(Math.max(0.3, dm)) - 1);
+    return { label, n: cs.length, dist: d, s100: sens(100), s200: sens(200) };
+  }).filter(Boolean);
+}
+const sensHint = (s) => (s <= 85 ? 'almost any speaker' : s <= 88 ? 'most bookshelf and in-wall speakers' : s <= 91 ? 'towers and efficient bookshelves' : s <= 95 ? 'high-sensitivity designs' : 'horn-loaded or pro cinema speakers');
 
 // ---- 67-tune-draw.js ----
 // ===================================================================
@@ -8014,23 +8356,23 @@ function attachHover(cv, tip, onPick) {
   cv.addEventListener('pointerleave', () => tip.classList.remove('on'));
   cv.addEventListener('click', (e) => { if (!cv._ax) return; const r = cv.getBoundingClientRect(); const f = cv._ax.inv(e.clientX - r.left); if (f >= 15 && f <= 200) onPick(f); });
 }
+/** Seat responses relative to the calibrated target: 0 = exactly right, the green band = sounds even. */
 function drawResponse(cv, tip, V) {
   const { c, W, H } = chartCtx(cv), F = V.ctx.F, t = state.tune, sm = (d) => smoothDb(d, TV.smooth);
-  const series = V.resp.map((r) => sm(r.db)), mean = sm(V.m.mean);
-  const all = series.flat ? [].concat(...series.map((s) => Array.from(s))) : [];
-  const hi = Math.ceil((Math.max(...all) + 3) / 5) * 5, lo = Math.max(hi - 45, Math.floor((Math.min(...all) - 2) / 5) * 5);
-  const ax = freqAxes(c, W, H, { y0: lo, y1: hi });
-  // target band ±3 dB around the level
-  c.fillStyle = 'rgba(214,164,99,0.10)'; c.beginPath();
-  F.forEach((f, i) => { const y = ax.Y(V.m.level + targetAt(f) + 3); if (i) c.lineTo(ax.X(f), y); else c.moveTo(ax.X(f), y); });
-  for (let i = F.length - 1; i >= 0; i--) c.lineTo(ax.X(F[i]), ax.Y(V.m.level + targetAt(F[i]) - 3)); c.closePath(); c.fill();
-  const [b0, b1] = bassBand(); c.fillStyle = 'rgba(255,255,255,0.03)'; c.fillRect(ax.l, ax.t, ax.X(b0) - ax.l, H - ax.t - ax.b); c.fillRect(ax.X(b1), ax.t, W - ax.r - ax.X(b1), H - ax.t - ax.b);
+  const rel = (d) => { const s2 = sm(d); return Float64Array.from(s2, (v, i) => clamp(v - V.m.level - targetAt(F[i]), -19, 13)); };
+  const series = V.resp.map((r) => rel(r.db)), mean = rel(V.m.mean);
+  const ax = freqAxes(c, W, H, { y0: -18, y1: 12, ystep: 6, unit: 'dB' });
+  c.fillStyle = 'rgba(143,191,138,0.13)'; c.fillRect(ax.l, ax.Y(3), W - ax.l - ax.r, ax.Y(-3) - ax.Y(3));
+  c.strokeStyle = 'rgba(143,191,138,0.55)'; c.beginPath(); c.moveTo(ax.l, ax.Y(0)); c.lineTo(W - ax.r, ax.Y(0)); c.stroke();
+  c.fillStyle = 'rgba(169,156,138,0.75)'; c.textAlign = 'left'; c.fillText('▲ boomy', ax.l + 6, ax.Y(10)); c.fillText('▼ thin / missing', ax.l + 6, ax.Y(-15));
+  c.fillStyle = 'rgba(143,191,138,0.8)'; c.textAlign = 'right'; c.fillText('sounds even', W - ax.r - 6, ax.Y(2));
+  const [b0, b1] = bassBand(); c.fillStyle = 'rgba(0,0,0,0.25)'; c.fillRect(ax.l, ax.t, ax.X(b0) - ax.l, H - ax.t - ax.b); c.fillRect(ax.X(b1), ax.t, W - ax.r - ax.X(b1), H - ax.t - ax.b);
   V.resp.forEach((r, i) => { if (!r.seat.mlp) polyline(c, F, series[i], ax.X, ax.Y, seatColor(r.seat, i) + (r.seat.main || t.allSeats ? 'cc' : '44'), 1.1); });
   const mi = V.resp.findIndex((r) => r.seat.mlp); if (mi >= 0) polyline(c, F, series[mi], ax.X, ax.Y, '#d6a463', 2.2);
-  polyline(c, F, mean, ax.X, ax.Y, '#efe6d8', 1.4, [5, 4]);
-  if (!TV.band) { c.strokeStyle = 'rgba(239,230,216,0.5)'; c.beginPath(); c.moveTo(ax.X(TV.f), ax.t); c.lineTo(ax.X(TV.f), H - ax.b); c.stroke(); }
+  polyline(c, F, mean, ax.X, ax.Y, '#efe6d8', 1.3, [5, 4]);
+  if (TV.mapKind === 'note') { c.strokeStyle = 'rgba(239,230,216,0.5)'; c.beginPath(); c.moveTo(ax.X(TV.f), ax.t); c.lineTo(ax.X(TV.f), H - ax.b); c.stroke(); }
   cv._ax = ax;
-  cv._read = (f) => { const i = Math.min(F.length - 1, Math.max(0, Math.round(AC.ppo * Math.log2(f / F[0])))); return `<b>${fmtF(F[i])}</b>` + V.resp.map((r, k) => `<span style="color:${seatColor(r.seat, k)}">${r.seat.label} ${series[k][i].toFixed(1)}</span>`).join('') + `<span>avg ${mean[i].toFixed(1)} dB</span>`; };
+  cv._read = (f) => { const i = Math.min(F.length - 1, Math.max(0, Math.round(AC.ppo * Math.log2(f / F[0])))); return `<b>${fmtF(F[i])} · ${noteName(F[i])}</b>` + V.resp.map((r, k) => `<span style="color:${seatColor(r.seat, k)}">${r.seat.label} ${sgn(series[k][i])} dB</span>`).join('') + `<span>sofa average ${sgn(mean[i])} dB</span>`; };
 }
 function drawWaterfall(cv, V) {
   const { c, W, H } = chartCtx(cv), mlp = V.ctx.seats.find((s) => s.mlp) || V.ctx.seats[0];
@@ -8058,14 +8400,14 @@ function drawDecay(cv) {
   for (let v = 0; v <= ymax; v += 0.2) { c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(W - r, Y(v)); c.stroke(); c.textAlign = 'right'; c.fillText(v.toFixed(1), l - 5, Y(v)); }
   c.textAlign = 'left'; c.fillText('s', 4, t + 4);
   d.forEach((q, i) => {
-    const x = l + i * bw, tg = decayTarget(q.fc, TA.rt.rtMid);
+    const x = l + i * bw, tg = decayTarget(q.fc);
     if (q.t60) { c.fillStyle = q.t60 > tg + 0.1 ? '#e07a62' : q.t60 > tg ? '#e2b55a' : '#8fbf8a'; c.fillRect(x + bw * 0.2, Y(q.t60), bw * 0.6, Y(0) - Y(q.t60)); }
     c.strokeStyle = '#efe6d8'; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(x + 2, Y(tg)); c.lineTo(x + bw - 2, Y(tg)); c.stroke(); c.setLineDash([]);
     c.fillStyle = CH_INK.text; c.textAlign = 'center'; c.fillText(String(q.fc), x + bw / 2, H - 9);
   });
 }
-function drawSweep(cv) {
-  const { c, W, H } = chartCtx(cv), s = TA.sweep, pts = s.pts, l = 36, r = 10, t = 10, b = 20;
+function drawSweep(cv, s) {
+  const { c, W, H } = chartCtx(cv), pts = s.pts, l = 36, r = 10, t = 10, b = 20;
   const ymax = Math.ceil(Math.max(...pts.map((p) => Math.max(p.flat, p.ssv))) + 1), X = (o) => l + (W - l - r) * (o + 42) / 84, Y = (v) => t + (H - t - b) * (1 - v / ymax);
   c.fillStyle = 'rgba(255,255,255,0.05)'; for (const p of pts) if (!p.fits) c.fillRect(X(p.off) - (W - l - r) / 56, t, (W - l - r) / 28, H - t - b);
   c.strokeStyle = CH_INK.grid; c.fillStyle = CH_INK.text;
@@ -8127,7 +8469,7 @@ function fieldAt(S, damp, subs, f, z) {
 /** dB relative to the room average (cinema cells) for one frequency or a band. */
 function mapDb(S, damp, subs, z) {
   const g = S.grid, pw = new Float64Array(g.N);
-  const fs = TV.band ? logFreqs(20, 80, 12) : [TV.f];
+  const fs = [TV.f];
   for (const f of fs) { const { re, im } = fieldAt(S, damp, subs, f, z); for (let i = 0; i < g.N; i++) pw[i] += re[i] * re[i] + im[i] * im[i]; }
   let m = 0, n = 0; for (let i = 0; i < g.N; i++) if (g.room[i]) { m += pw[i]; n++; }
   const ref = m / n, out = new Float32Array(g.N); for (let i = 0; i < g.N; i++) out[i] = 10 * Math.log10(pw[i] / ref + 1e-12);
@@ -8155,96 +8497,301 @@ function paintGrid(S, val, colorOf, contour = 3) {
   c.putImageData(img, 0, 0);
   return cv;
 }
+// "where the bass is good": how far each spot strays from the target, 20–100 Hz, level-matched on the sofa
+const QSTOPS = [[1.5, [88, 176, 132]], [3, [146, 196, 118]], [4.5, [222, 196, 98]], [6, [232, 146, 78]], [8.5, [214, 92, 78]]];
+function qualColor(v) {
+  if (v <= QSTOPS[0][0]) return QSTOPS[0][1];
+  for (let i = 1; i < QSTOPS.length; i++) if (v <= QSTOPS[i][0]) { const [a, ca] = QSTOPS[i - 1], [b, cb] = QSTOPS[i], u = (v - a) / (b - a); return ca.map((x, k) => x + (cb[k] - x) * u); }
+  return QSTOPS[QSTOPS.length - 1][1];
+}
+const qualWord = (v) => spotWord(v);
+let QCACHE = null;
+function qualityVals(S, ctx, subs, eq) {
+  const key = JSON.stringify([ctx.key, subs, eq]); if (QCACHE && QCACHE.key === key) return QCACHE.v;
+  const g = S.grid, t = state.tune, F = logFreqs(20, 100, 12), nf = F.length, N = g.N, D = new Float32Array(N * nf);
+  F.forEach((f, j) => {
+    const { re, im } = fieldAt(S, ctx.damp, subs, f, AC.ear);
+    let ch = cmul(subResp(t.sub, f), lr4('lp', t.signal === 'managed' ? t.xo : 120, f)); if (eq && eq.length) ch = cmul(ch, eqResp(eq, f));
+    const cd = 10 * Math.log10(ch[0] ** 2 + ch[1] ** 2) + 20 * Math.log10(FF) - targetAt(f);
+    for (let i = 0; i < N; i++) D[i * nf + j] = 10 * Math.log10(re[i] * re[i] + im[i] * im[i] + 1e-30) + cd;
+  });
+  // 1/6-octave smoothing (power), as for the seats
+  for (let i = 0; i < N; i++) {
+    const row = Array.from({ length: nf }, (_, j) => 10 ** (D[i * nf + j] / 10));
+    for (let j = 0; j < nf; j++) { const a = row[Math.max(0, j - 1)], b = row[j], c = row[Math.min(nf - 1, j + 1)]; D[i * nf + j] = 10 * Math.log10((a + 2 * b + c) / 4); }
+  }
+  const M = new Float32Array(N); for (let i = 0; i < N; i++) { let s2 = 0; for (let j = 0; j < nf; j++) s2 += D[i * nf + j]; M[i] = s2 / nf; }
+  const seats = ctx.seats.filter((q) => q.main); let ref = 0;
+  for (const s2 of seats) for (const [k, w] of acProbe(g, s2.x, s2.y)) ref += w * M[k] / seats.length;
+  const v = new Float32Array(N); for (let i = 0; i < N; i++) { let e = 0; for (let j = 0; j < nf; j++) e += (D[i * nf + j] - ref) ** 2; v[i] = Math.sqrt(e / nf); }
+  QCACHE = { key, v };
+  return v;
+}
 const TUNE_LINE = new THREE.LineBasicMaterial({ color: '#7fb3d5', transparent: true, opacity: 0.6, depthTest: false });
-/** Rebuild everything the tuning studio draws in the room for the current tab. */
 function disposeTune() {
-  tuneGroup.traverse((o) => { if (o.material && !o.material.isShared) { if (o.material.map) o.material.map.dispose(); if (o.material !== TUNE_LINE) o.material.dispose(); } });
+  tuneGroup.traverse((o) => { if (o.material) { if (o.material.map) o.material.map.dispose(); if (o.material !== TUNE_LINE) o.material.dispose(); } });
   disposeGroup(tuneGroup); invalidate(2);
 }
+/** Rebuild everything the tuning studio draws in the room for the current tab. */
 function drawTuneOverlay() {
   disposeTune();
   if (!TV.open || !ACS || !TA) return;
-  const S = ACS, g = S.grid, plan = mode === 'plan', ctx = TA.ctx, subs = previewOrCurrent();
+  const S = ACS, g = S.grid, plan = mode === 'plan', ctx = TA.ctx, subs = previewOrCurrent(), tab = TV.tab;
   const top = plan ? state.room.ceiling + 6 : null;
   const addLabel = (text, pos, cls) => { const el = document.createElement('div'); const inner = document.createElement('div'); inner.className = cls; inner.textContent = text; el.append(inner); const o = new CSS2DObject(el); o.position.copy(pos); tuneGroup.add(o); return inner; };
-  // floor map: bass (overview, bass) or a mode shape (modes)
-  let vals = null, color = mapColor, contour = 3;
-  if (TV.tab === 'modes' && TV.modeSel != null) {
-    const md = S.modes3[TV.modeSel], psi = S.modes2[md.m].psi, mx = Math.max(...Array.from(psi, Math.abs));
-    vals = Float32Array.from(psi, (v) => v / mx); contour = 0;
-    color = (v) => (Math.abs(v) < 0.04 ? [240, 236, 226] : v > 0 ? mapColor(lerp(0, 10, v)) : mapColor(lerp(0, -15, -v)));
-  } else if (TV.tab === 'bass' || TV.tab === 'overview') vals = mapDb(S, ctx.damp, subs, AC.ear);
+  const mapTabs = { summary: 1, plan: 1, bass: 1, report: 1 };
+  // the floor map
+  let vals = null, color = mapColor, contour = 3, kind = TV.mapKind;
+  if (mapTabs[tab]) {
+    if (kind === 'mode' && TV.modeSel != null && S.modes3[TV.modeSel]) {
+      const md = S.modes3[TV.modeSel], psi = S.modes2[md.m].psi, mx = Math.max(...Array.from(psi, Math.abs));
+      vals = Float32Array.from(psi, (v) => v / mx); contour = 0;
+      color = (v) => (Math.abs(v) < 0.04 ? [240, 236, 226] : v > 0 ? mapColor(lerp(0, 10, v)) : mapColor(lerp(0, -15, -v)));
+    } else if (kind === 'note') vals = mapDb(S, ctx.damp, subs, AC.ear);
+    else { kind = 'quality'; vals = qualityVals(S, ctx, subs, TV.preview ? autoEQ(ctx, subs) : TA.eq); color = qualColor; contour = 1.5; }
+  }
   if (vals) {
     const tex = new THREE.CanvasTexture(paintGrid(S, vals, color, contour)); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     const w = g.nx * g.g, hh = g.ny * g.g;
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: !plan, opacity: plan ? 0.82 : 0.85, toneMapped: false }));
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: !plan, opacity: plan ? 0.8 : 0.85, toneMapped: false }));
     mesh.rotation.x = -Math.PI / 2; mesh.position.copy(P(g.x0 + w / 2, g.y0 + hh / 2, plan ? state.room.ceiling + 2 : 0.7)); mesh.renderOrder = plan ? 30 : 2; mesh.userData.noShadow = true;
     tuneGroup.add(mesh);
-    // seat values
-    if (TV.tab !== 'modes') {
-      const probe = (x, y) => { const pr = acProbe(g, x, y); let s = 0; for (const [k, w2] of pr) s += w2 * vals[k]; return s; };
-      ctx.seats.forEach((s) => { const v = probe(s.x, s.y), txt = sgn(v, 0) || '0'; addLabel(s.mlp ? `MLP ${txt}` : txt, P(s.x, s.y, plan ? top : AC.ear + 4), 'dim tseat' + (s.mlp ? ' mlp' : '') + (v < -6 ? ' null' : v > 4 ? ' peak' : '')).title = s.label; });
+    if (kind !== 'mode') {
+      const probe = (x, y) => { const pr = acProbe(g, x, y); let s2 = 0; for (const [k, w2] of pr) s2 += w2 * vals[k]; return s2; };
+      ctx.seats.forEach((s) => {
+        const v = probe(s.x, s.y), pos = P(s.x, s.y, plan ? top : AC.ear + 4);
+        if (kind === 'quality') { const wd = qualWord(v), short = s.mlp ? 'MLP' : s.label.replace(/^Seat /, '').replace(/^Chair /, 'C'); addLabel(short, pos, `dim tseat q${wd[0]}${s.mlp ? ' mlp' : ''}`).title = `${s.label}: ${wd} (strays ±${v.toFixed(1)} dB from the target)`; }
+        else addLabel(s.mlp ? `MLP ${sgn(v, 0) || '0'}` : sgn(v, 0) || '0', pos, 'dim tseat' + (s.mlp ? ' mlp' : '') + (v < -6 ? ' null' : v > 4 ? ' peak' : '')).title = s.label;
+      });
     }
+    subs.forEach((s, i) => addLabel(`SW${i + 1}${TV.preview ? '?' : ''}`, P(s.x, s.y, plan ? top : 18), 'dim tsub'));
   }
-  // subwoofers
-  if (TV.tab === 'bass' || TV.tab === 'overview' || TV.tab === 'modes') subs.forEach((s, i) => addLabel(`SW${i + 1}${TV.preview ? '?' : ''}`, P(s.x, s.y, plan ? top : 18), 'dim tsub'));
   // planned treatment (outlines)
   const t = state.tune, mat = new THREE.MeshBasicMaterial({ color: '#d6a463', transparent: true, opacity: 0.28, depthWrite: false });
   const edge = new THREE.LineBasicMaterial({ color: '#d6a463', transparent: true, opacity: 0.9 });
   const box = (x, y, z, w, d, hh, rotY = 0) => { const geo = new THREE.BoxGeometry(w, hh, d), m = new THREE.Mesh(geo, mat); m.position.copy(P(x, y, z)); m.rotation.y = rotY; m.userData.noShadow = true; const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edge); m.add(e); tuneGroup.add(m); };
-  if (TV.tab !== 'speakers') {
+  if (tab !== 'speakers') {
     for (const s of acTrapSpots().slice(0, t.traps || 0)) box(s.x, s.y, state.room.ceiling / 2, 16, 16, state.room.ceiling - 2, Math.PI / 4);
     const wallBox = (s, thick) => { const w = roomWalls().reduce((b, q) => { const d = Math.abs((s.x - q.a[0]) * q.n[0] + (s.y - q.a[1]) * q.n[1]); return d < b.d ? { d, q } : b; }, { d: Infinity }).q; if (!w) return; box(s.x + w.n[0] * thick / 2, s.y + w.n[1] * thick / 2, s.z, 24, thick, 48, Math.atan2(w.n[0], w.n[1])); };
-    if (t.reflPanels) for (const s of acReflectionPanelSpots()) wallBox(s, 2);
+    if (t.reflPanels || tab === 'dialogue') for (const s of acReflectionPanelSpots()) wallBox(s, t.reflPanels ? 2 : 0.6);
     if (t.rearPanels) for (const s of acRearSpots()) wallBox(s, 4);
-    if (t.cloud) { const m = mainSeat(); if (m) box(m.x, m.y + 20, state.room.ceiling - 4, 72, 48, 4); }
+    const cl = t.cloud && acCloudSpot(); if (cl) box(cl.x, cl.y, state.room.ceiling - 4, cl.w, cl.d, 4);
   }
+  const mlp = TA.mlp, eye = P(mlp.x, mlp.y, plan ? top : AC.ear);
   // speakers
-  if (TV.tab === 'speakers' || TV.tab === 'refl') {
+  if (tab === 'speakers') {
     const disc = new THREE.MeshBasicMaterial({ color: '#7fb3d5', depthTest: false, transparent: true, opacity: 0.95 });
-    const mlp = TA.mlp, eye = P(mlp.x, mlp.y, plan ? top : AC.ear);
     for (const ch of TA.lay) {
       const pos = P(ch.p[0], ch.p[1], plan ? top : ch.z), sp = new THREE.Mesh(new THREE.SphereGeometry(3.2, 16, 12), disc); sp.position.copy(pos); sp.renderOrder = 31; tuneGroup.add(sp);
       const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([eye, pos]), TUNE_LINE); ln.renderOrder = 30; tuneGroup.add(ln);
-      addLabel(ch.k, pos, 'dim spk' + (ch.ok ? '' : ' bad'));
+      addLabel(ch.k, pos, 'dim spk' + (ch.ok ? '' : ' bad')).title = `${ch.name}: ${ch.actual} (Dolby ${ch.target})`;
+    }
+  }
+  // the first bounces of the front three (or the chosen speaker) at the main seat
+  if (tab === 'dialogue') {
+    const chans = TA.lay.filter((c) => (TV.reflCh === 'front' ? ['L', 'C', 'R'].includes(c.k) : c.k === TV.reflCh));
+    for (const ch of chans) {
+      const spk = P(ch.p[0], ch.p[1], plan ? top : ch.z);
+      addLabel(ch.k, spk, 'dim spk');
+      for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: mlp.x, y: mlp.y, z: AC.ear })) {
+        if (q.delay > 15 || q.kind === 'floor') continue;
+        const bad = q.level > -10, pt = P(q.x, q.y, plan ? top : q.z);
+        const lm = new THREE.LineDashedMaterial({ color: bad ? '#e07a62' : '#8fbf8a', dashSize: 3, gapSize: 2, transparent: true, opacity: 0.8, depthTest: false });
+        const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([spk, pt, eye]), lm); ln.computeLineDistances(); ln.renderOrder = 30; tuneGroup.add(ln);
+        addLabel(bad ? `${q.level.toFixed(0)} dB` : 'ok', pt, 'dim trefl' + (bad ? ' bad' : ''));
+      }
     }
     const dot = new THREE.Mesh(new THREE.SphereGeometry(2.4, 16, 12), new THREE.MeshBasicMaterial({ color: '#d6a463', depthTest: false })); dot.position.copy(eye); dot.renderOrder = 31; tuneGroup.add(dot);
   }
-  // reflection points of the chosen speaker
-  if (TV.tab === 'refl') {
-    const ch = TA.lay.find((c) => c.k === TV.reflCh) || TA.lay[0], spk = P(ch.p[0], ch.p[1], plan ? top : ch.z), eye = P(TA.mlp.x, TA.mlp.y, plan ? top : AC.ear);
-    for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: TA.mlp.x, y: TA.mlp.y, z: AC.ear })) {
-      if (q.delay > 25) continue;
-      const bad = q.delay < 15 && q.level > -10, pt = P(q.x, q.y, plan ? top : q.z);
-      const lm = new THREE.LineDashedMaterial({ color: bad ? '#e07a62' : '#8fbf8a', dashSize: 3, gapSize: 2, transparent: true, opacity: 0.8, depthTest: false });
-      const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([spk, pt, eye]), lm); ln.computeLineDistances(); ln.renderOrder = 30; tuneGroup.add(ln);
-      addLabel(`${q.surface} ${q.level.toFixed(0)} dB`, pt, 'dim trefl' + (bad ? ' bad' : ''));
-    }
+}
+
+// ---- 67-tune-listen.js ----
+// ===================================================================
+// 67 · Hear it: the bass at a seat, rendered from the room model.
+// The model's response at the seat (subs, crossover, DSP and EQ, every room mode with its decay) is turned
+// into an impulse response at audio rate and a test track is played through it: the low end goes through
+// the room, everything above the crossover plays dry, as it would through the main speakers. Each version is
+// level-matched on the sofa's average (as a calibrated system would be), so what you hear is the evenness,
+// the boom and the ringing, not a volume change. A/B: today · with the plan · an ideal room.
+// ===================================================================
+const LISTEN = { ac: null, src: null, g: {}, which: 'now', track: 'music', seat: 'MLP', playing: false, key: '', busy: false, sweepT0: 0, sweepTimer: 0 };
+const TRACKS = { music: 'Bass line and drums', rumble: 'Movie rumble', sweep: 'Slow bass sweep' };
+const SWEEP = { f0: 18, f1: 180, dur: 12 };
+
+/** Test tracks, synthesised (mono). */
+function synthTrack(kind, sr) {
+  let seed = 12345; const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x3fffffff - 1; };
+  if (kind === 'sweep') {
+    const n = Math.round(SWEEP.dur * sr), y = new Float32Array(n), k = Math.log(SWEEP.f1 / SWEEP.f0) / SWEEP.dur;
+    for (let i = 0; i < n; i++) { const t = i / sr, ph = 2 * Math.PI * SWEEP.f0 * (Math.exp(k * t) - 1) / k, fade = Math.min(1, t / 0.3, (SWEEP.dur - t) / 0.3); y[i] = 0.45 * fade * Math.sin(ph); }
+    return y;
   }
+  const beat = 0.6, len = kind === 'rumble' ? 9.6 : 16 * beat, n = Math.round(len * sr), y = new Float32Array(n);
+  const add = (t0, dur, fn) => { const i0 = Math.round(t0 * sr), m = Math.min(n - i0, Math.round(dur * sr)); for (let i = 0; i < m; i++) y[i0 + i] += fn(i / sr); };
+  if (kind === 'rumble') {
+    for (const t0 of [0.2, 4.9]) {
+      let a = 0, b = 0, c = 0; const lp = 2 * Math.PI * 55 / sr;
+      add(t0, 4.4, (t) => { a += lp * (rnd() - a); b += lp * (a - b); c += lp * (b - c); const env = Math.min(1, t / 0.03) * Math.exp(-t / 1.4); return 9 * c * env; });
+      let ph = 0; add(t0 + 0.05, 3, (t) => { const f = 28 + 30 * Math.exp(-t / 0.7); ph += 2 * Math.PI * f / sr; return 0.42 * Math.sin(ph) * Math.min(1, t / 0.02) * Math.exp(-t / 1.1); });
+      add(t0, 0.25, (t) => 0.35 * rnd() * Math.exp(-t / 0.03));                         // the crack on top
+    }
+  } else {
+    const notes = [55, 55, 65.41, 73.42, 41.2, 41.2, 49, 61.74, 43.65, 43.65, 55, 65.41, 49, 49, 61.74, 73.42];
+    notes.forEach((f, b) => {
+      const t0 = b * beat;
+      add(t0, beat * 0.97, (t) => { const env = (1 - Math.exp(-t / 0.004)) * Math.exp(-t / 0.5) * Math.min(1, (beat * 0.97 - t) / 0.01); return 0.32 * env * (Math.sin(2 * Math.PI * f * t) + 0.35 * Math.sin(4 * Math.PI * f * t + 0.3) + 0.18 * Math.sin(6 * Math.PI * f * t)); });
+      if (b % 2 === 0) { let ph = 0; add(t0, 0.45, (t) => { ph += 2 * Math.PI * (46 + 110 * Math.exp(-t / 0.03)) / sr; return 0.55 * Math.sin(ph) * Math.exp(-t / 0.17) + 0.12 * rnd() * Math.exp(-t / 0.002); }); }
+      else add(t0, 0.3, (t) => 0.16 * rnd() * Math.exp(-t / 0.08) + 0.1 * Math.sin(2 * Math.PI * 185 * t) * Math.exp(-t / 0.05));
+      for (const hh of [0, 0.5]) { let last = 0; add(t0 + hh * beat, 0.08, (t) => { const x = rnd(), d = x - last; last = x; return 0.05 * d * Math.exp(-t / 0.014); }); }
+    });
+  }
+  return y;
+}
+
+/** Impulse response of the low end at a seat (the current state), sample rate sr. norm: dB to subtract. */
+function seatIR(subs, eq, seat, sr) {
+  const ctx = bassCtx(), t = state.tune, N = 65536, df = sr / N, kMax = Math.ceil(260 / df);
+  const F = Array.from({ length: kMax }, (_, i) => (i + 1) * df);
+  const inv = acInv(ctx.S, ctx.damp, F), cr = acCoef(ctx.S, seat.x, seat.y, seat.z || AC.ear);
+  const H = new Float64Array(kMax * 2);
+  for (const s of subs) {
+    const tr = acTransfer(inv, acCoef(ctx.S, s.x, s.y, AC.subZ), cr);
+    F.forEach((f, i) => {
+      let w = cmul(subW(s, f), cmul(subResp(t.sub, f), lr4('lp', t.xo, f))); if (eq && eq.length) w = cmul(w, eqResp(eq, f));
+      const taper = f < 200 ? 1 : 0.5 + 0.5 * Math.cos(Math.PI * Math.min(1, (f - 200) / 60)), a = tr[2 * i] * FF * taper, b = tr[2 * i + 1] * FF * taper;
+      H[2 * i] += a * w[0] - b * w[1]; H[2 * i + 1] += a * w[1] + b * w[0];
+    });
+  }
+  return { H, F, N };
+}
+/** Calibrate a set of seat responses on the sofa's average power, 30–80 Hz, against the target shape. */
+function calibDb(list) {
+  let s = 0, n = 0;
+  for (const { H, F } of list) F.forEach((f, i) => { if (f >= 30 && f <= 80) { s += (H[2 * i] ** 2 + H[2 * i + 1] ** 2) / 10 ** (targetAt(f) / 10); n++; } });
+  return 10 * Math.log10(s / n);
+}
+function irBuffer(ac, { H, F, N }, normDb) {
+  const re = new Float64Array(N), im = new Float64Array(N), g = 10 ** (-normDb / 20);
+  F.forEach((f, i) => { re[i + 1] = H[2 * i] * g; im[i + 1] = H[2 * i + 1] * g; re[N - i - 1] = re[i + 1]; im[N - i - 1] = -im[i + 1]; });
+  fft(re, im, true);
+  const len = N, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0), fadeN = Math.round(0.15 * ac.sampleRate);
+  for (let i = 0; i < len; i++) d[i] = re[i] * (i > len - fadeN ? (len - i) / fadeN : 1);
+  return buf;
+}
+/** The ideal room: the target curve and the crossover, nothing else. */
+function idealResp(sr) {
+  const N = 65536, df = sr / N, kMax = Math.ceil(260 / df), F = Array.from({ length: kMax }, (_, i) => (i + 1) * df), H = new Float64Array(kMax * 2);
+  F.forEach((f, i) => { const w = cmul(subResp(state.tune.sub, f), lr4('lp', state.tune.xo, f)), g = 10 ** (targetAt(f) / 20); H[2 * i] = w[0] * g; H[2 * i + 1] = w[1] * g; });
+  return { H, F, N };
+}
+/** Build the three impulse responses for the chosen seat. */
+function listenBuffers(ac) {
+  const sr = ac.sampleRate, seatOf = (label) => { const all = acSeats(); return all.find((s) => s.label === label) || all.find((s) => s.mlp) || all[0]; };
+  const build = (A) => {
+    const main = acSeats().filter((s) => s.main), rs = main.map((s) => seatIR(A.subs, A.eq, s, sr)), norm = calibDb(rs);
+    return irBuffer(ac, seatIR(A.subs, A.eq, seatOf(LISTEN.seat), sr), norm);
+  };
+  const out = { now: build(TA) };
+  if (PLAN && PLAN.key === planKey()) out.plan = withState(PLAN.work, () => build(PLAN.after));
+  const ideal = idealResp(sr); out.ideal = irBuffer(ac, ideal, calibDb([ideal]));
+  return out;
+}
+async function listenPlay() {
+  if (LISTEN.playing) { listenStop(); return; }
+  if (!TA) return;
+  const AC2 = window.AudioContext || window.webkitAudioContext; if (!AC2) { toast('This browser cannot play audio'); return; }
+  LISTEN.busy = true; renderListen();
+  await tick();
+  try {
+    const ac = LISTEN.ac || (LISTEN.ac = new AC2());
+    if (ac.state === 'suspended') await ac.resume();
+    const irs = listenBuffers(ac), data = synthTrack(LISTEN.track, ac.sampleRate);
+    const buf = ac.createBuffer(1, data.length, ac.sampleRate); buf.getChannelData(0).set(data);
+    const src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+    const lim = ac.createDynamicsCompressor(); lim.threshold.value = -6; lim.ratio.value = 12; lim.attack.value = 0.003; lim.release.value = 0.25;
+    const master = ac.createGain(); master.gain.value = 0.75; lim.connect(master); master.connect(ac.destination);
+    // above the crossover: dry, through a Linkwitz–Riley high-pass (two Butterworth sections)
+    const hp1 = ac.createBiquadFilter(), hp2 = ac.createBiquadFilter();
+    for (const f of [hp1, hp2]) { f.type = 'highpass'; f.frequency.value = state.tune.xo; f.Q.value = Math.SQRT1_2; }
+    src.connect(hp1); hp1.connect(hp2); hp2.connect(lim);
+    LISTEN.g = {};
+    for (const [k, ir] of Object.entries(irs)) {
+      const cv = ac.createConvolver(); cv.normalize = false; cv.buffer = ir;
+      const g = ac.createGain(); g.gain.value = k === LISTEN.which ? 1 : 0;
+      src.connect(cv); cv.connect(g); g.connect(lim); LISTEN.g[k] = g;
+    }
+    if (!LISTEN.g[LISTEN.which]) { LISTEN.which = 'now'; LISTEN.g.now.gain.value = 1; }
+    src.start(); LISTEN.src = src; LISTEN.playing = true; LISTEN.key = planKey() + LISTEN.seat + LISTEN.track;
+    LISTEN.sweepT0 = ac.currentTime;
+    clearInterval(LISTEN.sweepTimer);
+    if (LISTEN.track === 'sweep') LISTEN.sweepTimer = setInterval(() => {
+      const t = (ac.currentTime - LISTEN.sweepT0) % SWEEP.dur, f = SWEEP.f0 * (SWEEP.f1 / SWEEP.f0) ** (t / SWEEP.dur);
+      const o = $('#listenNow'); if (o) o.textContent = `${hz(f)} · ${noteName(f)}`;
+      if (TV.open && (TV.tab === 'bass' || TV.tab === 'summary') && f <= 200) { TV.f = f; TV.mapKind = 'note'; drawTuneOverlay(); }
+    }, 160);
+  } catch (err) { console.error(err); toast('Could not start the audio'); }
+  LISTEN.busy = false; renderListen();
+}
+function listenStop() {
+  try { if (LISTEN.src) LISTEN.src.stop(); } catch (e) { /* already stopped */ }
+  LISTEN.src = null; LISTEN.playing = false; clearInterval(LISTEN.sweepTimer);
+  renderListen();
+}
+function listenSwitch(which) {
+  LISTEN.which = which;
+  if (LISTEN.playing && LISTEN.ac) for (const [k, g] of Object.entries(LISTEN.g)) g.gain.setTargetAtTime(k === which ? 1 : 0, LISTEN.ac.currentTime, 0.04);
+  renderListen();
+}
+/** Restart with new settings if playing (seat or track changed). */
+function listenRestart() { if (LISTEN.playing) { listenStop(); listenPlay(); } else renderListen(); }
+function listenCard() {
+  return h('div', { class: 'listen', id: 'listenCard' });
+}
+function renderListen() {
+  const box = $('#listenCard'); if (!box) return;
+  const seats = TA ? TA.ctx.seats.filter((s) => s.main).map((s) => s.label) : ['MLP'];
+  const planReady = PLAN && PLAN.key === planKey();
+  const ab = [['now', 'Today'], ['plan', 'With the plan'], ['ideal', 'Ideal room']];
+  box.replaceChildren(...[
+    h('div', { class: 'lhead' }, h('button', { class: 'lplay' + (LISTEN.playing ? ' on' : ''), 'aria-label': LISTEN.playing ? 'Stop' : 'Play', disabled: LISTEN.busy, onclick: listenPlay }, LISTEN.busy ? '…' : LISTEN.playing ? '■' : '▶'),
+      h('div', {}, h('b', {}, 'Hear the difference'), h('small', {}, 'Headphones or a good speaker: laptop and phone speakers can\'t play this low.'))),
+    h('div', { class: 'seg lab', role: 'group' }, ab.map(([k, l]) => h('button', { 'aria-pressed': String(LISTEN.which === k), disabled: k === 'plan' && !planReady, onclick: () => listenSwitch(k) }, l))),
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Track'), tchips(Object.entries(TRACKS), LISTEN.track, (v) => { LISTEN.track = v; listenRestart(); })),
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Seat'), tchips(seats.map((s) => [s, s]), LISTEN.seat, (v) => { LISTEN.seat = v; listenRestart(); })),
+    LISTEN.track === 'sweep' ? h('p', { class: 'note' }, 'The sweep climbs from 18 to 180 Hz over 12 seconds. Where it swells or fades is a peak or a null at this seat; the floor map follows it: ', h('b', { id: 'listenNow' }, LISTEN.playing ? '' : '—')) : null].filter(Boolean));
 }
 
 // ---- 67-tune-ui.js ----
 // ===================================================================
-// 67 · Cinema tuning studio: the panel, charts and the overlays in the room.
-//  Overview (scorecard, key figures, advice) · Bass (seat responses, bass map on the floor, subwoofer
-//  configurations and optimiser, per-sub DSP, room EQ, waterfall, decay, sofa position) · Modes ·
-//  Reverb (RT60 and treatment) · Reflections (ETC, points on the walls) · Speakers (layouts, angles,
-//  delays, trims, headroom) · Report (download / copy).
+// 67 · Cinema tuning studio, organised around what a customer wants to know:
+//  Summary  · how the room sounds today, and with the plan, in five qualities you can judge by ear
+//  Plan     · the steps, in order, each with what it changes, what it costs and how long it takes
+//  Bass     · every seat's bass, where in the room it's good, subwoofer options and sizing
+//  Dialogue · echoes and where panels go, echo time, sound reaching the floor above
+//  Speakers · the layout, where each speaker goes, and what to buy for the loudness you want
+//  Report   · the shopping list and the installer's settings
+// The engineering views (responses, EQ filters, waterfall, decay, modes, energy-time, RT60 tables)
+// sit under "Pro detail" in each tab.
 // ===================================================================
-const TV = { open: false, tab: 'overview', f: 42, band: true, preview: null, opt: null, optN: 2, optKeep: false, busy: '',
-  modeSel: null, reflCh: 'L', smooth: 6, prev: null, timer: 0, playing: 0 };
+const TV = { open: false, tab: 'summary', f: 41, mapKind: 'quality', preview: null, opt: null, optN: 2, optKeep: false, optRunning: null, busy: '',
+  modeSel: null, reflCh: 'front', smooth: 6, prev: null, timer: 0, planBusy: '',
+  pro: (() => { try { return localStorage.getItem('basement-cinema-pro') === '1'; } catch (e) { return false; } })() };
 const tuneGroup = new THREE.Group(); helpersGroup.add(tuneGroup);
 const SEAT_COLORS = ['#7fb3d5', '#d6a463', '#8fbf8a', '#c89bd6', '#e07a62', '#6fc2b8', '#c9c27a', '#b9a58c'];
-const TABS = [['overview', 'Overview'], ['bass', 'Bass'], ['modes', 'Modes'], ['reverb', 'Reverb'], ['refl', 'Reflections'], ['speakers', 'Speakers'], ['report', 'Report']];
+const TABS = [['summary', 'Summary'], ['plan', 'Plan'], ['bass', 'Bass'], ['dialogue', 'Dialogue'], ['speakers', 'Speakers'], ['report', 'Report']];
 const fmtF = (f) => (f >= 100 ? f.toFixed(0) : f.toFixed(1).replace(/\.0$/, '')) + ' Hz';
 const sgn = (v, d = 1) => { const r = Number(v.toFixed(d)); return `${r > 0 ? '+' : r < 0 ? '−' : ''}${Math.abs(r).toFixed(d)}`; };
+const VCLASS = { Excellent: 'qE', Good: 'qG', Fair: 'qF', Poor: 'qP' };
+const SUBNOTE = (n) => (n === 2 ? 'two subwoofers' : n === 1 ? 'one subwoofer' : `${n} subwoofers`);
 
 // ---------------- open / close ----------------
 function initTune() {
+  const pro = h('label', { class: 'mini-toggle pro-toggle', title: 'Show the engineering charts and tables in every tab' },
+    h('input', { type: 'checkbox', checked: TV.pro, onchange: (e) => { TV.pro = e.target.checked; try { localStorage.setItem('basement-cinema-pro', TV.pro ? '1' : '0'); } catch (err) { /* ok */ } renderTune(); } }), 'Pro detail');
   const panel = h('aside', { class: 'tune', id: 'tune', 'aria-label': 'Cinema tuning', hidden: true },
     h('header', { class: 'tune-head' },
-      h('div', { class: 'tune-titles' }, h('span', { class: 'tune-kicker' }, 'Cinema tuning'), h('h2', {}, 'Acoustic model of the basement'), h('p', { id: 'tuneSub' }, '')),
-      h('button', { class: 'tune-x', 'aria-label': 'Close tuning', onclick: () => closeTune() }, '✕')),
+      h('div', { class: 'tune-titles' }, h('span', { class: 'tune-kicker' }, 'Cinema tuning'), h('h2', {}, 'How your room will sound'), h('p', { id: 'tuneSub' }, '')),
+      pro, h('button', { class: 'tune-x', 'aria-label': 'Close tuning', onclick: () => closeTune() }, '✕')),
     h('nav', { class: 'tune-tabs', role: 'tablist' }, TABS.map(([k, label]) => h('button', { role: 'tab', 'data-tab': k, 'aria-selected': String(k === TV.tab), onclick: () => tuneTab(k) }, label))),
     h('div', { class: 'tune-body', id: 'tuneBody' }));
   $('#app').append(panel);
@@ -8269,14 +8816,15 @@ function openTune(tab) {
   setTimeout(() => { resize(); if (mode === 'plan') fitPlan(); }, 30);
 }
 function closeTune() {
-  TV.open = false; clearInterval(TV.playing); TV.playing = 0; TV.preview = null;
+  TV.open = false; TV.preview = null; listenStop();
   $('#tune').hidden = true; $('#app').classList.remove('tuning'); $('#tuneBtn').setAttribute('aria-pressed', 'false');
   if (TV.prev) { $('#leftPanel').classList.toggle('collapsed', !TV.prev.left); $('#rightPanel').classList.toggle('collapsed', !TV.prev.right); }
   disposeTune();
   setTimeout(() => { resize(); if (mode === 'plan') fitPlan(); }, 30);
 }
 function tuneTab(k, quiet) {
-  TV.tab = k; TV.modeSel = k === 'modes' ? TV.modeSel : null;
+  TV.tab = k;
+  if (k !== 'bass' && TV.mapKind === 'mode') TV.mapKind = 'quality';
   $$('.tune-tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
   renderTune(); if (!quiet) $('#tuneBody').scrollTop = 0;
 }
@@ -8290,8 +8838,16 @@ function ensureSolved() {
 }
 function tuneAnalyse() {
   if (!TV.open) return;
-  try { analyseRoom(); } catch (err) { console.error(err); }
+  try { TA = assess(); if (TA) TA.key = planKey(); } catch (err) { console.error(err); }
+  if (LISTEN.playing && LISTEN.key.indexOf(planKey()) !== 0) listenStop();
   renderTune();
+  // then the plan, in the background
+  if (TA && !(PLAN && PLAN.key === TA.key)) {
+    TV.planBusy = 'Working out your plan';
+    buildPlan((msg) => { TV.planBusy = msg; const el = $('#planBusy'); if (el) el.textContent = `${msg}…`; })
+      .then((pl) => { TV.planBusy = ''; if (pl && TV.open) renderTune(); })
+      .catch((err) => { console.error(err); TV.planBusy = ''; });
+  }
 }
 /** Called after any edit to the layout. */
 function tuneChanged() {
@@ -8304,256 +8860,343 @@ function setTune(patch, analyse = true) {
   pushHistory(); Object.assign(state.tune, patch); save();
   if (analyse) tuneAnalyse();
 }
+const planReady = () => PLAN && TA && PLAN.key === TA.key;
 
 // ---------------- rendering the panel ----------------
 function renderTune() {
   const body = $('#tuneBody'); if (!body || !TV.open) return;
-  const sub = $('#tuneSub');
-  if (ACS) sub.textContent = `${ACS.modes3.filter((m) => m.f <= 200).length} room modes below 200 Hz · ${ACS.grid.N.toLocaleString()} cells · ${state.tune.layout} · ${currentSubs().filter((s) => s.real).length || 'no'} sub${currentSubs().filter((s) => s.real).length === 1 ? '' : 's'}`;
+  const nSubs = currentSubs().filter((s) => s.real).length;
+  $('#tuneSub').textContent = `${state.tune.layout} · ${nSubs ? SUBNOTE(nSubs) : 'no subwoofer yet'} · listening level: ${refName().toLowerCase()}`;
   const keep = body.scrollTop;
   body.replaceChildren();
   if (TV.busy || !TA) {
-    body.append(h('div', { class: 'tune-busy' }, h('div', { class: 'tprog', id: 'tuneProgress' }, h('i')), h('p', { id: 'tuneProgressMsg' }, TV.busy || 'Analysing…'),
-      h('p', { class: 'note' }, 'Solving the wave equation on the real floor plan: the room, the TV alcove, the fireplace lounge, the stairs and the hall. Once per room shape; furniture and speaker changes are instant after that.')));
+    body.append(h('div', { class: 'tune-busy' }, h('div', { class: 'tprog', id: 'tuneProgress' }, h('i')), h('p', { id: 'tuneProgressMsg' }, TV.busy || 'Listening to the room…'),
+      h('p', { class: 'note' }, 'The planner is solving how sound waves behave in your actual floor plan: the room, the TV alcove, the fireplace lounge, the stairs and the hall. It takes a few seconds once; after that, moving furniture or speakers updates instantly.')));
     drawTuneOverlay(); return;
   }
-  const fn = { overview: tabOverview, bass: tabBass, modes: tabModes, reverb: tabReverb, refl: tabRefl, speakers: tabSpeakers, report: tabReport }[TV.tab];
+  const fn = { summary: tabSummary, plan: tabPlan, bass: tabBass, dialogue: tabDialogue, speakers: tabSpeakers, report: tabReport }[TV.tab];
   body.append(fn());
   body.scrollTop = keep;
-  requestAnimationFrame(() => { $$('canvas[data-chart]', body).forEach((cv) => cv._draw && cv._draw()); });
+  requestAnimationFrame(() => { $$('canvas[data-chart]', body).forEach((cv) => cv.offsetParent && cv._draw && cv._draw()); renderListen(); renderMapControls(); });
   drawTuneOverlay();
 }
 const sect = (title, ...kids) => h('section', { class: 'tsec' }, title ? h('h3', {}, title) : null, ...kids);
 const tchips = (opts, cur, pick, cls = '') => h('div', { class: 'chips ' + cls }, opts.map(([v, label]) => h('button', { class: 'chip', 'aria-pressed': String(v === cur), onclick: () => pick(v) }, label)));
-const kv = (k, v, sub) => h('div', { class: 'kv' }, h('span', {}, k), h('b', {}, v), sub ? h('small', {}, sub) : null);
-const gradeChip = (g) => h('span', { class: 'grade g' + g }, g);
-
-// ---------------- Overview ----------------
-function tabOverview() {
-  const A = TA, sc = A.score, rt = A.rt, S = ACS;
-  const ring = h('div', { class: 'scoring', style: `--s:${sc.total}` }, h('b', {}, String(sc.total)), h('small', {}, 'of 100'));
-  const first = S.modes3.find((m) => m.f > 1);
-  const top = h('div', { class: 'tov' }, ring, h('div', { class: 'kvs' },
-    kv('Room volume', `${A.rt.V.toFixed(0)} m³`, `${(A.rt.V * 35.315).toFixed(0)} ft³, not counting the stairs and hall`),
-    kv('Reverberation', `${rt.rtMid.toFixed(2)} s`, 'mid-band RT60'),
-    kv('Schroeder frequency', fmtF(rt.schroeder), 'below it, room modes rule'),
-    kv('Lowest mode', fmtF(first ? first.f : 0), 'the whole basement breathing through the hall')));
-  const rows = h('div', { class: 'scorecard' }, sc.rows.map((r) => h('details', { class: 'srow' },
-    h('summary', {}, h('span', { class: 'sl' }, r.label), h('span', { class: 'sv' }, r.value), gradeChip(r.g)), h('p', {}, r.note))));
-  const adv = h('div', { class: 'advice' }, A.advice.slice(0, 7).map((a, i) => h('div', { class: 'adv' },
-    h('span', { class: 'adv-n' }, String(i + 1)), h('div', {}, h('b', {}, a.title), h('p', {}, a.detail)),
-    a.act ? h('button', { class: 'btn' + (i === 0 ? ' primary' : ''), onclick: () => doAdvice(a.act) }, a.act.label) : null)));
-  return h('div', {}, sect(null, top), sect('Scorecard', rows, h('p', { class: 'note' }, 'Grades use targets common in professional home-cinema design (seat-to-seat bass within ±3 dB, RT60 0.2–0.4 s, no reflection above −10 dB in the first 15 ms, Dolby speaker angles). They follow the spirit of the CEDIA/CTA RP22 levels; this is a model, not a certification.')),
-    sect('What to do, in order', adv));
+const vchip = (v) => h('span', { class: 'vchip ' + VCLASS[v] }, v);
+/** A collapsible "Pro detail" block; its charts draw when it opens. */
+function pro(title, ...kids) {
+  const d = h('details', { class: 'pro', open: TV.pro }, h('summary', {}, h('span', { class: 'pro-tag' }, 'Pro'), title), h('div', { class: 'pro-body' }, ...kids));
+  d.addEventListener('toggle', () => { if (d.open) requestAnimationFrame(() => $$('canvas[data-chart]', d).forEach((cv) => cv._draw && cv._draw())); });
+  return d;
 }
-function doAdvice(act) {
-  if (act.kind === 'subs') { applySubConfig(act.subs); snack(`${act.subs.length} subwoofer${act.subs.length > 1 ? 's' : ''} placed`); }
-  else if (act.kind === 'row') { const L = mainSeatLine(); if (L) { pushHistory(); L.it.x += L.ez[0] * act.off; L.it.y += L.ez[1] * act.off; placeItem(itemObjects.get(L.it.id).group, L.it); commit(false); snack(`Sofa moved ${Math.abs(act.off)}″`); } }
-  else if (act.kind === 'traps') { setTune({ traps: act.n }); snack(`${act.n} corner bass traps added`); }
-  else if (act.kind === 'refl') { setTune({ reflPanels: true }); snack('Panels added at the reflection points'); }
-  else if (act.kind === 'cloud') { setTune({ cloud: true }); snack('Ceiling cloud added'); }
-  else if (act.kind === 'rear') { setTune({ rearPanels: true }); snack('Rear-wall panels added'); }
-  else if (act.kind === 'eq') { setTune({ eqOn: true }); }
-  else if (act.kind === 'door') { setTune({ door: true }); snack('Door at the stairs planned'); }
-  tuneChanged();
+function chart(cls, draw) { const cv = h('canvas', { class: 'chart ' + cls, 'data-chart': 1 }); cv._draw = () => draw(cv); return cv; }
+function loudnessChips() {
+  return h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'How loud'), tchips(Object.entries(LOUDNESS).map(([k, v]) => [Number(k), v.label]), state.tune.refLvl ?? -5, (v) => setTune({ refLvl: v })),
+    h('small', { class: 'tnote' }, loudness().note));
+}
+
+// ---------------- Summary ----------------
+const PHRASE = { seats: 'uneven bass along the sofa', tight: 'boomy, ringing bass', clarity: 'echoes that blur dialogue', immersion: 'speakers that can\'t reach the right angles', privacy: 'sound carrying upstairs' };
+function headline(A) {
+  const low = QUALITIES.filter((q) => q.key !== 'privacy' && A.q[q.key] < 70).sort((a, b) => A.q[a.key] - A.q[b.key]).map((q) => PHRASE[q.key]);
+  if (!low.length) return 'Your room is in good shape: even bass, clear dialogue and well-placed speakers.';
+  const list = low.length === 1 ? low[0] : `${low.slice(0, -1).join(', ')} and ${low[low.length - 1]}`;
+  return `${list[0].toUpperCase()}${list.slice(1)}.`;
+}
+function meter(today, after) {
+  return h('div', { class: 'meter' }, h('i', { class: 'm-scale' }),
+    after != null ? h('i', { class: 'm-gain', style: `left:${Math.min(today, after)}%;width:${Math.abs(after - today)}%` }) : null,
+    h('b', { class: 'm-now', style: `left:${today}%`, title: `Today: ${Math.round(today)}` }),
+    after != null ? h('b', { class: 'm-after', style: `left:${after}%`, title: `With the plan: ${Math.round(after)}` }) : null);
+}
+function tabSummary() {
+  const A = TA, P = planReady() ? PLAN : null, after = P ? P.after : null;
+  const cost = P ? planCost(P) : null, nSteps = P ? P.steps.filter((s) => !s.info).length : 0;
+  const done = P && !nSteps;
+  const hero = h('div', { class: 'hero' },
+    h('div', { class: 'hero-col' }, h('small', {}, done ? 'Your room' : 'Today'), h('b', {}, String(A.overall)), vchip(verdictOf(A.overall))),
+    done ? h('div', { class: 'hero-col' }, h('small', {}, 'Plan'), h('b', { class: 'busy' }, 'Nothing left to do: every step is in place.')) : null,
+    done ? null : h('div', { class: 'hero-arrow' }, '→'),
+    done ? null : h('div', { class: 'hero-col' + (P ? '' : ' wait') }, h('small', {}, 'With the plan'), P ? h('b', {}, String(after.overall)) : h('b', { id: 'planBusy', class: 'busy' }, `${TV.planBusy || 'Working out your plan'}…`), P ? vchip(verdictOf(after.overall)) : null));
+  const lead = h('p', { class: 'lead' }, headline(A), P && nSteps ? ` ${nSteps} steps fix most of it` + (cost ? `, for about ${usd(cost[0], cost[1])} in all.` : '.') : '');
+  const cards = h('div', { class: 'qcards' }, QUALITIES.map((q) => {
+    const v = A.q[q.key], a = after ? after.q[q.key] : null;
+    return h('button', { class: 'qcard', onclick: () => tuneTab(q.tab) },
+      h('div', { class: 'qhead' }, h('b', {}, q.title), vchip(verdictOf(v)), a != null && Math.round(a) > Math.round(v) + 2 ? h('span', { class: 'qto' }, '→ ', vchip(verdictOf(a))) : null),
+      h('small', { class: 'qask' }, q.ask), meter(v, a != null && a > v + 2 ? a : null), h('p', {}, A.say[q.key]));
+  }));
+  return h('div', {},
+    sect(null, hero, lead, P && nSteps ? h('div', { class: 'btnrow' }, h('button', { class: 'btn primary', onclick: () => tuneTab('plan') }, 'See the plan'), h('button', { class: 'btn', onclick: () => tuneTab('report') }, 'Shopping list')) : null),
+    sect('What you\'ll hear', cards, h('p', { class: 'note' }, 'Scores out of 100 from the room model. ● today · ○ with the plan. Tap a quality for the detail.')),
+    sect(null, listenCard()),
+    sect('What the analysis assumes', assumptions(A)));
+}
+function assumptions(A) {
+  const nSubs = currentSubs().filter((s) => s.real).length, t = state.tune;
+  return h('ul', { class: 'assume' },
+    h('li', {}, nSubs ? `${SUBNOTE(nSubs)} where you placed ${nSubs > 1 ? 'them' : 'it'}.` : 'No subwoofer in the layout yet: "today" assumes one in the front-right corner, where the pre-wire plan puts it. The plan shows where it should really go.'),
+    h('li', {}, `Speakers: a ${t.layout} layout placed at Dolby's angles from the main seat (change it in Speakers).`),
+    h('li', {}, `The sofa's ${A.ctx.seats.filter((s) => s.main).length} seats, ears 38″ up. The main listening position (MLP) is the seat facing the TV.`),
+    h('li', {}, loudnessChips()),
+    h('li', {}, 'Typical absorption for drywall, laminate and upholstery. It\'s a model: confirm with a measurement microphone (REW) once the gear is in.'));
+}
+
+// ---------------- Plan ----------------
+function planCost(P) {
+  let lo = 0, hi = 0;
+  for (const s of P.steps) { const m = String(s.cost).match(/\$([\d,]+)(?:–([\d,]+))?/); if (m) { const a = +m[1].replace(/,/g, ''), b = m[2] ? +m[2].replace(/,/g, '') : a; lo += a; hi += b; } }
+  return lo || hi ? [lo, hi] : null;
+}
+const QSHORT = { seats: 'Bass at every seat', tight: 'Tight bass', clarity: 'Dialogue', immersion: 'Immersion', privacy: 'Privacy' };
+function tabPlan() {
+  if (!planReady()) return h('div', { class: 'tune-busy' }, h('div', { class: 'tprog indet' }, h('i')), h('p', { id: 'planBusy' }, `${TV.planBusy || 'Working out your plan'}…`),
+    h('p', { class: 'note' }, 'Trying subwoofer layouts, the sofa\'s position, bass traps, panels and speaker layouts on a copy of your room, one after another, to find what helps most.'));
+  const P = PLAN, steps = P.steps, cost = planCost(P);
+  let score = P.before.overall;
+  const cards = steps.map((s, i) => {
+    const deltas = QUALITIES.map((q) => q.key).filter((k) => Math.round(s.after[k]) - Math.round(s.before[k]) >= 3)
+      .map((k) => (verdictOf(s.before[k]) === verdictOf(s.after[k])
+        ? h('span', { class: 'delta' }, QSHORT[k], ' ', vchip(verdictOf(s.after[k])), ` better (+${Math.round(s.after[k] - s.before[k])})`)
+        : h('span', { class: 'delta' }, QSHORT[k], ' ', vchip(verdictOf(s.before[k])), ' → ', vchip(verdictOf(s.after[k])))));
+    if (!s.info) score += s.gain;
+    return h('div', { class: 'step' + (s.info ? ' info' : '') },
+      h('span', { class: 'step-n' }, String(i + 1)),
+      h('div', { class: 'step-b' }, h('b', {}, s.title), h('p', {}, s.why), s.note ? h('p', { class: 'step-note' }, s.note) : null,
+        deltas.length ? h('div', { class: 'deltas' }, deltas) : s.info ? h('div', { class: 'deltas' }, h('span', { class: 'delta' }, 'Advice: the model can\'t score this one')) : null,
+        h('div', { class: 'step-meta' }, h('span', {}, '💲 ', s.cost), h('span', {}, '⏱ ', s.effort), !s.info ? h('span', {}, `Score ${Math.round(score - s.gain)} → ${Math.round(score)}`) : null)),
+      s.act ? h('div', { class: 'step-acts' },
+        s.act.kind === 'subs' ? h('button', { class: 'btn', onclick: () => { TV.preview = { label: s.title, subs: s.act.subs }; tuneTab('bass'); } }, 'Preview') : null,
+        h('button', { class: 'btn primary', onclick: () => { doStep(s.act); } }, 'Do it')) : null);
+  });
+  return h('div', {},
+    sect(null, h('div', { class: 'plan-head' },
+      h('div', {}, h('b', {}, `${steps.filter((s) => !s.info).length} steps · ${P.before.overall} → ${P.after.overall}`), h('small', {}, cost ? `About ${usd(cost[0], cost[1])} in all (typical retail, before installation)` : '')),
+      h('button', { class: 'btn primary', onclick: applyPlan }, 'Apply the whole plan')),
+      h('p', { class: 'note' }, 'In the order a pro would do them: subwoofers and seating first (they decide the bass), then treatment, then the door. Each step was tried on a copy of your room on top of the ones before it, so the effects add up as shown. Applying puts the subwoofers, panels and treatment into your layout (Undo takes them back).')),
+    sect(null, h('div', { class: 'steps' }, cards)));
+}
+/** Apply one step of the plan to the real layout. */
+function doStep(act, record = true) {
+  if (act.kind === 'subs') { applySubConfig(act.subs, record); if (record) snack(`${act.subs.length} subwoofer${act.subs.length > 1 ? 's' : ''} placed`); }
+  else if (act.kind === 'row') { const L = mainSeatLine(); if (L) { if (record) pushHistory(); L.it.x += L.ez[0] * act.off; L.it.y += L.ez[1] * act.off; placeItem(itemObjects.get(L.it.id).group, L.it); commit(false); if (record) snack(`Sofa moved ${Math.abs(act.off)}″`); } }
+  else if (act.kind === 'refl') { if (record) pushHistory(); state.tune.reflPanels = true; save(); }
+  else if (act.kind === 'tune') { if (record) pushHistory(); Object.assign(state.tune, act.patch); save(); }
+  TV.preview = null;
+  if (record) tuneChanged();
+}
+function applyPlan() {
+  if (!planReady()) return;
+  pushHistory();
+  for (const s of PLAN.steps) if (s.act) doStep(s.act, false);
+  commit(false); snack('Plan applied'); tuneChanged();
 }
 
 // ---------------- Bass ----------------
 function previewOrCurrent() { return TV.preview ? TV.preview.subs : currentSubs(); }
 function bassView() {
-  const ctx = TA.ctx, subs = previewOrCurrent(), t = state.tune;
-  const eq = t.eqOn ? (TV.preview ? autoEQ(ctx, subs) : TA.eq) : [];
-  const resp = bassResponses(ctx, subs, { eq: eq.length ? eq : null }), m = bassMetrics(resp, ctx.F);
-  return { ctx, subs, eq, resp, m };
+  if (!TV.preview) return { ctx: TA.ctx, subs: TA.subs, eq: TA.eq, resp: TA.resp, m: TA.m, raw: TA.raw };
+  const ctx = TA.ctx, subs = TV.preview.subs, eq = state.tune.eqOn ? autoEQ(ctx, subs) : [];
+  const resp = bassResponses(ctx, subs, { eq: eq.length ? eq : null });
+  return { ctx, subs, eq, resp, m: bassMetrics(resp, ctx.F), raw: bassResponses(ctx, subs, { eq: null }) };
 }
 function tabBass() {
-  const t = state.tune, V = bassView(), { ctx, m } = V, F = ctx.F;
-  const wrap = h('div', {});
+  const A = TA, V = bassView(), wrap = h('div', {});
   if (TV.preview) wrap.append(h('div', { class: 'preview-bar' }, h('span', {}, `Previewing: ${TV.preview.label}`),
     h('button', { class: 'btn primary', onclick: () => { applySubConfig(TV.preview.subs); TV.preview = null; snack('Subwoofers placed'); tuneChanged(); } }, 'Place them'),
     h('button', { class: 'btn', onclick: () => { TV.preview = null; renderTune(); } }, 'Cancel')));
-  // controls
-  wrap.append(sect(null,
-    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Signal'), tchips([['lfe', 'LFE (subs only)'], ['managed', 'Bass-managed L/R + subs']], t.signal, (v) => setTune({ signal: v }))),
-    t.signal === 'managed' ? h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Crossover'), tchips([[60, '60'], [80, '80'], [100, '100'], [120, '120 Hz']], t.xo, (v) => setTune({ xo: v }))) : null,
-    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Subwoofer'), tchips(Object.entries(SUB_MODELS).map(([k, s]) => [k, s.label]), t.sub, (v) => setTune({ sub: v }))),
-    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Target'), tchips(Object.entries(TARGETS).map(([k, s]) => [k, s.label]), t.target, (v) => setTune({ target: v, eq: [] }))),
-    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Show'), tchips([[0, 'Raw'], [24, '1/24'], [6, '1/6 oct'], [3, '1/3 oct']], TV.smooth, (v) => { TV.smooth = v; renderTune(); }),
-      h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: t.eqOn, onchange: (e) => setTune({ eqOn: e.target.checked }) }), 'Room EQ'),
-      h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: t.allSeats, onchange: (e) => setTune({ allSeats: e.target.checked }) }), 'Chairs too'))));
-  // metrics strip
-  wrap.append(h('div', { class: 'metrics' },
-    metric('Seat to seat', `±${m.ssv.toFixed(1)}`, 'dB', grade(m.ssv, [2.5, 3.5, 5])),
-    metric('Smoothness', `±${m.flat.toFixed(1)}`, 'dB', grade(m.flat, [2, 3, 4.5])),
-    metric('Main seat', `±${m.flatMlp.toFixed(1)}`, 'dB', grade(m.flatMlp, [2.5, 3.5, 5])),
-    metric('Extension', m.ext < 17 ? '<16' : m.ext.toFixed(0), 'Hz', grade(m.ext, [20, 25, 32]))));
-  // frequency response chart
-  const cv = h('canvas', { class: 'chart', 'data-chart': 1 }), tip = h('div', { class: 'ctip' });
-  cv._draw = () => drawResponse(cv, tip, V);
-  attachHover(cv, tip, (x) => { TV.f = x; TV.band = false; drawTuneOverlay(); renderMapControls(); });
-  wrap.append(sect('Frequency response at the seats', h('div', { class: 'chartwrap' }, cv, tip),
-    h('div', { class: 'legend' }, V.resp.map((r, i) => h('span', { class: 'lg' + (r.seat.main || t.allSeats ? '' : ' off') }, h('i', { style: `background:${seatColor(r.seat, i)}` }), r.seat.label)),
-      h('span', { class: 'lg' }, h('i', { class: 'dash' }), 'Average'), h('span', { class: 'lg' }, h('i', { class: 'band' }), 'Target')),
-    h('p', { class: 'note' }, `dB relative to the subwoofer's own output at 1 m outdoors: the room's gain and its peaks and nulls. Click the chart to see that frequency on the floor.`)));
+  // verdicts
+  const seatsRep = TV.preview ? seatReport({ ...A, resp: V.resp, m: V.m }) : A.seatsQ;
+  wrap.append(sect('Bass at every seat', h('p', { class: 'say' }, vchip(verdictOf(lin(V.m.ssv, 2, 7))), ' ', TV.preview ? `Seat to seat the bass varies by ±${V.m.ssv.toFixed(1)} dB with this layout (today ±${A.m.ssv.toFixed(1)}).` : A.say.seats),
+    h('div', { class: 'seatlist' }, seatsRep.filter((r) => r.seat.main || state.tune.allSeats).map((r) => h('div', { class: 'seatrow' },
+      h('b', {}, r.seat.label), vchip(r.verdict), h('span', { class: 'sbar' }, h('i', { style: `width:${clamp(100 - r.rms * 12, 6, 100)}%` })),
+      h('small', {}, r.issue ? `${r.issue.d < 0 ? 'thin' : 'boomy'} around ${hz(r.issue.f)} (${sgn(r.issue.d, 0)} dB)` : 'even all the way down')))),
+    h('p', { class: 'say' }, vchip(verdictOf(TV.preview ? 0.6 * lin(V.m.flat, 1.5, 5) + 0.4 * lin(A.ring, 0, 0.35) : A.q.tight)), ' ', A.say.tight)));
   // the map
-  wrap.append(sect('Bass map', h('div', { id: 'mapControls' }), h('p', { class: 'note' }, 'Colours on the floor show how loud each spot is compared with the room average at ear height (38″): blue are nulls, amber are peaks. The seats show their own value.')));
-  // subwoofers
-  wrap.append(subSection(V));
-  // EQ
-  if (V.eq.length) wrap.append(sect('Room EQ (all subs)', h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, '#'), h('th', {}, 'Frequency'), h('th', {}, 'Gain'), h('th', {}, 'Q'))),
-    h('tbody', {}, V.eq.map((q, i) => h('tr', {}, h('td', {}, String(i + 1)), h('td', {}, fmtF(q.f)), h('td', {}, `${sgn(q.g)} dB`), h('td', {}, q.q.toFixed(2)))))),
-    h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => copyText(eqText(V.eq), 'EQ filters copied') }, 'Copy filters'),
-      h('span', { class: 'note' }, `Fitted to the seating area's average with the ${TARGETS[t.target].label.toLowerCase()}. Cuts only, plus at most one broad +3 dB boost; nulls are left alone: EQ can't fill them.`))));
-  // waterfall
-  const wf = h('canvas', { class: 'chart tall', 'data-chart': 1 });
-  wf._draw = () => drawWaterfall(wf, V);
-  wrap.append(sect('Waterfall at the main seat', wf, h('p', { class: 'note' }, 'How the bass dies away after the sound stops, every 25 ms: long ridges are ringing modes (boomy, one-note bass).')));
-  // decay
-  const dc = h('canvas', { class: 'chart', 'data-chart': 1 });
-  dc._draw = () => drawDecay(dc);
-  wrap.append(sect('Low-frequency decay (T30) per third octave', dc, h('p', { class: 'note' }, `From the modelled impulse response at the main seat. Target: about the mid-band reverb time + 0.1 s (${(TA.rt.rtMid + 0.1).toFixed(2)} s), allowed to rise below 63 Hz.`)));
-  // sofa position
-  if (TA.sweep) {
-    const sw = h('canvas', { class: 'chart short', 'data-chart': 1 });
-    sw._draw = () => drawSweep(sw);
-    const b = TA.sweep.best;
-    wrap.append(sect('Where the sofa sits', sw, h('div', { class: 'btnrow' },
-      b && b.off !== 0 ? h('button', { class: 'btn', onclick: () => doAdvice({ kind: 'row', off: b.off }) }, `Move it ${Math.abs(b.off)}″ ${b.off > 0 ? 'forward' : 'back'}`) : h('span', { class: 'note' }, 'The sofa is already at the best spot it can reach.'),
-      h('span', { class: 'note' }, 'Main-seat smoothness (brass) and seat-to-seat variation (blue) as the whole sofa slides toward or away from the TV, subs fixed. Grey: it would hit a wall or the stairs.'))));
-  }
-  requestAnimationFrame(renderMapControls);
+  wrap.append(sect('Where in the room the bass is good', h('div', { id: 'mapControls' })));
+  // listening
+  wrap.append(sect(null, listenCard()));
+  // subwoofer options
+  wrap.append(subOptions(V));
+  // sizing
+  wrap.append(sizingSection());
+  // pro
+  wrap.append(proBass(V));
   return wrap;
 }
-function metric(label, v, unit, g) { return h('div', { class: 'metric' }, h('small', {}, label), h('b', {}, v, h('i', {}, unit)), gradeChip(g)); }
-const seatColor = (s, i) => (s.mlp ? '#d6a463' : SEAT_COLORS[(i + 3) % SEAT_COLORS.length]);
+const NOTE_PRESETS = [[25, 'Explosions'], [41, 'Low E string'], [55, 'Kick drum'], [80, 'Bass body']];
 function renderMapControls() {
   const box = $('#mapControls'); if (!box) return;
+  const kinds = tchips([['quality', 'Where it\'s good'], ['note', 'One note at a time']], TV.mapKind === 'mode' ? 'note' : TV.mapKind, (v) => { TV.mapKind = v; renderMapControls(); drawTuneOverlay(); });
+  if (TV.mapKind === 'quality') {
+    box.replaceChildren(kinds, h('p', { class: 'note' }, 'Colours on the floor: how far the bass at each spot strays from the target across 20–100 Hz, with the room EQ, level-matched on the sofa. Green sounds even and punchy; red is boomy in some notes and thin in others.'),
+      h('div', { class: 'qlegend' }, ['Excellent', 'Good', 'Fair', 'Poor'].map((v, i) => h('span', {}, h('i', { style: `background:rgb(${qualColor([1.5, 3.4, 5, 7.5][i]).map(Math.round).join(',')})` }), v))));
+    return;
+  }
   const lf = Math.log2(TV.f / 15) / Math.log2(200 / 15);
-  const sl = h('input', { type: 'range', min: 0, max: 1000, value: String(Math.round(lf * 1000)), 'aria-label': 'Map frequency' });
-  sl.addEventListener('input', () => { TV.f = 15 * (200 / 15) ** (sl.value / 1000); TV.band = false; out.textContent = TV.band ? '20–80 Hz' : fmtF(TV.f); drawTuneOverlay(); bandBtn.setAttribute('aria-pressed', 'false'); });
-  const out = h('b', { class: 'mapf' }, TV.band ? '20–80 Hz average' : fmtF(TV.f));
-  const bandBtn = h('button', { class: 'chip', 'aria-pressed': String(TV.band), onclick: () => { TV.band = !TV.band; renderMapControls(); drawTuneOverlay(); } }, '20–80 Hz average');
-  const play = h('button', { class: 'chip', 'aria-pressed': String(!!TV.playing), onclick: () => {
-    if (TV.playing) { clearInterval(TV.playing); TV.playing = 0; renderMapControls(); return; }
-    TV.band = false; TV.f = 15;
-    TV.playing = setInterval(() => { TV.f *= 2 ** (1 / 24); if (TV.f > 200) TV.f = 15; drawTuneOverlay(); const o = $('.mapf'); if (o) o.textContent = fmtF(TV.f); const s2 = $('#mapControls input'); if (s2) s2.value = String(Math.round(Math.log2(TV.f / 15) / Math.log2(200 / 15) * 1000)); }, 120);
-    renderMapControls();
-  } }, TV.playing ? 'Stop sweep' : 'Play sweep');
-  box.replaceChildren(h('div', { class: 'maprow' }, out, sl), h('div', { class: 'chips' }, bandBtn, play,
-    ...[30, 45, 60, 90].map((f) => h('button', { class: 'chip', onclick: () => { TV.f = f; TV.band = false; renderMapControls(); drawTuneOverlay(); } }, `${f} Hz`))),
-    h('div', { class: 'cbar' }, h('span', {}, '−15 dB'), h('i'), h('span', {}, '+10 dB')));
+  const out = h('b', { class: 'mapf' }, `${fmtF(TV.f)} · ${noteName(TV.f)}`), what = h('small', { class: 'mapwhat' }, bassWhat(TV.f));
+  const sl = h('input', { type: 'range', min: 0, max: 1000, value: String(Math.round(lf * 1000)), 'aria-label': 'Note' });
+  sl.addEventListener('input', () => { TV.f = 15 * (200 / 15) ** (sl.value / 1000); TV.mapKind = 'note'; out.textContent = `${fmtF(TV.f)} · ${noteName(TV.f)}`; what.textContent = bassWhat(TV.f); drawTuneOverlay(); });
+  box.replaceChildren(kinds, h('div', { class: 'maprow' }, out, sl), what,
+    h('div', { class: 'chips' }, NOTE_PRESETS.map(([f, l]) => h('button', { class: 'chip', onclick: () => { TV.f = f; TV.mapKind = 'note'; renderMapControls(); drawTuneOverlay(); } }, `${l} · ${f} Hz`))),
+    h('p', { class: 'note' }, 'How loud this one note is at each spot compared with the room average. Blue: it nearly vanishes (a null). Amber: it booms (a peak). Play the slow sweep below to watch it move.'),
+    h('div', { class: 'cbar' }, h('span', {}, 'vanishes'), h('i'), h('span', {}, 'booms')));
 }
-function subSection(V) {
-  const t = state.tune, subs = currentSubs(), real = subs.filter((s) => s.real);
-  const list = h('div', { class: 'sublist' }, (real.length ? real : subs).map((s, i) => {
-    const d = state.tune.dsp[s.id] || { g: 0, d: 0, pol: 1 };
-    const set = (patch) => { pushHistory(); state.tune.dsp[s.id] = { ...d, ...patch }; save(); tuneAnalyse(); };
-    return h('div', { class: 'subrow' }, h('b', {}, `SW${i + 1}`), h('span', { class: 'sname' }, s.real ? spotName({ ...s, n: wallNormalAt(s.x, s.y) }) : 'pre-wire spot (no sub placed yet)'),
-      s.real ? h('div', { class: 'dsp' },
-        stepper('Gain', `${sgn(d.g || 0)} dB`, () => set({ g: clamp((d.g || 0) - 0.5, -12, 0) }), () => set({ g: clamp((d.g || 0) + 0.5, -12, 0) })),
-        stepper('Delay', `${(d.d || 0).toFixed(1)} ms`, () => set({ d: clamp((d.d || 0) - 0.5, 0, 20) }), () => set({ d: clamp((d.d || 0) + 0.5, 0, 20) })),
-        h('button', { class: 'chip', 'aria-pressed': String(d.pol === -1), onclick: () => set({ pol: d.pol === -1 ? 1 : -1 }) }, d.pol === -1 ? 'Polarity −' : 'Polarity +')) : null);
-  }));
-  // presets
-  const cmp = compareConfigs(subPresets()).sort((a, b) => a.score - b.score);
-  const cur = { label: 'Current', ssv: TA.mRaw.ssv, flat: TA.mRaw.flat, level: TA.mRaw.level };
-  const row = (c, i, opt) => h('tr', { class: TV.preview && TV.preview.label === c.label ? 'on' : '' },
-    h('td', {}, c.label, opt ? h('small', {}, c.subs.map((s) => `${s.label}${s.g ? ` ${sgn(s.g)} dB` : ''}${s.d ? ` ${s.d} ms` : ''}${s.pol === -1 ? ' inv.' : ''}`).join(' · ')) : null),
-    h('td', {}, `±${c.ssv.toFixed(1)}`), h('td', {}, `±${c.flat.toFixed(1)}`), h('td', {}, sgn(c.level - cur.level)),
-    h('td', {}, c.subs ? h('button', { class: 'btn', onclick: () => { TV.preview = { label: c.label, subs: c.subs }; renderTune(); } }, 'Preview') : null));
-  const table = h('table', { class: 'ttable cfg' }, h('thead', {}, h('tr', {}, h('th', {}, 'Layout'), h('th', {}, 'Seat to seat'), h('th', {}, 'Smooth'), h('th', {}, 'Output'), h('th', {}))),
-    h('tbody', {}, h('tr', { class: 'cur' }, h('td', {}, real.length ? `Now: ${real.length} sub${real.length > 1 ? 's' : ''}` : 'Now: pre-wire spot'), h('td', {}, `±${cur.ssv.toFixed(1)}`), h('td', {}, `±${cur.flat.toFixed(1)}`), h('td', {}, '0'), h('td', {})),
-      ...(TV.opt || []).map((c, i) => row({ ...c, label: `Optimised ${c.subs.length} · #${i + 1}` }, i, true)),
-      ...cmp.map((c, i) => row(c, i))));
-  const optCtl = h('div', { class: 'optctl' },
-    h('span', { class: 'tl' }, 'Optimise'), tchips([[1, '1 sub'], [2, '2'], [3, '3'], [4, '4 subs']], TV.optN, (v) => { TV.optN = v; renderTune(); }),
-    h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: TV.optKeep, disabled: !real.length, onchange: (e) => { TV.optKeep = e.target.checked; } }), 'Keep positions, tune DSP only'),
-    h('button', { class: 'btn primary', disabled: !!TV.optRunning, onclick: runOptimiser }, TV.optRunning ? TV.optRunning : 'Run'));
-  return sect('Subwoofers', list, optCtl, table, h('p', { class: 'note' }, 'Spots are along the walls (every foot, corners first) and behind the seats, clear of the sofa, chairs, console and towers. The optimiser compares every pair, grows the best to 3 or 4, moves each sub to wherever it helps most, then tunes gain, delay and polarity: lowest seat-to-seat variation first, then a smooth average, without giving up much output.'));
+function subOptions(V) {
+  const real = currentSubs().filter((s) => s.real);
+  const opts = [];
+  if (planReady()) {
+    if (PLAN.best2) opts.push({ label: `Two subs · ${subLabel(PLAN.best2.subs)}`, subs: PLAN.best2.subs, rec: PLAN.steps.some((s) => s.key === 'subs' && s.act.subs === PLAN.best2.subs) });
+    if (PLAN.best1) opts.push({ label: `One sub · ${subLabel(PLAN.best1.subs)}`, subs: PLAN.best1.subs, rec: PLAN.steps.some((s) => s.key === 'subs' && s.act.subs === PLAN.best1.subs) });
+  }
+  for (const c of (TV.opt || [])) opts.push({ label: `Searched: ${subLabel(c.subs)}`, subs: c.subs });
+  for (const c of subPresets()) opts.push({ label: c.label.replace(/^(\d) · /, (m, n) => `${n === '1' ? 'One sub' : n === '2' ? 'Two subs' : 'Four subs'} · `), subs: c.subs });
+  const scored = compareConfigs(opts);
+  scored.forEach((o, i) => { o.rec = opts[i].rec; });
+  scored.sort((a, b) => (b.rec - a.rec) || a.score - b.score);
+  const today = { ssv: TA.mRaw.ssv, flat: TA.mRaw.flat };
+  const card = (o) => {
+    const vs = verdictOf(lin(o.ssv, 2, 7)), vt = verdictOf(lin(o.flat, 1.5, 5));
+    return h('div', { class: 'opt-card' + (o.rec ? ' rec' : '') + (TV.preview && TV.preview.label === o.label ? ' on' : '') },
+      h('div', { class: 'oc-t' }, o.rec ? h('span', { class: 'rec-tag' }, 'Recommended') : null, h('b', {}, o.label)),
+      h('div', { class: 'oc-v' }, h('span', {}, 'Every seat ', vchip(vs)), h('span', {}, 'Smooth ', vchip(vt)), h('small', {}, `±${o.ssv.toFixed(1)} dB seat to seat`)),
+      h('div', { class: 'oc-a' }, h('button', { class: 'btn', onclick: () => { TV.preview = { label: o.label, subs: o.subs }; renderTune(); } }, 'Preview'),
+        h('button', { class: 'btn primary', onclick: () => { applySubConfig(o.subs); TV.preview = null; snack('Subwoofers placed'); tuneChanged(); } }, 'Place')));
+  };
+  const search = h('div', { class: 'optctl' }, h('span', { class: 'tl' }, 'Search'), tchips([[1, '1 sub'], [2, '2'], [3, '3'], [4, '4 subs']], TV.optN, (v) => { TV.optN = v; renderTune(); }),
+    h('button', { class: 'btn', disabled: !!TV.optRunning, onclick: runOptimiser }, TV.optRunning || 'Search every spot'));
+  return sect('Subwoofer options',
+    h('p', { class: 'note' }, `Today: ${real.length ? SUBNOTE(real.length) : 'no subwoofer yet (assumed in the front-right corner)'}, ±${today.ssv.toFixed(1)} dB seat to seat. Spots are along the walls and behind the seats, clear of the sofa, chairs, console and towers; a few ask you to move a small piece. Preview shows the result on the map and the seats; Place puts the subs in your layout.`),
+    h('div', { class: 'opt-cards' }, scored.slice(0, 6).map(card)), search,
+    h('p', { class: 'note' }, 'Why two subs? Every room has spots where a note cancels itself out. Two subs in the right places fill each other\'s gaps, so the whole sofa gets the same bass. It\'s the biggest single upgrade most rooms can make; EQ can\'t do it.'));
 }
-function stepper(label, val, dec, inc) { return h('span', { class: 'step' }, h('small', {}, label), h('button', { onclick: dec, 'aria-label': `${label} down` }, '−'), h('b', {}, val), h('button', { onclick: inc, 'aria-label': `${label} up` }, '+')); }
-function wallNormalAt(x, y) { const r = state.room, G = geom(); return [x < 30 ? 1 : x > r.width - 30 ? -1 : 0, y > G.mainY - 30 && y <= G.mainY ? -1 : y < 30 ? 1 : 0]; }
 async function runOptimiser() {
   TV.optRunning = 'Starting…'; renderTune();
-  const res = await optimiseSubs({ n: TV.optN, keep: TV.optKeep, onProgress: (p, msg) => { TV.optRunning = msg; const b = $('.optctl .btn.primary'); if (b) b.textContent = `${Math.round(p * 100)}% · ${msg}`; } });
-  TV.optRunning = null; TV.opt = res ? res.slice(0, 3) : null;
-  if (res && res[0]) TV.preview = { label: `Optimised ${res[0].subs.length} · #1`, subs: res[0].subs };
+  const res = await optimiseSubs({ n: TV.optN, keep: TV.optKeep, onProgress: (p, msg) => { TV.optRunning = `${Math.round(p * 100)}%`; const b = $('.optctl .btn'); if (b) b.textContent = `${Math.round(p * 100)}% · ${msg}`; } });
+  TV.optRunning = null; TV.opt = res ? res.slice(0, 2) : null;
+  if (res && res[0]) TV.preview = { label: `Searched: ${subLabel(res[0].subs)}`, subs: res[0].subs };
   renderTune();
 }
+function sizingSection() {
+  const S = subSizing(TA, planReady() ? PLAN : null);
+  const row = (r) => h('tr', { class: r === S.pick ? 'on' : '' }, h('td', {}, r.label, r === S.pick ? h('small', {}, 'the least you need') : null),
+    h('td', {}, r.margin >= 3 ? 'Plenty ✓' : r.margin >= 0 ? 'Enough ✓' : r.margin >= -3 ? 'Just short' : 'Not enough', h('small', {}, `${sgn(r.margin, 0)} dB at 25–80 Hz`)),
+    h('td', {}, r.deep >= 0 ? 'Full' : r.deep >= -6 ? 'Most of it' : 'Weak', h('small', {}, `${sgn(r.deep, 0)} dB at 20 Hz`)), h('td', {}, usd(r.price[0], r.price[1])));
+  return sect('How much subwoofer you need', loudnessChips(),
+    h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, 'Option'), h('th', {}, 'Bass peaks'), h('th', {}, 'Deepest rumble'), h('th', {}, 'Typical price'))), h('tbody', {}, S.rows.map(row))),
+    h('p', { class: 'note' }, `For "${refName().toLowerCase()}" the main seat needs bass peaks of ${S.need} dB. Figures use each class's typical maximum output, your room's gain at the recommended spots and the EQ.`));
+}
+function proBass(V) {
+  const t = state.tune, F = V.ctx.F;
+  const cv = h('canvas', { class: 'chart', 'data-chart': 1 }), tip = h('div', { class: 'ctip' });
+  cv._draw = () => drawResponse(cv, tip, V);
+  attachHover(cv, tip, (f) => { TV.f = f; TV.mapKind = 'note'; renderMapControls(); drawTuneOverlay(); });
+  const controls = h('div', { class: 'pro-ctl' },
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Signal'), tchips([['lfe', 'LFE (subs only)'], ['managed', 'Bass-managed L/R + subs']], t.signal, (v) => setTune({ signal: v }))),
+    t.signal === 'managed' ? h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Crossover'), tchips([[60, '60'], [80, '80'], [100, '100'], [120, '120 Hz']], t.xo, (v) => setTune({ xo: v }))) : null,
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Sub class'), tchips(Object.entries(SUB_MODELS).map(([k, s]) => [k, s.label]), t.sub, (v) => setTune({ sub: v }))),
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Target'), tchips(Object.entries(TARGETS).map(([k, s]) => [k, s.label]), t.target, (v) => setTune({ target: v }))),
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Smoothing'), tchips([[0, 'None'], [24, '1/24'], [6, '1/6'], [3, '1/3 oct']], TV.smooth, (v) => { TV.smooth = v; renderTune(); }),
+      h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: t.eqOn, onchange: (e) => setTune({ eqOn: e.target.checked }) }), 'Room EQ'),
+      h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: t.allSeats, onchange: (e) => setTune({ allSeats: e.target.checked }) }), 'Chairs too')));
+  const real = currentSubs().filter((s) => s.real);
+  const dsp = real.length ? h('div', { class: 'sublist' }, real.map((s, i) => {
+    const d = state.tune.dsp[s.id] || { g: 0, d: 0, pol: 1 };
+    const set = (patch) => { pushHistory(); state.tune.dsp[s.id] = { ...d, ...patch }; save(); tuneAnalyse(); };
+    return h('div', { class: 'subrow' }, h('b', {}, `SW${i + 1}`), h('span', { class: 'sname' }, spotName({ ...s, n: wallNormalAt(s.x, s.y) })), h('div', { class: 'dsp' },
+      stepper('Gain', `${sgn(d.g || 0)} dB`, () => set({ g: clamp((d.g || 0) - 0.5, -12, 0) }), () => set({ g: clamp((d.g || 0) + 0.5, -12, 0) })),
+      stepper('Delay', `${(d.d || 0).toFixed(1)} ms`, () => set({ d: clamp((d.d || 0) - 0.5, 0, 20) }), () => set({ d: clamp((d.d || 0) + 0.5, 0, 20) })),
+      h('button', { class: 'chip', 'aria-pressed': String(d.pol === -1), onclick: () => set({ pol: d.pol === -1 ? 1 : -1 }) }, d.pol === -1 ? 'Polarity −' : 'Polarity +')));
+  })) : h('p', { class: 'note' }, 'Place subwoofers to set their gain, delay and polarity here.');
+  const sweep = rowSweep(V.ctx, V.subs);
+  const modes = modesTable();
+  return h('div', { class: 'pros' },
+    pro('Frequency response at every seat', controls, h('div', { class: 'chartwrap' }, cv, tip),
+      h('div', { class: 'legend' }, V.resp.map((r, i) => h('span', { class: 'lg' + (r.seat.main || t.allSeats ? '' : ' off') }, h('i', { style: `background:${seatColor(r.seat, i)}` }), r.seat.label)), h('span', { class: 'lg' }, h('i', { class: 'dash' }), 'Sofa average')),
+      h('p', { class: 'note' }, `dB against the ${TARGETS[t.target].label.toLowerCase()}, level-matched on the sofa (as after calibration). Seat to seat ±${V.m.ssv.toFixed(1)} dB, sofa average ±${V.m.flat.toFixed(1)} dB, main seat ±${V.m.flatMlp.toFixed(1)} dB, 20–${bassBand()[1]} Hz. Click to map a frequency.`)),
+    pro(`Room EQ · ${V.eq.length} filters`, V.eq.length ? h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, '#'), h('th', {}, 'Frequency'), h('th', {}, 'Gain'), h('th', {}, 'Q'))),
+      h('tbody', {}, V.eq.map((q, i) => h('tr', {}, h('td', {}, String(i + 1)), h('td', {}, fmtF(q.f)), h('td', {}, `${sgn(q.g)} dB`), h('td', {}, q.q.toFixed(2)))))) : h('p', { class: 'note' }, 'Room EQ is off or not needed.'),
+      V.eq.length ? h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => copyText(eqText(V.eq), 'EQ filters copied') }, 'Copy filters (REW / miniDSP)')) : null,
+      h('p', { class: 'note' }, 'Fitted to the sofa\'s average: cuts only, plus at most one broad +3 dB boost. Nulls are left alone.')),
+    pro('Subwoofer DSP (gain, delay, polarity)', dsp),
+    pro('Waterfall at the main seat', chart('tall', (c) => drawWaterfall(c, V)), h('p', { class: 'note' }, 'Cumulative spectral decay every 20 ms: long ridges are notes that ring on.')),
+    pro('Low-frequency decay (T30) per third octave', chart('', (c) => drawDecay(c)), h('p', { class: 'note' }, 'From the modelled impulse response at the main seat; dashed: target (0.4 s down to 63 Hz, allowed to rise to 0.65 s at 20 Hz).')),
+    sweep ? pro('Sofa position sweep', chart('short', (c) => drawSweep(c, sweep)), h('p', { class: 'note' }, 'Main-seat smoothness (brass) and seat-to-seat variation (blue) as the sofa slides toward (+) or away from the TV, subs fixed. Grey: it would hit a wall.')) : null,
+    pro(`Room modes below 200 Hz · Schroeder ${fmtF(TA.rt.schroeder)}`, modes));
+}
+function modesTable() {
+  const S = ACS, subs = currentSubs(), mlp = TA.mlp;
+  const cs = subs.map((s) => acCoef(S, s.x, s.y, AC.subZ)), cr = acCoef(S, mlp.x, mlp.y, AC.ear);
+  const list = S.modes3.map((m, i) => ({ m, i })).filter(({ m }) => m.f > 1 && m.f <= 200);
+  const exc = list.map(({ i }) => { let a = 0; for (const q of cs) a += q[i]; return a * cr[i]; });
+  const emax = Math.max(...exc.map(Math.abs), 1e-9);
+  const rows = list.map(({ m, i }, j) => {
+    const md = S.modes2[m.m], lb = md.label, T60 = 6.91 / TA.ctx.damp[i], Q = Math.PI * m.f * T60 / 6.91, nn = [lb.p, lb.q, m.nz].filter((x) => x).length;
+    const shape = lb.c > 0.55 ? `${lb.p}·${lb.q}·${m.nz}` : `basement · ${m.nz}`;
+    const kind = lb.c > 0.55 ? (nn === 0 ? 'room breathing against the hall' : nn === 1 ? 'axial' : nn === 2 ? 'tangential' : 'oblique') : (md.roomFrac < 0.6 ? 'mostly in the hall and stairs' : 'whole floor');
+    const e = 20 * Math.log10(Math.abs(exc[j]) / emax + 1e-6);
+    return h('tr', { class: TV.modeSel === i && TV.mapKind === 'mode' ? 'on' : '', onclick: () => { const on = !(TV.modeSel === i && TV.mapKind === 'mode'); TV.modeSel = i; TV.mapKind = on ? 'mode' : 'quality'; renderTune(); } },
+      h('td', {}, fmtF(m.f), h('small', {}, noteName(m.f))), h('td', {}, shape, h('small', {}, kind)), h('td', {}, `${T60.toFixed(2)} s`), h('td', {}, Q.toFixed(0)),
+      h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(2, 100 + e * 2.5)}%` }), `${e.toFixed(0)} dB`));
+  });
+  return h('div', {}, h('p', { class: 'note' }, 'From the wave solution of the real floor plan. Shape: half-waves along the length · width · height of the main room. Click a mode to see its pressure on the floor (white: its nodes). Excitation: how hard the subs drive it at the main seat.'),
+    h('div', { class: 'tscroll' }, h('table', { class: 'ttable modes' }, h('thead', {}, h('tr', {}, h('th', {}, 'Freq.'), h('th', {}, 'Shape'), h('th', {}, 'Decay'), h('th', {}, 'Q'), h('th', {}, 'Excitation'))), h('tbody', {}, rows))));
+}
+function stepper(label, val, dec, inc) { return h('span', { class: 'step-c' }, h('small', {}, label), h('button', { onclick: dec, 'aria-label': `${label} down` }, '−'), h('b', {}, val), h('button', { onclick: inc, 'aria-label': `${label} up` }, '+')); }
+function wallNormalAt(x, y) { const r = state.room, G = geom(); return [x < 30 ? 1 : x > r.width - 30 ? -1 : 0, y > G.mainY - 30 && y <= G.mainY ? -1 : y < 30 ? 1 : 0]; }
+const seatColor = (s, i) => (s.mlp ? '#d6a463' : SEAT_COLORS[(i + 3) % SEAT_COLORS.length]);
 const eqText = (eq) => ['Filter Settings file', '', 'Room EQ from Basement Cinema planner', '', ...eq.map((q, i) => `Filter ${i + 1}: ON PK Fc ${q.f.toFixed(1)} Hz Gain ${q.g.toFixed(1)} dB Q ${q.q.toFixed(2)}`)].join('\n');
 async function copyText(txt, msg) { try { await navigator.clipboard.writeText(txt); toast(msg); } catch (e) { downloadBlob(new Blob([txt], { type: 'text/plain' }), 'cinema-tuning.txt'); } }
 
-// ---------------- Modes ----------------
-function tabModes() {
-  const S = ACS, ctx = TA.ctx, subs = currentSubs(), mlp = TA.mlp;
-  const cs = subs.map((s) => acCoef(S, s.x, s.y, AC.subZ)), cr = acCoef(S, mlp.x, mlp.y, AC.ear);
-  const list = S.modes3.map((m, i) => ({ m, i })).filter(({ m }) => m.f > 1 && m.f <= 200);
-  const r = state.room, G = geom(), c = 343, inM = (v) => v * AC.IN;
-  const ax = [['Length (fireplace wall to exterior wall)', r.width], ['Width (stairs to the alcove front)', G.mainY], ['Height', r.ceiling]];
-  const exc = list.map(({ m, i }) => { let a = 0; for (const q of cs) a += q[i]; return a * cr[i]; });
-  const emax = Math.max(...exc.map(Math.abs), 1e-9);
-  const rows = list.map(({ m, i }, j) => {
-    const md = S.modes2[m.m], lb = md.label, T60 = 6.91 / TA.ctx.damp[i], Q = Math.PI * m.f * T60 / 6.91;
-    const shape = lb.c > 0.55 ? `${lb.p}·${lb.q}·${m.nz}` : `basement · ${m.nz}`;
-    const nn = [lb.p, lb.q, m.nz].filter((x) => x).length;
-    const kind = lb.c > 0.55 ? (nn === 0 ? 'room breathing against the hall and stairs' : nn === 1 ? 'axial' : nn === 2 ? 'tangential' : 'oblique') : (md.roomFrac < 0.6 ? 'mostly in the hall and stairs' : 'whole floor');
-    const e = 20 * Math.log10(Math.abs(exc[j]) / emax + 1e-6);
-    return h('tr', { class: TV.modeSel === i ? 'on' : '', onclick: () => { TV.modeSel = TV.modeSel === i ? null : i; renderTune(); } },
-      h('td', {}, fmtF(m.f)), h('td', {}, shape, h('small', {}, kind)), h('td', {}, `${T60.toFixed(2)} s`), h('td', {}, Q.toFixed(0)),
-      h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(2, 100 + e * 2.5)}%` }), `${e.toFixed(0)} dB`));
-  });
+// ---------------- Dialogue ----------------
+function tabDialogue() {
+  const A = TA, t = state.tune, spots = acReflectionPanelSpots(), runs = new Map();
+  for (const s of spots) { const r = runs.get(s.run.wall) || { ...s.run, z: s.z, n: 0 }; r.n++; runs.set(s.run.wall, r); }
+  const rt = A.rt, band = (lo, hi) => rt.bands.filter((b) => b.f >= lo && b.f <= hi).reduce((a, b, i, arr) => a + b.eyring / arr.length, 0);
+  const groups = [['Bass', band(63, 125), 0.6], ['Voices', band(500, 2000), 0.4], ['Treble', band(4000, 8000), 0.4]];
+  const word = (v, hi) => (v < 0.2 ? 'dead' : v <= hi ? 'just right' : v <= hi + 0.12 ? 'a bit lively' : 'echoey');
   return h('div', {},
-    sect('Room modes', h('p', { class: 'note' }, `${list.length} modes below 200 Hz from the wave solution. Shape = half-waves along the length · width · height of the main room (when the mode looks like one), or a mode that spreads into the hall and stairs. Click one to see its pressure on the floor (white lines are its nodes, where it vanishes). Excitation: how hard your subs drive it at the main seat.`),
-      h('div', { class: 'tscroll' }, h('table', { class: 'ttable modes' }, h('thead', {}, h('tr', {}, h('th', {}, 'Freq.'), h('th', {}, 'Shape'), h('th', {}, 'Decay'), h('th', {}, 'Q'), h('th', {}, 'Excitation at the MLP'))), h('tbody', {}, rows)))),
-    sect('Reference: a plain box this size', h('div', { class: 'kvs three' }, ax.map(([k, L]) => kv(k, fmtF(c / (2 * inM(L))), `${ftin(L)} · axial 1st order`))),
-      h('p', { class: 'note' }, `The real room isn't a box: the TV alcove, the fireplace lounge and the open stairs and hall shift and split these. Schroeder frequency ${fmtF(TA.rt.schroeder)}: above it, modes overlap and the room behaves statistically.`)));
+    sect('Clear dialogue', h('p', { class: 'say' }, vchip(verdictOf(A.q.clarity)), ' ', A.say.clarity),
+      h('p', { class: 'note' }, 'Your ear blends anything that arrives within about 15 ms of the direct sound. If a wall or the ceiling bounces it back loudly in that time, voices smear and seem to come from the wall. Pros keep those bounces at least 10 dB down.')),
+    sect('Where the panels go', runs.size ? h('div', { class: 'runs' }, [...runs.values()].map((r) => h('div', { class: 'run' },
+      h('b', {}, `${r.n} panel${r.n > 1 ? 's' : ''} on the ${r.wall}`), h('small', {}, `a ${ftin(r.len)} zone, centred ${ftin(r.z)} up · catches the ${r.chs.join(', ')} bounce for ${r.seats.length === A.ctx.seats.filter((s) => s.main).length ? 'every seat' : r.seats.join(', ')}`)))) : h('p', { class: 'note' }, 'No side-wall bounce needs treating.'),
+      h('div', { class: 'btnrow' },
+        spots.length ? h('button', { class: 'btn primary', onclick: () => hangPanels(spots) }, `Hang ${spots.length} panels there`) : null,
+        h('button', { class: 'btn', onclick: () => setTune({ reflPanels: !t.reflPanels }) }, t.reflPanels ? 'Remove the planned panels' : 'Plan them (outline only)'),
+        h('button', { class: 'btn', onclick: () => setTune({ cloud: !t.cloud }) }, t.cloud ? 'Remove the ceiling cloud' : 'Add a ceiling cloud')),
+      h('p', { class: 'note' }, 'The map shows the bounces from the front three speakers to the main seat: red ones are too loud, green are fine. The mirror trick confirms it on site: sit in each seat while a friend slides a mirror along the wall; wherever you see a speaker in it, a panel goes there.')),
+    sect('Echo time', h('div', { class: 'echo' }, groups.map(([l, v, hi]) => h('div', { class: 'echo-b' }, h('small', {}, l), h('b', {}, `${v.toFixed(2)} s`), h('span', { class: 'echo-w ' + word(v, hi).replace(/ /g, '-') }, word(v, hi))))),
+      h('p', { class: 'note' }, `How long the room keeps ringing after a sound stops. A room this size (${Math.round(rt.V * 35.3)} ft³) sounds best around 0.2–0.4 s for voices: clear but not dead.`),
+      h('div', { class: 'treat' },
+        h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Bass traps'), tchips([[0, 'None'], [2, '2 front corners'], [4, '4 corners']], t.traps, (v) => setTune({ traps: v }))),
+        toggleRow('4″ panels on the wall behind the sofa', t.rearPanels, (v) => setTune({ rearPanels: v }), `${acRearSpots().length} × 2 × 4 ft at head height, on the solid wall beside the stairs`),
+        h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'People'), tchips([[0, 'Empty'], [2, '2'], [4, '4'], [6, '6']], t.people, (v) => setTune({ people: v }))))),
+    sect('Keeps the movie downstairs', h('p', { class: 'say' }, vchip(verdictOf(A.q.privacy)), ' ', A.say.privacy),
+      toggleRow('Plan a solid-core door with seals at the stairs', t.door, (v) => setTune({ door: v }), 'typically $600–1,200 installed')),
+    h('div', { class: 'pros' },
+      pro('Energy-time view per speaker', reflPro()),
+      pro('Reverberation time per octave (RT60)', chart('', (c) => drawRT(c, rt)), h('div', { class: 'legend' }, h('span', { class: 'lg' }, h('i', { style: 'background:#d6a463' }), 'Eyring'), h('span', { class: 'lg' }, h('i', { class: 'dot' }), 'Sabine'), h('span', { class: 'lg' }, h('i', { class: 'band' }), 'Target')),
+        h('p', { class: 'note' }, `Statistical model of the room and alcove (${rt.V.toFixed(0)} m³, ${rt.S.toFixed(0)} m²), the opening to the stairs and hall counted as absorption. Schroeder frequency ${fmtF(rt.schroeder)}.`)),
+      pro('What absorbs the sound', absorbTable(rt))));
 }
-
-// ---------------- Reverb ----------------
-function tabReverb() {
-  const t = state.tune, rt = TA.rt;
-  const cv = h('canvas', { class: 'chart', 'data-chart': 1 }); cv._draw = () => drawRT(cv, rt);
-  const surf = rt.surf.slice().sort((a, b) => b.area * b.a[3] - a.area * a.a[3]);
-  const A500 = rt.bands[3].A;
-  return h('div', {},
-    sect('Reverberation time (RT60)', cv, h('div', { class: 'legend' }, h('span', { class: 'lg' }, h('i', { style: 'background:#d6a463' }), 'Eyring'), h('span', { class: 'lg' }, h('i', { class: 'dot' }), 'Sabine'), h('span', { class: 'lg' }, h('i', { class: 'band' }), 'Target')),
-      h('p', { class: 'note' }, `Statistical model of the room and alcove (${rt.V.toFixed(0)} m³, ${rt.S.toFixed(0)} m² of surfaces), with the opening to the stairs and hall counted as absorption. Below about ${fmtF(rt.schroeder)} the Bass tab's decay is the real answer.`)),
-    sect('Treatment', h('div', { class: 'treat' },
-      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Corner bass traps'), tchips([[0, 'None'], [2, '2 front'], [4, '4 corners']], t.traps, (v) => setTune({ traps: v }))),
-      toggleRow('2″ panels at the side-wall reflection points', t.reflPanels, (v) => setTune({ reflPanels: v }), `${acReflectionPanelSpots().length} panels, 2 × 4 ft`),
-      toggleRow('4″ panels on the wall behind the seats', t.rearPanels, (v) => setTune({ rearPanels: v }), 'two, 2 × 4 ft, on the solid wall beside the stairs'),
-      toggleRow('Ceiling cloud over the seats', t.cloud, (v) => setTune({ cloud: v }), '4″, 4 × 6 ft, hung 2″ down'),
-      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'People watching'), tchips([[0, 'Empty room'], [2, '2'], [4, '4'], [6, '6']], t.people, (v) => setTune({ people: v }))),
-      toggleRow('Solid-core door at the stairs', t.door, (v) => setTune({ door: v }), 'keeps sound downstairs (not part of RT60)'),
-      h('p', { class: 'note' }, 'Panels you hang from Furnish › Wall décor (Acoustic panel) count too, where they are. Treatments here appear in the room as outlines.'))),
-    sect('What absorbs the sound', h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, 'Surface'), h('th', {}, 'Area'), h('th', {}, 'α 125'), h('th', {}, 'α 500'), h('th', {}, 'Share at 500 Hz'))),
-      h('tbody', {}, surf.map((s) => h('tr', {}, h('td', {}, s.label), h('td', {}, `${s.area.toFixed(1)} m²`), h('td', {}, s.a[1].toFixed(2)), h('td', {}, s.a[3].toFixed(2)),
-        h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(1, s.area * s.a[3] / A500 * 100)}%` }), `${(s.area * s.a[3] / A500 * 100).toFixed(0)}%`))),
-        rt.units.map((u) => h('tr', {}, h('td', {}, u.label), h('td', {}, '—'), h('td', {}, (u.a[1] * u.n).toFixed(1) + ' m²'), h('td', {}, (u.a[3] * u.n).toFixed(1) + ' m²'),
-          h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(1, u.n * u.a[3] / A500 * 100)}%` }), `${(u.n * u.a[3] / A500 * 100).toFixed(0)}%`)))))));
+function reflPro() {
+  const lay = TA.lay.filter((c) => !c.k.startsWith('T')), ch = lay.find((c) => c.k === TV.reflCh) || lay[0];
+  const list = firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: TA.mlp.x, y: TA.mlp.y, z: AC.ear });
+  return h('div', {}, h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Speaker'), tchips([['front', 'Front 3'], ...lay.map((c) => [c.k, c.k])], TV.reflCh, (v) => { TV.reflCh = v; renderTune(); })),
+    TV.reflCh === 'front' ? h('p', { class: 'note' }, 'Pick a speaker for its energy-time chart.') : h('div', {}, chart('', (c) => drawETC(c, list)),
+      h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, 'Surface'), h('th', {}, 'Height'), h('th', {}, 'Delay'), h('th', {}, 'Level'), h('th', {}, 'Material'))),
+        h('tbody', {}, list.map((q) => h('tr', { class: q.delay < 15 && q.level > -10 ? 'warn' : '' }, h('td', {}, q.surface), h('td', {}, ftin(q.z)), h('td', {}, `${q.delay.toFixed(1)} ms`), h('td', {}, `${q.level.toFixed(1)} dB`), h('td', {}, MAT_NAME[q.mat] || q.mat)))))));
+}
+function absorbTable(rt) {
+  const surf = rt.surf.slice().sort((a, b) => b.area * b.a[3] - a.area * a.a[3]), A500 = rt.bands[3].A;
+  return h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, 'Surface'), h('th', {}, 'Area'), h('th', {}, 'α 125'), h('th', {}, 'α 500'), h('th', {}, 'Share'))),
+    h('tbody', {}, surf.map((s) => h('tr', {}, h('td', {}, s.label), h('td', {}, `${Math.round(s.area * 10.76)} ft²`), h('td', {}, s.a[1].toFixed(2)), h('td', {}, s.a[3].toFixed(2)),
+      h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(1, s.area * s.a[3] / A500 * 100)}%` }), `${(s.area * s.a[3] / A500 * 100).toFixed(0)}%`))),
+    rt.units.map((u) => h('tr', {}, h('td', {}, u.label), h('td', {}, '—'), h('td', {}, `${(u.a[1] * u.n * 10.76).toFixed(0)} sab.`), h('td', {}, `${(u.a[3] * u.n * 10.76).toFixed(0)} sab.`),
+      h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(1, u.n * u.a[3] / A500 * 100)}%` }), `${(u.n * u.a[3] / A500 * 100).toFixed(0)}%`)))));
 }
 function toggleRow(label, on, fn, sub) {
   const input = h('input', { type: 'checkbox', role: 'switch', checked: !!on }); input.addEventListener('change', () => fn(input.checked));
   return h('label', { class: 'toggle trow2' }, h('span', {}, label, sub ? h('small', {}, sub) : null), input);
-}
-
-// ---------------- Reflections ----------------
-function tabRefl() {
-  const lay = TA.lay.filter((c) => !c.k.startsWith('T')), ch = lay.find((c) => c.k === TV.reflCh) || lay[0];
-  const spk = { x: ch.p[0], y: ch.p[1], z: ch.z }, list = firstReflections(spk, { x: TA.mlp.x, y: TA.mlp.y, z: AC.ear });
-  const cv = h('canvas', { class: 'chart', 'data-chart': 1 }); cv._draw = () => drawETC(cv, list);
-  const spots = acReflectionPanelSpots();
-  return h('div', {},
-    sect(null, h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Speaker'), tchips(lay.map((c) => [c.k, c.k]), ch.k, (v) => { TV.reflCh = v; renderTune(); }))),
-    sect(`${ch.name} → main seat: first reflections`, cv,
-      h('p', { class: 'note' }, 'Energy-time view: the direct sound at 0 ms and each first reflection (level after the surface\'s absorption at 2 kHz and the speaker\'s directivity). Inside the shaded box (louder than −10 dB in the first 15 ms) a reflection smears dialogue and imaging.'),
-      h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, 'Surface'), h('th', {}, 'Lands at'), h('th', {}, 'Delay'), h('th', {}, 'Level'), h('th', {}, 'Material'))),
-        h('tbody', {}, list.map((q) => h('tr', { class: q.delay < 15 && q.level > -10 ? 'warn' : '' }, h('td', {}, q.surface), h('td', {}, `${ftin(q.z)} up`), h('td', {}, `${q.delay.toFixed(1)} ms`), h('td', {}, `${q.level.toFixed(1)} dB`), h('td', {}, MAT_NAME[q.mat] || q.mat)))))),
-    sect('Treat them', h('p', { class: 'note' }, `${spots.length} side-wall points catch the first reflections of the left, centre and right speakers at the main seat. Mirror trick: where a friend's mirror on the wall shows you the speaker from your seat.`),
-      h('div', { class: 'btnrow' },
-        h('button', { class: 'btn primary', onclick: () => hangPanels(spots) }, `Hang ${spots.length} acoustic panels there`),
-        h('button', { class: 'btn', onclick: () => setTune({ reflPanels: !state.tune.reflPanels }) }, state.tune.reflPanels ? 'Remove the planned panels' : 'Plan them (outline only)'),
-        h('button', { class: 'btn', onclick: () => setTune({ cloud: !state.tune.cloud }) }, state.tune.cloud ? 'Remove the ceiling cloud' : 'Add a ceiling cloud'))));
 }
 function hangPanels(spots) {
   pushHistory();
@@ -8566,17 +9209,37 @@ function hangPanels(spots) {
 }
 
 // ---------------- Speakers ----------------
+const LAYOUT_NOTE = {
+  '2.1': 'Stereo and a subwoofer: music first.', '3.1': 'Adds a centre speaker that locks dialogue to the screen.',
+  '5.1': 'Two surrounds beside or just behind you: the classic movie layout.', '7.1': 'Adds two rear surrounds for smoother pans behind you.',
+  '5.1.2': 'Five around you and two in the ceiling just ahead: Dolby Atmos height for most rooms.', '5.1.4': 'Four ceiling speakers, front and rear: fuller overhead effects.',
+  '7.1.4': 'The reference home Atmos layout: seven around, four overhead.', '9.1.6': 'Adds wide fronts and a middle ceiling pair: for big, dedicated rooms.',
+};
 function tabSpeakers() {
-  const t = state.tune, lay = TA.lay;
+  const t = state.tune, lay = TA.lay, ss = speakerSizing(TA);
+  const recLayout = planReady() ? (PLAN.steps.find((s) => s.key === 'layout') || {}).act : null;
+  const cards = h('div', { class: 'layouts' }, Object.keys(LAYOUTS).map((k) => {
+    const okAll = tuneLayout(k).every((c) => c.ok);
+    return h('button', { class: 'lay-card', 'aria-pressed': String(k === t.layout), onclick: () => setTune({ layout: k }) },
+      h('b', {}, k), h('small', {}, LAYOUT_NOTE[k]), h('span', { class: 'lay-fit ' + (okAll ? 'ok' : 'no') }, okAll ? 'fits this room' : 'compromised here'),
+      recLayout && recLayout.patch.layout === k ? h('span', { class: 'rec-tag' }, 'Recommended') : null);
+  }));
+  const where = h('div', { class: 'spklist' }, lay.map((c) => h('div', { class: 'spk-row' + (c.ok ? '' : ' off') },
+    h('b', {}, c.k), h('div', {}, h('span', {}, c.name), h('small', {}, c.how)), h('span', { class: 'spk-ang' }, c.ok ? '✓ ' : '✕ ', c.actual, h('small', {}, `Dolby ${c.target}`)))));
+  const sizing = h('div', { class: 'sizing' }, ss.map((g) => h('div', { class: 'size-row' },
+    h('div', {}, h('b', {}, g.label), h('small', {}, `${g.n} speaker${g.n > 1 ? 's' : ''}, up to ${ftin(g.dist)} from the main seat`)),
+    h('div', { class: 'size-need' }, h('span', {}, `${g.s100} dB`, h('small', {}, 'sensitivity at 100 W')), h('span', {}, `${g.s200} dB`, h('small', {}, 'at 200 W'))),
+    h('small', { class: 'size-hint' }, `${sensHint(g.s100)} on a 100 W receiver`))));
   return h('div', {},
-    sect(null,
-      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Layout'), tchips(Object.keys(LAYOUTS).map((k) => [k, k]), t.layout, (v) => setTune({ layout: v }))),
+    sect('Surround immersion', h('p', { class: 'say' }, vchip(verdictOf(TA.q.immersion)), ' ', TA.say.immersion)),
+    sect('Layout', cards),
+    sect('Where each speaker goes', where, h('label', { class: 'toggle' }, h('span', {}, 'Show these in the room after closing (pre-wire plan)'), (() => { const i = h('input', { type: 'checkbox', role: 'switch', checked: state.showSpeakers }); i.addEventListener('change', () => { pushHistory(); state.showSpeakers = i.checked; commit(false); }); return i; })())),
+    sect('What to buy', loudnessChips(), sizing,
+      h('p', { class: 'note' }, 'Sensitivity is on every speaker\'s spec sheet (dB at 1 W or 2.83 V, 1 m). Meet these and every channel reaches the peaks your listening level asks for at the main seat, with a little room to spare.')),
+    h('div', { class: 'pros' }, pro('Angles, delays, trims and headroom', spkTable(lay),
       h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Speakers'), tchips(Object.entries(SPK_CLASSES).map(([k, s]) => [k, s.label]), t.spk, (v) => setTune({ spk: v }))),
       h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Amplifier'), tchips([[50, '50 W'], [100, '100 W'], [200, '200 W'], [400, '400 W']], t.amp, (v) => setTune({ amp: v }))),
-      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Loudest level'), tchips([[0, 'Reference'], [-5, '−5 dB'], [-10, '−10 dB']], t.refLvl ?? -5, (v) => setTune({ refLvl: v })))),
-    sect(`${t.layout} from the main seat`, spkTable(lay),
-      h('p', { class: 'note' }, `Angles after Dolby's home-theatre guidelines (tops by their elevation seen from the side). Delay and trim are what an AV receiver sets so every channel arrives together and equally loud at the main seat. Headroom: peaks of ${105 + (t.refLvl ?? -5)} dB at the main seat (${refName()}).`),
-      showSpkToggle()));
+      h('p', { class: 'note' }, 'Delay and trim are what an AV receiver sets so every channel arrives together and equally loud at the main seat. Headroom: against the peaks for your listening level, with the speaker class and amplifier above.'))));
 }
 function spkTable(lay) {
   const head = h('thead', {}, h('tr', {}, ...['Ch.', 'Where', 'Angle', 'Distance', 'Delay · trim', 'Headroom'].map((x) => h('th', {}, x))));
@@ -8585,51 +9248,72 @@ function spkTable(lay) {
     h('td', {}, ftin(c.dist)), h('td', {}, `${c.delay.toFixed(1)} ms`, h('small', {}, `${sgn(c.trim)} dB`)), h('td', { class: c.headroom < 0 ? 'bad' : '' }, `${sgn(c.headroom)} dB`)));
   return h('div', { class: 'tscroll' }, h('table', { class: 'ttable spk' }, head, h('tbody', {}, rows)));
 }
-function showSpkToggle() {
-  const i = h('input', { type: 'checkbox', role: 'switch', checked: state.showSpeakers });
-  i.addEventListener('change', () => { pushHistory(); state.showSpeakers = i.checked; commit(false); });
-  return h('label', { class: 'toggle' }, h('span', {}, 'Show the speakers in the room after closing'), i);
-}
 
 // ---------------- Report ----------------
-function tabReport() {
-  return h('div', {},
-    sect('Report', h('p', { class: 'note' }, 'Everything on one page for an installer or calibrator: the scorecard, the subwoofer positions and settings, the room EQ, speaker distances, delays and trims, treatment, and the charts.'),
-      h('div', { class: 'btnrow' }, h('button', { class: 'btn primary', onclick: downloadReport }, 'Download report (HTML)'), h('button', { class: 'btn', onclick: () => copyText(reportText(), 'Settings copied') }, 'Copy settings as text'))),
-    sect('How the model works', h('ul', { class: 'method' },
-      h('li', {}, h('b', {}, 'Bass (below ~200 Hz): '), 'the floor plan is cut into 5″ cells and the room\'s modes are solved from the wave equation (shift-invert Lanczos), including the alcove, the fireplace lounge, the pilaster and the open stairs and hall. The 9′ ceiling adds the vertical modes. Each mode is damped by what its pressure meets: drywall walls and ceiling, the floor, the openings, the seats and any traps or panels, so corner traps help more than mid-wall ones, as in real rooms.'),
-      h('li', {}, h('b', {}, 'Responses: '), 'every seat\'s response, the bass map, the impulse response, waterfall and decay all come from the same modal sum, with each sub\'s roll-off, the crossover, gain, delay, polarity and EQ.'),
-      h('li', {}, h('b', {}, 'Reverberation: '), 'Sabine and Eyring per octave from the surfaces, furniture, people and treatment, with typical published absorption coefficients.'),
-      h('li', {}, h('b', {}, 'Reflections: '), 'image sources on the real walls, ceiling and floor, with the speaker\'s directivity and the absorption where each lands.'),
-      h('li', {}, h('b', {}, 'Limits: '), 'walls are modelled as rigid with an absorption-based loss (no transmission into the framing), furniture doesn\'t block bass, and absorption figures are typical rather than measured. Measure with a microphone (REW) to confirm, then use the same EQ and DSP workflow.'))));
+function shoppingList() {
+  const out = [], P = planReady() ? PLAN : null, ss = speakerSizing(TA), S = subSizing(TA, P);
+  const subsStep = P && P.steps.find((s) => s.key === 'subs');
+  const nSub = subsStep ? subsStep.act.subs.length : Math.max(1, currentSubs().filter((s) => s.real).length);
+  const subRow = S.rows.find((r) => r.n === nSub && r.margin >= 0) || S.pick;
+  out.push({ what: `${nSub === 2 ? 'Two' : 'One'} ${SUB_MODELS[subRow.model].label} subwoofer${nSub > 1 ? 's' : ''}`, spec: `${SUB_MODELS[subRow.model].note}; reaches ${S.need} dB bass peaks at the main seat`, cost: usd(SUB_PRICE[subRow.model][0] * nSub, SUB_PRICE[subRow.model][1] * nSub) });
+  for (const g of ss) out.push({ what: `${g.label} (${g.n})`, spec: `≥ ${g.s100} dB sensitivity on 100 W (or ≥ ${g.s200} dB on 200 W)`, cost: '' });
+  out.push({ what: 'AV receiver', spec: `${LAYOUTS[state.tune.layout].length + 1}+ channels for ${state.tune.layout}${nSub > 1 ? ', two independent sub outputs' : ''}, room correction (Dirac Live or Audyssey MultEQ XT32)`, cost: '' });
+  if (P) for (const s of P.steps) {
+    if (s.key === 'treat') for (const q of s.parts) out.push({ what: q.text[0].toUpperCase() + q.text.slice(1), spec: q.flag === 'reflPanels' ? '2″ fabric-wrapped mineral wool or fibreglass' : '4″ thick, or 2″ on a 2″ air gap', cost: usd(q.lo, q.hi) });
+    else if (['traps', 'rug', 'door'].includes(s.key)) out.push({ what: s.title, spec: s.note || '', cost: s.cost });
+  }
+  out.push({ what: 'Measurement microphone', spec: 'a calibrated USB mic (e.g. UMIK-1) with REW, to confirm the model and fine-tune', cost: usd(80, 120) });
+  return out;
 }
-function reportText() {
-  const A = TA, t = state.tune, subs = currentSubs();
-  const L = [`Basement Cinema · acoustic plan`, `Score ${A.score.total}/100`, '', ...A.score.rows.map((r) => `${r.label}: ${r.value} (${r.g})`), '',
-    'Subwoofers:', ...subs.map((s, i) => `  SW${i + 1}: ${ftin(s.x)} from the fireplace wall, ${ftin(s.y)} from the stair wall · gain ${sgn(s.g || 0)} dB · delay ${(s.d || 0).toFixed(1)} ms · polarity ${s.pol === -1 ? 'inverted' : 'normal'}`),
-    `  Model: ${SUB_MODELS[t.sub].label} · ${t.signal === 'managed' ? `crossover ${t.xo} Hz` : 'LFE'}`, '',
-    'Room EQ:', ...(A.eq.length ? A.eq.map((q, i) => `  ${i + 1}. PK ${q.f.toFixed(1)} Hz ${sgn(q.g)} dB Q ${q.q.toFixed(2)}`) : ['  none']), '',
-    `Speakers (${t.layout}):`, ...A.lay.map((c) => `  ${c.k.padEnd(4)} ${c.name.padEnd(22)} ${c.actual.padEnd(10)} target ${c.target.padEnd(12)} ${ftin(c.dist).padEnd(9)} delay ${c.delay.toFixed(1)} ms trim ${sgn(c.trim)} dB · ${c.how}`), '',
-    `Reverberation (Eyring): ${A.rt.bands.map((b, i) => `${OCT_LABEL[i]} ${b.eyring.toFixed(2)} s`).join(' · ')}`,
-    `Treatment: traps ${t.traps} · reflection panels ${t.reflPanels ? 'yes' : 'no'} · rear panels ${t.rearPanels ? 'yes' : 'no'} · cloud ${t.cloud ? 'yes' : 'no'}`, '',
-    'Advice:', ...A.advice.map((a, i) => `  ${i + 1}. ${a.title}: ${a.detail}`)];
+function settingsText() {
+  const A = TA, t = state.tune, P = planReady() ? PLAN : null, subs = currentSubs();
+  const L = [`Basement Cinema · acoustic plan · ${new Date().toLocaleDateString()}`, '',
+    `Today ${A.overall}/100 (${verdictOf(A.overall)})${P ? ` · with the plan ${P.after.overall}/100 (${verdictOf(P.after.overall)})` : ''}`,
+    ...QUALITIES.map((q) => `  ${q.title}: ${verdictOf(A.q[q.key])}${P ? ` → ${verdictOf(P.after.q[q.key])}` : ''} · ${A.say[q.key]}`), ''];
+  if (P) L.push('Plan:', ...P.steps.map((s, i) => `  ${i + 1}. ${s.title} (${s.cost}, ${s.effort}). ${s.why}${s.note ? ' ' + s.note : ''}`), '');
+  L.push('Shopping list:', ...shoppingList().map((r) => `  · ${r.what}: ${r.spec}${r.cost ? ` (${r.cost})` : ''}`), '',
+    'Installer settings (as the layout stands now):',
+    ...subs.map((s, i) => `  SW${i + 1}: ${ftin(s.x)} from the fireplace wall, ${ftin(s.y)} from the stair wall · gain ${sgn(s.g || 0)} dB · delay ${(s.d || 0).toFixed(1)} ms · polarity ${s.pol === -1 ? 'inverted' : 'normal'}${s.real ? '' : ' (assumed)'}`),
+    `  Room EQ: ${A.eq.length ? A.eq.map((q) => `PK ${q.f.toFixed(1)} Hz ${sgn(q.g)} dB Q ${q.q.toFixed(2)}`).join(' · ') : 'none'}`,
+    `  Speakers (${t.layout}): ` + A.lay.map((c) => `${c.k} ${ftin(c.dist)} ${c.delay.toFixed(1)} ms ${sgn(c.trim)} dB`).join(' · '),
+    `  Crossover ${t.xo} Hz · target ${TARGETS[t.target].label.toLowerCase()} · listening level ${refName().toLowerCase()}`);
   return L.join('\n');
 }
+function tabReport() {
+  const list = shoppingList();
+  return h('div', {},
+    sect('Shopping list', h('table', { class: 'ttable shop' }, h('thead', {}, h('tr', {}, h('th', {}, 'What'), h('th', {}, 'Spec'), h('th', {}, 'Typical'))),
+      h('tbody', {}, list.map((r) => h('tr', {}, h('td', {}, r.what), h('td', {}, r.spec), h('td', {}, r.cost || '—'))))),
+      h('p', { class: 'note' }, 'Prices are rough typical retail, before installation, to help budget. The specs are what matters: anything that meets them will do.')),
+    sect('For your installer', h('p', { class: 'note' }, 'Everything on one page: the scores and what they mean, the plan, the shopping list, subwoofer positions and DSP, the room EQ, and every speaker\'s distance, delay and trim, with the charts.'),
+      h('div', { class: 'btnrow' }, h('button', { class: 'btn primary', onclick: downloadReport }, 'Download the report'), h('button', { class: 'btn', onclick: () => copyText(settingsText(), 'Plan and settings copied') }, 'Copy as text'))),
+    h('div', { class: 'pros' }, pro('How the model works', h('ul', { class: 'method' },
+      h('li', {}, h('b', {}, 'Bass (below ~200 Hz): '), 'the floor plan is cut into 5″ cells and the room\'s modes are solved from the wave equation (shift-invert Lanczos), including the alcove, the fireplace lounge, the pilaster and the open stairs and hall; the 9′ ceiling adds the vertical modes. Each mode is damped by what its pressure meets: drywall, floor, openings, seats, traps and panels. Checked against a rectangle: modes within 0.4 % of the exact values.'),
+      h('li', {}, h('b', {}, 'At the seats: '), 'responses, maps, impulse responses (and what you hear in "Hear the difference") all come from the same modal sum, with each sub\'s roll-off, the crossover, DSP and EQ, level-matched on the sofa as after calibration.'),
+      h('li', {}, h('b', {}, 'Echoes: '), 'image sources on the real walls, ceiling and floor with speaker directivity and the absorption where each bounce lands; reverberation from Sabine and Eyring per octave.'),
+      h('li', {}, h('b', {}, 'Scores: '), 'each quality maps a measurable (seat-to-seat variation, smoothness and decay, early-reflection level and echo time, Dolby angles) onto 0–100 using targets common in professional home-cinema design, in the spirit of the CEDIA/CTA RP22 levels. Not a certification.'),
+      h('li', {}, h('b', {}, 'Limits: '), 'walls are modelled as rigid with an absorption-based loss, furniture doesn\'t block bass, absorption figures are typical. Confirm with a measurement microphone; the EQ and DSP workflow is the same.')))));
+}
 function downloadReport() {
-  // render the charts off-screen at a fixed size and inline them
   const shot = (fn) => { const cv = document.createElement('canvas'); cv.style.width = '720px'; cv.style.height = '260px'; document.body.append(cv); fn(cv); const url = cv.toDataURL('image/png'); cv.remove(); return url; };
-  const V = bassView();
-  const imgs = [['Frequency response at the seats', shot((cv) => drawResponse(cv, null, V))], ['Waterfall at the main seat', shot((cv) => drawWaterfall(cv, V))],
-    ['Low-frequency decay', shot((cv) => drawDecay(cv))], ['Reverberation time', shot((cv) => drawRT(cv, TA.rt))]];
+  const V = bassView(), P = planReady() ? PLAN : null;
+  const imgs = [['Bass at each seat, against the target', shot((cv) => drawResponse(cv, null, V))], ['How the bass dies away at the main seat', shot((cv) => drawWaterfall(cv, V))],
+    ['Echo time per octave', shot((cv) => drawRT(cv, TA.rt))]];
   const plan = (() => { try { return window.__cinema.capture('image/jpeg', 0.85); } catch (e) { return ''; } })();
   const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const qRows = QUALITIES.map((q) => `<tr><td><b>${esc(q.title)}</b><br><small>${esc(q.ask)}</small></td><td>${verdictOf(TA.q[q.key])}</td><td>${P ? verdictOf(P.after.q[q.key]) : ''}</td><td>${esc(TA.say[q.key])}</td></tr>`).join('');
+  const steps = P ? P.steps.map((s, i) => `<tr><td>${i + 1}</td><td><b>${esc(s.title)}</b><br>${esc(s.why)}${s.note ? `<br><small>${esc(s.note)}</small>` : ''}</td><td>${esc(s.cost)}</td><td>${esc(s.effort)}</td></tr>`).join('') : '';
+  const shop = shoppingList().map((r) => `<tr><td>${esc(r.what)}</td><td>${esc(r.spec)}</td><td>${esc(r.cost || '—')}</td></tr>`).join('');
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>Basement Cinema · acoustic plan</title><style>
-body{font:14px/1.5 system-ui,sans-serif;max-width:800px;margin:32px auto;padding:0 16px;color:#1c1814;background:#fff}h1{font-weight:400;font-size:28px;margin:0}h2{font-size:15px;text-transform:uppercase;letter-spacing:.08em;margin:28px 0 8px;color:#7a5a2e}
-img{width:100%;border-radius:8px;background:#151210}pre{background:#f6f2ea;padding:12px;border-radius:8px;white-space:pre-wrap;font-size:12px}.s{font-size:44px;color:#b07a33}</style></head><body>
-<h1>Basement Cinema · acoustic plan</h1><p>${new Date().toLocaleDateString()} · <span class="s">${TA.score.total}</span>/100</p>
-${plan ? `<h2>Bass map and layout</h2><img src="${plan}">` : ''}
+body{font:14px/1.5 system-ui,sans-serif;max-width:860px;margin:32px auto;padding:0 16px;color:#1c1814;background:#fff}h1{font-weight:400;font-size:28px;margin:0}h2{font-size:14px;text-transform:uppercase;letter-spacing:.08em;margin:30px 0 8px;color:#7a5a2e}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #e6dfd2;padding:7px 6px;vertical-align:top;text-align:left}small{color:#6b6257}img{width:100%;border-radius:8px;background:#151210}pre{background:#f6f2ea;padding:12px;border-radius:8px;white-space:pre-wrap;font-size:12px}.big{font-size:40px;color:#b07a33}</style></head><body>
+<h1>Basement Cinema · how your room will sound</h1><p>${new Date().toLocaleDateString()} · today <span class="big">${TA.overall}</span> ${verdictOf(TA.overall)}${P ? ` → with the plan <span class="big">${P.after.overall}</span> ${verdictOf(P.after.overall)}` : ''}</p>
+<h2>What you'll hear</h2><table><tr><th>Quality</th><th>Today</th><th>With the plan</th><th>Why</th></tr>${qRows}</table>
+${P ? `<h2>The plan</h2><table><tr><th>#</th><th>Step</th><th>Cost</th><th>Time</th></tr>${steps}</table>` : ''}
+<h2>Shopping list</h2><table><tr><th>What</th><th>Spec</th><th>Typical</th></tr>${shop}</table>
+${plan ? `<h2>The room</h2><img src="${plan}">` : ''}
 ${imgs.map(([t, u]) => `<h2>${esc(t)}</h2><img src="${u}">`).join('')}
-<h2>Settings and advice</h2><pre>${esc(reportText())}</pre></body></html>`;
+<h2>Installer settings</h2><pre>${esc(settingsText())}</pre></body></html>`;
   downloadBlob(new Blob([html], { type: 'text/html' }), 'basement-cinema-acoustics.html');
   toast('Report downloaded');
 }
@@ -9235,7 +9919,7 @@ window.__cinema = {
     if (!o) return null; activeCam.updateMatrixWorld(); const v = o.project(activeCam);
     return { x: ((v.x + 1) / 2) * stage.clientWidth, y: (1 - (v.y + 1) / 2) * stage.clientHeight };
   },
-  tune: { solve: (cb) => acSolve(cb), analyse: () => analyseRoom(), optimise: (o) => optimiseSubs(o), presets: () => subPresets(), compare: (c) => compareConfigs(c),
+  tune: { solve: (cb) => acSolve(cb), analyse: () => assess(), plan: () => buildPlan(), optimise: (o) => optimiseSubs(o), presets: () => subPresets(), compare: (c) => compareConfigs(c),
     layout: (k) => tuneLayout(k), rt: () => rtModel(), seats: () => acSeats(), cands: () => subCandidates(), apply: (s) => applySubConfig(s), ctx: () => bassCtx(), S: () => ACS },
   idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
   perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,

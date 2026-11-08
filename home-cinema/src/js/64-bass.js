@@ -449,8 +449,9 @@ function bandDecay(ir) {
     return { fc, t60: slope < 0 ? -60 / slope : null, span };
   });
 }
-/** Target for the low-frequency decay: about the mid-band reverb time + 0.1 s, allowed to rise below 63 Hz. */
-const decayTarget = (fc, rtMid) => (rtMid + 0.1) * (fc >= 63 ? 1 : 1 + 0.6 * Math.log2(63 / fc) / Math.log2(63 / 20));
+/** Target for the low-frequency decay: 0.4 s down to 63 Hz, allowed to rise to 0.65 s at 20 Hz (small-room practice).
+ *  Fixed, so absorbing the mids never makes the bass look worse. */
+const decayTarget = (fc) => (fc >= 63 ? 0.4 : 0.4 + 0.25 * Math.log2(63 / fc) / Math.log2(63 / 20));
 
 // ---------------- the sofa's position in the room ----------------
 /** Move the main seating forward / back and see what the bass does at the seats (subs stay put). */
@@ -468,8 +469,8 @@ function rowSweep(ctx, subs) {
   return { pts: out, best, cur: out.find((o) => o.off === 0), dir: L.ez };
 }
 /** Put the subs from a configuration into the layout (replacing the current ones). */
-function applySubConfig(subs) {
-  pushHistory();
+function applySubConfig(subs, record = true) {
+  if (record) pushHistory();
   for (const it of state.items.filter((i) => i.type === 'subwoofer')) {
     const obj = itemObjects.get(it.id); if (obj) { itemsGroup.remove(obj.group); disposeGroup(obj.group); itemObjects.delete(it.id); }
     delete state.tune.dsp[it.id];
