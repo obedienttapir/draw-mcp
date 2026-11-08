@@ -8,7 +8,7 @@ initControls();
 initPipeline();                                       // composers: quick frames while moving, full frames when still (52-render)
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initPhoto(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initDirect(); initPhoto(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));
@@ -124,6 +124,7 @@ function frame(now) {
   const which = inMove ? 'move' : 'still';
   drawView(activeCam, which);
   labelRenderer.render(scene, activeCam);
+  placeCtx();
   // moving frames: drop their resolution while they're slow, raise it back when there is headroom. Only back-to-back
   // moving frames count (a longer stall is a one-off, e.g. a shader compile); the full frame is never scaled down.
   if (which === 'move' && lastWasMove && rafGap < 1000) {
@@ -159,7 +160,14 @@ window.__cinema = {
     if (envDirty) captureEnv();
     drawView(activeCam, 'still');
     labelRenderer.render(scene, activeCam);
+    placeCtx();
     return type ? renderer.domElement.toDataURL(type, q) : '';
+  },
+  /** Screen position (CSS px in the canvas) of a piece, or of the selected piece's turning knob. */
+  pieceScreen(id) {
+    const o = id === 'knob' ? (knobR ? outline.localToWorld(new THREE.Vector3(0, 1, knobR)) : null) : itemObjects.get(id)?.group.position.clone();
+    if (!o) return null; activeCam.updateMatrixWorld(); const v = o.project(activeCam);
+    return { x: ((v.x + 1) / 2) * stage.clientWidth, y: (1 - (v.y + 1) / 2) * stage.clientHeight };
   },
   idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
   perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,

@@ -88,8 +88,7 @@ function renderFurnish() {
     grid.append(h('button', { onclick: () => addItem(type), title: 'Add ' + def.label }, h('b', {}, def.label), h('small', {}, def.note)));
   }
   root.append(group('Add to the room', grid,
-    toggle('hold-mode', 'Press and hold to edit (touch-friendly)', holdMode(), (v) => setHoldMode(v)),
-    h('p', { class: 'note' }, 'On: hold a piece to pick it up and get its menu, hold the floor to add here. Taps only move the camera, so nothing gets bumped. Furniture never passes through walls.')));
+    h('p', { class: 'note' }, 'Or hold the floor where you want it. Tap a piece to select it, drag it to move, turn it with the ring. Furniture never passes through walls and snaps flush when it gets close.')));
   const list = h('div', { class: 'chips' });
   for (const it of state.items) {
     const sel = selected && selected.kind === 'item' && selected.id === it.id;

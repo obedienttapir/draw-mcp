@@ -298,7 +298,7 @@ table.spec tfoot td { border-bottom: 0; background: rgba(255,255,255,0.025); }
 .holdring { position: absolute; z-index: 8; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; pointer-events: none;
   background: conic-gradient(var(--brass) calc(var(--p, 0) * 1turn), rgba(255,255,255,0.12) 0);
   -webkit-mask: radial-gradient(circle, transparent 25px, #000 26px); mask: radial-gradient(circle, transparent 25px, #000 26px);
-  animation: holdfill var(--hold, 420ms) linear forwards; opacity: 0.95; }
+  animation: holdfill calc(var(--hold, 420ms) - 140ms) linear 140ms both; opacity: 0.95; }   /* a quick swipe never flashes it */
 .holdring.done { animation: holdpop 220ms ease-out forwards; }
 @property --p { syntax: '<number>'; inherits: false; initial-value: 0; }
 @keyframes holdfill { from { --p: 0; transform: scale(0.7); } to { --p: 1; transform: scale(1); } }
@@ -322,15 +322,17 @@ table.spec tfoot td { border-bottom: 0; background: rgba(255,255,255,0.025); }
 .sheet-head h2 { margin: 0; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sheet-head p { margin: 1px 0 0; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sheet-head .badge { flex: none; font-size: 11px; padding: 2px 7px; }
-.sheet-x { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; font-size: 14px; }
+.sheet-done { flex: none; height: 34px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--brass); color: #1c1612; font-weight: 600; font-size: 13px; }
+.sheet-done:active { transform: scale(0.96); }
 .sheet-acts { display: flex; gap: 6px; overflow-x: auto; padding: 2px 16px 6px; scrollbar-width: none; flex: none; }
 .sheet-acts::-webkit-scrollbar, .sheet-tabs::-webkit-scrollbar { display: none; }
 .act { flex: none; min-width: 44px; height: 40px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px;
   border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,0.04); padding: 0 8px; }
-.act .ico { font-size: 15px; line-height: 1; }
+.act .ic { color: var(--fg); flex: none; }
+.act.flip .ic { transform: scaleX(-1); }
 .act small { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
 .act:active { background: var(--brass-dim); border-color: var(--brass); }
-.act.danger .ico { filter: saturate(0.6); }
+.act.danger .ic { color: var(--bad); }
 .act.danger small { color: var(--bad); }
 .sheet-tabs { display: flex; gap: 4px; padding: 0 16px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; flex: none; }
 .sheet-tabs button { flex: none; min-height: 40px; padding: 0 14px; border: 0; background: none; color: var(--muted); font-weight: 500; border-bottom: 2px solid transparent; }
@@ -452,6 +454,54 @@ select.ph-pill { padding-right: 8px; width: auto; flex: none; }
   .ph-level { padding: 0 10px; }
   .ph-top { gap: 6px; }
 }
+
+/* ---------- direct editing: floating toolbar, angle chip, undo snackbar ---------- */
+.ic { display: block; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ctx { position: absolute; z-index: 6; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  transform: translate(-50%, -100%) translateY(6px) scale(0.94); transform-origin: 50% 100%; opacity: 0; pointer-events: none;
+  transition: opacity 140ms ease, transform 180ms cubic-bezier(.2,.9,.25,1.2); }
+.ctx.on { opacity: 1; transform: translate(-50%, -100%); pointer-events: auto; }
+.ctx.below { flex-direction: column-reverse; transform-origin: 50% 0; transform: translate(-50%, 0) translateY(-6px) scale(0.94); }
+.ctx.below.on { transform: translate(-50%, 0); }
+.ctx.below .ctx-row::after { bottom: auto; top: -5px; transform: rotate(225deg); }
+.ctx-name { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); background: rgba(18,15,12,0.7);
+  padding: 2px 9px; border-radius: 999px; white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
+.ctx-row { display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 16px;
+  background: rgba(28, 24, 20, 0.82); border: 1px solid var(--line-strong); box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); }
+.ctx-row::after { content: ''; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; margin-left: -5px; transform: rotate(45deg);
+  background: rgba(28, 24, 20, 0.92); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); }
+.ctx-b { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 42px; height: 42px; padding: 0 10px;
+  border: 0; border-radius: 12px; background: transparent; color: var(--fg); cursor: pointer; transition: background 120ms, transform 90ms; }
+.ctx-b:hover { background: rgba(255,255,255,0.07); }
+.ctx-b:active { transform: scale(0.92); background: var(--brass-dim); }
+.ctx-b.danger { color: var(--bad); }
+.ctx-b.danger:hover { background: rgba(224,122,98,0.14); }
+.ctx-b.wide { padding: 0 14px 0 11px; font-weight: 600; font-size: 13px; }
+.ctx-b.primary { background: var(--brass); color: #1c1612; }
+.ctx-b.primary:hover { background: #e2b273; }
+.ctx-sep { width: 1px; height: 24px; background: var(--line-strong); margin: 0 4px; }
+.ctx-b[title]:hover::after { content: attr(title); position: absolute; top: calc(100% + 12px); left: 50%; transform: translateX(-50%); white-space: nowrap;
+  font-size: 11px; font-weight: 500; color: var(--fg); background: var(--panel-solid); border: 1px solid var(--line); padding: 2px 7px; border-radius: 6px; pointer-events: none; }
+.ctx-b.wide[title]:hover::after { display: none; }
+@media (pointer: coarse) { .ctx-b { min-width: 46px; height: 46px; } .ctx-b[title]:hover::after { display: none; } }
+.ctx-chip { position: absolute; z-index: 8; left: 0; top: 0; transform: translate(-50%, -50%); pointer-events: none; opacity: 0; transition: opacity 120ms;
+  font-family: var(--font-num); font-size: 14px; font-weight: 500; color: #1c1612; background: var(--brass); padding: 4px 10px; border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4); font-variant-numeric: tabular-nums; }
+.ctx-chip.on { opacity: 1; }
+.dim.live { font-size: 12px; padding: 2px 7px; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+.dim.live.flush { background: var(--ok); border-color: var(--ok); }
+.snack { position: absolute; z-index: 9; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 14px;
+  transform: translate(-50%, 16px); opacity: 0; pointer-events: none; transition: opacity 160ms, transform 200ms cubic-bezier(.2,.9,.25,1.1);
+  background: rgba(28, 24, 20, 0.94); border: 1px solid var(--line-strong); border-radius: 999px; padding: 6px 6px 6px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45); font-size: 13px; white-space: nowrap; max-width: calc(100% - 32px); }
+.snack.on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.snack button { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 999px; background: var(--brass-dim); color: var(--brass);
+  font-weight: 600; padding: 7px 12px; }
+.snack button:active { transform: scale(0.95); }
+#app.focus .ctx, #app.photo .ctx, #app.photo .snack, #app.photo .ctx-chip { display: none !important; }
+#app.fast .ctx-row { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--panel-solid); }
 
 </style>
 <script type="importmap">
@@ -4586,11 +4636,11 @@ function select(sel) {
   selected = sel && sel.kind !== 'room' ? sel : null;
   drawOutline();
   renderInspector();
-  if (selected && isNarrow() && !(holdMode() && selected.kind === 'item')) openPanel('right');
-  syncSheet();
+  if (selected && isNarrow() && selected.kind !== 'item') openPanel('right');
+  syncSheet(); renderCtx(); updateDims();
 }
 function drawOutline() {
-  disposeGroup(outline); invalidate(2);
+  disposeGroup(outline); invalidate(2); knobR = 0;
   if (!selected) return;
   if (selected.kind === 'item') {
     const it = itemById(selected.id), obj = itemObjects.get(selected.id); if (!it || !obj) { selected = null; return; }
@@ -4605,6 +4655,7 @@ function drawOutline() {
     }
     const loop = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), OUTLINE_MAT);
     loop.renderOrder = 20; outline.add(loop);
+    drawRing(obj);
     // facing arrow
     const ar = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-5, 0.8, d / 2 + 4), new THREE.Vector3(0, 0.8, d / 2 + 10), new THREE.Vector3(5, 0.8, d / 2 + 4)]), OUTLINE_MAT);
     ar.renderOrder = 20; outline.add(ar);
@@ -4650,6 +4701,16 @@ function updateMeasureLabels() {
 
 // ---------------- pointer ----------------
 const el = renderer.domElement;
+// Tap (or click) selects. A selected piece drags to move; its ring's knob turns it. With a mouse any piece
+// drags straight away; on a touch screen an unselected piece lets the camera move instead (nothing gets
+// bumped), and a long press picks it up at once. A long press on the floor or a wall adds a piece there.
+function startMove(e, id) {
+  const it = itemById(id); setRay(e); const fp = floorPoint(); if (!it || !fp) return false;
+  drag = { id, x0: it.x, y0: it.y, f0: fp, moved: false, snap: snapshot() };
+  controls.enabled = false; planControls.enabled = false;
+  try { el.setPointerCapture(e.pointerId); } catch (err) { /* gone */ }
+  return true;
+}
 el.addEventListener('pointerdown', (e) => {
   el.focus({ preventScroll: true });
   touches.add(e.pointerId);
@@ -4657,18 +4718,18 @@ el.addEventListener('pointerdown', (e) => {
   down = { x: e.clientX, y: e.clientY, button: e.button, id: e.pointerId };
   if (mode === 'walk') { walk.dragging = true; walk.lx = e.clientX; walk.ly = e.clientY; el.setPointerCapture(e.pointerId); return; }
   if (e.button !== 0 || measure.on || viewOnly()) return;             // menus hidden: every touch just moves the camera
-  if (holdMode()) { sheetYieldToCanvas(); holdStart(e); return; }                           // press and hold picks up; a tap never selects
+  sheetYieldToCanvas();
+  if (knobHit(e)) { startRotate(e); return; }                         // the turning ring of the selected piece
   setRay(e);
   const hit = pick();
   if (hit && hit.kind === 'item') {
-    const it = itemById(hit.id), fp = floorPoint();
-    if (it && fp) {
-      drag = { id: it.id, x0: it.x, y0: it.y, f0: fp, moved: false, snap: snapshot() };
-      controls.enabled = false; planControls.enabled = false;
-      el.setPointerCapture(e.pointerId);
-      if (!selected || selected.id !== it.id) select({ kind: 'item', id: it.id });
+    const isSel = selected && selected.kind === 'item' && selected.id === hit.id;
+    if (isSel || e.pointerType === 'mouse') {
+      if (startMove(e, hit.id) && !isSel) select({ kind: 'item', id: hit.id });
+      return;
     }
   }
+  holdStart(e);                                                        // camera moves; a long press picks up or adds
 });
 el.addEventListener('pointermove', (e) => {
   if (mode === 'walk' && walk.dragging) {
@@ -4677,6 +4738,7 @@ el.addEventListener('pointermove', (e) => {
     walk.yaw -= (e.clientX - walk.lx) * 0.0042; walk.pitch = clamp(walk.pitch - (e.clientY - walk.ly) * 0.0042, -1.2, 1.2);
     walk.lx = e.clientX; walk.ly = e.clientY; return;
   }
+  if (rot) { moveRotate(e); return; }
   if (holdMove(e)) return;
   if (!drag) return;
   setRay(e);
@@ -4686,38 +4748,47 @@ el.addEventListener('pointermove', (e) => {
   if (!drag.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 4) return;
   drag.moved = true;
   if (isWallType(it.type)) { dragOnWall(it, obj); return; }
-  // walls stop the piece; it slides along them instead of passing through
+  // walls stop the piece; it slides along them instead of passing through, and snaps flush when it comes close
   [it.x, it.y] = resolveMove(it, clamp(nx, -40, state.room.width + 40), clamp(ny, -state.room.stairWidth - 40, state.room.depth + 40));
+  const [sx, sy, snapped] = snapToWalls(it, it.x, it.y);
+  if (snapped && !drag.snapped) buzz(6);
+  drag.snapped = snapped; it.x = sx; it.y = sy;
   placeItem(obj.group, it); if (drag.fromHold) obj.group.position.y = 1.5;
-  syncOutline();
+  syncOutline(); updateDims();
   renderInspectorLive();
 });
 el.addEventListener('pointerup', (e) => {
   touches.delete(e.pointerId);
-  const click = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5 && down.button === 0;
+  const click = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 6 && down.button === 0;
   if (mode === 'walk') { walk.dragging = false; down = null; return; }
-  const tapped = holdEnd(e);
+  holdEnd(e);
+  if (rot) { endRotate(); down = null; return; }
   if (drag) {
     const d = drag;
     if (d.moved) { history.push(d.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; }
-    drag = null;
+    drag = null; updateDims();
     controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
     if (d.fromHold) { liftItem(d.id, false); buzz(8); }
     if (d.moved) commit(false);
-    if (d.fromHold) openItemSheet(d.id);
-  } else if (holdMode() && !measure.on) {
-    if (tapped && click && !viewOnly()) holdTap(e);
+    renderCtx();
   } else if (click && !viewOnly()) {
     setRay(e);
     const hit = pick();
     if (measure.on) {
       const p = mode === 'plan' ? floorPoint() : hit && hit.point.clone();
       if (p) { if (measure.pts.length >= 2) measure.pts = []; measure.pts.push(p); updateMeasureLabels(); }
-    } else select(hit);
+    } else if (hit && (hit.kind === 'item' || hit.kind === 'fixture')) select(hit);
+    else { select(null); closeSheet(); }
   }
   down = null;
 });
-el.addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); holdCancel(); if (drag && drag.fromHold) liftItem(drag.id, false); drag = null; down = null; walk.dragging = false; controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan'; });
+el.addEventListener('pointercancel', (e) => {
+  touches.delete(e.pointerId); holdCancel();
+  if (rot) endRotate();
+  if (drag && drag.fromHold) liftItem(drag.id, false);
+  drag = null; down = null; walk.dragging = false; updateDims(); renderCtx();
+  controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
+});
 
 /** Drag a wall piece: follow the wall under the finger (sliding along it, up and down), or the nearest wall to the floor point. */
 function dragOnWall(it, obj) {
@@ -4784,7 +4855,7 @@ function removeSelected() {
   pushHistory();
   state.items = state.items.filter((i) => i.id !== it.id);
   const obj = itemObjects.get(it.id); if (obj) { itemsGroup.remove(obj.group); disposeGroup(obj.group); itemObjects.delete(it.id); }
-  select(null); commit(false); toast(`${CATALOG[it.type].label} removed · Ctrl+Z to undo`);
+  select(null); closeSheet(); commit(false); snack(`${CATALOG[it.type].label} deleted`);
 }
 function duplicateSelected() {
   if (!selected || selected.kind !== 'item') return;
@@ -4796,7 +4867,7 @@ function duplicateSelected() {
     const w = itemObjects.get(copy.id).w + 4, c = Math.cos(it.rot * DEG), s = Math.sin(it.rot * DEG);
     placeOnWall(copy, it.x - c * w, it.y - s * w); placeItem(itemObjects.get(copy.id).group, copy);
   } else { const spot = nearestFit(copy, copy.x, copy.y); if (spot) { [copy.x, copy.y] = spot; placeItem(itemObjects.get(copy.id).group, copy); } }
-  updateLighting(); select({ kind: 'item', id: copy.id }); commit(false);
+  updateLighting(); select({ kind: 'item', id: copy.id }); commit(false); snack('Copied · drag the copy into place');
 }
 /** Add a piece at plan point `at` (default: middle of the room). Seats turn to face the TV; it lands where it fits. */
 function addItem(type, at, style) {
@@ -4813,7 +4884,7 @@ function addItem(type, at, style) {
     placeOnWall(it, pos.x, pos.y, at && at.wall ? at.wall.h : it.p.h); it.rot = it.rot || 0;
     placeItem(itemObjects.get(it.id).group, it); updateLighting();
     select({ kind: 'item', id: it.id }); commit(false);
-    toast(`${def.label} hung · ${holdMode() ? 'hold it to slide it along the wall or up and down' : 'drag it along the wall'}`);
+    toast(`${def.label} hung · drag it along the wall, or up and down`);
     return;
   }
   let spot = nearestFit(it, it.x, it.y);
@@ -4821,7 +4892,7 @@ function addItem(type, at, style) {
   if (spot) { [it.x, it.y] = spot; placeItem(itemObjects.get(it.id).group, it); }
   updateLighting();
   select({ kind: 'item', id: it.id }); commit(false);
-  toast(spot || fitsRoom(it) ? `${def.label} added · ${holdMode() ? 'press and hold to move it' : 'drag it into place'}` : `${def.label} added, but it is too big for this room`);
+  toast(spot || fitsRoom(it) ? `${def.label} added · drag it into place` : `${def.label} added, but it is too big for this room`);
 }
 function undo() {
   const prev = history.pop(); $('#undoBtn').disabled = history.length === 0;
@@ -4859,10 +4930,10 @@ window.addEventListener('keydown', (e) => {
     case '3': setMode('walk'); break;
     case 'm': case 'M': if (!viewOnly()) setMeasure(!measure.on); break;
     case 'h': case 'H': setFocus(!viewOnly()); break;
-    case 'Escape': if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else select(null); break;
+    case 'Escape': if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else if (sheet) closeSheet(); else select(null); break;
     case 'q': case 'Q': rotateSelected(e.shiftKey ? 45 : 15); break;
     case 'e': case 'E': rotateSelected(e.shiftKey ? -45 : -15); break;
-    case 'r': case 'R': rotateSelected(90); break;
+    case 'r': case 'R': rotateSelected(-90); break;
     case 'Delete': case 'Backspace': if (selected && selected.kind === 'item') { e.preventDefault(); removeSelected(); } break;
     default:
       if (mode !== 'walk' && selected && selected.kind === 'item' && e.key.startsWith('Arrow')) {
@@ -4875,6 +4946,267 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => walk.keys.delete(e.code));
 window.addEventListener('blur', () => walk.keys.clear());
+
+// ---- 56-direct.js ----
+// ===================================================================
+// 56 · Direct manipulation: the way pieces are picked, moved and turned.
+//  - tap (or click) a piece to select it: an outline, a turning ring on the floor and a small toolbar
+//    floating above it (Turn 90°, Face TV, Copy, Delete, Edit)
+//  - drag a selected piece to move it (with a mouse, any piece); dragging an unselected piece on a touch
+//    screen moves the camera, so nothing gets bumped by accident; a long press picks it up straight away
+//  - drag the knob on the ring to turn it, in 15° steps, with the angle shown as you go
+//  - while it moves, the distances to the nearest walls show on the floor and a piece that comes within 3″
+//    of a wall snaps flush against it
+//  - Copy and Delete leave an Undo button for a few seconds
+// ===================================================================
+const ICONS = {
+  turn: '<path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/>',
+  tv: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  fire: '<path d="M12 21c-3.9 0-6-2.6-6-5.6 0-3.6 3-5.4 3.6-9.4 2.5 1.6 3.4 4 3.4 5.6.9-.7 1.4-1.8 1.5-3 1.9 1.6 3.5 4 3.5 6.8 0 3-2.1 5.6-6 5.6z"/>',
+  copy: '<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  edit: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>', down: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+  left: '<path d="M19 12H5M11 6l-6 6 6 6"/>', right: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  eye: '<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+};
+/** An inline line icon (24 × 24, drawn in the current text colour). */
+function icon(name, size = 20) {
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', size); s.setAttribute('height', size);
+  s.setAttribute('aria-hidden', 'true'); s.setAttribute('class', 'ic');
+  s.innerHTML = ICONS[name] || '';
+  return s;
+}
+
+// ---------------- the floating toolbar ----------------
+let ctxEl = null, chipEl = null, snackEl = null, snackTimer = 0, selTop = 30;
+function initDirect() {
+  ctxEl = h('div', { class: 'ctx', role: 'toolbar', 'aria-label': 'Selected piece' }); $('#app').append(ctxEl);
+  chipEl = h('div', { class: 'ctx-chip', 'aria-live': 'polite' }); $('#app').append(chipEl);
+  snackEl = h('div', { class: 'snack', role: 'status' }); $('#app').append(snackEl);
+  // hover cue on a mouse: a hand over pieces, a grabbing hand over the selected one
+  let lastHover = 0;
+  el.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' || e.buttons || drag || rot || viewOnly() || mode === 'walk' || measure.on) return;
+    const now = performance.now(); if (now - lastHover < 60) return; lastHover = now;
+    if (knobHit(e)) { el.style.cursor = 'grab'; return; }
+    setRay(e); const hit = pick();
+    el.style.cursor = hit && hit.kind === 'item' ? (selected && selected.id === hit.id ? 'move' : 'pointer') : hit && hit.kind === 'fixture' ? 'pointer' : '';
+  });
+}
+function ctxButton(name, label, fn, cls = '') {
+  return h('button', { class: 'ctx-b ' + cls, title: label, 'aria-label': label, onclick: (e) => { e.stopPropagation(); fn(); } }, icon(name), cls.includes('wide') ? h('span', {}, label) : null);
+}
+/** Rebuild the toolbar for the current selection. */
+function renderCtx() {
+  if (!ctxEl) return;
+  ctxEl.replaceChildren();
+  if (!selected) { ctxEl.classList.remove('on'); return; }
+  if (selected.kind === 'fixture') {
+    ctxEl.append(h('span', { class: 'ctx-name' }, selected.name === 'tv' ? 'TV' : 'Fireplace'),
+      h('div', { class: 'ctx-row' }, ctxButton('edit', 'Edit', () => { if (isNarrow()) openPanel('right'); else { $('#rightPanel').classList.remove('collapsed'); $('#toggleRight').setAttribute('aria-expanded', 'true'); } }, 'wide')));
+  } else {
+    const it = itemById(selected.id); if (!it) return;
+    const G = geom(), wall = isWallType(it.type);
+    const row = h('div', { class: 'ctx-row' },
+      wall ? null : ctxButton('turn', 'Turn 90°', () => rotateSelected(-90)),            // clockwise, like the icon
+      SEATING[it.type] ? ctxButton('tv', 'Face the TV', () => turnTo(squareFacing(it, G.tvX + state.tv.offset, state.room.depth))) : null,
+      ctxButton('copy', 'Copy', duplicateSelected),
+      ctxButton('trash', 'Delete', removeSelected, 'danger'),
+      h('span', { class: 'ctx-sep' }),
+      ctxButton('edit', 'Edit', () => openItemSheet(it.id), 'wide primary'));
+    ctxEl.append(h('span', { class: 'ctx-name' }, CATALOG[it.type].label), row);
+  }
+  ctxEl.classList.add('on');
+  invalidate(1);
+}
+/** Keep the toolbar just clear of the selected piece and its ring (called after every drawn frame): above it,
+ *  or below it when there's no room above. It never covers the piece or the knob. */
+const _cv = new THREE.Vector3();
+function placeCtx() {
+  if (!ctxEl) return;
+  const busy = !!(drag && drag.moved) || !!(rot && rot.moved);
+  const sheetUp = sheet && sheet.kind === 'item' && sheet.view !== 'peek';
+  let show = !!selected && !busy && !sheetUp && mode !== 'walk' && !viewOnly() && !measure.on;
+  const pts = [];
+  if (show) {
+    if (selected.kind === 'item') {
+      const obj = itemObjects.get(selected.id), it = itemById(selected.id);
+      if (!obj || !it) show = false;
+      else {
+        const g = obj.group.position, r = knobR || Math.max(obj.w, obj.d) / 2 + 4;
+        if (isWallType(it.type)) {                       // a wall piece: its upright box
+          const b = new THREE.Box3().setFromObject(obj.group, true);
+          for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) pts.push(new THREE.Vector3(x, y, z));
+        } else for (let k = 0; k < 12; k++) {             // the ring on the floor and a circle at the top of the piece
+          const a = (k / 12) * Math.PI * 2, c = Math.cos(a), sn = Math.sin(a);
+          pts.push(new THREE.Vector3(g.x + c * (r + 4), g.y + 1, g.z + sn * (r + 4)));
+          pts.push(new THREE.Vector3(g.x + c * Math.max(obj.w, obj.d) / 2, g.y + selTop, g.z + sn * Math.max(obj.w, obj.d) / 2));
+        }
+        pts.centre = g.clone().setY(g.y + selTop);
+      }
+    } else {
+      const grp = selected.name === 'tv' ? FX.tv?.group : FX.fire?.group;
+      if (grp) {
+        const b = new THREE.Box3().setFromObject(grp, true);
+        for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) pts.push(new THREE.Vector3(x, y, z));
+        pts.centre = b.getCenter(new THREE.Vector3());
+      } else show = false;
+    }
+  }
+  if (show) {
+    activeCam.updateMatrixWorld();
+    const W = stage.clientWidth, H = stage.clientHeight, bottom = H - viewInset;
+    const scr = (v) => { _cv.copy(v).project(activeCam); return { x: ((_cv.x + 1) / 2) * W, y: (1 - (_cv.y + 1) / 2) * H, z: _cv.z }; };
+    const c = scr(pts.centre);
+    let y0 = Infinity, y1 = -Infinity;
+    for (const v of pts) { const q = scr(v); if (q.z < 1) { y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y); } }
+    const bw = ctxEl.offsetWidth || 220, bh = ctxEl.offsetHeight || 70, TOP = 112;
+    if (c.z > 1 || c.x < -40 || c.x > W + 40 || y1 < TOP || y0 > bottom) show = false;
+    else {
+      let below = false, y = y0 - 10;
+      if (y - bh < TOP) { below = y1 + 10 + bh < bottom; y = below ? y1 + 10 : TOP + bh; }
+      ctxEl.classList.toggle('below', below);
+      ctxEl.style.left = `${clamp(c.x, bw / 2 + 8, W - bw / 2 - 8)}px`;
+      ctxEl.style.top = `${y}px`;
+    }
+  }
+  ctxEl.classList.toggle('on', show);
+}
+/** A small label that follows the gesture (the angle while turning). */
+function showChip(text, e) {
+  if (!chipEl) return;
+  if (!text) { chipEl.classList.remove('on'); return; }
+  chipEl.textContent = text; chipEl.classList.add('on');
+  if (e) { chipEl.style.left = `${e.clientX}px`; chipEl.style.top = `${e.clientY - 46}px`; }
+}
+/** A message with an Undo button, for a few seconds. */
+function snack(msg, undoable = true) {
+  if (!snackEl) { toast(msg); return; }
+  clearTimeout(snackTimer);
+  snackEl.replaceChildren(h('span', {}, msg), undoable ? h('button', { onclick: () => { snackEl.classList.remove('on'); undo(); } }, icon('undo', 16), 'Undo') : null);
+  const sh = $('#sheet'), app = $('#app').getBoundingClientRect();
+  snackEl.style.bottom = sh.classList.contains('open') ? `${app.bottom - sh.getBoundingClientRect().top + 12}px` : '';
+  snackEl.classList.add('on');
+  snackTimer = setTimeout(() => snackEl.classList.remove('on'), undoable ? 4500 : 2200);
+}
+
+// ---------------- the turning ring ----------------
+const RING_MAT = new THREE.LineBasicMaterial({ color: '#d6a463', depthTest: false, transparent: true, opacity: 0.45 });
+const KNOB_MAT = new THREE.MeshBasicMaterial({ color: '#d6a463', depthTest: false, transparent: true });
+const KNOB_DOT = new THREE.MeshBasicMaterial({ color: '#1c1814', depthTest: false, transparent: true });
+let knobR = 0;
+/** Draw the ring and its knob in the outline group (local frame of the piece: +Z is its front). */
+function drawRing(obj) {
+  knobR = Math.max(obj.w, obj.d) / 2 + 12;
+  const pts = []; for (let k = 0; k <= 72; k++) { const a = (k / 72) * Math.PI * 2; pts.push(new THREE.Vector3(Math.sin(a) * knobR, 0.9, Math.cos(a) * knobR)); }
+  const ring = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), RING_MAT); ring.renderOrder = 20; outline.add(ring);
+  const knob = new THREE.Mesh(new THREE.CircleGeometry(3.4, 28), KNOB_MAT); knob.rotation.x = -Math.PI / 2; knob.position.set(0, 1, knobR); knob.renderOrder = 22;
+  const dot = new THREE.Mesh(new THREE.RingGeometry(1.1, 1.9, 24), KNOB_DOT); dot.rotation.x = -Math.PI / 2; dot.position.set(0, 1.05, knobR); dot.renderOrder = 23;
+  outline.add(knob, dot);
+  const b = new THREE.Box3().setFromObject(obj.group, true); selTop = Math.max(8, b.max.y - obj.group.position.y);
+}
+/** Is the pointer on the knob of the selected piece's ring? (screen distance, generous for fingers) */
+function knobHit(e) {
+  if (!selected || selected.kind !== 'item' || !knobR) return false;
+  const it = itemById(selected.id); if (!it || isWallType(it.type)) return false;
+  const p = outline.localToWorld(new THREE.Vector3(0, 1, knobR)); activeCam.updateMatrixWorld();
+  const v = p.project(activeCam), r = renderer.domElement.getBoundingClientRect();
+  const x = r.left + ((v.x + 1) / 2) * r.width, y = r.top + (1 - (v.y + 1) / 2) * r.height;
+  // a finger gets a generous target, but never one that reaches the middle of a piece that looks small on screen
+  const m = outline.position.clone().project(activeCam), mx = r.left + ((m.x + 1) / 2) * r.width, my = r.top + (1 - (m.y + 1) / 2) * r.height;
+  const reach = Math.min(e.pointerType === 'mouse' ? 16 : 30, Math.max(10, Math.hypot(x - mx, y - my) * 0.55));
+  return Math.hypot(e.clientX - x, e.clientY - y) < reach;
+}
+let rot = null;                                       // { id, snap, rot0, moved }
+function startRotate(e) {
+  const it = itemById(selected.id);
+  rot = { id: it.id, snap: snapshot(), rot0: it.rot, x0: it.x, y0: it.y, moved: false };
+  controls.enabled = false; planControls.enabled = false;
+  try { el.setPointerCapture(e.pointerId); } catch (err) { /* gone */ }
+  el.style.cursor = 'grabbing';
+}
+function moveRotate(e) {
+  const it = itemById(rot.id), obj = itemObjects.get(rot.id); if (!it || !obj) return;
+  setRay(e); const fp = floorPoint(); if (!fp) return;
+  const target = ((Math.round(facing(it, fp.x, -fp.z) / 15) * 15) % 360 + 360) % 360;
+  if (target !== it.rot) {
+    // turn about where it started; near a wall it steps out just enough to clear it (and back when turned square again)
+    const spot = !fitsRoom(it, rot.x0, rot.y0, it.rot) ? [rot.x0, rot.y0] : nearestFit(it, rot.x0, rot.y0, target);
+    if (!spot || Math.hypot(spot[0] - rot.x0, spot[1] - rot.y0) > 30) { showChip(`${it.rot}°`, e); return; }
+    if (target % 90 === 0) buzz(6);
+    it.rot = target; it.x = Math.round(spot[0] * 4) / 4; it.y = Math.round(spot[1] * 4) / 4; rot.moved = true;
+    placeItem(obj.group, it); syncOutline(); updateDims(); renderInspectorLive(); invalidate(1);
+  }
+  showChip(`${it.rot}°`, e);
+}
+function endRotate() {
+  const r = rot; rot = null; showChip(null); el.style.cursor = ''; updateDims(); renderCtx();
+  controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
+  if (r.moved) { history.push(r.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; commit(false); }
+}
+
+// ---------------- distances to the walls, and snapping flush ----------------
+const dimsGroup = new THREE.Group(); helpersGroup.add(dimsGroup);
+const DIM_MAT = new THREE.LineDashedMaterial({ color: '#d6a463', dashSize: 2, gapSize: 1.5, depthTest: false, transparent: true });
+const SNAP_IN = 3;
+/** The piece's plan bounding box and the free distance from each side to the nearest wall or obstacle. */
+function wallGaps(it, x = it.x, y = it.y) {
+  const fp = footprint(it, x, y); if (!fp) return null;
+  const xs = fp.map((p) => p[0]), ys = fp.map((p) => p[1]);
+  const box = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+  const edges = [], o = geom().outline;
+  for (let i = 0; i < o.length; i++) edges.push([o[i], o[(i + 1) % o.length]]);
+  for (const ob of floorObstacles()) for (let i = 0; i < 4; i++) edges.push([ob[i], ob[(i + 1) % 4]]);
+  const cast = (ox, oy, dx, dy) => {                   // nearest edge hit along an axis ray
+    let best = Infinity;
+    for (const [a, b] of edges) {
+      const ex = b[0] - a[0], ey = b[1] - a[1], den = dx * ey - dy * ex; if (Math.abs(den) < 1e-9) continue;
+      const t = ((a[0] - ox) * ey - (a[1] - oy) * ex) / den, u = ((a[0] - ox) * dy - (a[1] - oy) * dx) / den;
+      if (t > -0.01 && u >= 0 && u <= 1 && t < best) best = t;
+    }
+    return best;
+  };
+  const cx = (box.x0 + box.x1) / 2, cy = (box.y0 + box.y1) / 2;
+  return { box, cx, cy, gaps: { e: cast(box.x1, cy, 1, 0), w: cast(box.x0, cy, -1, 0), n: cast(cx, box.y1, 0, 1), s: cast(cx, box.y0, 0, -1) } };
+}
+/** Pull a square-on piece flush against a wall it has come within 3″ of. Returns the snapped position. */
+function snapToWalls(it, x, y) {
+  if (isWallType(it.type) || ((it.rot % 90) + 90) % 90 !== 0) return [x, y, false];
+  const g = wallGaps(it, x, y); if (!g) return [x, y, false];
+  let nx = x, ny = y, hit = false;
+  // the collision footprint is WALL_SKIN smaller than the piece: stop with the piece's real edge on the wall
+  const k = WALL_SKIN, near = (d) => d < SNAP_IN && d > k + 0.05;
+  if (near(g.gaps.e)) { nx += g.gaps.e - k; hit = true; } else if (near(g.gaps.w)) { nx -= g.gaps.w - k; hit = true; }
+  if (near(g.gaps.n)) { ny += g.gaps.n - k; hit = true; } else if (near(g.gaps.s)) { ny -= g.gaps.s - k; hit = true; }
+  nx = Math.round(nx * 100) / 100; ny = Math.round(ny * 100) / 100;
+  if (hit && fitsRoom(it, nx, ny)) return [nx, ny, true];
+  return [x, y, false];
+}
+/** Dashed lines with their lengths from each side of the selected piece to the nearest wall (shown while it moves). */
+function updateDims(force = false) {
+  disposeGroup(dimsGroup);
+  const active = force || (drag && drag.moved) || (rot && rot.moved);
+  if (!active || !selected || selected.kind !== 'item') return;
+  const it = itemById(selected.id); if (!it || isWallType(it.type)) return;
+  const g = wallGaps(it); if (!g) return;
+  const z = 1.2, seg = (a, b, d) => {
+    if (!(d < 260)) return;
+    const gap = Math.max(0, d - WALL_SKIN);                // the footprint is WALL_SKIN inside the real edge
+    const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([P(a[0], a[1], z), P(b[0], b[1], z)]), DIM_MAT);
+    l.computeLineDistances(); l.renderOrder = 21; dimsGroup.add(l);
+    const tag = document.createElement('div'); tag.className = 'dim brass live'; tag.textContent = gap < 0.3 ? 'flush' : ftin(gap);
+    if (gap < 0.3) tag.classList.add('flush');
+    const o = new CSS2DObject(tag); o.position.copy(P((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, z)); dimsGroup.add(o);
+  };
+  const { box, cx, cy, gaps } = g;
+  seg([box.x1, cy], [box.x1 + gaps.e, cy], gaps.e); seg([box.x0, cy], [box.x0 - gaps.w, cy], gaps.w);
+  seg([cx, box.y1], [cx, box.y1 + gaps.n], gaps.n); seg([cx, box.y0], [cx, box.y0 - gaps.s], gaps.s);
+  invalidate(1);
+}
 
 // ---- 57-collide.js ----
 // ===================================================================
@@ -5059,28 +5391,18 @@ function wallKeepOuts(onFireWall, onTVWall) {
 
 // ---- 58-hold.js ----
 // ===================================================================
-// 58 · Press and hold: the touch-first way to edit.
-//  - hold a piece  -> it lifts; drag to move it (it slides along walls), release for its menu
-//  - hold the floor -> "Add here" menu; the new piece lands on that spot
-//  - a quick tap never selects, so a phone can orbit the room without bumping furniture
-// The menu is a bottom sheet sized for thumbs: quick actions, then Colour / Fabric / Style /
-// Layout / Size tabs that only appear when the piece has them.
+// 58 · Press and hold, and the edit sheet.
+//  - hold a piece   -> it lifts at once and follows your finger (no need to select it first)
+//  - hold the floor -> "Add here"; the new piece lands on that spot · hold a wall -> hang something there
+// The sheet (from the toolbar's Edit button) is sized for thumbs: Colour / Fabric / Style / Layout / Size
+// tabs that only appear when the piece has them, plus the few actions the toolbar doesn't carry.
 // ===================================================================
-const HOLD_KEY = 'basement-cinema-hold';
 const HOLD_MS = 420, HOLD_SLOP = 10;
-let holdPref = (() => { try { return localStorage.getItem(HOLD_KEY) !== 'off'; } catch (e) { return true; } })();
-const holdMode = () => holdPref;
-function setHoldMode(on) {
-  holdPref = !!on;
-  try { localStorage.setItem(HOLD_KEY, on ? 'on' : 'off'); } catch (e) { /* stays for this visit */ }
-  if (!on) closeSheet();
-  updateHint();
-}
 function updateHint() {
   const t = $('#hint'); if (!t) return;
-  t.textContent = holdMode()
-    ? 'Press and hold furniture to pick it up · hold the floor to add · Q / E rotate'
-    : 'Click furniture to select · drag to move · Q / E rotate · Del removes';
+  t.textContent = matchMedia('(pointer: coarse)').matches
+    ? 'Tap a piece to select it · drag it to move · turn it with the ring · hold the floor to add'
+    : 'Click a piece to select · drag to move · drag the ring to turn · Q / E rotate · Del removes · hold the floor to add';
 }
 const buzz = (ms = 12) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* no haptics */ } };
 
@@ -5111,7 +5433,6 @@ function holdFire() {
   hold.fired = true; hold.ring.classList.add('done');
   setTimeout(() => hold && hold.ring && hold.ring.remove(), 220);
   buzz();
-  if (fp) lastHoldFloor = { x: Math.round(fp.x * 2) / 2, y: Math.round(-fp.z * 2) / 2 };
   if (hit && hit.kind === 'item') {
     const it = itemById(hit.id); if (!it) return;
     setRay({ clientX: hold.cx, clientY: hold.cy });
@@ -5123,7 +5444,6 @@ function holdFire() {
     try { el.setPointerCapture(hold.id); } catch (err) { /* pointer already gone */ }
     select({ kind: 'item', id: it.id });
     liftItem(it.id, true);
-    toast('Drag to move · let go for options');
   } else if (hit && hit.kind === 'fixture') {
     select({ kind: 'fixture', name: hit.name }); if (isNarrow()) openPanel('right');
   } else if (hit && hit.kind === 'room' && hit.point.y >= 3 && hit.point.y < state.room.ceiling - 2
@@ -5145,16 +5465,6 @@ function holdEnd(e) {
   const tap = hold && !hold.fired && e.pointerId === hold.id;
   holdCancel();
   return tap;
-}
-let tapHints = 0, lastHoldFloor = null;
-function holdTap(e) {
-  setRay(e);
-  const hit = pick();
-  if (hit && hit.kind === 'item') {
-    if (tapHints++ < 3 || sheet) toast('Press and hold to pick it up');
-  } else if (hit && hit.kind === 'fixture') {
-    select({ kind: 'fixture', name: hit.name });
-  } else if (sheet) { closeSheet(); select(null); }
 }
 
 // ---------------- the sheet ----------------
@@ -5183,8 +5493,8 @@ function showSheet(view) {
 }
 function openItemSheet(id) {
   const it = itemById(id); if (!it) return;
-  sheet = { kind: 'item', id, tab: sheetTabs[it.type], view: 'peek' };
-  renderSheet(); showSheet('peek'); revealSelected();
+  sheet = { kind: 'item', id, tab: sheetTabs[it.type], view: 'open' };
+  renderSheet(); showSheet('open'); revealSelected(); placeCtx();
 }
 function openAddSheet(at) {
   sheet = { kind: 'add', at, view: 'open' };
@@ -5228,13 +5538,13 @@ function revealSelected() {
     }
   }, 380);
 }
-/** Keep the sheet in step with the selection (undo, the Furnish list, keyboard). */
+/** Keep an open sheet in step with the selection (undo, the Furnish list, keyboard). It opens only from Edit. */
 function syncSheet() {
-  if (!holdMode()) return;
+  if (!sheet || sheet.kind !== 'item') return;
   if (selected && selected.kind === 'item') {
-    if (!sheet || sheet.kind !== 'item' || sheet.id !== selected.id) { if (!drag) openItemSheet(selected.id); }
-    else renderSheet();
-  } else if (sheet && sheet.kind === 'item') closeSheet();
+    if (sheet.id !== selected.id) { const it = itemById(selected.id); sheet.id = selected.id; sheet.tab = it && sheetTabs[it.type]; }
+    renderSheet();
+  } else closeSheet();
 }
 function renderSheet() {
   const body = $('#sheetBody'); if (!sheet) return;
@@ -5270,9 +5580,9 @@ function sheetHead(title, sub, extra) {
   return h('header', { class: 'sheet-head' },
     h('div', { class: 'sheet-titles' }, h('h2', {}, title), sub ? h('p', {}, sub) : null),
     extra || null,
-    h('button', { class: 'sheet-x', 'aria-label': 'Close', onclick: () => { closeSheet(); select(null); } }, '✕'));
+    h('button', { class: 'sheet-done', onclick: () => closeSheet() }, 'Done'));
 }
-const act = (icon, label, fn, cls = '') => h('button', { class: 'act ' + cls, onclick: fn, 'aria-label': label }, h('span', { class: 'ico', 'aria-hidden': 'true' }, icon), h('small', {}, label));
+const act = (ic, label, fn, cls = '') => h('button', { class: 'act ' + cls, onclick: fn, 'aria-label': label }, icon(ic, 18), h('small', {}, label));
 
 function itemSheet() {
   const it = itemById(sheet.id); if (!it) { closeSheet(); return h('div'); }
@@ -5284,25 +5594,24 @@ function itemSheet() {
     : h('span', { class: 'badge ' + (fits ? 'ok' : 'bad') }, fits ? 'Clear of walls' : 'Overlaps a wall: drag it free');
 
   const G = geom(), tv = [G.tvX + state.tv.offset, state.room.depth];
+  // the toolbar above the piece carries Turn, Face TV, Copy and Delete; the sheet adds the finer moves
   const acts = h('div', { class: 'sheet-acts' },
     ...(isWallType(it.type) ? [
-      act('▲', 'Up 2″', () => nudgeSelected(0, 2)),
-      act('▼', 'Down 2″', () => nudgeSelected(0, -2)),
-      act('◀', 'Slide', () => nudgeSelected(-4, 0)),
-      act('▶', 'Slide', () => nudgeSelected(4, 0)),
-      ['frame', 'gallery', 'mirror'].includes(it.type) ? act('◎', '57″ eye', () => nudgeSelected(0, 57 - it.p.h)) : null,
+      act('up', 'Up 2″', () => nudgeSelected(0, 2)),
+      act('down', 'Down 2″', () => nudgeSelected(0, -2)),
+      act('left', 'Slide', () => nudgeSelected(-4, 0)),
+      act('right', 'Slide', () => nudgeSelected(4, 0)),
+      ['frame', 'gallery', 'mirror'].includes(it.type) ? act('eye', '57″ eye', () => nudgeSelected(0, 57 - it.p.h)) : null,
     ] : [
-      act('⟲', '15°', () => rotateSelected(15)),
-      act('⟳', '15°', () => rotateSelected(-15)),
-      act('↻', '90°', () => rotateSelected(90)),
+      act('turn', '15° left', () => rotateSelected(15), 'flip'),      // counter-clockwise seen from above
+      act('turn', '15° right', () => rotateSelected(-15)),
     ]),
-    SEATING[it.type] ? act('▣', 'Face TV', () => turnTo(squareFacing(it, ...tv))) : null,
-    SEATING[it.type] ? act('♨', 'Face fire', () => turnTo(squareFacing(it, 0, state.fireplace.center))) : null,
-    it.type === 'rug' ? act('＋', 'Add here', () => { const at = lastHoldFloor || { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
-    act('⧉', 'Copy', duplicateSelected),
-    act('⤓', '3D file', () => exportItemGLB(it)),
-    act('↶', 'Undo', undo),
-    act('🗑', 'Delete', removeSelected, 'danger'));
+    SEATING[it.type] ? act('tv', 'Face TV', () => turnTo(squareFacing(it, ...tv))) : null,
+    SEATING[it.type] ? act('fire', 'Face fire', () => turnTo(squareFacing(it, 0, state.fireplace.center))) : null,
+    it.type === 'rug' ? act('plus', 'Add on it', () => { const at = { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
+    act('copy', 'Copy', duplicateSelected),
+    act('download', '3D file', () => exportItemGLB(it)),
+    act('trash', 'Delete', removeSelected, 'danger'));
 
   // ---- which tabs this piece has ----
   const tabs = [];
@@ -5415,7 +5724,7 @@ function addSheet(at) {
     h('button', { class: 'opt card', onclick: () => pick(t) }, h('b', {}, `${DECOR_ICON[t]}  ${CATALOG[t].label}`), h('small', {}, CATALOG[t].note))));
   if (at.wall) return h('div', { class: 'sheet-inner' },
     sheetHead('Hang on this wall', `${ftin(at.wall.h)} up · it lands flat on the wall, facing the room`),
-    h('div', { class: 'sheet-pane' }, decorGrid(), h('p', { class: 'note' }, 'Hold a hung piece to slide it along the wall or up and down; drag it across to another wall.')));
+    h('div', { class: 'sheet-pane' }, decorGrid(), h('p', { class: 'note' }, 'Drag a hung piece to slide it along the wall or up and down, or across to another wall.')));
   const FEATURED = [
     ['uSectional', 'From Wayfair', 'Tremee U-sectional', '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper', WAYFAIR_FABRICS],
     ['prettySectional', 'From Must Société', 'Pretty modular sectional', '127″ × 93″ × 26″ · curved L, rounded open ends', MUST_FABRICS],
@@ -5595,8 +5904,7 @@ function renderFurnish() {
     grid.append(h('button', { onclick: () => addItem(type), title: 'Add ' + def.label }, h('b', {}, def.label), h('small', {}, def.note)));
   }
   root.append(group('Add to the room', grid,
-    toggle('hold-mode', 'Press and hold to edit (touch-friendly)', holdMode(), (v) => setHoldMode(v)),
-    h('p', { class: 'note' }, 'On: hold a piece to pick it up and get its menu, hold the floor to add here. Taps only move the camera, so nothing gets bumped. Furniture never passes through walls.')));
+    h('p', { class: 'note' }, 'Or hold the floor where you want it. Tap a piece to select it, drag it to move, turn it with the ring. Furniture never passes through walls and snaps flush when it gets close.')));
   const list = h('div', { class: 'chips' });
   for (const it of state.items) {
     const sel = selected && selected.kind === 'item' && selected.id === it.id;
@@ -6706,7 +7014,7 @@ initControls();
 initPipeline();                                       // composers: quick frames while moving, full frames when still (52-render)
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initPhoto(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initDirect(); initPhoto(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));
@@ -6822,6 +7130,7 @@ function frame(now) {
   const which = inMove ? 'move' : 'still';
   drawView(activeCam, which);
   labelRenderer.render(scene, activeCam);
+  placeCtx();
   // moving frames: drop their resolution while they're slow, raise it back when there is headroom. Only back-to-back
   // moving frames count (a longer stall is a one-off, e.g. a shader compile); the full frame is never scaled down.
   if (which === 'move' && lastWasMove && rafGap < 1000) {
@@ -6857,7 +7166,14 @@ window.__cinema = {
     if (envDirty) captureEnv();
     drawView(activeCam, 'still');
     labelRenderer.render(scene, activeCam);
+    placeCtx();
     return type ? renderer.domElement.toDataURL(type, q) : '';
+  },
+  /** Screen position (CSS px in the canvas) of a piece, or of the selected piece's turning knob. */
+  pieceScreen(id) {
+    const o = id === 'knob' ? (knobR ? outline.localToWorld(new THREE.Vector3(0, 1, knobR)) : null) : itemObjects.get(id)?.group.position.clone();
+    if (!o) return null; activeCam.updateMatrixWorld(); const v = o.project(activeCam);
+    return { x: ((v.x + 1) / 2) * stage.clientWidth, y: (1 - (v.y + 1) / 2) * stage.clientHeight };
   },
   idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
   perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,

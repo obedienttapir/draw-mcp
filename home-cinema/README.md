@@ -44,7 +44,7 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
 
 - **3D / Plan / Walk** (keys `1` `2` `3`): orbit the dollhouse, read a dimensioned plan, or walk at eye height (`W A S D` or arrows, drag to look, hold ▲ on touch screens).
 - **Camera presets**: Overview, From sofa, TV wall, Fireplace, From stairs.
-- **Select and move**: click a piece, drag it on the floor (snaps to ½″). `Q` / `E` rotate 15° (Shift: 45°), `R` turns 90°, arrows nudge 1″ (Shift: 6″), `Del` removes, `Ctrl+D` duplicates, `Ctrl+Z` undoes.
+- **Select and move**: click a piece, drag it on the floor (snaps to ½″, and flush to a wall within 3″), drag the knob on its ring to turn it. `Q` / `E` rotate 15° (Shift: 45°), `R` turns 90° clockwise, arrows nudge 1″ (Shift: 6″), `Del` removes, `Ctrl+D` duplicates, `Ctrl+Z` undoes. See [Editing](#editing-select-move-turn).
 - **TV**: click it to change size (65″–98″), mount height and offset. The details panel reports eye-to-screen distance, the field of view the picture fills (SMPTE 30° / THX 36° references), whether it fits the 84″ alcove wall, neck tilt, and whether it clears the soundbar.
 - **Measure** (`M`): click two points. In Plan view points are taken on the floor.
 - **Lighting**: Bright, Evening, Movie and Fireside scenes, plus dimmers for the pot lights and the 2700K LED channels, TV, flame and lamps.
@@ -78,15 +78,17 @@ Your tape measurements are sliders under **Room › Measured**, and Plan view sh
 - **After the shot**: **Share to an app…** (the phone's share sheet: a render or AI app, Photos, Messages), **Download**, **Copy**, and for render apps: **Scene + camera (.glb)**, the whole room and furniture in metres with a glTF camera that matches the shot (Blender, D5, SketchUp, Twinmotion open it with the same framing), and **Camera data** (position, look-at, focal length, sensor, field of view, aspect and the lens shift to set when straight verticals is on).
 - `Esc` or ✕ leaves photo mode; editing is off while it's open, so taps only move the camera.
 
-## Press and hold (touch-first editing)
+## Editing: select, move, turn
 
-Built for phones first; on by default and switchable under **Furnish › Press and hold to edit**.
+The same gestures work with a finger or a mouse, in 3D and in Plan.
 
-- **Hold a piece** (a ring fills under your finger, the phone buzzes): it lifts off the floor. Keep your finger down and drag to move it; let go and its menu slides up from the bottom.
-- **A quick tap never selects**, so one finger can orbit the room without bumping furniture. Tapping empty floor closes the menu.
-- **Hold the floor** to open **Add here**: the piece lands on that spot, seats turn to face the TV, and if it's too big for the spot it goes to the nearest place it fits. Holding a rug selects the rug; its menu has **Add here** too.
-- **The menu** is a bottom sheet that stays out of the way. It opens as a slim strip (about 150 px on a phone) with the name, quick actions (rotate 15° / 90°, **Face TV**, **Face fire**, copy, **3D file**, undo, delete) and tabs that appear only when the piece has them: **Colour**, **Fabric** or **Finish**, **Style**, **Layout** and **Size**. Tap a tab to open its options; tap it again, or touch the room, to fold back to the strip. Swipe the grip up for more room and down to fold or close.
-- **The room stays in view**: on a phone the 3D picture (and Plan) shifts up by half the sheet's height so the room centres in the part you can see, and if the piece you picked is hidden behind the sheet the camera glides to it. The camera presets hide while the sheet is up.
+- **Tap (or click) a piece to select it**: it gets an outline, a facing arrow, a **turning ring** on the floor and a small toolbar floating just above it (below it when there's no room above): **Turn 90°**, **Face the TV** (seats), **Copy**, **Delete** and **Edit**. The toolbar never covers the piece or its ring, and follows it as you orbit. Tap empty floor (or press `Esc`) to deselect.
+- **Drag a selected piece to move it.** With a mouse any piece drags straight away. On a touch screen, dragging a piece that isn't selected moves the camera instead, so one finger can orbit without bumping furniture; **press and hold** a piece to pick it up at once (a ring fills under your finger, the phone buzzes, the piece lifts).
+- **Live distances**: while a piece moves or turns, dashed lines show the gap from each side to the nearest wall or obstacle. Within 3″ of a wall a square-on piece **snaps flush** (the tag turns green and reads *flush*, the phone ticks).
+- **Turn by dragging the knob** on the ring: 15° steps with the angle shown next to your finger, a tick at every right angle. Next to a wall the piece steps out just enough to clear it, and back again when it's square.
+- **Undo is always one tap away**: Delete and Copy leave an **Undo** button at the bottom for a few seconds; `Ctrl+Z` and the Undo button in the top bar undo moves and turns too.
+- **Edit** opens the detail sheet: tabs that appear only when the piece has them (**Colour**, **Fabric** or **Finish**, **Style**, **Layout**, **Size**) and the finer moves the toolbar doesn't carry (15° left / right, **Face fire**, **Add on it** for rugs, **3D file**; Up / Down / Slide for wall pieces). **Done** closes it and keeps the piece selected. Tap a tab again, or touch the room, to fold it to a slim strip; swipe the grip to resize or close it. On a phone the room shifts up so it stays in view above the sheet, and the camera glides to the piece if the sheet would hide it.
+- **Hold the floor** to open **Add here**: the piece lands on that spot, seats turn to face the TV, and if it's too big for the spot it goes to the nearest place it fits.
 - **Hold a wall** to open **Hang on this wall**: frames, a gallery wall, mirrors, shelves, sconces and acoustic panels land flat on that wall at the height you held.
 - **Walls are solid**: dragging, nudging, turning, copying and adding all keep a piece's footprint on the floor and clear of the stairs and the steel-beam bump. A drag into a wall stops at the wall and slides along it. Turning next to a wall shifts the piece out a little, or says there's no room. A piece that already overlaps a wall (an old layout) can be dragged free but never further in.
 
@@ -114,7 +116,7 @@ The 79.6″ depth is the drawing's layout: a long chaise (seat + two ottomans) o
 
 ### Download a 3D file
 
-Any piece can be downloaded as a **.glb** (binary glTF) with its current fabric, colour and layout: **3D file** in the press-and-hold menu, or **3D file (.glb)** in the details panel. Files are in metres, Y up, front facing +Z, and open in Blender, SketchUp (glTF importer), Windows 3D Viewer, Android Scene Viewer and most web viewers. Corduroy ribs come through as a colour texture; glTF has no bump maps.
+Any piece can be downloaded as a **.glb** (binary glTF) with its current fabric, colour and layout: **3D file** in the Edit sheet, or **3D file (.glb)** in the details panel. Files are in metres, Y up, front facing +Z, and open in Blender, SketchUp (glTF importer), Windows 3D Viewer, Android Scene Viewer and most web viewers. Corduroy ribs come through as a colour texture; glTF has no bump maps.
 
 Ready-made files in [`models/`](models/):
 
@@ -162,7 +164,7 @@ Six wall pieces, under **Furnish** or by holding a wall (or the floor: they go o
 | Acoustic panel | fabric (any cover and colour) or wood slats on felt | size; counts towards the acoustics score |
 
 - Wall pieces hang flat on the wall, facing the room, and on the face of the slats where a wall has them. Their centre height is in **Size** (57″ is gallery eye level: the **57″ eye** button).
-- **Hold one and drag** to slide it along the wall and up or down, or across to another wall. In the menu, **Up / Down** move it 2″ and **Slide** moves it 4″ along the wall; arrow keys do the same on a keyboard.
+- **Drag it** (or hold and drag on a touch screen) to slide it along the wall and up or down, or across to another wall. In the Edit sheet, **Up / Down** move it 2″ and **Slide** moves it 4″ along the wall; arrow keys do the same on a keyboard.
 - They stay inside the wall, under the ceiling or bulkhead, and step aside so they never cover the fireplace, the windows above it or the TV.
 - Art is drawn by the planner (no images to download), so it works offline once loaded.
 
@@ -225,8 +227,9 @@ src/js/46-decor-styles.js wall décor variants, prices and default finishes
 src/js/50-view.js     renderer, cameras, presets, walk mode, plan dimensions, viewing maths
 src/js/52-render.js   rendering: quick/full frames, bounce light, shadows, ambient occlusion, glow
 src/js/55-edit.js     picking, dragging, measuring, keyboard
+src/js/56-direct.js   direct editing: floating toolbar, turning ring, live wall distances and snap, undo snackbar
 src/js/57-collide.js  footprints, walls and obstacles: keeps furniture on the floor and wall pieces on walls
-src/js/58-hold.js     press and hold gestures, the bottom-sheet furniture menu, Add here
+src/js/58-hold.js     press and hold gestures, the Edit sheet, Add here
 src/js/59-export.js   download a piece as a .glb 3D file
 src/js/60-ui.js       design panel tabs
 src/js/62-style-ui.js  Style tab, per-piece style controls, compare view, spec sheet

@@ -36,11 +36,11 @@ function select(sel) {
   selected = sel && sel.kind !== 'room' ? sel : null;
   drawOutline();
   renderInspector();
-  if (selected && isNarrow() && !(holdMode() && selected.kind === 'item')) openPanel('right');
-  syncSheet();
+  if (selected && isNarrow() && selected.kind !== 'item') openPanel('right');
+  syncSheet(); renderCtx(); updateDims();
 }
 function drawOutline() {
-  disposeGroup(outline); invalidate(2);
+  disposeGroup(outline); invalidate(2); knobR = 0;
   if (!selected) return;
   if (selected.kind === 'item') {
     const it = itemById(selected.id), obj = itemObjects.get(selected.id); if (!it || !obj) { selected = null; return; }
@@ -55,6 +55,7 @@ function drawOutline() {
     }
     const loop = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), OUTLINE_MAT);
     loop.renderOrder = 20; outline.add(loop);
+    drawRing(obj);
     // facing arrow
     const ar = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-5, 0.8, d / 2 + 4), new THREE.Vector3(0, 0.8, d / 2 + 10), new THREE.Vector3(5, 0.8, d / 2 + 4)]), OUTLINE_MAT);
     ar.renderOrder = 20; outline.add(ar);
@@ -100,6 +101,16 @@ function updateMeasureLabels() {
 
 // ---------------- pointer ----------------
 const el = renderer.domElement;
+// Tap (or click) selects. A selected piece drags to move; its ring's knob turns it. With a mouse any piece
+// drags straight away; on a touch screen an unselected piece lets the camera move instead (nothing gets
+// bumped), and a long press picks it up at once. A long press on the floor or a wall adds a piece there.
+function startMove(e, id) {
+  const it = itemById(id); setRay(e); const fp = floorPoint(); if (!it || !fp) return false;
+  drag = { id, x0: it.x, y0: it.y, f0: fp, moved: false, snap: snapshot() };
+  controls.enabled = false; planControls.enabled = false;
+  try { el.setPointerCapture(e.pointerId); } catch (err) { /* gone */ }
+  return true;
+}
 el.addEventListener('pointerdown', (e) => {
   el.focus({ preventScroll: true });
   touches.add(e.pointerId);
@@ -107,18 +118,18 @@ el.addEventListener('pointerdown', (e) => {
   down = { x: e.clientX, y: e.clientY, button: e.button, id: e.pointerId };
   if (mode === 'walk') { walk.dragging = true; walk.lx = e.clientX; walk.ly = e.clientY; el.setPointerCapture(e.pointerId); return; }
   if (e.button !== 0 || measure.on || viewOnly()) return;             // menus hidden: every touch just moves the camera
-  if (holdMode()) { sheetYieldToCanvas(); holdStart(e); return; }                           // press and hold picks up; a tap never selects
+  sheetYieldToCanvas();
+  if (knobHit(e)) { startRotate(e); return; }                         // the turning ring of the selected piece
   setRay(e);
   const hit = pick();
   if (hit && hit.kind === 'item') {
-    const it = itemById(hit.id), fp = floorPoint();
-    if (it && fp) {
-      drag = { id: it.id, x0: it.x, y0: it.y, f0: fp, moved: false, snap: snapshot() };
-      controls.enabled = false; planControls.enabled = false;
-      el.setPointerCapture(e.pointerId);
-      if (!selected || selected.id !== it.id) select({ kind: 'item', id: it.id });
+    const isSel = selected && selected.kind === 'item' && selected.id === hit.id;
+    if (isSel || e.pointerType === 'mouse') {
+      if (startMove(e, hit.id) && !isSel) select({ kind: 'item', id: hit.id });
+      return;
     }
   }
+  holdStart(e);                                                        // camera moves; a long press picks up or adds
 });
 el.addEventListener('pointermove', (e) => {
   if (mode === 'walk' && walk.dragging) {
@@ -127,6 +138,7 @@ el.addEventListener('pointermove', (e) => {
     walk.yaw -= (e.clientX - walk.lx) * 0.0042; walk.pitch = clamp(walk.pitch - (e.clientY - walk.ly) * 0.0042, -1.2, 1.2);
     walk.lx = e.clientX; walk.ly = e.clientY; return;
   }
+  if (rot) { moveRotate(e); return; }
   if (holdMove(e)) return;
   if (!drag) return;
   setRay(e);
@@ -136,38 +148,47 @@ el.addEventListener('pointermove', (e) => {
   if (!drag.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 4) return;
   drag.moved = true;
   if (isWallType(it.type)) { dragOnWall(it, obj); return; }
-  // walls stop the piece; it slides along them instead of passing through
+  // walls stop the piece; it slides along them instead of passing through, and snaps flush when it comes close
   [it.x, it.y] = resolveMove(it, clamp(nx, -40, state.room.width + 40), clamp(ny, -state.room.stairWidth - 40, state.room.depth + 40));
+  const [sx, sy, snapped] = snapToWalls(it, it.x, it.y);
+  if (snapped && !drag.snapped) buzz(6);
+  drag.snapped = snapped; it.x = sx; it.y = sy;
   placeItem(obj.group, it); if (drag.fromHold) obj.group.position.y = 1.5;
-  syncOutline();
+  syncOutline(); updateDims();
   renderInspectorLive();
 });
 el.addEventListener('pointerup', (e) => {
   touches.delete(e.pointerId);
-  const click = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5 && down.button === 0;
+  const click = down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 6 && down.button === 0;
   if (mode === 'walk') { walk.dragging = false; down = null; return; }
-  const tapped = holdEnd(e);
+  holdEnd(e);
+  if (rot) { endRotate(); down = null; return; }
   if (drag) {
     const d = drag;
     if (d.moved) { history.push(d.snap); if (history.length > 60) history.shift(); $('#undoBtn').disabled = false; }
-    drag = null;
+    drag = null; updateDims();
     controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
     if (d.fromHold) { liftItem(d.id, false); buzz(8); }
     if (d.moved) commit(false);
-    if (d.fromHold) openItemSheet(d.id);
-  } else if (holdMode() && !measure.on) {
-    if (tapped && click && !viewOnly()) holdTap(e);
+    renderCtx();
   } else if (click && !viewOnly()) {
     setRay(e);
     const hit = pick();
     if (measure.on) {
       const p = mode === 'plan' ? floorPoint() : hit && hit.point.clone();
       if (p) { if (measure.pts.length >= 2) measure.pts = []; measure.pts.push(p); updateMeasureLabels(); }
-    } else select(hit);
+    } else if (hit && (hit.kind === 'item' || hit.kind === 'fixture')) select(hit);
+    else { select(null); closeSheet(); }
   }
   down = null;
 });
-el.addEventListener('pointercancel', (e) => { touches.delete(e.pointerId); holdCancel(); if (drag && drag.fromHold) liftItem(drag.id, false); drag = null; down = null; walk.dragging = false; controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan'; });
+el.addEventListener('pointercancel', (e) => {
+  touches.delete(e.pointerId); holdCancel();
+  if (rot) endRotate();
+  if (drag && drag.fromHold) liftItem(drag.id, false);
+  drag = null; down = null; walk.dragging = false; updateDims(); renderCtx();
+  controls.enabled = mode === 'orbit'; planControls.enabled = mode === 'plan';
+});
 
 /** Drag a wall piece: follow the wall under the finger (sliding along it, up and down), or the nearest wall to the floor point. */
 function dragOnWall(it, obj) {
@@ -234,7 +255,7 @@ function removeSelected() {
   pushHistory();
   state.items = state.items.filter((i) => i.id !== it.id);
   const obj = itemObjects.get(it.id); if (obj) { itemsGroup.remove(obj.group); disposeGroup(obj.group); itemObjects.delete(it.id); }
-  select(null); commit(false); toast(`${CATALOG[it.type].label} removed · Ctrl+Z to undo`);
+  select(null); closeSheet(); commit(false); snack(`${CATALOG[it.type].label} deleted`);
 }
 function duplicateSelected() {
   if (!selected || selected.kind !== 'item') return;
@@ -246,7 +267,7 @@ function duplicateSelected() {
     const w = itemObjects.get(copy.id).w + 4, c = Math.cos(it.rot * DEG), s = Math.sin(it.rot * DEG);
     placeOnWall(copy, it.x - c * w, it.y - s * w); placeItem(itemObjects.get(copy.id).group, copy);
   } else { const spot = nearestFit(copy, copy.x, copy.y); if (spot) { [copy.x, copy.y] = spot; placeItem(itemObjects.get(copy.id).group, copy); } }
-  updateLighting(); select({ kind: 'item', id: copy.id }); commit(false);
+  updateLighting(); select({ kind: 'item', id: copy.id }); commit(false); snack('Copied · drag the copy into place');
 }
 /** Add a piece at plan point `at` (default: middle of the room). Seats turn to face the TV; it lands where it fits. */
 function addItem(type, at, style) {
@@ -263,7 +284,7 @@ function addItem(type, at, style) {
     placeOnWall(it, pos.x, pos.y, at && at.wall ? at.wall.h : it.p.h); it.rot = it.rot || 0;
     placeItem(itemObjects.get(it.id).group, it); updateLighting();
     select({ kind: 'item', id: it.id }); commit(false);
-    toast(`${def.label} hung · ${holdMode() ? 'hold it to slide it along the wall or up and down' : 'drag it along the wall'}`);
+    toast(`${def.label} hung · drag it along the wall, or up and down`);
     return;
   }
   let spot = nearestFit(it, it.x, it.y);
@@ -271,7 +292,7 @@ function addItem(type, at, style) {
   if (spot) { [it.x, it.y] = spot; placeItem(itemObjects.get(it.id).group, it); }
   updateLighting();
   select({ kind: 'item', id: it.id }); commit(false);
-  toast(spot || fitsRoom(it) ? `${def.label} added · ${holdMode() ? 'press and hold to move it' : 'drag it into place'}` : `${def.label} added, but it is too big for this room`);
+  toast(spot || fitsRoom(it) ? `${def.label} added · drag it into place` : `${def.label} added, but it is too big for this room`);
 }
 function undo() {
   const prev = history.pop(); $('#undoBtn').disabled = history.length === 0;
@@ -309,10 +330,10 @@ window.addEventListener('keydown', (e) => {
     case '3': setMode('walk'); break;
     case 'm': case 'M': if (!viewOnly()) setMeasure(!measure.on); break;
     case 'h': case 'H': setFocus(!viewOnly()); break;
-    case 'Escape': if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else select(null); break;
+    case 'Escape': if (viewOnly()) setFocus(false); else if (measure.on) setMeasure(false); else if (sheet) closeSheet(); else select(null); break;
     case 'q': case 'Q': rotateSelected(e.shiftKey ? 45 : 15); break;
     case 'e': case 'E': rotateSelected(e.shiftKey ? -45 : -15); break;
-    case 'r': case 'R': rotateSelected(90); break;
+    case 'r': case 'R': rotateSelected(-90); break;
     case 'Delete': case 'Backspace': if (selected && selected.kind === 'item') { e.preventDefault(); removeSelected(); } break;
     default:
       if (mode !== 'walk' && selected && selected.kind === 'item' && e.key.startsWith('Arrow')) {

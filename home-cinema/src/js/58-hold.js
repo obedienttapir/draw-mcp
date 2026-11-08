@@ -1,26 +1,16 @@
 // ===================================================================
-// 58 · Press and hold: the touch-first way to edit.
-//  - hold a piece  -> it lifts; drag to move it (it slides along walls), release for its menu
-//  - hold the floor -> "Add here" menu; the new piece lands on that spot
-//  - a quick tap never selects, so a phone can orbit the room without bumping furniture
-// The menu is a bottom sheet sized for thumbs: quick actions, then Colour / Fabric / Style /
-// Layout / Size tabs that only appear when the piece has them.
+// 58 · Press and hold, and the edit sheet.
+//  - hold a piece   -> it lifts at once and follows your finger (no need to select it first)
+//  - hold the floor -> "Add here"; the new piece lands on that spot · hold a wall -> hang something there
+// The sheet (from the toolbar's Edit button) is sized for thumbs: Colour / Fabric / Style / Layout / Size
+// tabs that only appear when the piece has them, plus the few actions the toolbar doesn't carry.
 // ===================================================================
-const HOLD_KEY = 'basement-cinema-hold';
 const HOLD_MS = 420, HOLD_SLOP = 10;
-let holdPref = (() => { try { return localStorage.getItem(HOLD_KEY) !== 'off'; } catch (e) { return true; } })();
-const holdMode = () => holdPref;
-function setHoldMode(on) {
-  holdPref = !!on;
-  try { localStorage.setItem(HOLD_KEY, on ? 'on' : 'off'); } catch (e) { /* stays for this visit */ }
-  if (!on) closeSheet();
-  updateHint();
-}
 function updateHint() {
   const t = $('#hint'); if (!t) return;
-  t.textContent = holdMode()
-    ? 'Press and hold furniture to pick it up · hold the floor to add · Q / E rotate'
-    : 'Click furniture to select · drag to move · Q / E rotate · Del removes';
+  t.textContent = matchMedia('(pointer: coarse)').matches
+    ? 'Tap a piece to select it · drag it to move · turn it with the ring · hold the floor to add'
+    : 'Click a piece to select · drag to move · drag the ring to turn · Q / E rotate · Del removes · hold the floor to add';
 }
 const buzz = (ms = 12) => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* no haptics */ } };
 
@@ -51,7 +41,6 @@ function holdFire() {
   hold.fired = true; hold.ring.classList.add('done');
   setTimeout(() => hold && hold.ring && hold.ring.remove(), 220);
   buzz();
-  if (fp) lastHoldFloor = { x: Math.round(fp.x * 2) / 2, y: Math.round(-fp.z * 2) / 2 };
   if (hit && hit.kind === 'item') {
     const it = itemById(hit.id); if (!it) return;
     setRay({ clientX: hold.cx, clientY: hold.cy });
@@ -63,7 +52,6 @@ function holdFire() {
     try { el.setPointerCapture(hold.id); } catch (err) { /* pointer already gone */ }
     select({ kind: 'item', id: it.id });
     liftItem(it.id, true);
-    toast('Drag to move · let go for options');
   } else if (hit && hit.kind === 'fixture') {
     select({ kind: 'fixture', name: hit.name }); if (isNarrow()) openPanel('right');
   } else if (hit && hit.kind === 'room' && hit.point.y >= 3 && hit.point.y < state.room.ceiling - 2
@@ -85,16 +73,6 @@ function holdEnd(e) {
   const tap = hold && !hold.fired && e.pointerId === hold.id;
   holdCancel();
   return tap;
-}
-let tapHints = 0, lastHoldFloor = null;
-function holdTap(e) {
-  setRay(e);
-  const hit = pick();
-  if (hit && hit.kind === 'item') {
-    if (tapHints++ < 3 || sheet) toast('Press and hold to pick it up');
-  } else if (hit && hit.kind === 'fixture') {
-    select({ kind: 'fixture', name: hit.name });
-  } else if (sheet) { closeSheet(); select(null); }
 }
 
 // ---------------- the sheet ----------------
@@ -123,8 +101,8 @@ function showSheet(view) {
 }
 function openItemSheet(id) {
   const it = itemById(id); if (!it) return;
-  sheet = { kind: 'item', id, tab: sheetTabs[it.type], view: 'peek' };
-  renderSheet(); showSheet('peek'); revealSelected();
+  sheet = { kind: 'item', id, tab: sheetTabs[it.type], view: 'open' };
+  renderSheet(); showSheet('open'); revealSelected(); placeCtx();
 }
 function openAddSheet(at) {
   sheet = { kind: 'add', at, view: 'open' };
@@ -168,13 +146,13 @@ function revealSelected() {
     }
   }, 380);
 }
-/** Keep the sheet in step with the selection (undo, the Furnish list, keyboard). */
+/** Keep an open sheet in step with the selection (undo, the Furnish list, keyboard). It opens only from Edit. */
 function syncSheet() {
-  if (!holdMode()) return;
+  if (!sheet || sheet.kind !== 'item') return;
   if (selected && selected.kind === 'item') {
-    if (!sheet || sheet.kind !== 'item' || sheet.id !== selected.id) { if (!drag) openItemSheet(selected.id); }
-    else renderSheet();
-  } else if (sheet && sheet.kind === 'item') closeSheet();
+    if (sheet.id !== selected.id) { const it = itemById(selected.id); sheet.id = selected.id; sheet.tab = it && sheetTabs[it.type]; }
+    renderSheet();
+  } else closeSheet();
 }
 function renderSheet() {
   const body = $('#sheetBody'); if (!sheet) return;
@@ -210,9 +188,9 @@ function sheetHead(title, sub, extra) {
   return h('header', { class: 'sheet-head' },
     h('div', { class: 'sheet-titles' }, h('h2', {}, title), sub ? h('p', {}, sub) : null),
     extra || null,
-    h('button', { class: 'sheet-x', 'aria-label': 'Close', onclick: () => { closeSheet(); select(null); } }, '✕'));
+    h('button', { class: 'sheet-done', onclick: () => closeSheet() }, 'Done'));
 }
-const act = (icon, label, fn, cls = '') => h('button', { class: 'act ' + cls, onclick: fn, 'aria-label': label }, h('span', { class: 'ico', 'aria-hidden': 'true' }, icon), h('small', {}, label));
+const act = (ic, label, fn, cls = '') => h('button', { class: 'act ' + cls, onclick: fn, 'aria-label': label }, icon(ic, 18), h('small', {}, label));
 
 function itemSheet() {
   const it = itemById(sheet.id); if (!it) { closeSheet(); return h('div'); }
@@ -224,25 +202,24 @@ function itemSheet() {
     : h('span', { class: 'badge ' + (fits ? 'ok' : 'bad') }, fits ? 'Clear of walls' : 'Overlaps a wall: drag it free');
 
   const G = geom(), tv = [G.tvX + state.tv.offset, state.room.depth];
+  // the toolbar above the piece carries Turn, Face TV, Copy and Delete; the sheet adds the finer moves
   const acts = h('div', { class: 'sheet-acts' },
     ...(isWallType(it.type) ? [
-      act('▲', 'Up 2″', () => nudgeSelected(0, 2)),
-      act('▼', 'Down 2″', () => nudgeSelected(0, -2)),
-      act('◀', 'Slide', () => nudgeSelected(-4, 0)),
-      act('▶', 'Slide', () => nudgeSelected(4, 0)),
-      ['frame', 'gallery', 'mirror'].includes(it.type) ? act('◎', '57″ eye', () => nudgeSelected(0, 57 - it.p.h)) : null,
+      act('up', 'Up 2″', () => nudgeSelected(0, 2)),
+      act('down', 'Down 2″', () => nudgeSelected(0, -2)),
+      act('left', 'Slide', () => nudgeSelected(-4, 0)),
+      act('right', 'Slide', () => nudgeSelected(4, 0)),
+      ['frame', 'gallery', 'mirror'].includes(it.type) ? act('eye', '57″ eye', () => nudgeSelected(0, 57 - it.p.h)) : null,
     ] : [
-      act('⟲', '15°', () => rotateSelected(15)),
-      act('⟳', '15°', () => rotateSelected(-15)),
-      act('↻', '90°', () => rotateSelected(90)),
+      act('turn', '15° left', () => rotateSelected(15), 'flip'),      // counter-clockwise seen from above
+      act('turn', '15° right', () => rotateSelected(-15)),
     ]),
-    SEATING[it.type] ? act('▣', 'Face TV', () => turnTo(squareFacing(it, ...tv))) : null,
-    SEATING[it.type] ? act('♨', 'Face fire', () => turnTo(squareFacing(it, 0, state.fireplace.center))) : null,
-    it.type === 'rug' ? act('＋', 'Add here', () => { const at = lastHoldFloor || { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
-    act('⧉', 'Copy', duplicateSelected),
-    act('⤓', '3D file', () => exportItemGLB(it)),
-    act('↶', 'Undo', undo),
-    act('🗑', 'Delete', removeSelected, 'danger'));
+    SEATING[it.type] ? act('tv', 'Face TV', () => turnTo(squareFacing(it, ...tv))) : null,
+    SEATING[it.type] ? act('fire', 'Face fire', () => turnTo(squareFacing(it, 0, state.fireplace.center))) : null,
+    it.type === 'rug' ? act('plus', 'Add on it', () => { const at = { x: it.x, y: it.y }; select(null); openAddSheet(at); }) : null,
+    act('copy', 'Copy', duplicateSelected),
+    act('download', '3D file', () => exportItemGLB(it)),
+    act('trash', 'Delete', removeSelected, 'danger'));
 
   // ---- which tabs this piece has ----
   const tabs = [];
@@ -355,7 +332,7 @@ function addSheet(at) {
     h('button', { class: 'opt card', onclick: () => pick(t) }, h('b', {}, `${DECOR_ICON[t]}  ${CATALOG[t].label}`), h('small', {}, CATALOG[t].note))));
   if (at.wall) return h('div', { class: 'sheet-inner' },
     sheetHead('Hang on this wall', `${ftin(at.wall.h)} up · it lands flat on the wall, facing the room`),
-    h('div', { class: 'sheet-pane' }, decorGrid(), h('p', { class: 'note' }, 'Hold a hung piece to slide it along the wall or up and down; drag it across to another wall.')));
+    h('div', { class: 'sheet-pane' }, decorGrid(), h('p', { class: 'note' }, 'Drag a hung piece to slide it along the wall or up and down, or across to another wall.')));
   const FEATURED = [
     ['uSectional', 'From Wayfair', 'Tremee U-sectional', '134″ × 80″ · 5 storage seats, 3 ottomans · sleeper', WAYFAIR_FABRICS],
     ['prettySectional', 'From Must Société', 'Pretty modular sectional', '127″ × 93″ × 26″ · curved L, rounded open ends', MUST_FABRICS],
