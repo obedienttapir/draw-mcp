@@ -245,8 +245,8 @@ function renderRoomTab() {
     rs('transomW', 'Window width', 24, 54)));
   root.append(group('Overlays',
     toggle('sightOn', 'Sightline from the sofa', state.showSightline, (v) => { state.showSightline = v; updateLabels(); }),
-    toggle('spkOn', 'Speaker pre-wire plan (5.1.2)', state.showSpeakers, (v) => { state.showSpeakers = v; updateLabels(); }),
-    h('p', { class: 'note' }, 'Blue dots show where to run speaker wire while the ceiling is open. Hover a dot for its role.')));
+    toggle('spkOn', `Speaker pre-wire plan (${state.tune.layout})`, state.showSpeakers, (v) => { state.showSpeakers = v; updateLabels(); }),
+    h('p', { class: 'note' }, 'Blue dots show where to run speaker wire while the ceiling is open. Hover a dot for its role. Choose the layout in Cinema tuning › Speakers.')));
   root.append(group('Save or share', h('p', { class: 'note' }, 'Your layout is kept in this browser. Copy the layout code to keep versions or move it to another device.'),
     h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => openCode() }, 'Layout code'))));
 }

@@ -8,7 +8,7 @@ initControls();
 initPipeline();                                       // composers: quick frames while moving, full frames when still (52-render)
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initDirect(); initPhoto(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initDirect(); initPhoto(); initTune(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));
@@ -169,6 +169,8 @@ window.__cinema = {
     if (!o) return null; activeCam.updateMatrixWorld(); const v = o.project(activeCam);
     return { x: ((v.x + 1) / 2) * stage.clientWidth, y: (1 - (v.y + 1) / 2) * stage.clientHeight };
   },
+  tune: { solve: (cb) => acSolve(cb), analyse: () => analyseRoom(), optimise: (o) => optimiseSubs(o), presets: () => subPresets(), compare: (c) => compareConfigs(c),
+    layout: (k) => tuneLayout(k), rt: () => rtModel(), seats: () => acSeats(), cands: () => subCandidates(), apply: (s) => applySubConfig(s), ctx: () => bassCtx(), S: () => ACS },
   idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
   perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
   view(px, py, pz, tx, ty, tz, fov = 50) { tween = null; camera.fov = fov; camera.updateProjectionMatrix(); camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },

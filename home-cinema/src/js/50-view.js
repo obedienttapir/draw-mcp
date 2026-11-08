@@ -71,7 +71,12 @@ let viewInset = 0;                                     // px of the stage covere
 function applyViewInset(px) {
   viewInset = px;
   const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
-  for (const cam of [camera, ortho]) { if (px > 0.5) cam.setViewOffset(w, h, 0, px / 2, w, h); else cam.clearViewOffset(); }
+  // the tuning panel docks on the right (or the bottom on a phone): centre the 3D picture in what's left
+  const tp = TV && TV.open ? $('#tune') : null, tr = tp && !tp.hidden ? tp.getBoundingClientRect() : null;
+  const ox = tr && !isNarrow() ? (w - (tr.left - stage.getBoundingClientRect().left)) / 2 : 0;
+  const oy = tr && isNarrow() ? Math.max(0, stage.getBoundingClientRect().bottom - tr.top) / 2 : 0;
+  if (px > 0.5 || ox || oy) camera.setViewOffset(w, h, ox, px / 2 + oy, w, h); else camera.clearViewOffset();
+  if (px > 0.5) ortho.setViewOffset(w, h, 0, px / 2, w, h); else ortho.clearViewOffset();
   invalidate(2);
 }
 
@@ -151,7 +156,11 @@ function safeRect() {
   const W = stage.clientWidth, H = stage.clientHeight, s = stage.getBoundingClientRect();
   let l = 0, r = W, t = 74, b = H - 70;
   if (viewOnly()) { t = 56; b = H - 16; }                         // menus hidden: only the Show menus button
-  const L = $('#leftPanel'), R = $('#rightPanel');
+  const L = $('#leftPanel'), R = $('#rightPanel'), T = $('#tune');
+  if (T && !T.hidden) {                                            // the tuning panel
+    const tr = T.getBoundingClientRect();
+    if (isNarrow()) b = Math.min(b, tr.top - s.top - 8); else r = Math.min(r, tr.left - s.left - 8);
+  }
   if (!isNarrow()) {
     if (L && !L.classList.contains('collapsed') && L.offsetParent) l = L.getBoundingClientRect().right - s.left + 8;
     if (R && !R.classList.contains('collapsed') && R.offsetParent) r = R.getBoundingClientRect().left - s.left - 8;
@@ -195,6 +204,7 @@ function setMode(m) {
   updateLabels();
   invalidate(3);
   $('#walkpad').hidden = m !== 'walk';
+  if (TV.open) drawTuneOverlay();
   $('#hint').textContent = m === 'walk'
     ? 'Drag to look around · W A S D or arrow keys to walk · Shift to move faster'
     : m === 'plan' ? 'Drag furniture to move it · drag empty floor to pan · scroll to zoom'
@@ -330,30 +340,12 @@ function updateLabels() {
   updateMeasureLabels();
 }
 
-/**
- * 5.1.2 pre-wire plan from the prime seat, after Dolby's placement angles:
- * fronts ~22° off axis, surrounds 90–110°, top-middle pair just ahead of the seat.
- */
+/** Speaker pre-wire plan: the Cinema tuning layout (5.1.2 by default) placed from the main seat, plus the subwoofers. */
 function speakerPlan() {
-  const seat = mainSeat(); if (!seat) return [];
-  const r = state.room, G = geom(), H = r.ceiling, ear = 40;
-  const T = [G.tvX, r.depth], f = [T[0] - seat.x, T[1] - seat.y], fl = Math.hypot(f[0], f[1]);
-  f[0] /= fl; f[1] /= fl;
-  const rt = [f[1], -f[0]];                               // listener's right
-  const at = (along, side) => [seat.x + f[0] * along + rt[0] * side, seat.y + f[1] * along + rt[1] * side];
-  const frontY = G.mainY + G.ret - 4, along = frontY - seat.y, lat = along * Math.tan(22 * DEG);
-  const clampBay = ([x, y]) => [clamp(x, r.bayLeft + 8, r.bayRight - 8), y];
-  const sideR = r.width - 2 - seat.x, back = -8;
-  return [
-    { k: 'L', name: 'Front left', p: clampBay(at(along, -lat)), z: ear, how: 'tower or in-wall' },
-    { k: 'C', name: 'Centre', p: [G.tvX, r.depth - 10], z: 16, how: 'under the screen' },
-    { k: 'R', name: 'Front right', p: clampBay(at(along, lat)), z: ear, how: 'tower or in-wall' },
-    { k: 'SW', name: 'Subwoofer', p: [r.bayRight - 12, G.mainY + 10], z: 8, how: 'floor, front corner' },
-    { k: 'SR', name: 'Surround right', p: at(back, sideR), z: ear + 22, how: 'exterior wall, 2 ft above ears' },
-    { k: 'SL', name: 'Surround left', p: at(back, -Math.min(sideR, seat.x - r.boxX)), z: H, how: 'in-ceiling, angled (no wall there)' },
-    { k: 'TL', name: 'Top left', p: at(26, -lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
-    { k: 'TR', name: 'Top right', p: at(26, lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
-  ];
+  if (!mainSeat()) return [];
+  const out = tuneLayout(state.tune.layout, true).map((c) => ({ ...c }));
+  for (const s of currentSubs()) out.push({ k: 'SW', name: 'Subwoofer', p: [s.x, s.y], z: 8, how: s.real ? 'floor' : 'floor, front corner (pre-wire)' });
+  return out;
 }
 function drawSpeakerPlan() {
   const disc = new THREE.MeshBasicMaterial({ color: '#7fb3d5', depthTest: false, transparent: true, opacity: 0.9 });

@@ -503,6 +503,141 @@ select.ph-pill { padding-right: 8px; width: auto; flex: none; }
 #app.focus .ctx, #app.photo .ctx, #app.photo .snack, #app.photo .ctx-chip { display: none !important; }
 #app.fast .ctx-row { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--panel-solid); }
 
+/* ---------- cinema tuning studio ---------- */
+.tune { position: absolute; z-index: 5; top: 84px; bottom: 16px; right: var(--gutter-r); width: min(620px, calc(100% - 420px));
+  display: flex; flex-direction: column; overflow: hidden; background: rgba(22, 18, 15, 0.94); border: 1px solid var(--line-strong);
+  border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); backdrop-filter: blur(16px); }
+#app.tuning .dock { right: auto; left: var(--gutter-l); transform: none; }
+#app.tuning .hint { display: none; }
+#app.photo .tune, #app.focus .tune { display: none !important; }
+#tuneBtn[aria-pressed="true"] { border-color: var(--brass); color: var(--brass); background: var(--brass-dim); }
+.tune-head { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 10px; }
+.tune-titles { flex: 1; min-width: 0; }
+.tune-kicker { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+.tune-head h2 { margin: 2px 0 0; font-family: var(--font-mark); font-weight: 400; font-size: 24px; letter-spacing: 0.01em; }
+.tune-head p { margin: 2px 0 0; color: var(--muted); font-family: var(--font-num); font-size: 11px; }
+.tune-x { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; }
+.tune-tabs { display: flex; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; flex: none; }
+.tune-tabs::-webkit-scrollbar { display: none; }
+.tune-tabs button { flex: none; border: 0; background: none; color: var(--muted); padding: 9px 10px 8px; border-bottom: 2px solid transparent; font-weight: 500; }
+.tune-tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--brass); }
+.tune-body { flex: 1; overflow-y: auto; padding: 4px 16px 18px; overscroll-behavior: contain; }
+.tsec { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; gap: 9px; }
+.tsec:last-child { border-bottom: 0; }
+.tsec h3 { margin: 0; font-size: 10.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+.tsec .note, .tune .note { margin: 0; color: var(--muted); font-size: 12px; }
+.trow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.trow .tl, .optctl .tl { width: 82px; flex: none; color: var(--muted); font-size: 12px; }
+.trow .chips { flex: 1; }
+.tune .chip { padding: 5px 10px; font-size: 12px; }
+.mini-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-left: 4px; }
+.mini-toggle input { accent-color: var(--brass); }
+.trow2 span small { display: block; color: var(--faint); font-size: 11px; }
+.tune-busy { padding: 40px 8px; display: grid; gap: 12px; text-align: center; }
+.tprog { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.tprog i { display: block; height: 100%; width: calc(var(--p, 0.02) * 100%); background: var(--brass); transition: width .2s; }
+.tune-busy p { margin: 0; font-family: var(--font-num); font-size: 12px; color: var(--fg); }
+/* overview */
+.tov { display: grid; grid-template-columns: 116px 1fr; gap: 16px; align-items: center; }
+.scoring { width: 108px; height: 108px; border-radius: 50%; display: grid; place-content: center; text-align: center; position: relative;
+  background: conic-gradient(var(--brass) calc(var(--s) * 1%), rgba(255,255,255,0.08) 0); }
+.scoring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: #191512; }
+.scoring b, .scoring small { position: relative; }
+.scoring b { font-family: var(--font-mark); font-size: 40px; font-weight: 400; line-height: 1; color: var(--fg); }
+.scoring small { color: var(--muted); font-size: 11px; }
+.kvs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+.kvs.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kv span { display: block; font-size: 11px; color: var(--muted); }
+.kv b { font-family: var(--font-num); font-weight: 500; font-size: 15px; color: var(--fg); }
+.kv small { display: block; color: var(--faint); font-size: 10.5px; line-height: 1.3; }
+.scorecard { display: grid; gap: 2px; }
+.srow summary { display: grid; grid-template-columns: 1fr auto 26px; gap: 10px; align-items: center; padding: 7px 4px; cursor: pointer; list-style: none; border-radius: 8px; }
+.srow summary::-webkit-details-marker { display: none; }
+.srow summary:hover { background: rgba(255,255,255,0.03); }
+.srow .sv { font-family: var(--font-num); font-size: 12px; color: var(--muted); }
+.srow p { margin: 0 4px 8px; color: var(--muted); font-size: 12px; }
+.grade { display: inline-grid; place-items: center; width: 24px; height: 22px; border-radius: 6px; font-weight: 700; font-size: 12px; font-family: var(--font-num); }
+.grade.gA { background: rgba(143,191,138,0.18); color: var(--ok); } .grade.gB { background: rgba(214,164,99,0.16); color: var(--brass); }
+.grade.gC { background: rgba(226,181,90,0.16); color: var(--warn); } .grade.gD { background: rgba(224,122,98,0.18); color: var(--bad); }
+.advice { display: grid; gap: 8px; }
+.adv { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: start; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02); }
+.adv-n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--brass-dim); color: var(--brass); font-size: 11.5px; font-weight: 600; }
+.adv b { font-weight: 600; } .adv p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+.adv .btn { white-space: nowrap; }
+/* bass */
+.preview-bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; margin: 8px 0 0; padding: 8px 10px; border-radius: 10px;
+  background: var(--brass-dim); border: 1px solid var(--brass); }
+.preview-bar span { flex: 1; color: var(--brass); font-weight: 500; }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.metric { position: relative; padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.02); }
+.metric small { display: block; color: var(--muted); font-size: 11px; }
+.metric b { font-family: var(--font-num); font-weight: 500; font-size: 18px; }
+.metric b i { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 3px; }
+.metric .grade { position: absolute; top: 8px; right: 8px; transform: scale(0.85); }
+.chartwrap { position: relative; }
+canvas.chart { display: block; width: 100%; height: 230px; border-radius: 10px; cursor: crosshair; }
+canvas.chart.tall { height: 290px; cursor: default; } canvas.chart.short { height: 170px; cursor: default; }
+.ctip { position: absolute; pointer-events: none; opacity: 0; background: rgba(28,24,20,0.95); border: 1px solid var(--line-strong); border-radius: 8px; padding: 6px 8px;
+  font-family: var(--font-num); font-size: 10.5px; display: grid; gap: 1px; min-width: 120px; transition: opacity .1s; }
+.ctip.on { opacity: 1; } .ctip b { color: var(--fg); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 11.5px; color: var(--muted); }
+.lg { display: inline-flex; align-items: center; gap: 5px; } .lg.off { opacity: 0.45; }
+.lg i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.lg i.dash { background: repeating-linear-gradient(90deg, #efe6d8 0 4px, transparent 4px 7px); }
+.lg i.band { height: 9px; background: rgba(214,164,99,0.25); }
+.lg i.dot { width: 7px; height: 7px; border-radius: 50%; background: #efe6d8; }
+.maprow { display: flex; align-items: center; gap: 10px; }
+.maprow input { flex: 1; accent-color: var(--brass); }
+.mapf { font-family: var(--font-num); font-weight: 500; min-width: 120px; color: var(--brass); }
+.cbar { display: flex; align-items: center; gap: 8px; font-family: var(--font-num); font-size: 10.5px; color: var(--muted); margin-top: 8px; }
+.cbar i { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgb(27,42,74), rgb(47,111,143) 24%, rgb(95,179,165) 44%, rgb(233,227,201) 60%, rgb(232,168,92) 76%, rgb(200,85,61)); }
+.sublist { display: grid; gap: 6px; }
+.subrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.subrow > b { font-family: var(--font-num); color: var(--brass); }
+.subrow .sname { flex: 1; min-width: 140px; color: var(--muted); font-size: 12px; }
+.dsp { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.step { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+.step small { color: var(--faint); margin-right: 2px; }
+.step button { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--line-strong); background: transparent; padding: 0; }
+.step b { font-family: var(--font-num); font-weight: 500; min-width: 56px; text-align: center; font-size: 12px; }
+.optctl { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.ttable { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ttable th { text-align: left; font-weight: 500; color: var(--faint); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 6px; border-bottom: 1px solid var(--line); }
+.ttable td { padding: 6px; border-bottom: 1px solid var(--line); font-family: var(--font-num); vertical-align: top; }
+.ttable td:first-child { font-family: var(--font-ui); }
+.ttable td small { display: block; color: var(--faint); font-family: var(--font-ui); font-size: 10.5px; margin-top: 1px; }
+.ttable tr.on td { background: var(--brass-dim); } .ttable tr.cur td { color: var(--brass); }
+.ttable tr.warn td { color: var(--warn); } .ttable td.bad { color: var(--bad); }
+.ttable.modes tbody tr { cursor: pointer; } .ttable.modes tbody tr:hover td { background: rgba(255,255,255,0.03); }
+.ttable .bar { display: inline-block; width: 60px; height: 6px; border-radius: 3px; margin-right: 6px; vertical-align: middle;
+  background: linear-gradient(90deg, var(--brass) var(--w), rgba(255,255,255,0.08) 0); }
+.tscroll { max-height: 420px; overflow: auto; border-radius: 8px; }
+.ttable.spk td { white-space: nowrap; } .ttable.spk td:nth-child(2) { white-space: normal; min-width: 150px; font-family: var(--font-ui); color: var(--muted); }
+.treat { display: grid; gap: 9px; }
+.method { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--muted); font-size: 12.5px; }
+.method b { color: var(--fg); font-weight: 600; }
+/* labels in the room */
+.dim.tseat { background: rgba(18,15,12,0.85); border-color: var(--line-strong); font-weight: 500; }
+.dim.tseat.mlp { font-weight: 600; }
+.dim.tseat.null { border-color: #4f86b0; color: #9ccbf0; } .dim.tseat.peak { border-color: var(--brass); color: var(--brass); }
+.dim.tsub { background: #d6a463; color: #1c1612; border-color: #d6a463; font-weight: 600; }
+.dim.spk.bad { background: var(--bad); border-color: var(--bad); color: #1c1612; }
+.dim.trefl { background: rgba(143,191,138,0.9); border-color: transparent; color: #12160f; font-size: 10px; }
+.dim.trefl.bad { background: rgba(224,122,98,0.95); }
+@media (max-width: 1100px) { .tune { width: min(560px, calc(100% - 32px)); } }
+@media (max-width: 900px) {
+  #app.tuning #toggleLeft, #app.tuning #toggleRight, #app.tuning #photoBtn, #app.tuning #focusBtn, #app.tuning #codeBtn { display: none; }
+  .tune-head { padding: 10px 14px 6px; } .tune-head h2 { display: none; } .tune-head p { font-size: 10.5px; }
+  .trow .tl, .optctl .tl { width: 68px; }
+  .tune { top: auto; bottom: 0; left: 0; right: 0; width: auto; height: 56%; border-radius: 18px 18px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  #app.tuning .dock { display: none; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tov { grid-template-columns: 96px 1fr; } .scoring { width: 92px; height: 92px; } .scoring b { font-size: 32px; }
+  .kvs.three { grid-template-columns: 1fr 1fr; }
+  canvas.chart { height: 200px; }
+  .adv { grid-template-columns: 22px 1fr; } .adv .btn { grid-column: 2; justify-self: start; }
+}
+
 </style>
 <script type="importmap">
 { "imports": {
@@ -531,6 +666,7 @@ select.ph-pill { padding-right: 8px; width: auto; flex: none; }
     <button class="iconbtn" id="toggleLeft" aria-expanded="true" aria-controls="leftPanel" title="Show or hide the design panel">Design</button>
     <button class="iconbtn" id="toggleRight" aria-expanded="true" aria-controls="rightPanel" title="Show or hide the details panel">Details</button>
     <button class="iconbtn" id="undoBtn" title="Undo (Ctrl+Z)" disabled>Undo</button>
+ <button class="iconbtn" id="tuneBtn" aria-pressed="false" title="Cinema tuning: bass, room modes, reverb, reflections and speakers (T)">◎ Tune</button>
  <button class="iconbtn" id="photoBtn" title="Photo mode: frame and shoot the room (P)">◉ Photo</button>
     <button class="iconbtn" id="focusBtn" title="Hide the menus and see only the 3D view (H)">Hide menus</button>
     <button class="iconbtn wide-only" id="codeBtn" title="Copy or paste a layout">Layout code</button>
@@ -742,6 +878,12 @@ const DEFAULT_STATE = {
   option: 'original',
   showSightline: true,
   showSpeakers: false,
+  // Cinema tuning: analysis choices and acoustic treatment (the subwoofers themselves are items)
+  tune: {
+    layout: '5.1.2', sub: '15p', signal: 'lfe', xo: 80, target: 'gentle', eq: [], eqOn: true, allSeats: false,
+    dsp: {}, gdelay: 0, subPol: 1, traps: 0, reflPanels: false, rearPanels: false, cloud: false, people: 0,
+    spk: 'bookshelf', amp: 100, door: false, refLvl: -5,
+  },
   items: [
     { id: 'sectional', type: 'sectional', x: 160, y: 52, rot: 0,
       p: { back: 136, ret: 104, depth: 38, side: 'right' } },
@@ -870,6 +1012,7 @@ function applyState(obj, record = true) {
     light: { ...d.light, ...(obj.light || {}) },
     items: obj.items.filter((it) => it && it.type).map((it) => ({ id: it.id || uid(), rot: 0, p: {}, ...it })),
     style: { ...d.style, ...(obj.style || {}) },
+    tune: { ...d.tune, ...(obj.tune || {}), dsp: { ...((obj.tune || {}).dsp || {}) } },
     study: { ...d.study, ...(obj.study || {}), weights: { ...d.study.weights, ...((obj.study || {}).weights || {}) } },
   };
   if (!obj.style) migrateLegacyStyle();
@@ -4132,7 +4275,12 @@ let viewInset = 0;                                     // px of the stage covere
 function applyViewInset(px) {
   viewInset = px;
   const w = Math.max(1, stage.clientWidth), h = Math.max(1, stage.clientHeight);
-  for (const cam of [camera, ortho]) { if (px > 0.5) cam.setViewOffset(w, h, 0, px / 2, w, h); else cam.clearViewOffset(); }
+  // the tuning panel docks on the right (or the bottom on a phone): centre the 3D picture in what's left
+  const tp = TV && TV.open ? $('#tune') : null, tr = tp && !tp.hidden ? tp.getBoundingClientRect() : null;
+  const ox = tr && !isNarrow() ? (w - (tr.left - stage.getBoundingClientRect().left)) / 2 : 0;
+  const oy = tr && isNarrow() ? Math.max(0, stage.getBoundingClientRect().bottom - tr.top) / 2 : 0;
+  if (px > 0.5 || ox || oy) camera.setViewOffset(w, h, ox, px / 2 + oy, w, h); else camera.clearViewOffset();
+  if (px > 0.5) ortho.setViewOffset(w, h, 0, px / 2, w, h); else ortho.clearViewOffset();
   invalidate(2);
 }
 
@@ -4212,7 +4360,11 @@ function safeRect() {
   const W = stage.clientWidth, H = stage.clientHeight, s = stage.getBoundingClientRect();
   let l = 0, r = W, t = 74, b = H - 70;
   if (viewOnly()) { t = 56; b = H - 16; }                         // menus hidden: only the Show menus button
-  const L = $('#leftPanel'), R = $('#rightPanel');
+  const L = $('#leftPanel'), R = $('#rightPanel'), T = $('#tune');
+  if (T && !T.hidden) {                                            // the tuning panel
+    const tr = T.getBoundingClientRect();
+    if (isNarrow()) b = Math.min(b, tr.top - s.top - 8); else r = Math.min(r, tr.left - s.left - 8);
+  }
   if (!isNarrow()) {
     if (L && !L.classList.contains('collapsed') && L.offsetParent) l = L.getBoundingClientRect().right - s.left + 8;
     if (R && !R.classList.contains('collapsed') && R.offsetParent) r = R.getBoundingClientRect().left - s.left - 8;
@@ -4256,6 +4408,7 @@ function setMode(m) {
   updateLabels();
   invalidate(3);
   $('#walkpad').hidden = m !== 'walk';
+  if (TV.open) drawTuneOverlay();
   $('#hint').textContent = m === 'walk'
     ? 'Drag to look around · W A S D or arrow keys to walk · Shift to move faster'
     : m === 'plan' ? 'Drag furniture to move it · drag empty floor to pan · scroll to zoom'
@@ -4391,30 +4544,12 @@ function updateLabels() {
   updateMeasureLabels();
 }
 
-/**
- * 5.1.2 pre-wire plan from the prime seat, after Dolby's placement angles:
- * fronts ~22° off axis, surrounds 90–110°, top-middle pair just ahead of the seat.
- */
+/** Speaker pre-wire plan: the Cinema tuning layout (5.1.2 by default) placed from the main seat, plus the subwoofers. */
 function speakerPlan() {
-  const seat = mainSeat(); if (!seat) return [];
-  const r = state.room, G = geom(), H = r.ceiling, ear = 40;
-  const T = [G.tvX, r.depth], f = [T[0] - seat.x, T[1] - seat.y], fl = Math.hypot(f[0], f[1]);
-  f[0] /= fl; f[1] /= fl;
-  const rt = [f[1], -f[0]];                               // listener's right
-  const at = (along, side) => [seat.x + f[0] * along + rt[0] * side, seat.y + f[1] * along + rt[1] * side];
-  const frontY = G.mainY + G.ret - 4, along = frontY - seat.y, lat = along * Math.tan(22 * DEG);
-  const clampBay = ([x, y]) => [clamp(x, r.bayLeft + 8, r.bayRight - 8), y];
-  const sideR = r.width - 2 - seat.x, back = -8;
-  return [
-    { k: 'L', name: 'Front left', p: clampBay(at(along, -lat)), z: ear, how: 'tower or in-wall' },
-    { k: 'C', name: 'Centre', p: [G.tvX, r.depth - 10], z: 16, how: 'under the screen' },
-    { k: 'R', name: 'Front right', p: clampBay(at(along, lat)), z: ear, how: 'tower or in-wall' },
-    { k: 'SW', name: 'Subwoofer', p: [r.bayRight - 12, G.mainY + 10], z: 8, how: 'floor, front corner' },
-    { k: 'SR', name: 'Surround right', p: at(back, sideR), z: ear + 22, how: 'exterior wall, 2 ft above ears' },
-    { k: 'SL', name: 'Surround left', p: at(back, -Math.min(sideR, seat.x - r.boxX)), z: H, how: 'in-ceiling, angled (no wall there)' },
-    { k: 'TL', name: 'Top left', p: at(26, -lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
-    { k: 'TR', name: 'Top right', p: at(26, lat * 0.8), z: H, how: 'in-ceiling, Atmos' },
-  ];
+  if (!mainSeat()) return [];
+  const out = tuneLayout(state.tune.layout, true).map((c) => ({ ...c }));
+  for (const s of currentSubs()) out.push({ k: 'SW', name: 'Subwoofer', p: [s.x, s.y], z: 8, how: s.real ? 'floor' : 'floor, front corner (pre-wire)' });
+  return out;
 }
 function drawSpeakerPlan() {
   const disc = new THREE.MeshBasicMaterial({ color: '#7fb3d5', depthTest: false, transparent: true, opacity: 0.9 });
@@ -6061,8 +6196,8 @@ function renderRoomTab() {
     rs('transomW', 'Window width', 24, 54)));
   root.append(group('Overlays',
     toggle('sightOn', 'Sightline from the sofa', state.showSightline, (v) => { state.showSightline = v; updateLabels(); }),
-    toggle('spkOn', 'Speaker pre-wire plan (5.1.2)', state.showSpeakers, (v) => { state.showSpeakers = v; updateLabels(); }),
-    h('p', { class: 'note' }, 'Blue dots show where to run speaker wire while the ceiling is open. Hover a dot for its role.')));
+    toggle('spkOn', `Speaker pre-wire plan (${state.tune.layout})`, state.showSpeakers, (v) => { state.showSpeakers = v; updateLabels(); }),
+    h('p', { class: 'note' }, 'Blue dots show where to run speaker wire while the ceiling is open. Hover a dot for its role. Choose the layout in Cinema tuning › Speakers.')));
   root.append(group('Save or share', h('p', { class: 'note' }, 'Your layout is kept in this browser. Copy the layout code to keep versions or move it to another device.'),
     h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => openCode() }, 'Layout code'))));
 }
@@ -6381,6 +6516,909 @@ function initStyleUI() {
   for (const id of ['#compareModal', '#specModal']) $(id).addEventListener('click', (e) => { if (e.target.id === id.slice(1)) (id === '#compareModal' ? closeCompare : closeSpec)(); });
 }
 
+// ---- 63-acoustics.js ----
+// ===================================================================
+// 63 · Acoustics engine (Cinema tuning): the low-frequency wave model.
+//
+// Below ~200 Hz a room is a set of standing waves, and what you hear at a seat is their sum. Rather than
+// assume a shoebox, the planner solves the actual floor plan:
+//  - the floor (main room, TV alcove, fireplace lounge, stairs, hall and the passage to the rest of the
+//    basement) is cut into 5″ cells; the steel-beam pilaster is solid; the stair wall is solid
+//  - the 2-D room modes (Helmholtz equation with rigid walls) are found with shift-invert Lanczos on that
+//    grid; the flat 9′ ceiling gives the vertical modes exactly (cos nπz/H), so each 3-D mode is a
+//    2-D mode × a vertical one (a "2.5-D" model)
+//  - each mode gets its own damping from where its energy meets the boundaries: drywall walls and ceiling
+//    (membrane absorbers), the floor, the open passage to the rest of the basement and the stairwell that
+//    opens to the floor above, the seats, and any bass traps or panels (weighted by the mode's pressure at
+//    the trap: a trap in a corner works on nearly every mode, one at a node does nothing)
+//  - the pressure from a source at any point to any point is the modal sum (Green's function), so the
+//    bass map, every seat's response, the impulse response and the subwoofer optimiser all come from the
+//    same solution, in absolute level relative to the subwoofer's own 1 m output.
+// ===================================================================
+const AC = { c: 343, IN: 0.0254, g: 5, fLo: 15, fHi: 200, fMode: 300, ppo: 48, ear: 38, subZ: 8 };
+const OCT = [63, 125, 250, 500, 1000, 2000, 4000, 8000];
+const OCT_LABEL = ['63', '125', '250', '500', '1k', '2k', '4k', '8k'];
+// random-incidence absorption coefficients, 63 Hz – 8 kHz (typical published values for these constructions)
+const ABS = {
+  drywall: { label: 'Drywall on studs', a: [0.28, 0.29, 0.10, 0.05, 0.04, 0.07, 0.09, 0.09] },
+  ceiling: { label: 'Drywall ceiling on joists', a: [0.25, 0.29, 0.10, 0.05, 0.04, 0.07, 0.09, 0.09] },
+  laminate: { label: 'Laminate on underlay over the slab', a: [0.03, 0.04, 0.04, 0.07, 0.06, 0.06, 0.07, 0.07] },
+  rug: { label: 'Rug with pad', a: [0.02, 0.04, 0.12, 0.30, 0.55, 0.65, 0.70, 0.70] },
+  glass: { label: 'Window glass', a: [0.30, 0.35, 0.25, 0.18, 0.12, 0.07, 0.04, 0.04] },
+  tv: { label: 'TV / screen', a: [0.12, 0.10, 0.06, 0.04, 0.03, 0.03, 0.02, 0.02] },
+  stone: { label: 'Fireplace glass and surround', a: [0.02, 0.02, 0.02, 0.03, 0.03, 0.03, 0.04, 0.04] },
+  slats: { label: 'Wood slats over felt', a: [0.08, 0.15, 0.40, 0.75, 0.80, 0.65, 0.50, 0.40] },
+  panel2: { label: '2″ fabric-wrapped panel', a: [0.05, 0.18, 0.75, 1.0, 1.0, 1.0, 0.98, 0.95] },
+  panel4: { label: '4″ panel with air gap', a: [0.25, 0.75, 1.0, 1.0, 1.0, 0.98, 0.95, 0.9] },
+  slatPanel: { label: 'Slatted acoustic panel', a: [0.06, 0.12, 0.45, 0.80, 0.85, 0.70, 0.55, 0.45] },
+  opening: { label: 'Open to the stairs and hall', a: [0.65, 0.70, 0.80, 0.85, 0.90, 0.95, 0.95, 0.95] },
+};
+// absorption area (m²) per unit
+const UNITS = {
+  seat: { label: 'Upholstered seat', a: [0.05, 0.12, 0.25, 0.40, 0.50, 0.55, 0.55, 0.50] },
+  person: { label: 'Person (seated)', a: [0.05, 0.12, 0.25, 0.35, 0.42, 0.45, 0.45, 0.42] },
+  trap: { label: 'Corner bass trap, floor to ceiling', a: [0.9, 1.6, 1.9, 1.9, 1.8, 1.7, 1.6, 1.5] },
+};
+const AIR_M = [0, 0, 0, 0.0006, 0.001, 0.0024, 0.0074, 0.024];       // air absorption (1/m), 20 °C, 50 % RH
+/** Value of a per-octave table at frequency f (log interpolation, held at the ends). */
+function octAt(a, f) {
+  const t = Math.log2(Math.max(f, 1) / 63);
+  if (t <= 0) return a[0];
+  if (t >= 7) return a[7];
+  const i = Math.floor(t), u = t - i;
+  return a[i] + (a[i + 1] - a[i]) * u;
+}
+const acM = (inches) => inches * AC.IN;
+const tick = () => new Promise((res) => setTimeout(res, 0));
+
+// ---------------- the grid ----------------
+function acGrid() {
+  const r = state.room, G = geom(), g = AC.g, poly = G.outline;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const [x, y] of poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  const nx = Math.ceil((x1 - x0) / g), ny = Math.ceil((y1 - y0) / g);
+  const pil = [r.beamX - r.pilasterW / 2, G.westY - r.pilasterD, r.beamX + r.pilasterW / 2, G.westY];
+  const id = new Int32Array(nx * ny).fill(-1), X = [], Y = [], I = [], J = [];
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    const x = x0 + (i + 0.5) * g, y = y0 + (j + 0.5) * g;
+    if (!pointInPoly([x, y], poly)) continue;
+    if (x > pil[0] && x < pil[2] && y > pil[1] && y < pil[3]) continue;
+    id[j * nx + i] = X.length; X.push(x); Y.push(y); I.push(i); J.push(j);
+  }
+  const N = X.length;
+  // the solid wall between the room and the stairs (from wallX to the exterior wall)
+  const blocked = (k, kk) => (Y[k] < 0) !== (Y[kk] < 0) && X[k] >= G.wallX - 0.01 && X[k] <= r.width;
+  const edges = [], wallF = new Float32Array(N), openF = new Float32Array(N);
+  const room = new Uint8Array(N), stair = new Uint8Array(N);
+  const sx0 = Math.min(r.stairStart, G.topX - G.run);
+  const walls = [];                                     // boundary faces: [cell, nx, ny] (outward normal) for candidates
+  let bw = 0;
+  for (let k = 0; k < N; k++) {
+    room[k] = Y[k] >= 0 ? 1 : 0;
+    stair[k] = Y[k] < 0 && Y[k] >= G.uy0 && X[k] >= sx0 ? 1 : 0;
+    for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const i2 = I[k] + di, j2 = J[k] + dj;
+      const kk = i2 >= 0 && i2 < nx && j2 >= 0 && j2 < ny ? id[j2 * nx + i2] : -1;
+      if (kk >= 0 && !blocked(k, kk)) { if (kk > k) { edges.push(k, kk); bw = Math.max(bw, kk - k); } continue; }
+      // a boundary face: the open end of the passage to the rest of the basement, or a wall
+      const open = di === -1 && G.openEdge && Math.abs(X[k] - g / 2 - G.runX) < g * 0.75 && Y[k] < G.oy0 && Y[k] > G.oy1;
+      if (open) openF[k] += 1; else { wallF[k] += 1; walls.push([k, di, dj]); }
+    }
+  }
+  return { nx, ny, x0, y0, g, N, id, X, Y, I, J, edges, bw, wallF, openF, room, stair, walls, H: r.ceiling, key: acKey() };
+}
+const acKey = () => JSON.stringify(state.room);
+
+// ---------------- banded Cholesky ----------------
+function bandChol(A, N, bw) {
+  const W = bw + 1;
+  for (let i = 0; i < N; i++) {
+    const j0 = Math.max(0, i - bw);
+    for (let j = j0; j <= i; j++) {
+      let s = A[i * W + (i - j)];
+      const k0 = Math.max(j0, j - bw), ri = i * W + i, rj = j * W + j;
+      for (let k = k0; k < j; k++) s -= A[ri - k] * A[rj - k];
+      if (i === j) A[i * W] = Math.sqrt(Math.max(s, 1e-300)); else A[i * W + (i - j)] = s / A[j * W];
+    }
+  }
+}
+function bandSolve(L, N, bw, b) {
+  const W = bw + 1;
+  for (let i = 0; i < N; i++) { let s = b[i]; const ri = i * W + i; for (let k = Math.max(0, i - bw); k < i; k++) s -= L[ri - k] * b[k]; b[i] = s / L[i * W]; }
+  for (let i = N - 1; i >= 0; i--) { let s = b[i]; const kmax = Math.min(N - 1, i + bw); for (let k = i + 1; k <= kmax; k++) s -= L[k * W + (k - i)] * b[k]; b[i] = s / L[i * W]; }
+}
+/** Symmetric tridiagonal eigen-decomposition (implicit QL). d: diagonal, e: off-diagonal (e[i] between i and i+1).
+ *  z: n×n identity on entry, eigenvectors in its columns on exit. */
+function tqli(d, e, z, n) {
+  for (let l = 0; l < n; l++) {
+    let iter = 0, m;
+    do {
+      for (m = l; m < n - 1; m++) { const dd = Math.abs(d[m]) + Math.abs(d[m + 1]); if (Math.abs(e[m]) + dd === dd) break; }
+      if (m !== l) {
+        if (iter++ === 80) break;
+        let g = (d[l + 1] - d[l]) / (2 * e[l]), r = Math.hypot(g, 1);
+        g = d[m] - d[l] + e[l] / (g + (g >= 0 ? Math.abs(r) : -Math.abs(r)));
+        let s = 1, c = 1, p = 0, i;
+        for (i = m - 1; i >= l; i--) {
+          let f = s * e[i]; const b = c * e[i];
+          e[i + 1] = (r = Math.hypot(f, g));
+          if (r === 0) { d[i + 1] -= p; e[m] = 0; break; }
+          s = f / r; c = g / r; g = d[i + 1] - p; r = (d[i] - g) * s + 2 * c * b; d[i + 1] = g + (p = s * r); g = c * r - b;
+          for (let k = 0; k < n; k++) { const zi = k * n + i; f = z[zi + 1]; z[zi + 1] = s * z[zi] + c * f; z[zi] = c * z[zi] - s * f; }
+        }
+        if (r === 0 && i >= l) continue;
+        d[l] -= p; e[l] = g; e[m] = 0;
+      }
+    } while (m !== l);
+  }
+}
+
+// ---------------- room modes ----------------
+let ACS = null;                                         // the solved room: { grid, modes2, modes3 } (per room geometry)
+let acsJob = null;
+/** Solve the room's modes (async, a second or so; cached until the room measurements change). */
+function acSolve(onProgress = () => {}) {
+  const key = acKey();
+  if (ACS && ACS.grid.key === key) return Promise.resolve(ACS);
+  if (acsJob && acsJob.key === key) return acsJob.p;
+  const p = (async () => {
+    const grid = acGrid(), { N, bw, edges } = grid, h = acM(grid.g), H = acM(grid.H);
+    const lamMax = (2 * Math.PI * AC.fMode / AC.c) ** 2, sigma = (2 * Math.PI * 6 / AC.c) ** 2;
+    // stiffness (negative Laplacian, finite volumes, rigid walls) + shift, banded, then factor
+    const W = bw + 1, A = new Float64Array(N * W), ih2 = 1 / (h * h);
+    for (let k = 0; k < N; k++) A[k * W] = sigma;
+    for (let e = 0; e < edges.length; e += 2) {
+      const a = edges[e], b = edges[e + 1];
+      A[a * W] += ih2; A[b * W] += ih2; A[b * W + (b - a)] -= ih2;
+    }
+    onProgress(0.02, 'Factoring the room'); await tick();
+    bandChol(A, N, bw);
+    // how many modes to expect below fMode (Weyl's law, with the rigid-wall edge term)
+    let per = 0; for (let k = 0; k < N; k++) per += grid.wallF[k] + grid.openF[k];
+    const area = N * h * h, kmax = Math.sqrt(lamMax);
+    const est = area * lamMax / (4 * Math.PI) + per * h * kmax / (4 * Math.PI) + 2;
+    const m = Math.min(N - 1, Math.ceil(est * 2.2 + 30), 520);
+    const Q = new Float64Array(m * N), alpha = new Float64Array(m), beta = new Float64Array(m);
+    let q = new Float64Array(N), qPrev = null;
+    let seed = 7; for (let k = 0; k < N; k++) { seed = (seed * 16807) % 2147483647; q[k] = seed / 2147483647 - 0.5; }
+    let nq = 0; for (let k = 0; k < N; k++) nq += q[k] * q[k]; nq = Math.sqrt(nq); for (let k = 0; k < N; k++) q[k] /= nq;
+    let steps = m;
+    for (let j = 0; j < m; j++) {
+      Q.set(q, j * N);
+      const w = Float64Array.from(q); bandSolve(A, N, bw, w);
+      let a = 0; for (let k = 0; k < N; k++) a += w[k] * q[k];
+      for (let k = 0; k < N; k++) w[k] -= a * q[k] + (qPrev ? beta[j - 1] * qPrev[k] : 0);
+      // full reorthogonalisation (a second pass only when the first removed most of the vector)
+      let n0 = 0; for (let k = 0; k < N; k++) n0 += w[k] * w[k];
+      for (let pass = 0; pass < 2; pass++) {
+        for (let i = 0; i <= j; i++) {
+          const off = i * N; let c = 0;
+          for (let k = 0; k < N; k++) c += w[k] * Q[off + k];
+          for (let k = 0; k < N; k++) w[k] -= c * Q[off + k];
+        }
+        let n1 = 0; for (let k = 0; k < N; k++) n1 += w[k] * w[k];
+        if (n1 > 0.5 * n0) break; n0 = n1;
+      }
+      let b = 0; for (let k = 0; k < N; k++) b += w[k] * w[k]; b = Math.sqrt(b);
+      alpha[j] = a; beta[j] = b;
+      if (b < 1e-13) { steps = j + 1; break; }
+      qPrev = q; q = w; for (let k = 0; k < N; k++) q[k] /= b;
+      if (j % 16 === 15) { onProgress(0.05 + 0.8 * j / m, `Solving room modes · ${j + 1} of ${m} Lanczos steps`); await tick(); }
+    }
+    onProgress(0.86, 'Extracting the modes'); await tick();
+    const n = steps, d = alpha.slice(0, n), e = new Float64Array(n), z = new Float64Array(n * n);
+    for (let i = 0; i < n - 1; i++) e[i] = beta[i];
+    for (let i = 0; i < n; i++) z[i * n + i] = 1;
+    tqli(d, e, z, n);
+    const found = [];
+    for (let i = 0; i < n; i++) {
+      const th = d[i]; if (!(th > 0)) continue;
+      const lam = 1 / th - sigma; if (lam > lamMax * 1.05) continue;
+      const resid = Math.abs(beta[n - 1] * z[(n - 1) * n + i]);
+      if (resid / th > 2e-5) continue;
+      found.push({ lam: Math.max(0, lam), i });
+    }
+    found.sort((p1, p2) => p1.lam - p2.lam);
+    const modes2 = [];
+    for (const { lam, i } of found) {
+      const psi = new Float64Array(N);
+      for (let j = 0; j < n; j++) { const y = z[j * n + i]; if (Math.abs(y) < 1e-14) continue; const off = j * N; for (let k = 0; k < N; k++) psi[k] += y * Q[off + k]; }
+      let ss = 0, big = 0; for (let k = 0; k < N; k++) { ss += psi[k] * psi[k]; if (Math.abs(psi[k]) > Math.abs(big)) big = psi[k]; }
+      const sc = Math.sqrt(N / ss) * (big < 0 ? -1 : 1);       // mean square 1 over the floor; largest lobe positive
+      const ps = new Float32Array(N); for (let k = 0; k < N; k++) ps[k] = psi[k] * sc;
+      // where its energy meets the boundaries (all relative to the mean square, 1)
+      let wall = 0, open = 0, st = 0, rm = 0;
+      for (let k = 0; k < N; k++) { const p2 = ps[k] * ps[k]; wall += p2 * grid.wallF[k]; open += p2 * grid.openF[k]; if (grid.stair[k]) st += p2; if (grid.room[k]) rm += p2; }
+      modes2.push({ lam, f: AC.c * Math.sqrt(Math.max(lam, 0)) / (2 * Math.PI), psi: ps, wallW: wall / (N * h), openW: open / (N * h), stairFrac: st / N, roomFrac: rm / N });
+      if (modes2.length % 20 === 0) await tick();
+    }
+    // 3-D modes: each 2-D mode with the vertical ones (rigid floor and ceiling)
+    const modes3 = [];
+    for (let mi = 0; mi < modes2.length; mi++) {
+      for (let nz = 0; ; nz++) {
+        const kz = nz * Math.PI / H, lam3 = modes2[mi].lam + kz * kz;
+        if (lam3 > lamMax) break;
+        modes3.push({ m: mi, nz, lam: lam3, f: AC.c * Math.sqrt(lam3) / (2 * Math.PI), L: nz ? 0.5 : 1 });
+      }
+    }
+    modes3.sort((p1, p2) => p1.lam - p2.lam);
+    for (const md of modes2) md.label = modeShape(grid, md);
+    const res = { grid, modes2, modes3, fTop: modes2.length ? modes2[modes2.length - 1].f : 0 };
+    ACS = res; acsJob = null; onProgress(1, `${modes3.length} room modes below ${AC.fMode} Hz`);
+    return res;
+  })();
+  acsJob = { key, p };
+  return p;
+}
+/** Name a 2-D mode by its closest match to the main room's rectangular modes (p along the room, q across). */
+function modeShape(grid, md) {
+  const r = state.room, G = geom(), Wd = r.width, D = G.mainY;
+  let best = { p: 0, q: 0, c: 0 };
+  for (let p = 0; p <= 6; p++) for (let q = 0; q <= 5; q++) {
+    let s = 0, n1 = 0, n2 = 0;
+    for (let k = 0; k < grid.N; k++) {
+      const x = grid.X[k], y = grid.Y[k]; if (y < 0 || y > D) continue;
+      const b = Math.cos(p * Math.PI * x / Wd) * Math.cos(q * Math.PI * y / D);
+      s += b * md.psi[k]; n1 += b * b; n2 += md.psi[k] * md.psi[k];
+    }
+    const c = n1 && n2 ? (s * s) / (n1 * n2) : 0;
+    if (c > best.c) best = { p, q, c };
+  }
+  return best;
+}
+
+// ---------------- probes: the mode values at a point ----------------
+/** Bilinear weights of the cells around plan point (x, y). */
+function acProbe(grid, x, y) {
+  const fi = (x - grid.x0) / grid.g - 0.5, fj = (y - grid.y0) / grid.g - 0.5;
+  const i0 = Math.floor(fi), j0 = Math.floor(fj), u = fi - i0, v = fj - j0, out = [];
+  let tw = 0;
+  for (const [di, dj, w] of [[0, 0, (1 - u) * (1 - v)], [1, 0, u * (1 - v)], [0, 1, (1 - u) * v], [1, 1, u * v]]) {
+    const i = i0 + di, j = j0 + dj; if (i < 0 || j < 0 || i >= grid.nx || j >= grid.ny) continue;
+    const k = grid.id[j * grid.nx + i]; if (k < 0 || w <= 0) continue;
+    out.push([k, w]); tw += w;
+  }
+  if (!out.length) {                                   // outside the floor: the nearest cell
+    let bk = 0, bd = Infinity;
+    for (let k = 0; k < grid.N; k++) { const dd = (grid.X[k] - x) ** 2 + (grid.Y[k] - y) ** 2; if (dd < bd) { bd = dd; bk = k; } }
+    return [[bk, 1]];
+  }
+  return out.map(([k, w]) => [k, w / tw]);
+}
+/** The coefficients ψ(x, y)·cos(nπz/H) of every 3-D mode at a point. */
+function acCoef(S, x, y, z) {
+  const pr = acProbe(S.grid, x, y), H = S.grid.H, c = new Float64Array(S.modes3.length);
+  const v2 = S.modes2.map((md) => { let s = 0; for (const [k, w] of pr) s += w * md.psi[k]; return s; });
+  S.modes3.forEach((md, i) => { c[i] = v2[md.m] * Math.cos(md.nz * Math.PI * z / H); });
+  return c;
+}
+
+// ---------------- damping ----------------
+/** Everything that absorbs bass, from the layout and the tuning choices. */
+function acAbsorbers() {
+  const t = state.tune, r = state.room, G = geom();
+  const seats = acSeatCount();
+  const traps = acTrapSpots().slice(0, t.traps || 0);
+  const panels = [];
+  for (const it of state.items) if (it.type === 'acousticPanel') {
+    const p = { ...CATALOG.acousticPanel.defaults, ...it.p }, v = resolveSpec(it).variant;
+    panels.push({ x: it.x, y: it.y, z: p.h, area: acM(p.w) * acM(p.hgt), mat: v === 'slat' ? 'slatPanel' : 'panel2' });
+  }
+  if (t.reflPanels) for (const s of acReflectionPanelSpots()) panels.push({ ...s, area: acM(24) * acM(48), mat: 'panel2', virtual: true });
+  if (t.rearPanels) for (const s of acRearSpots()) panels.push({ ...s, area: acM(24) * acM(48), mat: 'panel4', virtual: true });
+  if (t.cloud) { const m = mainSeat() || { x: G.tvX, y: 60 }; panels.push({ x: m.x, y: m.y + 20, z: r.ceiling - 4, area: acM(48) * acM(72), mat: 'panel4', ceiling: true, virtual: true }); }
+  let rugA = 0;
+  for (const it of state.items) if (it.type === 'rug') rugA += acM(it.p.w || 96) * acM(it.p.d || 72);
+  return { seats, people: Math.min(t.people || 0, seats), traps, panels, rugA };
+}
+/** Number of upholstered seats in the room. */
+function acSeatCount() {
+  let n = 0;
+  for (const it of state.items) {
+    const p = { ...(CATALOG[it.type] || {}).defaults, ...it.p };
+    if (it.type === 'uSectional') n += uSectionalSize(p).n + 1;
+    else if (it.type === 'prettySectional') n += 4;
+    else if (it.type === 'sectional') n += Math.round((p.back + p.ret) / 32);
+    else if (it.type === 'sofa') n += Math.max(2, Math.round((p.w || 84) / 30));
+    else if (it.type === 'loungeChair' || it.type === 'recliner') n += 1;
+    else if (it.type === 'ottoman' || it.type === 'pouf') n += 0.4;
+  }
+  return n;
+}
+/** Corners for bass traps: the room's real (convex, floor-to-ceiling) corners, front of the room first. */
+function acTrapSpots() {
+  const r = state.room, G = geom(), o = 6;
+  return [
+    { x: r.width - o, y: G.mainY - o, label: 'front right corner' },
+    { x: o, y: G.westY - o, label: 'front left corner (fireplace wall)' },
+    { x: r.width - o, y: o, label: 'rear right corner (by the stair wall)' },
+    { x: o, y: o, label: 'rear left corner' },
+  ];
+}
+/** Per-mode decay rate δ (1/s) for the current absorbers. */
+function acDamping(S) {
+  const g = S.grid, H = acM(g.H), Afl = g.N * acM(g.g) ** 2, V = Afl * H, c = AC.c;
+  const ab = acAbsorbers();
+  const rugFrac = clamp(ab.rugA / Afl, 0, 0.6);
+  const trapC = ab.traps.map((s) => acProbe(g, s.x, s.y));
+  const panC = ab.panels.map((s) => ({ ...s, pr: acProbe(g, s.x, s.y) }));
+  const psiAt = (md, pr) => { let s = 0; for (const [k, w] of pr) s += w * md.psi[k]; return s; };
+  return S.modes3.map((md3) => {
+    const md = S.modes2[md3.m], f = Math.max(md3.f, AC.fLo), L = md3.L;
+    const aw = octAt(ABS.drywall.a, f), ac = octAt(ABS.ceiling.a, f), ao = octAt(ABS.opening.a, f);
+    const af = octAt(ABS.laminate.a, f) * (1 - rugFrac) + octAt(ABS.rug.a, f) * rugFrac;
+    let d = (c / 16) * (aw * md.wallW + ao * md.openW);
+    d += (c / 16) * (af + ac * (1 - md.stairFrac) + ao * md.stairFrac) / (H * L);
+    d += c * (ab.seats * octAt(UNITS.seat.a, f) + ab.people * octAt(UNITS.person.a, f)) / (8 * V);
+    for (const pr of trapC) d += c * octAt(UNITS.trap.a, f) * psiAt(md, pr) ** 2 / (8 * V);
+    for (const p of panC) {
+      const fz = p.ceiling ? 1 : Math.cos(md3.nz * Math.PI * p.z / g.H) ** 2;
+      d += c * p.area * octAt(ABS[p.mat].a, f) * psiAt(md, p.pr) ** 2 * fz / (8 * V * L);
+    }
+    return d;
+  });
+}
+
+// ---------------- transfer functions ----------------
+const logFreqs = (lo = AC.fLo, hi = AC.fHi, ppo = AC.ppo) => { const n = Math.ceil(ppo * Math.log2(hi / lo)) + 1; return Array.from({ length: n }, (_, i) => lo * 2 ** (i / ppo)); };
+/** Modal denominators 1 / (V Λ (k_N² − k² + 2ikδ/c)) at each frequency: [re, im] per mode per frequency. */
+function acInv(S, damp, F) {
+  const g = S.grid, V = g.N * acM(g.g) ** 2 * acM(g.H), M = S.modes3.length;
+  const re = new Float64Array(F.length * M), im = new Float64Array(F.length * M);
+  F.forEach((f, fi) => {
+    const k = 2 * Math.PI * f / AC.c, k2 = k * k;
+    for (let n = 0; n < M; n++) {
+      const md = S.modes3[n], a = md.lam - k2, b = 2 * k * damp[n] / AC.c, s = V * md.L * (a * a + b * b);
+      re[fi * M + n] = a / s; im[fi * M + n] = -b / s;
+    }
+  });
+  return { re, im, M, F };
+}
+/** Complex transfer (1/m) from a source with coefficients cs to a receiver with coefficients cr. ×4π = re 1 m free field. */
+function acTransfer(inv, cs, cr) {
+  const { re, im, M, F } = inv, out = new Float64Array(F.length * 2);
+  const w = new Float64Array(M); for (let n = 0; n < M; n++) w[n] = cs[n] * cr[n];
+  for (let fi = 0; fi < F.length; fi++) {
+    let sr = 0, si = 0; const off = fi * M;
+    for (let n = 0; n < M; n++) { sr += w[n] * re[off + n]; si += w[n] * im[off + n]; }
+    out[fi * 2] = sr; out[fi * 2 + 1] = si;
+  }
+  return out;
+}
+const db = (re, im) => 10 * Math.log10(re * re + im * im + 1e-30);
+const FF = 4 * Math.PI;                                  // |transfer| × 4π: level re the same source at 1 m in free field
+
+// ---------------- filters ----------------
+/** Complex response of a 2nd-order section with poles at f0, Q (kind: 'lp' | 'hp'). */
+function sos(kind, f0, Q, f) {
+  const x = f / f0, dr = 1 - x * x, di = x / Q, den = dr * dr + di * di;
+  const nr = kind === 'lp' ? 1 : -x * x;                  // (jx)² = −x²
+  return [nr * dr / den, -nr * di / den];
+}
+const cmul = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]];
+/** Linkwitz–Riley 4th order. */
+const lr4 = (kind, f0, f) => { const s = sos(kind, f0, Math.SQRT1_2, f); return cmul(s, s); };
+/** RBJ peaking biquad (48 kHz) complex response. */
+function peq(f0, gainDb, Q, f, fs = 48000) {
+  const A = 10 ** (gainDb / 40), w0 = 2 * Math.PI * f0 / fs, al = Math.sin(w0) / (2 * Q), cw = Math.cos(w0);
+  const b0 = 1 + al * A, b1 = -2 * cw, b2 = 1 - al * A, a0 = 1 + al / A, a1 = -2 * cw, a2 = 1 - al / A;
+  const w = 2 * Math.PI * f / fs, c1 = Math.cos(w), s1 = -Math.sin(w), c2 = Math.cos(2 * w), s2 = -Math.sin(2 * w);
+  const nr = b0 + b1 * c1 + b2 * c2, ni = b1 * s1 + b2 * s2, dr = a0 + a1 * c1 + a2 * c2, di = a1 * s1 + a2 * s2, dd = dr * dr + di * di;
+  return [(nr * dr + ni * di) / dd, (ni * dr - nr * di) / dd];
+}
+// subwoofers: anechoic response (high-pass) and maximum output at 1 m (typical CEA-2010-style figures for the class)
+const SUB_MODELS = {
+  '12s': { label: '12″ sealed', note: '500 W, small cabinet', hp: [22, 0.7, 2], max: [[16, 88], [20, 95], [25, 101], [31.5, 106], [40, 110], [50, 112], [63, 113], [200, 113]] },
+  '15p': { label: '15″ ported', note: '1000 W, tuned to 17 Hz', hp: [17, Math.SQRT1_2, 4], max: [[16, 96], [20, 106], [25, 111], [31.5, 114], [40, 116], [50, 117], [63, 118], [200, 118]] },
+  '18p': { label: '18″ ported', note: '1500 W, reference class', hp: [15, Math.SQRT1_2, 4], max: [[16, 103], [20, 112], [25, 116], [31.5, 119], [40, 121], [50, 122], [63, 122], [200, 122]] },
+};
+function subMax(model, f) {
+  const t = SUB_MODELS[model].max;
+  if (f <= t[0][0]) return t[0][1];
+  for (let i = 1; i < t.length; i++) if (f <= t[i][0]) { const u = Math.log(f / t[i - 1][0]) / Math.log(t[i][0] / t[i - 1][0]); return lerp(t[i - 1][1], t[i][1], u); }
+  return t[t.length - 1][1];
+}
+function subResp(model, f) {
+  const [f0, Q, order] = SUB_MODELS[model].hp;
+  return order === 4 ? cmul(sos('hp', f0, 0.5412, f), sos('hp', f0, 1.3066, f)) : sos('hp', f0, Q, f);   // 4th order: Butterworth pair
+}
+/** The signal chain to the subwoofers at f: sub's own roll-off × low-pass (LFE 120 Hz, or the crossover). */
+function subChain(f, t = state.tune) { return cmul(subResp(t.sub, f), lr4('lp', t.signal === 'lfe' ? 120 : t.xo, f)); }
+/** The chain to the main speakers when bass is managed: tower roll-off × high-pass at the crossover. */
+function mainChain(f, t = state.tune) { return cmul(sos('hp', 38, 0.8, f), lr4('hp', t.xo, f)); }
+/** Response of the EQ filters. */
+function eqResp(filters, f) { let r = [1, 0]; for (const q of filters || []) r = cmul(r, peq(q.f, q.g, q.q, f)); return r; }
+
+// ---- 64-bass.js ----
+// ===================================================================
+// 64 · Bass tools on top of the wave model: listening positions, subwoofer placement (presets and a
+// multi-sub optimiser in the spirit of Welti's work at Harman: minimise seat-to-seat variation first, then
+// the flatness of what's left, without throwing away output), per-sub DSP (gain, delay, polarity), an
+// automatic parametric EQ for the seating area, the impulse response, waterfall and low-frequency decay
+// per third octave, and a sweep of the sofa's position through the room.
+// ===================================================================
+
+// ---------------- listening positions ----------------
+/** The main seating piece and its seat line (same frame as mainSeat). */
+function mainSeatLine() {
+  const it = state.items.find((i) => i.type === 'prettySectional') || state.items.find((i) => i.type === 'uSectional')
+    || state.items.find((i) => i.type === 'sectional') || state.items.find((i) => i.type === 'sofa') || state.items.find((i) => i.type === 'recliner');
+  if (!it) return null;
+  const phi = it.rot * DEG, ex = [-Math.cos(phi), -Math.sin(phi)], ez = [-Math.sin(phi), Math.cos(phi)];
+  const p = { ...CATALOG[it.type].defaults, ...it.p };
+  let lx0 = 0, lx1 = 0, lz = 2, xs = null;
+  if (it.type === 'prettySectional') {
+    const u = prettySize(p), sx = p.side === 'right' ? -1 : 1;
+    [lx0, lx1] = [sx * (-u.W / 2 + PRETTY.depth + 6), sx * (u.W / 2 - PRETTY.open)]; lz = -u.D / 2 + 22;
+  } else if (it.type === 'uSectional') {
+    const u = uSectionalSize(p);
+    lx0 = -u.W / 2 + u.arm + 12; lx1 = u.W / 2 - u.arm - 12; lz = -u.D / 2 + 22;
+    xs = Array.from({ length: u.n }, (_, i) => -u.W / 2 + u.arm + TREMEE.mw * (i + 0.5));
+  } else if (it.type === 'sectional') {
+    const B = p.back, R = p.ret, d = p.depth;
+    [lx0, lx1] = p.side === 'left' ? [-(B / 2 - 6), B / 2 - d] : [-B / 2 + d, B / 2 - 6]; lz = -R / 2 + 22;
+  } else if (it.type === 'sofa') { lx0 = -p.w / 2 + 12; lx1 = p.w / 2 - 12; lz = -p.depth / 2 + 22; }
+  return { it, ex, ez, lx0, lx1, lz, xs };
+}
+/** Listening positions: the main sofa's seats (ear height 38″), plus lounge chairs as a second group. */
+function acSeats(shift = [0, 0]) {
+  const out = [], L = mainSeatLine();
+  if (L) {
+    const { it, ex, ez, lz } = L;
+    let xs = L.xs;
+    if (!xs) { const a = Math.min(L.lx0, L.lx1), b = Math.max(L.lx0, L.lx1), n = Math.max(1, Math.round((b - a) / 26) + 1); xs = Array.from({ length: n }, (_, i) => (n === 1 ? (a + b) / 2 : a + (b - a) * i / (n - 1))); }
+    const right = [ez[1], -ez[0]];
+    const pts = xs.map((lx) => ({ x: it.x + lx * ex[0] + lz * ez[0] + shift[0], y: it.y + lx * ex[1] + lz * ez[1] + shift[1] }))
+      .sort((a, b) => (a.x * right[0] + a.y * right[1]) - (b.x * right[0] + b.y * right[1]));
+    const m = mainSeat(); const mp = m ? { x: m.x + shift[0], y: m.y + shift[1] } : pts[0];
+    let mi = 0, md = Infinity; pts.forEach((p, i) => { const d = Math.hypot(p.x - mp.x, p.y - mp.y); if (d < md) { md = d; mi = i; } });
+    pts.forEach((p, i) => out.push({ id: `s${i + 1}`, label: i === mi ? 'MLP' : `Seat ${i + 1}`, x: p.x, y: p.y, z: AC.ear, main: true, mlp: i === mi }));
+  }
+  let k = 0;
+  for (const it of state.items) if ((it.type === 'loungeChair' || it.type === 'recliner') && it !== (L && L.it)) {
+    out.push({ id: `c${++k}`, label: `Chair ${k}`, x: it.x, y: it.y, z: AC.ear - 2, main: false, mlp: false });
+  }
+  if (!out.length) out.push({ id: 's1', label: 'MLP', x: geom().tvX, y: geom().mainY * 0.45, z: AC.ear, main: true, mlp: true });
+  return out;
+}
+const tuneSeats = () => acSeats().filter((s) => s.main || state.tune.allSeats);
+
+// ---------------- sources ----------------
+/** The subwoofers in the layout (or the pre-wire position when there are none), with their DSP. */
+function currentSubs() {
+  const subs = state.items.filter((i) => i.type === 'subwoofer').map((it) => {
+    const d = state.tune.dsp[it.id] || {};
+    return { id: it.id, x: it.x, y: it.y, g: d.g || 0, d: d.d || 0, pol: d.pol === -1 ? -1 : 1, real: true };
+  });
+  if (subs.length) return subs;
+  const G = geom(), r = state.room;
+  return [{ id: 'prewire', x: r.width - 10, y: G.mainY - 10, g: 0, d: 0, pol: 1, real: false }];
+}
+/** The front left / right mains (tower items, or the layout's front positions). */
+function currentMains() {
+  const t = state.items.filter((i) => i.type === 'towerSpeaker').map((i) => ({ x: i.x, y: i.y }));
+  if (t.length >= 2) return t.slice(0, 2);
+  const lay = tuneLayout('5.1');
+  return lay.filter((c) => c.k === 'L' || c.k === 'R').map((c) => ({ x: c.p[0], y: c.p[1] }));
+}
+
+// ---------------- the analysis context (rebuilt when the layout or tuning changes) ----------------
+let BCTX = null;
+function bassCtx() {
+  if (!ACS || ACS.grid.key !== acKey()) return null;
+  const key = JSON.stringify([state.items, state.tune, state.room.ceiling]);
+  if (BCTX && BCTX.key === key && BCTX.S === ACS) return BCTX;
+  const S = ACS, damp = acDamping(S), F = logFreqs(), inv = acInv(S, damp, F);
+  const seats = acSeats().map((s) => ({ ...s, c: acCoef(S, s.x, s.y, s.z) }));
+  BCTX = { key, S, damp, F, inv, seats, cache: new Map() };
+  return BCTX;
+}
+/** Transfer from a point source at (x, y, z) to a seat (cached). */
+function ctxTransfer(ctx, x, y, z, seat) {
+  const k = `${x.toFixed(1)},${y.toFixed(1)},${z}|${seat.id}|${seat.x.toFixed(1)},${seat.y.toFixed(1)}`;
+  let t = ctx.cache.get(k);
+  if (!t) { t = acTransfer(ctx.inv, acCoef(ctx.S, x, y, z), seat.c || acCoef(ctx.S, seat.x, seat.y, seat.z)); ctx.cache.set(k, t); }
+  return t;
+}
+/** Complex weight of one sub at f: level, polarity, delay. */
+const subW = (s, f) => { const a = 10 ** ((s.g || 0) / 20) * (s.pol === -1 ? -1 : 1), ph = -2 * Math.PI * f * (s.d || 0) / 1000; return [a * Math.cos(ph), a * Math.sin(ph)]; };
+/** Seat responses (dB re one sub at 1 m) for a sub configuration. opts: { eq, signal, seats } */
+function bassResponses(ctx, subs, opts = {}) {
+  const t = state.tune, F = ctx.F, seats = opts.seats || ctx.seats, eq = opts.eq || null, signal = opts.signal || t.signal;
+  const mains = signal === 'managed' ? currentMains() : [];
+  const gd = (f) => { const ph = -2 * Math.PI * f * (t.gdelay || 0) / 1000; return [Math.cos(ph), Math.sin(ph)]; };
+  const chain = F.map((f) => { const c = cmul(cmul(subResp(t.sub, f), lr4('lp', signal === 'managed' ? t.xo : 120, f)), gd(f)); return eq ? cmul(c, eqResp(eq, f)) : c; });
+  const out = seats.map((seat) => {
+    const re = new Float64Array(F.length), im = new Float64Array(F.length);
+    for (const s of subs) {
+      const tr = ctxTransfer(ctx, s.x, s.y, AC.subZ, seat);
+      F.forEach((f, i) => { const w = cmul(subW(s, f), chain[i]);
+        re[i] += (tr[2 * i] * w[0] - tr[2 * i + 1] * w[1]) * FF; im[i] += (tr[2 * i] * w[1] + tr[2 * i + 1] * w[0]) * FF; });
+    }
+    for (const m of mains) {
+      const tr = ctxTransfer(ctx, m.x, m.y, 30, seat), pol = t.subPol === -1 ? -1 : 1;
+      F.forEach((f, i) => { const w = mainChain(f); re[i] += pol * (tr[2 * i] * w[0] - tr[2 * i + 1] * w[1]) * FF * 0.5; im[i] += pol * (tr[2 * i] * w[1] + tr[2 * i + 1] * w[0]) * FF * 0.5; });
+    }
+    const d = new Float64Array(F.length); for (let i = 0; i < F.length; i++) d[i] = db(re[i], im[i]);
+    return { seat, re, im, db: d };
+  });
+  return out;
+}
+/** Power average across responses, in dB. */
+function powerMean(rs, idx) {
+  const n = rs[0].db.length, out = new Float64Array(n), use = idx || rs.map((_, i) => i);
+  for (let f = 0; f < n; f++) { let s = 0; for (const i of use) s += 10 ** (rs[i].db[f] / 10); out[f] = 10 * Math.log10(s / use.length); }
+  return out;
+}
+/** Fractional-octave smoothing (power) on the log-spaced grid. frac 0 = none. */
+function smoothDb(d, frac, ppo = AC.ppo) {
+  if (!frac) return Float64Array.from(d);
+  const half = Math.max(1, Math.round(ppo / (2 * frac))), out = new Float64Array(d.length);
+  for (let i = 0; i < d.length; i++) { let s = 0, n = 0; for (let j = Math.max(0, i - half); j <= Math.min(d.length - 1, i + half); j++) { s += 10 ** (d[j] / 10); n++; } out[i] = 10 * Math.log10(s / n); }
+  return out;
+}
+const TARGETS = {
+  flat: { label: 'Flat', g: 0 },
+  gentle: { label: '+3 dB house curve', g: 3 },
+  harman: { label: '+6 dB house curve', g: 6 },
+};
+/** Target curve shape (dB, 0 in the upper bass) at f: a gentle low shelf. */
+const targetAt = (f, key = state.tune.target) => (TARGETS[key] || TARGETS.flat).g / (1 + (f / 45) ** 2);
+/** The analysis band for the bass metrics. */
+const bassBand = () => [20, state.tune.signal === 'managed' ? Math.max(100, state.tune.xo * 1.5) : 100];
+
+// ---------------- metrics ----------------
+function bassMetrics(rs, F, opts = {}) {
+  const [lo, hi] = opts.band || bassBand(), idx = [];
+  F.forEach((f, i) => { if (f >= lo && f <= hi) idx.push(i); });
+  const seatIdx = rs.map((r, i) => i).filter((i) => rs[i].seat.main || state.tune.allSeats);
+  const mlpI = Math.max(0, rs.findIndex((r) => r.seat.mlp));
+  const sm = rs.map((r) => smoothDb(r.db, 12));
+  // seat-to-seat variation: standard deviation across seats, averaged over the band
+  let ssv = 0;
+  for (const i of idx) { let m = 0; for (const s of seatIdx) m += sm[s][i]; m /= seatIdx.length; let v = 0; for (const s of seatIdx) v += (sm[s][i] - m) ** 2; ssv += Math.sqrt(v / Math.max(1, seatIdx.length - (seatIdx.length > 1 ? 1 : 0))); }
+  ssv /= idx.length;
+  const mean = powerMean(rs, seatIdx), meanS = smoothDb(mean, 12);
+  const dev = (arr) => { const v = idx.map((i) => arr[i] - targetAt(F[i])); const m = v.reduce((a, b) => a + b, 0) / v.length; return { sd: Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length), lvl: m, p2p: Math.max(...v) - Math.min(...v) }; };
+  const dm = dev(meanS), dl = dev(sm[mlpI]);
+  // extension: lowest frequency within 6 dB of the target line (mean response, 1/6 octave)
+  const m6 = smoothDb(mean, 6); let ext = F[F.length - 1];
+  for (let i = F.length - 1; i >= 0; i--) { if (F[i] > 80) continue; if (m6[i] - targetAt(F[i]) >= dm.lvl - 6) ext = F[i]; else break; }
+  return { ssv, flat: dm.sd, flatMlp: dl.sd, p2pMlp: dl.p2p, level: dm.lvl, ext, mean, meanS, mlp: mlpI, idx };
+}
+/** One number for comparing configurations (lower is better). */
+const bassScore = (m, n = 1, ref = null) => m.ssv + 0.5 * m.flat + (ref != null ? 0.25 * Math.max(0, ref + 20 * Math.log10(n) - 6 - m.level) : 0);
+
+// ---------------- subwoofer positions ----------------
+/** Where a subwoofer could stand: against the walls of the room (every foot, corners first) and just behind the seats. */
+function subCandidates() {
+  const S = ACS; if (!S) return [];
+  const g = S.grid, r = state.room, G = geom(), off = 8.5 - g.g / 2;
+  const byCell = new Map();
+  for (const [k, di, dj] of g.walls) { if (!g.room[k] || g.Y[k] < 4) continue; const v = byCell.get(k) || [0, 0, 0]; v[0] -= di; v[1] -= dj; v[2]++; byCell.set(k, v); }
+  // big pieces block a spot; small ones (a plant, a lamp, a bar cart) can move, and the spot says so
+  const BIG = { uSectional: 1, prettySectional: 1, sectional: 1, sofa: 1, recliner: 1, loungeChair: 1, console: 1, aetherStand: 1, towerSpeaker: 1, ottoman: 1 };
+  const blockers = state.items.filter((it) => BIG[it.type]).map((it) => footprint(it)).filter(Boolean);
+  const movable = state.items.filter((it) => !BIG[it.type] && it.type !== 'subwoofer' && it.type !== 'rug' && !isWallType(it.type)).map((it) => ({ it, fp: footprint(it) })).filter((q) => q.fp);
+  const fp = state.fireplace;
+  const free = (x, y) => pointInPoly([x, y], G.outline) && !blockers.some((poly) => [[0, 0], [8, 0], [-8, 0], [0, 8], [0, -8]].some(([a, b]) => pointInPoly([x + a, y + b], poly)))
+    && !(x < 22 && Math.abs(y - fp.center) < fp.width / 2 + 10) && !floorObstacles().some((o) => pointInPoly([x, y], o)) && y > 6;
+  const raw = [];
+  for (const [k, v] of byCell) {
+    const x = g.X[k] + Math.sign(v[0]) * off, y = g.Y[k] + Math.sign(v[1]) * off;
+    if (free(x, y)) raw.push({ x, y, corner: v[0] !== 0 && v[1] !== 0, n: [Math.sign(v[0]), Math.sign(v[1])] });
+  }
+  raw.sort((a, b) => (b.corner - a.corner));
+  const out = [];
+  for (const c of raw) if (out.every((o) => Math.hypot(o.x - c.x, o.y - c.y) >= (c.corner ? 8 : 12))) out.push(c);
+  // near-field: just behind the main seats
+  const L = mainSeatLine();
+  if (L) for (const s of acSeats().filter((q) => q.main)) {
+    const x = s.x - L.ez[0] * 36, y = s.y - L.ez[1] * 36;
+    if (free(x, y) && out.every((o) => Math.hypot(o.x - x, o.y - y) >= 12)) out.push({ x, y, corner: false, near: true, n: [-L.ez[0], -L.ez[1]] });
+  }
+  out.forEach((c) => {
+    c.label = spotName(c);
+    const mv = movable.filter((q) => [[0, 0], [8, 0], [-8, 0], [0, 8], [0, -8]].some(([a, b]) => pointInPoly([c.x + a, c.y + b], q.fp)));
+    if (mv.length) c.label += ` (move the ${mv.map((q) => CATALOG[q.it.type].label.toLowerCase()).join(' and ')})`;
+  });
+  return out;
+}
+/** Plain-language position: wall and side, as you face the TV. */
+function spotName(c) {
+  const G = geom(), r = state.room;
+  if (c.near) return 'behind the seats';
+  if (c.y > G.mainY + 2) return c.x < G.tvX - 8 ? 'TV alcove, left side' : c.x > G.tvX + 8 ? 'TV alcove, right side' : 'TV alcove, under the screen';
+  const [nx, ny] = c.n || [0, 0];
+  const side = nx > 0 ? 'left' : nx < 0 ? 'right' : '', end = ny < 0 ? 'front' : ny > 0 ? 'back' : '';
+  if (side && end) return `${end} ${side} corner`;
+  if (end) return `${end} wall${c.x < r.width * 0.33 ? ', left' : c.x > r.width * 0.66 ? ', right' : ''}`;
+  if (side) return `${side} wall${c.y > G.mainY * 0.66 ? ', front' : c.y < G.mainY * 0.33 ? ', back' : ', middle'}`;
+  return 'in the room';
+}
+/** Named arrangements, each snapped to the nearest valid spot. */
+function subPresets() {
+  const r = state.room, G = geom(), cands = subCandidates(); if (!cands.length) return [];
+  const snap = (x, y) => cands.reduce((b, c) => (Math.hypot(c.x - x, c.y - y) < Math.hypot(b.x - x, b.y - y) ? c : b), cands[0]);
+  const back = Math.max(G.wallX, (G.wallX + r.width) / 2), midY = G.mainY / 2;
+  const L = mainSeatLine(), near = cands.find((c) => c.near);
+  const list = [
+    ['fc', '1 · front corner', [[r.width, G.mainY]]],
+    ['tv', '1 · under the TV', [[G.tvX, r.depth]]],
+    ['2fc', '2 · front corners', [[0, G.westY], [r.width, G.mainY]]],
+    ['2al', '2 · alcove sides', [[G.bay[0][0], G.mainY + G.ret], [G.bay[5][0], G.mainY + G.ret]]],
+    ['2fb', '2 · front and back walls', [[G.tvX, r.depth], [back, 0]]],
+    ['2lr', '2 · side walls, middle', [[0, midY], [r.width, midY]]],
+    ['4mid', '4 · middle of each wall', [[G.tvX, r.depth], [back, 0], [0, midY], [r.width, midY]]],
+    ['4c', '4 · corners', [[0, G.westY], [r.width, G.mainY], [0, 0], [r.width, 0]]],
+  ];
+  if (near) list.push(['nf', '1 · near-field, behind the seats', [[near.x, near.y]]]);
+  return list.map(([key, label, pts]) => {
+    const subs = []; for (const [x, y] of pts) { const c = snap(x, y); if (!subs.some((s) => s.x === c.x && s.y === c.y)) subs.push({ x: c.x, y: c.y, g: 0, d: 0, pol: 1, label: c.label }); }
+    return { key, label, subs };
+  });
+}
+
+// ---------------- the optimiser ----------------
+/** Search positions (and per-sub gain, delay and polarity) for n subs. keep: optimise the current subs' DSP only. */
+async function optimiseSubs({ n = 2, keep = false, onProgress = () => {} } = {}) {
+  const ctx = bassCtx(); if (!ctx) return null;
+  const t = state.tune, [lo, hi] = bassBand(), F = ctx.F.filter((f, i) => i % 2 === 0 && f >= lo && f <= hi), nf = F.length;
+  const seats = ctx.seats.filter((s) => s.main || t.allSeats), ns = seats.length;
+  const chain = F.map((f) => cmul(subResp(t.sub, f), t.signal === 'managed' ? lr4('lp', t.xo, f) : lr4('lp', 120, f)));
+  const tgt = F.map((f) => targetAt(f));
+  const cands = keep ? currentSubs().map((s) => ({ ...s, label: spotName({ ...s, n: [0, 0] }) })) : subCandidates();
+  if (!cands.length) return null;
+  // transfer from every candidate to every seat on the band, with the common chain
+  const fi = F.map((f) => ctx.F.indexOf(f));
+  const Hc = cands.map((c, ci) => seats.map((s) => {
+    const tr = ctxTransfer(ctx, c.x, c.y, AC.subZ, s), out = new Float64Array(nf * 2);
+    for (let i = 0; i < nf; i++) { const a = tr[2 * fi[i]] * FF, b = tr[2 * fi[i] + 1] * FF, w = chain[i]; out[2 * i] = a * w[0] - b * w[1]; out[2 * i + 1] = a * w[1] + b * w[0]; }
+    return out;
+  }));
+  onProgress(0.1, `${cands.length} spots × ${seats.length} seats`); await tick();
+  const rot = (d) => { const c = new Float64Array(nf * 2); for (let i = 0; i < nf; i++) { const ph = -2 * Math.PI * F[i] * d / 1000; c[2 * i] = Math.cos(ph); c[2 * i + 1] = Math.sin(ph); } return c; };
+  const rotCache = new Map(), R = (d) => { const k = d.toFixed(2); let r = rotCache.get(k); if (!r) { r = rot(d); rotCache.set(k, r); } return r; };
+  const dbs = new Float64Array(ns * nf);
+  const evalCfg = (cfg) => {
+    for (let s = 0; s < ns; s++) {
+      for (let i = 0; i < nf; i++) {
+        let re = 0, im = 0;
+        for (const q of cfg) {
+          const h = Hc[q.c][s], a = 10 ** (q.g / 20) * q.pol, r = R(q.d);
+          const hr = h[2 * i] * r[2 * i] - h[2 * i + 1] * r[2 * i + 1], hi2 = h[2 * i] * r[2 * i + 1] + h[2 * i + 1] * r[2 * i];
+          re += a * hr; im += a * hi2;
+        }
+        dbs[s * nf + i] = 10 * Math.log10(re * re + im * im + 1e-30);
+      }
+    }
+    // seat-to-seat variation, flatness of the spatial average, output
+    let ssv = 0; const mean = new Float64Array(nf);
+    for (let i = 0; i < nf; i++) {
+      let m = 0, p = 0; for (let s = 0; s < ns; s++) { m += dbs[s * nf + i]; p += 10 ** (dbs[s * nf + i] / 10); }
+      m /= ns; let v = 0; for (let s = 0; s < ns; s++) v += (dbs[s * nf + i] - m) ** 2;
+      ssv += Math.sqrt(v / Math.max(1, ns - 1)); mean[i] = 10 * Math.log10(p / ns) - tgt[i];
+    }
+    ssv /= nf;
+    let mu = 0; for (let i = 0; i < nf; i++) mu += mean[i]; mu /= nf;
+    let sd = 0; for (let i = 0; i < nf; i++) sd += (mean[i] - mu) ** 2; sd = Math.sqrt(sd / nf);
+    return { ssv, flat: sd, level: mu };
+  };
+  const J = (cfg, m) => bassScore(m, cfg.length, ref);
+  // single spots first: the reference output for one sub
+  const singles = cands.map((c, i) => { const cfg = [{ c: i, g: 0, d: 0, pol: 1 }]; return { cfg, m: evalCfg(cfg) }; });
+  const ref = Math.max(...singles.map((s) => s.m.level));
+  singles.forEach((s) => { s.J = J(s.cfg, s.m); });
+  let pool;
+  if (keep) {
+    pool = [{ cfg: cands.map((c, i) => ({ c: i, g: c.g || 0, d: c.d || 0, pol: c.pol || 1 })) }];
+  } else if (n === 1) pool = singles.slice().sort((a, b) => a.J - b.J).slice(0, 4);
+  else {
+    const pairs = [];
+    for (let i = 0; i < cands.length; i++) for (let j = i + 1; j < cands.length; j++) { const cfg = [{ c: i, g: 0, d: 0, pol: 1 }, { c: j, g: 0, d: 0, pol: 1 }]; const m = evalCfg(cfg); pairs.push({ cfg, m, J: J(cfg, m) }); }
+    pairs.sort((a, b) => a.J - b.J);
+    onProgress(0.35, `${pairs.length} pairs compared`); await tick();
+    pool = pairs.slice(0, 10);
+    for (let size = 3; size <= n; size++) {
+      const next = [];
+      for (const p of pool) for (let k = 0; k < cands.length; k++) {
+        if (p.cfg.some((q) => q.c === k)) continue;
+        const cfg = [...p.cfg, { c: k, g: 0, d: 0, pol: 1 }]; const m = evalCfg(cfg); next.push({ cfg, m, J: J(cfg, m) });
+      }
+      next.sort((a, b) => a.J - b.J);
+      pool = []; for (const c of next) { const key = c.cfg.map((q) => q.c).sort((a, b) => a - b).join(','); if (!pool.some((p) => p.key === key)) pool.push({ ...c, key }); if (pool.length >= 8) break; }
+      onProgress(0.35 + 0.15 * (size - 2), `${size} subs: ${next.length} layouts compared`); await tick();
+    }
+    // move one sub at a time to wherever it helps most
+    for (const p of pool.slice(0, 4)) {
+      for (let round = 0; round < 3; round++) {
+        let improved = false;
+        for (let q = 0; q < p.cfg.length; q++) for (let k = 0; k < cands.length; k++) {
+          if (p.cfg.some((x) => x.c === k)) continue;
+          const cfg = p.cfg.map((x, i) => (i === q ? { ...x, c: k } : x)); const m = evalCfg(cfg), j = J(cfg, m);
+          if (j < p.J - 1e-6) { p.cfg = cfg; p.m = m; p.J = j; improved = true; }
+        }
+        if (!improved) break;
+      }
+      await tick();
+    }
+    pool.sort((a, b) => a.J - b.J); pool = pool.slice(0, 4);
+  }
+  onProgress(0.7, 'Tuning gain, delay and polarity'); await tick();
+  // DSP: coordinate descent on each sub but the first (gain −6…0 dB, delay 0…12 ms, polarity)
+  for (const p of pool) {
+    p.m = p.m || evalCfg(p.cfg); p.J = J(p.cfg, p.m);
+    if (p.cfg.length < 2) continue;
+    for (let round = 0; round < 3; round++) {
+      for (let q = 1; q < p.cfg.length; q++) {
+        let best = p.cfg[q];
+        for (const pol of [1, -1]) for (let d = 0; d <= 12; d += 0.5) for (let g = -6; g <= 0; g += 1) {
+          const cfg = p.cfg.map((x, i) => (i === q ? { ...x, g, d, pol } : x)); const m = evalCfg(cfg), j = J(cfg, m);
+          if (j < p.J - 1e-6) { p.J = j; p.m = m; best = cfg[q]; }
+        }
+        p.cfg = p.cfg.map((x, i) => (i === q ? best : x));
+      }
+      await tick();
+    }
+  }
+  pool.sort((a, b) => a.J - b.J);
+  const seen = new Set(); pool = pool.filter((p) => { const k = p.cfg.map((q) => `${q.c}:${q.g}:${q.d}:${q.pol}`).sort().join('|'); if (seen.has(k)) return false; seen.add(k); return true; });
+  onProgress(1, 'Done');
+  return pool.map((p) => ({ score: p.J, ...p.m, subs: p.cfg.map((q) => ({ x: cands[q.c].x, y: cands[q.c].y, g: q.g, d: q.d, pol: q.pol, label: cands[q.c].label })) }));
+}
+/** Evaluate a list of sub configurations the same way the optimiser does (for the comparison table). */
+function compareConfigs(configs) {
+  const ctx = bassCtx(); if (!ctx) return [];
+  const ref = Math.max(...subCandidates().slice(0, 40).map((c) => bassMetrics(bassResponses(ctx, [{ ...c, g: 0, d: 0, pol: 1 }]), ctx.F).level), -99);
+  return configs.map((cfg) => { const m = bassMetrics(bassResponses(ctx, cfg.subs), ctx.F); return { ...cfg, ...m, score: bassScore(m, cfg.subs.length, ref) }; });
+}
+
+// ---------------- automatic EQ ----------------
+/** Parametric EQ (cuts, and small boosts only for broad dips) fitting the seating area's average to the target. */
+function autoEQ(ctx, subs, max = 6) {
+  const F = ctx.F, rs = bassResponses(ctx, subs, { eq: null }), m0 = bassMetrics(rs, F);
+  const lo = 18, hi = Math.min(160, bassBand()[1] + 20), idx = F.map((f, i) => i).filter((i) => F[i] >= lo && F[i] <= hi);
+  const base = smoothDb(m0.mean, 6);
+  const ref = (() => { const v = idx.filter((i) => F[i] >= 30 && F[i] <= 90).map((i) => base[i] - targetAt(F[i])).sort((a, b) => a - b); return v[Math.floor(v.length * 0.4)] || 0; })();
+  const err = (filters) => idx.map((i) => base[i] + 20 * Math.log10(Math.hypot(...eqResp(filters, F[i]))) - targetAt(F[i]) - ref);
+  const cost = (filters) => { const e = err(filters); return e.reduce((a, b) => a + b * b, 0) / e.length; };
+  const filters = [];
+  for (let n = 0; n < max; n++) {
+    const e = err(filters); let bi = 0; e.forEach((v, i) => { if (v > e[bi]) bi = i; });
+    let gain = -e[bi], fc = F[idx[bi]];
+    if (e[bi] < 1.5) {                                                       // no peaks left: one broad, gentle boost at most
+      let wi = 0; e.forEach((v, i) => { if (v < e[wi]) wi = i; });
+      let a = wi, b = wi; while (a > 0 && e[a - 1] < e[wi] / 2) a--; while (b < e.length - 1 && e[b + 1] < e[wi] / 2) b++;
+      const bw = Math.log2(F[idx[b]] / F[idx[a]]);
+      if (e[wi] > -3 || bw < 0.4 || filters.some((q) => q.g > 0)) break;
+      gain = Math.min(3, -e[wi]); fc = F[idx[wi]];
+    }
+    let a = bi, b = bi; while (a > 0 && e[a - 1] > e[bi] / 2) a--; while (b < e.length - 1 && e[b + 1] > e[bi] / 2) b++;
+    const bw = Math.max(1 / 12, Math.log2(F[idx[b]] / F[idx[a]])), q = clamp(Math.sqrt(2 ** bw) / (2 ** bw - 1), 0.7, 8);
+    const near = filters.find((x) => Math.abs(Math.log2(x.f / fc)) < 1 / 6);
+    if (near) { near.g = clamp(near.g + gain * 0.7, -12, 3); if (n > max + 2) break; } else filters.push({ f: fc, g: clamp(gain, -12, 3), q });
+    // refine every filter a little
+    for (let pass = 0; pass < 2; pass++) for (const fl of filters) {
+      for (const [k, steps] of [['g', [-1, -0.5, 0.5, 1]], ['q', [0.8, 1.25]], ['f', [2 ** (-1 / 24), 2 ** (1 / 24)]]]) {
+        let best = cost(filters), bv = fl[k];
+        for (const s of steps) { const old = fl[k]; fl[k] = k === 'g' ? clamp(old + s, -12, 3) : k === 'q' ? clamp(old * s, 0.7, 8) : clamp(old * s, lo, hi); const c = cost(filters); if (c < best) { best = c; bv = fl[k]; } fl[k] = old; }
+        fl[k] = bv;
+      }
+    }
+  }
+  filters.sort((a, b) => a.f - b.f);
+  filters.forEach((q) => { q.f = Math.round(q.f * 10) / 10; q.g = Math.round(q.g * 10) / 10; q.q = Math.round(q.q * 100) / 100; });
+  return filters.filter((q) => Math.abs(q.g) >= 0.5);
+}
+
+// ---------------- impulse response, waterfall, decay ----------------
+function fft(re, im, inverse = false) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = (inverse ? 2 : -2) * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang);
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let j = 0; j < len / 2; j++) {
+      const a = i + j, b = a + len / 2, xr = re[b] * cr - im[b] * ci, xi = re[b] * ci + im[b] * cr;
+      re[b] = re[a] - xr; im[b] = im[a] - xi; re[a] += xr; im[a] += xi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } }
+  }
+  if (inverse) for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+}
+/** Impulse response at a seat (fs 800 Hz, 5.1 s) for a sub configuration, from the same modal model. */
+function bassImpulse(ctx, subs, seat, eq) {
+  const fs = 800, N = 4096, df = fs / N, half = N / 2, t = state.tune;
+  const F = Array.from({ length: half + 1 }, (_, k) => Math.max(k * df, 0.01));
+  const inv = acInv(ctx.S, ctx.damp, F), cr = seat.c || acCoef(ctx.S, seat.x, seat.y, seat.z);
+  const re = new Float64Array(N), im = new Float64Array(N);
+  const mains = t.signal === 'managed' ? currentMains() : [];
+  const add = (cs, wf) => {
+    const tr = acTransfer(inv, cs, cr);
+    for (let k = 1; k <= half; k++) {
+      const f = F[k], w = wf(f), taper = f < 220 ? 1 : f > 295 ? 0 : 0.5 + 0.5 * Math.cos(Math.PI * (f - 220) / 75);
+      const a = tr[2 * k] * FF * taper, b = tr[2 * k + 1] * FF * taper;
+      re[k] += a * w[0] - b * w[1]; im[k] += a * w[1] + b * w[0];
+    }
+  };
+  for (const s of subs) add(acCoef(ctx.S, s.x, s.y, AC.subZ), (f) => { let w = cmul(subW(s, f), cmul(subResp(t.sub, f), lr4('lp', t.signal === 'managed' ? t.xo : 120, f))); if (eq) w = cmul(w, eqResp(eq, f)); const gd = -2 * Math.PI * f * (t.gdelay || 0) / 1000; return cmul(w, [Math.cos(gd), Math.sin(gd)]); });
+  for (const m of mains) add(acCoef(ctx.S, m.x, m.y, 30), (f) => { const w = mainChain(f); return [w[0] * 0.5 * (t.subPol === -1 ? -1 : 1), w[1] * 0.5 * (t.subPol === -1 ? -1 : 1)]; });
+  for (let k = 1; k < half; k++) { re[N - k] = re[k]; im[N - k] = -im[k]; }
+  im[half] = 0;
+  fft(re, im, true);
+  return { h: re, fs, N };
+}
+/** Cumulative spectral decay: spectra (dB) of the impulse response from successive start times (ms). */
+function waterfall(ir, F, times = Array.from({ length: 16 }, (_, i) => i * 25), win = 0.4) {
+  const { h, fs, N } = ir, L = Math.round(win * fs), out = [];
+  for (const t0 of times) {
+    const s0 = Math.round(t0 / 1000 * fs), re = new Float64Array(N), im = new Float64Array(N);
+    for (let i = 0; i < L && s0 + i < N; i++) re[i] = h[s0 + i] * 0.5 * (1 + Math.cos(Math.PI * i / L));   // half-Hann tail
+    fft(re, im);
+    const mag = F.map((f) => { const x = f * N / fs, k = Math.floor(x), u = x - k; const m0 = Math.hypot(re[k], im[k]), m1 = Math.hypot(re[k + 1], im[k + 1]); return 20 * Math.log10(lerp(m0, m1, u) + 1e-12); });
+    out.push({ t: t0, db: mag });
+  }
+  return out;
+}
+const THIRDS = [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200];
+/** Low-frequency decay time per third octave: band-filtered (time-reversed, so the filter's own ringing doesn't
+ *  lengthen the decay, as ISO 3382 suggests for low frequencies), Schroeder backward integration, T30 (or T20). */
+function bandDecay(ir) {
+  const { h, fs, N } = ir;
+  const bp = (x, fc) => {                                  // two RBJ band-pass sections (0 dB peak), 1/3 octave
+    const w0 = 2 * Math.PI * fc / fs, Q = 4.32, al = Math.sin(w0) / (2 * Q), a0 = 1 + al, a1 = -2 * Math.cos(w0) / a0, a2 = (1 - al) / a0, b0 = al / a0, b2 = -al / a0;
+    for (let pass = 0; pass < 2; pass++) { let x1 = 0, x2 = 0, y1 = 0, y2 = 0; for (let i = 0; i < x.length; i++) { const y = b0 * x[i] + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = y; x[i] = y; } }
+  };
+  return THIRDS.map((fc) => {
+    const x = new Float64Array(N); for (let i = 0; i < N; i++) x[i] = h[N - 1 - i];
+    bp(x, fc); x.reverse();
+    const e = new Float64Array(N); let acc = 0; for (let i = N - 1; i >= 0; i--) { acc += x[i] * x[i]; e[i] = acc; }
+    let i0 = 0; for (let i = 1; i < N; i++) if (e[i - 1] - e[i] > e[i0 > 0 ? i0 - 1 : 0] - e[i0]) i0 = i;   // start at the strongest arrival
+    const e0 = e[i0] || 1, L = (i) => 10 * Math.log10(e[i] / e0 + 1e-30);
+    let a = -1, b = -1; for (let i = i0; i < N; i++) { const l = L(i); if (a < 0 && l <= -5) a = i; if (l <= -35) { b = i; break; } }
+    let span = 30; if (b < 0) { span = 20; for (let i = Math.max(a, i0); i < N; i++) if (L(i) <= -25) { b = i; break; } }
+    if (a < 0 || b <= a) return { fc, t60: null };
+    let sx = 0, sy = 0, sxx = 0, sxy = 0, n = 0;
+    for (let i = a; i <= b; i++) { const xx = i / fs, y = L(i); sx += xx; sy += y; sxx += xx * xx; sxy += xx * y; n++; }
+    const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+    return { fc, t60: slope < 0 ? -60 / slope : null, span };
+  });
+}
+/** Target for the low-frequency decay: about the mid-band reverb time + 0.1 s, allowed to rise below 63 Hz. */
+const decayTarget = (fc, rtMid) => (rtMid + 0.1) * (fc >= 63 ? 1 : 1 + 0.6 * Math.log2(63 / fc) / Math.log2(63 / 20));
+
+// ---------------- the sofa's position in the room ----------------
+/** Move the main seating forward / back and see what the bass does at the seats (subs stay put). */
+function rowSweep(ctx, subs) {
+  const L = mainSeatLine(); if (!L) return null;
+  const out = [];
+  for (let off = -42; off <= 42; off += 3) {
+    const dx = L.ez[0] * off, dy = L.ez[1] * off;
+    const fits = itemObjects.get(L.it.id) ? fitsRoom(L.it, L.it.x + dx, L.it.y + dy) : true;
+    const seats = acSeats([dx, dy]).filter((s) => s.main).map((s) => ({ ...s, c: acCoef(ctx.S, s.x, s.y, s.z) }));
+    const rs = bassResponses(ctx, subs, { seats, eq: null }), m = bassMetrics(rs, ctx.F);
+    out.push({ off, fits, ssv: m.ssv, flat: m.flatMlp, score: m.flatMlp + 0.5 * m.ssv });
+  }
+  const ok = out.filter((o) => o.fits), best = ok.length ? ok.reduce((a, b) => (b.score < a.score ? b : a)) : null;
+  return { pts: out, best, cur: out.find((o) => o.off === 0), dir: L.ez };
+}
+/** Put the subs from a configuration into the layout (replacing the current ones). */
+function applySubConfig(subs) {
+  pushHistory();
+  for (const it of state.items.filter((i) => i.type === 'subwoofer')) {
+    const obj = itemObjects.get(it.id); if (obj) { itemsGroup.remove(obj.group); disposeGroup(obj.group); itemObjects.delete(it.id); }
+    delete state.tune.dsp[it.id];
+  }
+  state.items = state.items.filter((i) => i.type !== 'subwoofer');
+  const G = geom(), c = [state.room.width * 0.55, G.mainY * 0.5];
+  subs.forEach((s, i) => {
+    const it = { id: uid('sub'), type: 'subwoofer', x: s.x, y: s.y, rot: 0, p: {} };
+    it.rot = squareFacing(it, c[0], c[1]);
+    state.items.push(it); buildItem(it);
+    if (!fitsRoom(it)) { const p = nearestFit(it, it.x, it.y); if (p) [it.x, it.y] = p; }
+    placeItem(itemObjects.get(it.id).group, it);
+    state.tune.dsp[it.id] = { g: s.g || 0, d: s.d || 0, pol: s.pol || 1 };
+  });
+  updateLighting(); select(null); commit(false);
+}
+
 // ---- 65-inspector.js ----
 // ===================================================================
 // 65 · Details panel (selection inspector + viewing report), commit,
@@ -6507,6 +7545,7 @@ function renderFurnishSelection() { if (!$('#tab-furnish').hidden) renderFurnish
 function commit() {
   save(); updateLabels(); renderInspector(); updateRoomSub(); markEnvDirty(); markShadowsDirty();
   if (sheet && sheet.kind === 'item') renderSheet();
+  tuneChanged();
 }
 
 // ---------------- layout code dialog ----------------
@@ -6572,6 +7611,1027 @@ function initPanels() {
   // narrow: one sheet at a time; wide: each panel toggles on its own
   $('#toggleLeft').addEventListener('click', () => { if (isNarrow()) openPanel(isOpen('#leftPanel') ? null : 'left'); else flip('#leftPanel', '#toggleLeft'); if (mode === 'plan') fitPlan(); });
   $('#toggleRight').addEventListener('click', () => { if (isNarrow()) openPanel(isOpen('#rightPanel') ? null : 'right'); else flip('#rightPanel', '#toggleRight'); if (mode === 'plan') fitPlan(); });
+}
+
+// ---- 66-room-acoustics.js ----
+// ===================================================================
+// 66 · Room acoustics above the bass: reverberation time per octave (Sabine and Eyring, from the actual
+// surfaces, furniture and treatment), first reflections from every speaker to every seat (image sources
+// on the real walls, ceiling and floor, with the speaker's directivity and the absorption where each one
+// lands), speaker layouts from 2.1 to 9.1.6 placed on this room's walls and ceiling after Dolby's angles,
+// level headroom, and the scorecard and advice that tie the whole analysis together.
+// ===================================================================
+
+// ---------------- surfaces and reverberation ----------------
+/** The cinema's own volume (the room and alcove, not the stairs and hall) and what lines it. */
+function rtModel() {
+  const S = ACS, r = state.room, G = geom(), t = state.tune, f = state.finish, H = acM(r.ceiling);
+  let floorIn = 0, wallIn = 0, openIn = 0;
+  if (S) {
+    const g = S.grid;
+    for (let k = 0; k < g.N; k++) if (g.room[k]) { floorIn += g.g * g.g; wallIn += g.wallF[k] * g.g; }
+    for (let e = 0; e < g.edges.length; e += 2) if (g.room[g.edges[e]] !== g.room[g.edges[e + 1]]) openIn += g.g;
+  }
+  const Fl = floorIn * AC.IN * AC.IN, V = Fl * H;
+  const sq = (a, b) => a * b * AC.IN * AC.IN;                         // in × in -> m²
+  const surf = [], add = (key, label, area, mat) => { if (area > 0.01) surf.push({ key, label, area, a: (ABS[mat] || ABS.drywall).a, mat }); };
+  // special areas on the walls
+  const tr = 2 * sq(r.transomW, r.transomH), trMat = f.transoms === 'hidden' ? 'drywall' : f.transoms === 'slatted' ? 'slats' : 'glass';
+  const fpA = sq(state.fireplace.width, state.fireplace.height);
+  const tvD = state.tv.screen && state.light.screenDown ? tvDims(state.tv.screenSize) : tvDims(state.tv.size), tvA = sq(tvD.w, tvD.h);
+  const fpSlats = f.fireplaceSlats ? sq(2 * (r.transomW + 14), r.transomH + 24) : 0;
+  const tvSlats = f.tvSlats ? Math.max(0, sq(r.bayFace, r.soffitBottom) - tvA) : 0;
+  let panelArea = { panel2: 0, slatPanel: 0, panel4: 0 };
+  for (const it of state.items) if (it.type === 'acousticPanel') { const p = { ...CATALOG.acousticPanel.defaults, ...it.p }; panelArea[resolveSpec(it).variant === 'slat' ? 'slatPanel' : 'panel2'] += sq(p.w, p.hgt); }
+  if (t.reflPanels) panelArea.panel2 += acReflectionPanelSpots().length * sq(24, 48);
+  if (t.rearPanels) panelArea.panel4 += acRearSpots().length * sq(24, 48);
+  const wallA = Math.max(0, wallIn * AC.IN * H - tr - fpA - tvA - fpSlats - tvSlats - panelArea.panel2 - panelArea.slatPanel - panelArea.panel4);
+  let rugA = 0; for (const it of state.items) if (it.type === 'rug') rugA += sq(it.p.w || 96, it.p.d || 72);
+  rugA = Math.min(rugA, Fl * 0.8);
+  const cloudA = t.cloud ? sq(48, 72) : 0;
+  add('walls', 'Walls · drywall on studs', wallA, 'drywall');
+  add('ceiling', 'Ceiling · drywall', Fl - cloudA, 'ceiling');
+  add('floor', 'Floor · laminate on the slab', Fl - rugA, 'laminate');
+  add('rug', 'Rugs', rugA, 'rug');
+  add('transoms', `Transom openings · ${trMat === 'glass' ? 'glass' : trMat === 'slats' ? 'slats over glass' : 'closed in'}`, tr, trMat);
+  add('fireplace', 'Fireplace glass and surround', fpA, 'stone');
+  add('tv', state.tv.screen && state.light.screenDown ? 'Projection screen' : 'TV', tvA, 'tv');
+  add('fpslats', 'Walnut slats over felt · fireplace wall', fpSlats, 'slats');
+  add('tvslats', 'Walnut slats over felt · TV wall', tvSlats, 'slats');
+  add('panel2', '2″ panels', panelArea.panel2, 'panel2');
+  add('slatPanel', 'Slatted acoustic panels', panelArea.slatPanel, 'slatPanel');
+  add('panel4', '4″ panels (rear wall)', panelArea.panel4, 'panel4');
+  add('cloud', 'Ceiling cloud · 4″ over the seats', cloudA, 'panel4');
+  add('open', 'Open to the stairs and hall', openIn * AC.IN * H, 'opening');
+  const ab = acAbsorbers();
+  const units = [
+    { label: `Upholstered seating (${Math.round(ab.seats)} seats)`, n: ab.seats, a: UNITS.seat.a },
+    ab.people ? { label: `People (${ab.people})`, n: ab.people, a: UNITS.person.a } : null,
+    ab.traps.length ? { label: `Corner bass traps (${ab.traps.length})`, n: ab.traps.length, a: UNITS.trap.a } : null,
+  ].filter(Boolean);
+  const Stot = surf.reduce((s, q) => s + q.area, 0);
+  const bands = OCT.map((fq, i) => {
+    const As = surf.reduce((s, q) => s + q.area * q.a[i], 0), Au = units.reduce((s, u) => s + u.n * u.a[i], 0), m4 = 4 * AIR_M[i] * V;
+    const sab = 0.161 * V / (As + Au + m4);
+    const abar = clamp((As + Au) / Stot, 0, 0.98), ey = 0.161 * V / (-Stot * Math.log(1 - abar) + m4);
+    return { f: fq, sabine: sab, eyring: ey, A: As + Au };
+  });
+  const mid = (bands[3].eyring + bands[4].eyring + bands[5].eyring) / 3;
+  return { V, S: Stot, floor: Fl, surf, units, bands, rtMid: mid, schroeder: 2000 * Math.sqrt(mid / V), openArea: openIn * AC.IN * H };
+}
+/** Recommended reverberation time per octave for a room this size (small rooms: short and even). */
+const rtTarget = (fq) => ({ lo: 0.2, hi: fq <= 63 ? 0.6 : fq <= 125 ? 0.5 : 0.4 });
+
+// ---------------- walls for geometry ----------------
+/** The cinema's wall segments (clipped to the room side of the stairs), with names as you face the TV. */
+function roomWalls() {
+  const r = state.room, G = geom(), o = G.outline, out = [];
+  for (let i = 0; i < o.length; i++) {
+    let a = o[i], b = o[(i + 1) % o.length];
+    if (a[1] < -0.5 && b[1] < -0.5) continue;
+    if (a[1] < 0 || b[1] < 0) {                                           // clip to y >= 0
+      const t = (0 - a[1]) / (b[1] - a[1]); const c = [a[0] + (b[0] - a[0]) * t, 0];
+      if (a[1] < 0) a = c; else b = c;
+    }
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 3) continue;
+    out.push({ a, b });
+  }
+  out.push({ a: [r.width, 0], b: [G.wallX, 0] });                           // the solid wall beside the stairs
+  for (const w of out) {
+    const dx = w.b[0] - w.a[0], dy = w.b[1] - w.a[1], L = Math.hypot(dx, dy);
+    w.n = [-dy / L, dx / L];                                               // outline is counter-clockwise: interior on the left
+    if (w.a[1] === 0 && w.b[1] === 0 && w.a[0] > w.b[0]) w.n = [0, 1];
+    w.len = L;
+    const mid = [(w.a[0] + w.b[0]) / 2, (w.a[1] + w.b[1]) / 2];
+    w.name = mid[1] > G.mainY + 1 ? (Math.abs(w.n[0]) > 0.3 && Math.abs(w.n[1]) > 0.3 ? 'alcove corner' : Math.abs(w.n[1]) > 0.9 ? 'TV wall' : 'alcove side')
+      : w.n[0] > 0.9 ? 'left wall' : w.n[0] < -0.9 ? 'right wall' : w.n[1] < -0.9 ? 'front wall' : w.n[1] > 0.9 ? 'back wall' : 'wall';
+  }
+  return out;
+}
+const inCinema = (x, y) => y >= 0 && pointInPoly([x, y], geom().outline);
+/** Which material is at a point on a wall (or the floor / ceiling) — for the reflection's absorption. */
+function surfaceAt(kind, x, y, z, wall) {
+  const r = state.room, G = geom(), f = state.finish, t = state.tune;
+  const near = (spots, rad) => spots.some((s) => Math.hypot(s.x - x, s.y - y) < rad && Math.abs((s.z ?? z) - z) < 26);
+  if (kind === 'floor') return state.items.some((it) => it.type === 'rug' && footprint(it) && pointInPoly([x, y], footprint(it))) ? 'rug' : 'laminate';
+  if (kind === 'ceiling') { const m = mainSeat(); return t.cloud && m && Math.abs(x - m.x) < 36 && Math.abs(y - (m.y + 20)) < 24 ? 'panel4' : 'ceiling'; }
+  for (const it of state.items) if (it.type === 'acousticPanel') {
+    const p = { ...CATALOG.acousticPanel.defaults, ...it.p };
+    if (Math.hypot(it.x - x, it.y - y) < p.w / 2 + 2 && Math.abs(z - p.h) < p.hgt / 2 + 2) return resolveSpec(it).variant === 'slat' ? 'slatPanel' : 'panel2';
+  }
+  if (t.reflPanels && near(acReflectionPanelSpots(), 14)) return 'panel2';
+  if (t.rearPanels && near(acRearSpots(), 14)) return 'panel4';
+  if (wall && wall.name === 'left wall' && x < 2) {                          // the fireplace wall
+    const fp = state.fireplace;
+    if (Math.abs(y - fp.center) < fp.width / 2 && z > fp.bottom && z < fp.bottom + fp.height) return 'stone';
+    const u = Math.abs(y - fp.center);
+    if (z > r.transomBottom && z < r.transomBottom + r.transomH && u > r.transomGap / 2 && u < r.transomGap / 2 + r.transomW) return f.transoms === 'hidden' ? 'drywall' : f.transoms === 'slatted' || f.fireplaceSlats ? 'slats' : 'glass';
+  }
+  if (wall && wall.name === 'TV wall') {
+    const d = state.tv.screen && state.light.screenDown ? { ...tvDims(state.tv.screenSize), c: 50 } : { ...tvDims(state.tv.size), c: state.tv.center };
+    if (Math.abs(x - (G.tvX + state.tv.offset)) < d.w / 2 && Math.abs(z - d.c) < d.h / 2) return 'tv';
+    if (f.tvSlats) return 'slats';
+  }
+  return 'drywall';
+}
+const MAT_NAME = { drywall: 'drywall', ceiling: 'drywall ceiling', laminate: 'laminate floor', rug: 'rug', glass: 'glass', tv: 'TV glass', stone: 'fireplace glass', slats: 'slats over felt', panel2: '2″ panel', panel4: '4″ panel', slatPanel: 'slat panel', opening: 'opening' };
+
+// ---------------- first reflections ----------------
+/** Speaker directivity at angle th off its axis (mid/high band, typical 2-way). */
+const dirDb = (th) => Math.max(-18, 24 * Math.log10((1 + Math.cos(th)) / 2 + 1e-6));
+/** First-order reflections from a speaker (aimed at aim) to a listener: walls, ceiling and floor. */
+function firstReflections(spk, lis, aim = lis) {
+  const H = state.room.ceiling, walls = roomWalls(), c = 343 / AC.IN;     // inches per second
+  const d0 = Math.hypot(lis.x - spk.x, lis.y - spk.y, lis.z - spk.z);
+  const ax = [aim.x - spk.x, aim.y - spk.y, aim.z - spk.z], al = Math.hypot(...ax);
+  const off = (R) => { const v = [R[0] - spk.x, R[1] - spk.y, R[2] - spk.z], l = Math.hypot(...v); return Math.acos(clamp((v[0] * ax[0] + v[1] * ax[1] + v[2] * ax[2]) / (l * al), -1, 1)); };
+  const out = [];
+  const push = (surface, R, path, kind, wall) => {
+    const mat = surfaceAt(kind, R[0], R[1], R[2], wall), a = octAt(ABS[mat].a, 2000);
+    const level = 20 * Math.log10(d0 / path) + 10 * Math.log10(Math.max(0.01, 1 - a)) + dirDb(off(R));
+    out.push({ surface, x: R[0], y: R[1], z: R[2], kind, mat, level, delay: (path - d0) / c * 1000, path, treated: a > 0.5 });
+  };
+  for (const w of walls) {
+    const sd = (p) => (p.x - w.a[0]) * w.n[0] + (p.y - w.a[1]) * w.n[1];
+    // both in front of the wall; a speaker on (or within 10″ of) a wall couples to it rather than reflecting off it
+    const ss = sd(spk), sl = sd(lis); if (ss <= 10 || sl <= 1) continue;
+    const im = [spk.x - 2 * ss * w.n[0], spk.y - 2 * ss * w.n[1]];
+    const t = ss / (ss + sl), R2 = [im[0] + (lis.x - im[0]) * t, im[1] + (lis.y - im[1]) * t];
+    const u = ((R2[0] - w.a[0]) * (w.b[0] - w.a[0]) + (R2[1] - w.a[1]) * (w.b[1] - w.a[1])) / (w.len * w.len);
+    if (u < 0.01 || u > 0.99) continue;
+    const z = spk.z + (lis.z - spk.z) * t; if (z <= 1 || z >= H - 1) continue;
+    const blocked = walls.some((o) => o !== w && (segsCross([spk.x, spk.y], R2, o.a, o.b) || segsCross(R2, [lis.x, lis.y], o.a, o.b)));
+    if (blocked) continue;
+    const dh = Math.hypot(lis.x - im[0], lis.y - im[1]);
+    push(w.name, [R2[0], R2[1], z], Math.hypot(dh, lis.z - spk.z), 'wall', w);
+  }
+  const dh = Math.hypot(lis.x - spk.x, lis.y - spk.y);
+  for (const [kind, zz] of [['floor', 0], ['ceiling', H]]) {
+    const a = Math.abs(zz - spk.z), b = Math.abs(zz - lis.z), t = a / (a + b);
+    if (a < 10) continue;                                                  // mounted in the ceiling / standing on the floor
+    const R = [spk.x + (lis.x - spk.x) * t, spk.y + (lis.y - spk.y) * t, zz];
+    if (!inCinema(R[0], R[1])) continue;
+    push(kind, R, Math.hypot(dh, a + b), kind);
+  }
+  return out.sort((p, q) => p.delay - q.delay);
+}
+/** Where 2″ panels would catch the side-wall first reflections of the front three to the main seat. */
+let spotGuard = false, spotCache = null;
+function acReflectionPanelSpots() {
+  const m = mainSeat(); if (!m || spotGuard) return [];
+  const key = JSON.stringify([state.items.map((i) => [i.type, i.x, i.y, i.rot]), state.tune.layout, state.room, state.tv]);
+  if (spotCache && spotCache.key === key) return spotCache.spots;
+  spotGuard = true;
+  try { spotCache = { key, spots: reflSpots(m) }; } finally { spotGuard = false; }
+  return spotCache.spots;
+}
+function reflSpots(m) {
+  const lis = { x: m.x, y: m.y, z: AC.ear }, out = [];
+  for (const ch of tuneLayout(state.tune.layout, true).filter((c) => ['L', 'C', 'R'].includes(c.k))) {
+    const spk = { x: ch.p[0], y: ch.p[1], z: ch.z };
+    for (const q of firstReflections(spk, lis)) if (q.kind === 'wall' && /left|right|alcove side/.test(q.surface) && q.delay < 20 && out.every((o) => Math.hypot(o.x - q.x, o.y - q.y) > 20)) out.push({ x: q.x, y: q.y, z: clamp(q.z, 30, 72), surface: q.surface });
+  }
+  return out;
+}
+/** Two spots on the wall behind the seats for 4″ panels (the solid part beside the stairs). */
+function acRearSpots() {
+  const r = state.room, G = geom(), m = mainSeat(); if (!m) return [];
+  const xs = [G.wallX + (r.width - G.wallX) * 0.3, G.wallX + (r.width - G.wallX) * 0.7];
+  return xs.map((x) => ({ x, y: 1, z: AC.ear + 6 }));
+}
+
+// ---------------- speaker layouts ----------------
+const LAYOUTS = {
+  '2.1': ['L', 'R'], '3.1': ['L', 'C', 'R'], '5.1': ['L', 'C', 'R', 'SL', 'SR'], '7.1': ['L', 'C', 'R', 'SL', 'SR', 'BL', 'BR'],
+  '5.1.2': ['L', 'C', 'R', 'SL', 'SR', 'TML', 'TMR'], '5.1.4': ['L', 'C', 'R', 'SL', 'SR', 'TFL', 'TFR', 'TRL', 'TRR'],
+  '7.1.4': ['L', 'C', 'R', 'SL', 'SR', 'BL', 'BR', 'TFL', 'TFR', 'TRL', 'TRR'],
+  '9.1.6': ['L', 'C', 'R', 'WL', 'WR', 'SL', 'SR', 'BL', 'BR', 'TFL', 'TFR', 'TML', 'TMR', 'TRL', 'TRR'],
+};
+// Dolby's recommended angles from the main seat (azimuth: 0 ahead, + to the right; elevation for the tops)
+const CHANNELS = {
+  L: { name: 'Front left', az: -26, rng: [22, 30] }, R: { name: 'Front right', az: 26, rng: [22, 30] }, C: { name: 'Centre', az: 0, rng: [0, 5] },
+  WL: { name: 'Wide left', az: -60, rng: [50, 70] }, WR: { name: 'Wide right', az: 60, rng: [50, 70] },
+  SL: { name: 'Surround left', az: -100, rng: [90, 110], rng5: [110, 120], az5: -115 }, SR: { name: 'Surround right', az: 100, rng: [90, 110], rng5: [110, 120], az5: 115 },
+  BL: { name: 'Rear surround left', az: -142, rng: [135, 150] }, BR: { name: 'Rear surround right', az: 142, rng: [135, 150] },
+  TFL: { name: 'Top front left', el: 45, side: -1, erng: [30, 55] }, TFR: { name: 'Top front right', el: 45, side: 1, erng: [30, 55] },
+  TML: { name: 'Top middle left', el: 80, side: -1, erng: [65, 100] }, TMR: { name: 'Top middle right', el: 80, side: 1, erng: [65, 100] },
+  TRL: { name: 'Top rear left', el: 135, side: -1, erng: [125, 150] }, TRR: { name: 'Top rear right', el: 135, side: 1, erng: [125, 150] },
+};
+const SPK_CLASSES = {
+  bookshelf: { label: 'Bookshelf / on-wall', sens: 86 }, tower: { label: 'Towers in front', sens: 89 },
+  inwall: { label: 'In-wall', sens: 88 }, reference: { label: 'High-sensitivity (horn-loaded)', sens: 95 },
+};
+/** Place a layout's channels in this room from the main seat. quick: positions only. */
+function tuneLayout(key = state.tune.layout, quick = false) {
+  const m = mainSeat(); if (!m) return [];
+  const r = state.room, G = geom(), H = r.ceiling, ear = AC.ear, walls = roomWalls();
+  const T = [G.tvX + state.tv.offset, r.depth], fv = [T[0] - m.x, T[1] - m.y], fl = Math.hypot(...fv); fv[0] /= fl; fv[1] /= fl;
+  const rt = [fv[1], -fv[0]];
+  const ang = (deg) => { const a = deg * DEG; return [fv[0] * Math.cos(a) + rt[0] * Math.sin(a), fv[1] * Math.cos(a) + rt[1] * Math.sin(a)]; };
+  const ceilAt = (x, y) => (x < r.beamDepth && y < G.westY && y > G.westY - 40 ? r.beamBottom : y > G.mainY + G.ret - r.soffitDepth && y > G.mainY ? r.soffitBottom : H);
+  const towers = state.items.filter((i) => i.type === 'towerSpeaker');
+  const five = !(LAYOUTS[key] || []).includes('BL');
+  const out = [];
+  // the front pair: towers if the layout has them, else in the alcove at about 26°
+  const frontY = G.mainY + G.ret - 4, along = frontY - m.y;
+  const frontAt = (side) => {
+    const tw = towers.map((t) => ({ x: t.x, y: t.y })).sort((a, b) => a.x - b.x);
+    if (tw.length >= 2) return { p: [side < 0 ? tw[0].x : tw[tw.length - 1].x, side < 0 ? tw[0].y : tw[tw.length - 1].y], z: 36, how: 'tower', mount: 'floor' };
+    const lat = along * Math.tan(26 * DEG);
+    return { p: [clamp(m.x + side * lat, r.bayLeft + 8, r.bayRight - 8), frontY], z: 40, how: 'on stands or on the wall', mount: 'stand' };
+  };
+  for (const k of LAYOUTS[key] || []) {
+    const ch = CHANNELS[k]; let pos;
+    if (k === 'L' || k === 'R') pos = frontAt(k === 'L' ? -1 : 1);
+    else if (k === 'C') {
+      const scr = state.tv.screen && state.light.screenDown;
+      pos = { p: [G.tvX + state.tv.offset, r.depth - 8], z: scr ? 50 : Math.max(14, state.tv.center - tvDims(state.tv.size).h / 2 - 8), how: scr ? 'behind the acoustically transparent screen' : 'under the TV', mount: 'stand' };
+    } else if (ch.az != null) {
+      const az = five && ch.az5 ? ch.az5 : ch.az, d = ang(az);
+      // cast from the seat to the first wall in that direction
+      let best = null;
+      for (const w of walls) {
+        const ex = w.b[0] - w.a[0], ey = w.b[1] - w.a[1], den = d[0] * ey - d[1] * ex; if (Math.abs(den) < 1e-9) continue;
+        const tt = ((w.a[0] - m.x) * ey - (w.a[1] - m.y) * ex) / den, u = ((w.a[0] - m.x) * d[1] - (w.a[1] - m.y) * d[0]) / den;
+        if (tt > 6 && u >= 0 && u <= 1 && (!best || tt < best.t)) best = { t: tt, w };
+      }
+      // does the ray leave through the opening to the stairs first?
+      const tOpen = d[1] < -1e-6 ? -m.y / d[1] : Infinity, xo = m.x + d[0] * tOpen;
+      const throughOpening = tOpen < (best ? best.t : Infinity) && xo > r.boxX && xo < G.wallX;
+      if (best && !throughOpening) {
+        const pt = [m.x + d[0] * (best.t - 3), m.y + d[1] * (best.t - 3)];
+        pos = { p: pt, z: ear + (Math.abs(az) >= 90 ? 18 : 6), how: `on the ${best.w.name}, ${ftin(ear + (Math.abs(az) >= 90 ? 18 : 6))} up`, mount: 'wall' };
+      } else {
+        const dd = Math.min(tOpen - 6, 60), pt = [m.x + d[0] * dd, m.y + d[1] * dd];
+        pos = { p: pt, z: ceilAt(pt[0], pt[1]), how: 'no wall there (stair opening): in-ceiling, angled toward the seats', mount: 'ceiling', fallback: true };
+      }
+    } else {
+      // overhead: in line with the front pair, at the elevation Dolby recommends
+      const lat = Math.max(30, along * Math.tan(26 * DEG)) * ch.side, el = ch.el * DEG;
+      const fwd = Math.abs(ch.el - 90) < 1 ? 0 : (H - ear) / Math.tan(el);
+      let pt = [m.x + fv[0] * fwd + rt[0] * lat, m.y + fv[1] * fwd + rt[1] * lat], note = 'in-ceiling';
+      if (!inCinema(pt[0], pt[1])) { pt = [clamp(pt[0], 6, r.width - 6), clamp(pt[1], 6, G.mainY + G.ret - 6)]; note = 'in-ceiling (pulled in from over the stair opening)'; }
+      pos = { p: pt, z: ceilAt(pt[0], pt[1]), how: note, mount: 'ceiling' };
+    }
+    out.push({ k, name: ch.name, ...pos });
+  }
+  if (quick) return out;
+  // actual angles, distances, delays and trims
+  const far = Math.max(...out.map((c) => Math.hypot(c.p[0] - m.x, c.p[1] - m.y, c.z - ear)));
+  const cls = SPK_CLASSES[state.tune.spk] || SPK_CLASSES.bookshelf, P = state.tune.amp || 100;
+  for (const c of out) {
+    const v = [c.p[0] - m.x, c.p[1] - m.y], hd = Math.hypot(...v), dist = Math.hypot(hd, c.z - ear);
+    const az = Math.atan2(v[0] * rt[0] + v[1] * rt[1], v[0] * fv[0] + v[1] * fv[1]) / DEG;
+    const elRaw = Math.atan2(c.z - ear, hd) / DEG, fwd = v[0] * fv[0] + v[1] * fv[1];
+    const ch = CHANNELS[c.k];
+    c.az = az; c.dist = dist; c.delay = (far - dist) * AC.IN / 343 * 1000; c.trim = -20 * Math.log10(far / dist);
+    // Dolby's elevation for the tops is seen from the side: 0° ahead, 90° overhead, 180° behind
+    if (ch.erng) { c.el = Math.atan2(c.z - ear, fwd) / DEG; c.target = `${ch.erng[0]}–${ch.erng[1]}° up`; c.ok = c.el >= ch.erng[0] - 3 && c.el <= ch.erng[1] + 3; c.actual = `${Math.round(c.el)}° up`; }
+    else { const rng = five && ch.rng5 ? ch.rng5 : ch.rng; c.target = c.k === 'C' ? 'on axis' : `${rng[0]}–${rng[1]}°`; c.ok = Math.abs(az) >= rng[0] - 3 && Math.abs(az) <= rng[1] + 3; c.actual = `${Math.round(Math.abs(az))}° ${az < -1 ? 'left' : az > 1 ? 'right' : ''}`.trim(); c.el = elRaw; }
+    const sens = c.how === 'tower' ? SPK_CLASSES.tower.sens : cls.sens;
+    c.maxSpl = sens + 10 * Math.log10(P) - 20 * Math.log10(Math.max(0.3, dist * AC.IN)) + 2 - 1;  // + room field, − power compression
+    c.headroom = c.maxSpl - (105 + (state.tune.refLvl ?? -5));
+  }
+  return out;
+}
+
+// ---------------- the whole analysis ----------------
+let TA = null;                                         // last analysis
+function analyseRoom() {
+  const ctx = bassCtx(); if (!ctx) return null;
+  const t = state.tune, subs = currentSubs(), F = ctx.F;
+  const raw = bassResponses(ctx, subs, { eq: null }), mRaw = bassMetrics(raw, F);
+  const eq = t.eqOn ? (t.eq && t.eq.length ? t.eq : autoEQ(ctx, subs)) : [];
+  const resp = eq.length ? bassResponses(ctx, subs, { eq }) : raw, m = eq.length ? bassMetrics(resp, F) : mRaw;
+  // headroom at the main seat: in-room maximum vs 115 dB LFE peaks
+  const mlpSeat = ctx.seats.find((s) => s.mlp) || ctx.seats[0];
+  const lfe = bassResponses(ctx, subs, { eq: eq.length ? eq : null, signal: 'lfe', seats: [mlpSeat] })[0];
+  const gmax = Math.max(...subs.map((s) => 10 ** ((s.g || 0) / 20)));
+  const maxSpl = F.map((f, i) => { const boost = eq.length ? Math.max(0, 20 * Math.log10(Math.hypot(...eqResp(eq, f)))) : 0; return lfe.db[i] - 20 * Math.log10(Math.hypot(...lr4('lp', 120, f)) + 1e-9) + subMax(t.sub, f) - boost - 20 * Math.log10(gmax); });
+  const hrIdx = F.map((f, i) => i).filter((i) => F[i] >= 25 && F[i] <= 80);
+  const headroom = Math.min(...hrIdx.map((i) => smoothDb(maxSpl, 6)[i])) - (115 + (t.refLvl ?? -5));
+  const rt = rtModel();
+  const ir = bassImpulse(ctx, subs, mlpSeat, eq.length ? eq : null), decay = bandDecay(ir);
+  const lay = tuneLayout(t.layout);
+  const mlp = { x: mlpSeat.x, y: mlpSeat.y, z: AC.ear };
+  const refl = lay.filter((c) => !c.k.startsWith('T')).map((c) => ({ ch: c, list: firstReflections({ x: c.p[0], y: c.p[1], z: c.z }, mlp) }));
+  const early = refl.flatMap((r) => r.list.filter((q) => q.delay < 15).map((q) => ({ ...q, ch: r.ch.k })));
+  // the floor bounce is graded on its own: only a rug treats it, and every room has one
+  const worstOf = (l) => (l.length ? l.reduce((a, b) => (b.level > a.level ? b : a)) : null);
+  const worst = worstOf(early.filter((q) => q.kind !== 'floor')), floorWorst = worstOf(early.filter((q) => q.kind === 'floor'));
+  const sweep = rowSweep(ctx, subs);
+  // modal ringing: decay of the bass third-octaves vs target
+  const ring = decay.filter((d) => d.t60 && d.fc <= 125).map((d) => d.t60 - decayTarget(d.fc, rt.rtMid));
+  TA = { ctx, subs, raw, mRaw, eq, resp, m, maxSpl, headroom, rt, ir, decay, ring: ring.length ? Math.max(...ring) : 0, lay, refl, early, worst, floorWorst, sweep, mlp: mlpSeat, at: Date.now() };
+  TA.score = tuneScore(TA); TA.advice = tuneAdvice(TA);
+  return TA;
+}
+const REF_LEVELS = { 0: 'Reference', '-5': 'Reference −5 dB', '-10': 'Reference −10 dB' };
+const refName = () => `${REF_LEVELS[state.tune.refLvl ?? -5] || 'Reference'}`;
+const grade = (v, cuts) => (v <= cuts[0] ? 'A' : v <= cuts[1] ? 'B' : v <= cuts[2] ? 'C' : 'D');
+const GRADE_PTS = { A: 100, B: 78, C: 55, D: 30 };
+/** The scorecard: each line as a pro would grade it. */
+function tuneScore(A) {
+  const t = state.tune, rows = [];
+  const rtDev = Math.max(0, A.rt.rtMid - 0.4, 0.2 - A.rt.rtMid);
+  const lay = A.lay, okN = lay.filter((c) => c.ok).length, minHr = Math.min(...lay.map((c) => c.headroom));
+  rows.push({ key: 'ssv', label: 'Bass, seat to seat', value: `±${A.m.ssv.toFixed(1)} dB`, g: grade(A.m.ssv, [2.5, 3.5, 5]), note: 'How alike the bass sounds across the sofa (20–100 Hz). Fixed by sub placement, not EQ.' });
+  rows.push({ key: 'flat', label: 'Bass smoothness', value: `±${A.m.flat.toFixed(1)} dB`, g: grade(A.m.flat, [2, 3, 4.5]), note: `Seating-area average against the ${TARGETS[t.target].label.toLowerCase()}${A.eq.length ? `, with ${A.eq.length} EQ filters` : ''}.` });
+  rows.push({ key: 'ring', label: 'Bass decay (ringing)', value: `${A.ring > 0 ? '+' : ''}${A.ring.toFixed(2)} s`, g: grade(A.ring, [0, 0.1, 0.25]), note: 'Worst third octave below 125 Hz against the decay target. Bass traps shorten it.' });
+  rows.push({ key: 'head', label: 'Bass headroom', value: `${A.headroom >= 0 ? '+' : ''}${A.headroom.toFixed(1)} dB`, g: grade(-A.headroom, [-3, 0, 4]), note: `${115 + (t.refLvl ?? -5)} dB LFE peaks at the main seat (${refName()}), 25–80 Hz, after EQ.` });
+  rows.push({ key: 'rt', label: 'Reverberation', value: `${A.rt.rtMid.toFixed(2)} s`, g: grade(rtDev, [0, 0.05, 0.15]), note: 'Mid-band RT60 (500 Hz–2 kHz, Eyring). Target 0.2–0.4 s for a room this size.' });
+  rows.push({ key: 'refl', label: 'Early reflections', value: A.worst ? `${A.worst.level.toFixed(1)} dB` : 'none', g: grade(A.worst ? A.worst.level : -30, [-15, -10, -6]), note: A.worst ? `Loudest in the first 15 ms: ${CHANNELS[A.worst.ch].name.toLowerCase()} off the ${A.worst.surface}, ${A.worst.delay.toFixed(1)} ms late.` : 'No early reflections at the main seat.' });
+  rows.push({ key: 'angles', label: 'Speaker placement', value: `${okN} of ${lay.length}`, g: grade(lay.length - okN, [0, 1, 3]), note: `Channels inside Dolby's recommended angles for ${t.layout}.` });
+  rows.push({ key: 'spl', label: 'Speaker headroom', value: `${minHr >= 0 ? '+' : ''}${minHr.toFixed(1)} dB`, g: grade(-minHr, [-3, 0, 4]), note: `${105 + (t.refLvl ?? -5)} dB peaks at the main seat from every channel (${refName()}; ${SPK_CLASSES[t.spk].label.toLowerCase()}, ${t.amp} W).` });
+  rows.push({ key: 'iso', label: 'Sound to the floor above', value: t.door ? 'door' : 'open stairwell', g: t.door ? 'B' : 'D', note: t.door ? 'A solid-core door with seals at the stairs: roughly 25–30 dB less sound upstairs.' : 'The stairwell is open to the main floor: bass and dialogue go straight up.' });
+  rows.forEach((r) => { r.pts = GRADE_PTS[r.g]; });
+  const W = { ssv: 2, flat: 1.5, ring: 1, head: 1, rt: 1.2, refl: 1.2, angles: 1, spl: 0.8, iso: 0.5 };
+  const total = rows.reduce((s, r) => s + r.pts * W[r.key], 0) / rows.reduce((s, r) => s + W[r.key], 0);
+  return { rows, total: Math.round(total) };
+}
+/** Prioritised advice, each with its predicted effect. */
+function tuneAdvice(A) {
+  const t = state.tune, out = [], ctx = A.ctx;
+  // subs: what would two or more, placed well, do?
+  const presets = compareConfigs(subPresets());
+  const best = presets.slice().sort((a, b) => a.score - b.score)[0];
+  if (best && best.ssv < A.m.ssv - 1) out.push({ pri: A.m.ssv - best.ssv, title: `Subwoofers: ${best.label.replace(/^\d · /, `${best.subs.length} `)}`, detail: `Seat-to-seat variation ${A.m.ssv.toFixed(1)} → ${best.ssv.toFixed(1)} dB. ${best.subs.map((s) => s.label).join(' + ')}. The optimiser on the Bass tab can do better still.`, act: { kind: 'subs', subs: best.subs, label: 'Place them' } });
+  if (A.sweep && A.sweep.best && A.sweep.best.off !== 0 && A.sweep.cur && A.sweep.cur.score - A.sweep.best.score > 0.8) {
+    const b = A.sweep.best; out.push({ pri: (A.sweep.cur.score - b.score) * 0.8, title: `Move the sofa ${Math.abs(b.off)}″ ${b.off > 0 ? 'forward' : 'back'}`, detail: `Main-seat bass ±${A.sweep.cur.flat.toFixed(1)} → ±${b.flat.toFixed(1)} dB: the seats move off a null.`, act: { kind: 'row', off: b.off, label: 'Move it' } });
+  }
+  if (A.ring > 0.08 && (t.traps || 0) < 4) out.push({ pri: A.ring * 8, title: `Bass traps in the ${(t.traps || 0) < 2 ? 'two front corners' : 'rear corners'}`, detail: `Modal ringing is ${A.ring.toFixed(2)} s over target. Floor-to-ceiling corner traps damp almost every mode at once.`, act: { kind: 'traps', n: Math.min(4, (t.traps || 0) + 2), label: 'Add traps' } });
+  if (A.worst && A.worst.level > -10 && !t.reflPanels) out.push({ pri: (A.worst.level + 10) * 0.6 + 1, title: '2″ panels at the side-wall reflection points', detail: `Worst early reflection ${A.worst.level.toFixed(1)} dB (${A.worst.surface}). Panels there bring the side walls below −10 dB and sharpen dialogue and imaging.`, act: { kind: 'refl', label: 'Add panels' } });
+  if (A.floorWorst && A.floorWorst.level > -6) out.push({ pri: 0.9, title: 'Rug between the speakers and the seats', detail: `The floor bounce from the ${CHANNELS[A.floorWorst.ch].name.toLowerCase()} lands ${ftin(Math.hypot(A.floorWorst.x - A.mlp.x, A.floorWorst.y - A.mlp.y))} in front of the main seat at ${A.floorWorst.level.toFixed(1)} dB. A thick rug with a felt pad there takes the edge off it.` });
+  if (A.early.some((q) => q.kind === 'ceiling' && q.level > -10) && !t.cloud) out.push({ pri: 1.2, title: 'A ceiling cloud over the seats', detail: 'The ceiling bounce from the front speakers arrives within 5 ms. A 4″ cloud (4 × 6 ft) absorbs it.', act: { kind: 'cloud', label: 'Add a cloud' } });
+  if (A.rt.rtMid > 0.42) out.push({ pri: (A.rt.rtMid - 0.4) * 10, title: 'Add absorption: the room is live', detail: `RT60 ${A.rt.rtMid.toFixed(2)} s. Rear-wall 4″ panels and a large rug bring it toward 0.3 s.`, act: !t.rearPanels ? { kind: 'rear', label: 'Add rear panels' } : null });
+  if (A.rt.rtMid < 0.18) out.push({ pri: 1, title: 'The room is too dead', detail: `RT60 ${A.rt.rtMid.toFixed(2)} s: swap some absorption for diffusion (slats, bookshelves) to keep it lively.` });
+  if (A.m.flat > 2.5 && !t.eqOn) out.push({ pri: 2, title: 'Turn on the room EQ', detail: 'Automatic parametric EQ cuts the room\'s peaks at the seats.', act: { kind: 'eq', label: 'Turn on' } });
+  const fb = A.lay.filter((c) => c.fallback);
+  if (fb.length) out.push({ pri: 0.8, title: `${fb.map((c) => c.name).join(' and ')}: no wall at the right angle`, detail: 'Those directions point into the stair opening; the plan uses angled in-ceiling speakers there.' });
+  const lowHr = A.lay.filter((c) => c.headroom < 0);
+  if (lowHr.length) out.push({ pri: 1, title: 'More amplifier or more sensitive speakers', detail: `${lowHr.map((c) => c.k).join(', ')} can't reach 105 dB peaks. Try ${t.amp < 200 ? '200 W per channel' : 'higher-sensitivity speakers'}.` });
+  if (A.headroom < 0) out.push({ pri: -A.headroom / 3 + 0.5, title: 'More bass output', detail: `${(-A.headroom).toFixed(1)} dB short of 115 dB LFE peaks between 25 and 80 Hz. A second sub adds about 6 dB; a larger model adds more.` });
+  if (!t.door) out.push({ pri: 0.3, title: 'Keep the movie downstairs', detail: 'A solid-core door with seals at the top or bottom of the stairs cuts sound to the main floor by roughly 25–30 dB.', act: { kind: 'door', label: 'Plan a door' } });
+  return out.sort((a, b) => b.pri - a.pri);
+}
+
+// ---- 67-tune-draw.js ----
+// ===================================================================
+// 67 · Cinema tuning: canvas charts and the overlays drawn in the room (the bass map on the floor,
+// seats with their level, subwoofers, planned treatment, speakers and reflection points).
+// ===================================================================
+const CH_INK = { grid: 'rgba(232,214,190,0.08)', axis: 'rgba(232,214,190,0.35)', text: '#a99c8a', bg: '#151210' };
+/** Size a canvas for its CSS box and return a 2D context in CSS pixels. */
+function chartCtx(cv) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth || parseFloat(cv.style.width) || 600, H = cv.clientHeight || parseFloat(cv.style.height) || 220;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.fillStyle = CH_INK.bg; c.fillRect(0, 0, W, H);
+  c.font = '10.5px "IBM Plex Mono", ui-monospace, monospace'; c.textBaseline = 'middle';
+  return { c, W, H };
+}
+/** Axes for a log-frequency chart. Returns mapping functions. */
+function freqAxes(c, W, H, { f0 = 15, f1 = 200, y0, y1, ystep = 5, unit = 'dB', pad = [36, 10, 8, 20] }) {
+  const [l, r, t, b] = pad, X = (f) => l + (W - l - r) * Math.log(f / f0) / Math.log(f1 / f0), Y = (v) => t + (H - t - b) * (1 - (v - y0) / (y1 - y0));
+  c.strokeStyle = CH_INK.grid; c.lineWidth = 1; c.fillStyle = CH_INK.text;
+  for (let v = Math.ceil(y0 / ystep) * ystep; v <= y1; v += ystep) { c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(W - r, Y(v)); c.stroke(); c.textAlign = 'right'; c.fillText(`${v}`, l - 5, Y(v)); }
+  for (const f of [20, 30, 40, 50, 60, 80, 100, 150, 200].filter((q) => q >= f0 && q <= f1)) { c.beginPath(); c.moveTo(X(f), t); c.lineTo(X(f), H - b); c.stroke(); c.textAlign = 'center'; c.fillText(String(f), X(f), H - b + 11); }
+  c.textAlign = 'left'; c.fillText(unit, 4, t + 4);
+  return { X, Y, l, r, t, b, inv: (px) => f0 * (f1 / f0) ** ((px - l) / (W - l - r)) };
+}
+function polyline(c, xs, ys, X, Y, color, width = 1.4, dash = null) {
+  c.strokeStyle = color; c.lineWidth = width; c.setLineDash(dash || []); c.beginPath();
+  xs.forEach((x, i) => { const px = X(x), py = Y(ys[i]); if (i) c.lineTo(px, py); else c.moveTo(px, py); }); c.stroke(); c.setLineDash([]);
+}
+/** Hover readout and click-to-pick on a frequency chart. */
+function attachHover(cv, tip, onPick) {
+  cv.addEventListener('pointermove', (e) => {
+    if (!cv._ax || !cv._read) return; const r = cv.getBoundingClientRect(), x = e.clientX - r.left;
+    if (x < cv._ax.l) { tip.classList.remove('on'); return; }
+    const f = cv._ax.inv(x); tip.innerHTML = cv._read(f); tip.classList.add('on');
+    tip.style.left = `${clamp(x + 12, 0, r.width - 150)}px`; tip.style.top = '6px';
+  });
+  cv.addEventListener('pointerleave', () => tip.classList.remove('on'));
+  cv.addEventListener('click', (e) => { if (!cv._ax) return; const r = cv.getBoundingClientRect(); const f = cv._ax.inv(e.clientX - r.left); if (f >= 15 && f <= 200) onPick(f); });
+}
+function drawResponse(cv, tip, V) {
+  const { c, W, H } = chartCtx(cv), F = V.ctx.F, t = state.tune, sm = (d) => smoothDb(d, TV.smooth);
+  const series = V.resp.map((r) => sm(r.db)), mean = sm(V.m.mean);
+  const all = series.flat ? [].concat(...series.map((s) => Array.from(s))) : [];
+  const hi = Math.ceil((Math.max(...all) + 3) / 5) * 5, lo = Math.max(hi - 45, Math.floor((Math.min(...all) - 2) / 5) * 5);
+  const ax = freqAxes(c, W, H, { y0: lo, y1: hi });
+  // target band ±3 dB around the level
+  c.fillStyle = 'rgba(214,164,99,0.10)'; c.beginPath();
+  F.forEach((f, i) => { const y = ax.Y(V.m.level + targetAt(f) + 3); if (i) c.lineTo(ax.X(f), y); else c.moveTo(ax.X(f), y); });
+  for (let i = F.length - 1; i >= 0; i--) c.lineTo(ax.X(F[i]), ax.Y(V.m.level + targetAt(F[i]) - 3)); c.closePath(); c.fill();
+  const [b0, b1] = bassBand(); c.fillStyle = 'rgba(255,255,255,0.03)'; c.fillRect(ax.l, ax.t, ax.X(b0) - ax.l, H - ax.t - ax.b); c.fillRect(ax.X(b1), ax.t, W - ax.r - ax.X(b1), H - ax.t - ax.b);
+  V.resp.forEach((r, i) => { if (!r.seat.mlp) polyline(c, F, series[i], ax.X, ax.Y, seatColor(r.seat, i) + (r.seat.main || t.allSeats ? 'cc' : '44'), 1.1); });
+  const mi = V.resp.findIndex((r) => r.seat.mlp); if (mi >= 0) polyline(c, F, series[mi], ax.X, ax.Y, '#d6a463', 2.2);
+  polyline(c, F, mean, ax.X, ax.Y, '#efe6d8', 1.4, [5, 4]);
+  if (!TV.band) { c.strokeStyle = 'rgba(239,230,216,0.5)'; c.beginPath(); c.moveTo(ax.X(TV.f), ax.t); c.lineTo(ax.X(TV.f), H - ax.b); c.stroke(); }
+  cv._ax = ax;
+  cv._read = (f) => { const i = Math.min(F.length - 1, Math.max(0, Math.round(AC.ppo * Math.log2(f / F[0])))); return `<b>${fmtF(F[i])}</b>` + V.resp.map((r, k) => `<span style="color:${seatColor(r.seat, k)}">${r.seat.label} ${series[k][i].toFixed(1)}</span>`).join('') + `<span>avg ${mean[i].toFixed(1)} dB</span>`; };
+}
+function drawWaterfall(cv, V) {
+  const { c, W, H } = chartCtx(cv), mlp = V.ctx.seats.find((s) => s.mlp) || V.ctx.seats[0];
+  const ir = bassImpulse(V.ctx, V.subs, mlp, V.eq.length ? V.eq : null);
+  const F = logFreqs(15, 200, 24), sl = waterfall(ir, F, Array.from({ length: 12 }, (_, i) => i * 20), 0.3);
+  const top = Math.max(...sl[0].db), n = sl.length, dx = Math.min(6, (W - 80) * 0.28 / n), dy = 8;
+  const ax = { l: 36, r: 10 + dx * n, t: 10 + dy * n, b: 20 }, X = (f) => ax.l + (W - ax.l - ax.r) * Math.log(f / 15) / Math.log(200 / 15), Y = (v) => ax.t + (H - ax.t - ax.b) * (1 - (v - (top - 30)) / 32);
+  c.fillStyle = CH_INK.text; c.textAlign = 'center';
+  for (const f of [20, 30, 50, 80, 100, 150, 200]) c.fillText(String(f), X(f), H - 9);
+  c.textAlign = 'right'; for (let v = 0; v >= -30; v -= 10) c.fillText(String(v), ax.l - 5, Y(top + v));
+  for (let k = n - 1; k >= 0; k--) {
+    const ox = dx * k, oy = -dy * k, s = sl[k], a = 1 - k / n;
+    c.beginPath(); c.moveTo(X(F[0]) + ox, Y(top - 30) + oy);
+    F.forEach((f, i) => c.lineTo(X(f) + ox, Y(Math.max(top - 30, s.db[i])) + oy));
+    c.lineTo(X(F[F.length - 1]) + ox, Y(top - 30) + oy); c.closePath();
+    c.fillStyle = CH_INK.bg; c.fill();
+    c.strokeStyle = `rgba(${Math.round(lerp(120, 214, a))},${Math.round(lerp(150, 164, a))},${Math.round(lerp(190, 99, a))},${0.35 + 0.65 * a})`; c.lineWidth = k === 0 ? 1.8 : 1.1; c.stroke();
+  }
+  c.fillStyle = CH_INK.text; c.textAlign = 'left'; c.fillText(`0 → ${sl[n - 1].t} ms`, W - ax.r + 6, ax.t - 4);
+}
+function drawDecay(cv) {
+  const { c, W, H } = chartCtx(cv), d = TA.decay, n = d.length, l = 36, b = 20, t = 10, r = 10;
+  const ymax = Math.max(1, ...d.map((q) => q.t60 || 0)) * 1.1, Y = (v) => t + (H - t - b) * (1 - v / ymax), bw = (W - l - r) / n;
+  c.strokeStyle = CH_INK.grid; c.fillStyle = CH_INK.text;
+  for (let v = 0; v <= ymax; v += 0.2) { c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(W - r, Y(v)); c.stroke(); c.textAlign = 'right'; c.fillText(v.toFixed(1), l - 5, Y(v)); }
+  c.textAlign = 'left'; c.fillText('s', 4, t + 4);
+  d.forEach((q, i) => {
+    const x = l + i * bw, tg = decayTarget(q.fc, TA.rt.rtMid);
+    if (q.t60) { c.fillStyle = q.t60 > tg + 0.1 ? '#e07a62' : q.t60 > tg ? '#e2b55a' : '#8fbf8a'; c.fillRect(x + bw * 0.2, Y(q.t60), bw * 0.6, Y(0) - Y(q.t60)); }
+    c.strokeStyle = '#efe6d8'; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(x + 2, Y(tg)); c.lineTo(x + bw - 2, Y(tg)); c.stroke(); c.setLineDash([]);
+    c.fillStyle = CH_INK.text; c.textAlign = 'center'; c.fillText(String(q.fc), x + bw / 2, H - 9);
+  });
+}
+function drawSweep(cv) {
+  const { c, W, H } = chartCtx(cv), s = TA.sweep, pts = s.pts, l = 36, r = 10, t = 10, b = 20;
+  const ymax = Math.ceil(Math.max(...pts.map((p) => Math.max(p.flat, p.ssv))) + 1), X = (o) => l + (W - l - r) * (o + 42) / 84, Y = (v) => t + (H - t - b) * (1 - v / ymax);
+  c.fillStyle = 'rgba(255,255,255,0.05)'; for (const p of pts) if (!p.fits) c.fillRect(X(p.off) - (W - l - r) / 56, t, (W - l - r) / 28, H - t - b);
+  c.strokeStyle = CH_INK.grid; c.fillStyle = CH_INK.text;
+  for (let v = 0; v <= ymax; v += 2) { c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(W - r, Y(v)); c.stroke(); c.textAlign = 'right'; c.fillText(`±${v}`, l - 5, Y(v)); }
+  c.textAlign = 'center'; for (const o of [-36, -24, -12, 0, 12, 24, 36]) c.fillText(o === 0 ? 'now' : `${o > 0 ? '+' : ''}${o}″`, X(o), H - 9);
+  polyline(c, pts.map((p) => p.off), pts.map((p) => p.ssv), X, Y, '#7fb3d5', 1.4);
+  polyline(c, pts.map((p) => p.off), pts.map((p) => p.flat), X, Y, '#d6a463', 2);
+  if (s.best) { c.fillStyle = '#8fbf8a'; c.beginPath(); c.arc(X(s.best.off), Y(s.best.flat), 4.5, 0, Math.PI * 2); c.fill(); }
+  c.strokeStyle = '#efe6d8'; c.setLineDash([3, 3]); c.beginPath(); c.moveTo(X(0), t); c.lineTo(X(0), H - b); c.stroke(); c.setLineDash([]);
+}
+function drawRT(cv, rt) {
+  const { c, W, H } = chartCtx(cv), n = OCT.length, l = 36, r = 10, t = 10, b = 20, bw = (W - l - r) / n;
+  const ymax = Math.max(0.8, ...rt.bands.map((q) => Math.max(q.eyring, q.sabine))) * 1.1, Y = (v) => t + (H - t - b) * (1 - v / ymax);
+  c.strokeStyle = CH_INK.grid; c.fillStyle = CH_INK.text;
+  for (let v = 0; v <= ymax; v += 0.2) { c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(W - r, Y(v)); c.stroke(); c.textAlign = 'right'; c.fillText(v.toFixed(1), l - 5, Y(v)); }
+  c.textAlign = 'left'; c.fillText('s', 4, t + 4);
+  rt.bands.forEach((q, i) => {
+    const x = l + i * bw, tg = rtTarget(q.f);
+    c.fillStyle = 'rgba(214,164,99,0.12)'; c.fillRect(x + 2, Y(tg.hi), bw - 4, Y(tg.lo) - Y(tg.hi));
+    c.fillStyle = q.eyring > tg.hi ? '#e2b55a' : q.eyring < tg.lo ? '#7fb3d5' : '#d6a463'; c.fillRect(x + bw * 0.25, Y(q.eyring), bw * 0.5, Y(0) - Y(q.eyring));
+    c.fillStyle = '#efe6d8'; c.beginPath(); c.arc(x + bw / 2, Y(q.sabine), 3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = CH_INK.text; c.textAlign = 'center'; c.fillText(OCT_LABEL[i], x + bw / 2, H - 9);
+  });
+}
+function drawETC(cv, list) {
+  const { c, W, H } = chartCtx(cv), l = 36, r = 10, t = 10, b = 20, xmax = 40, X = (ms) => l + (W - l - r) * ms / xmax, Y = (v) => t + (H - t - b) * (-v / 30);
+  c.fillStyle = 'rgba(224,122,98,0.13)'; c.fillRect(X(0), Y(0), X(15) - X(0), Y(-10) - Y(0));
+  c.strokeStyle = CH_INK.grid; c.fillStyle = CH_INK.text;
+  for (let v = 0; v >= -30; v -= 5) { c.beginPath(); c.moveTo(l, Y(v)); c.lineTo(W - r, Y(v)); c.stroke(); c.textAlign = 'right'; c.fillText(String(v), l - 5, Y(v)); }
+  c.textAlign = 'center'; for (let ms = 0; ms <= xmax; ms += 5) c.fillText(`${ms}`, X(ms), H - 9);
+  c.textAlign = 'left'; c.fillText('dB', 4, t + 4); c.textAlign = 'right'; c.fillText('ms', W - 4, H - 9);
+  const stem = (ms, v, col, label) => { c.strokeStyle = col; c.lineWidth = 2.2; c.beginPath(); c.moveTo(X(ms), Y(-30)); c.lineTo(X(ms), Y(Math.max(-30, v))); c.stroke(); c.fillStyle = col; c.beginPath(); c.arc(X(ms), Y(Math.max(-30, v)), 3, 0, Math.PI * 2); c.fill(); if (label) { c.fillStyle = CH_INK.text; c.textAlign = 'left'; c.fillText(label, X(ms) + 5, Y(Math.max(-30, v)) - 7); } };
+  stem(0, 0, '#d6a463', 'direct');
+  list.forEach((q) => { if (q.delay <= xmax) stem(q.delay, q.level, q.delay < 15 && q.level > -10 ? '#e07a62' : q.treated ? '#8fbf8a' : '#7fb3d5', q.surface); });
+}
+
+// ---------------- the overlays in the room ----------------
+const MAP_STOPS = [[-15, [27, 42, 74]], [-9, [47, 111, 143]], [-4, [95, 179, 165]], [0, [233, 227, 201]], [4, [232, 168, 92]], [10, [200, 85, 61]]];
+function mapColor(v) {
+  if (v <= MAP_STOPS[0][0]) return MAP_STOPS[0][1];
+  for (let i = 1; i < MAP_STOPS.length; i++) if (v <= MAP_STOPS[i][0]) { const [a, ca] = MAP_STOPS[i - 1], [b, cb] = MAP_STOPS[i], u = (v - a) / (b - a); return ca.map((x, k) => x + (cb[k] - x) * u); }
+  return MAP_STOPS[MAP_STOPS.length - 1][1];
+}
+/** Pressure (complex) at every cell for the given subs at frequency f, height z. */
+function fieldAt(S, damp, subs, f, z) {
+  const g = S.grid, V = g.N * acM(g.g) ** 2 * acM(g.H), k = 2 * Math.PI * f / AC.c, k2 = k * k;
+  const cm = S.modes2.map(() => [0, 0]);
+  const srcs = subs.map((s) => ({ c: acCoef(S, s.x, s.y, AC.subZ), w: subW(s, f) }));
+  S.modes3.forEach((md, n) => {
+    const a = md.lam - k2, b = 2 * k * damp[n] / AC.c, d = V * md.L * (a * a + b * b), ir = a / d, ii = -b / d;
+    let sr = 0, si = 0; for (const s of srcs) { sr += s.c[n] * s.w[0]; si += s.c[n] * s.w[1]; }
+    const vz = Math.cos(md.nz * Math.PI * z / g.H), pr = (sr * ir - si * ii) * vz, pi = (sr * ii + si * ir) * vz;
+    cm[md.m][0] += pr; cm[md.m][1] += pi;
+  });
+  const re = new Float32Array(g.N), im = new Float32Array(g.N);
+  S.modes2.forEach((md, m) => { const [a, b] = cm[m]; if (!a && !b) return; for (let i = 0; i < g.N; i++) { re[i] += md.psi[i] * a; im[i] += md.psi[i] * b; } });
+  return { re, im };
+}
+/** dB relative to the room average (cinema cells) for one frequency or a band. */
+function mapDb(S, damp, subs, z) {
+  const g = S.grid, pw = new Float64Array(g.N);
+  const fs = TV.band ? logFreqs(20, 80, 12) : [TV.f];
+  for (const f of fs) { const { re, im } = fieldAt(S, damp, subs, f, z); for (let i = 0; i < g.N; i++) pw[i] += re[i] * re[i] + im[i] * im[i]; }
+  let m = 0, n = 0; for (let i = 0; i < g.N; i++) if (g.room[i]) { m += pw[i]; n++; }
+  const ref = m / n, out = new Float32Array(g.N); for (let i = 0; i < g.N; i++) out[i] = 10 * Math.log10(pw[i] / ref + 1e-12);
+  return out;
+}
+/** Paint per-cell values onto a canvas texture covering the grid (bilinear, with contour lines). */
+function paintGrid(S, val, colorOf, contour = 3) {
+  const g = S.grid, sc = 8, W = g.nx * sc, H = g.ny * sc;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d'), img = c.createImageData(W, H), d = img.data;
+  const at = (i, j) => { if (i < 0 || j < 0 || i >= g.nx || j >= g.ny) return null; const k = g.id[j * g.nx + i]; return k < 0 ? null : val[k]; };
+  const band = new Int16Array(W * H).fill(-999);
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
+    const fx = (px + 0.5) / sc - 0.5, fy = (H - py - 0.5) / sc - 0.5, i = Math.floor(fx), j = Math.floor(fy), u = fx - i, v = fy - j;
+    const self = at(Math.round(fx), Math.round(fy)); if (self == null) continue;
+    let s = 0, w = 0;
+    for (const [di, dj, ww] of [[0, 0, (1 - u) * (1 - v)], [1, 0, u * (1 - v)], [0, 1, (1 - u) * v], [1, 1, u * v]]) { const q = at(i + di, j + dj); if (q != null) { s += q * ww; w += ww; } }
+    const val2 = w ? s / w : self, [r, gg, b] = colorOf(val2), o = (py * W + px) * 4;
+    d[o] = r; d[o + 1] = gg; d[o + 2] = b; d[o + 3] = 218; band[py * W + px] = Math.floor(val2 / contour);
+  }
+  if (contour) for (let py = 1; py < H; py++) for (let px = 1; px < W; px++) {
+    const k = py * W + px, a = band[k]; if (a === -999) continue;
+    if ((band[k - 1] !== -999 && band[k - 1] !== a) || (band[k - W] !== -999 && band[k - W] !== a)) { const o = k * 4; d[o] *= 0.55; d[o + 1] *= 0.55; d[o + 2] *= 0.55; d[o + 3] = 240; }
+  }
+  c.putImageData(img, 0, 0);
+  return cv;
+}
+const TUNE_LINE = new THREE.LineBasicMaterial({ color: '#7fb3d5', transparent: true, opacity: 0.6, depthTest: false });
+/** Rebuild everything the tuning studio draws in the room for the current tab. */
+function disposeTune() {
+  tuneGroup.traverse((o) => { if (o.material && !o.material.isShared) { if (o.material.map) o.material.map.dispose(); if (o.material !== TUNE_LINE) o.material.dispose(); } });
+  disposeGroup(tuneGroup); invalidate(2);
+}
+function drawTuneOverlay() {
+  disposeTune();
+  if (!TV.open || !ACS || !TA) return;
+  const S = ACS, g = S.grid, plan = mode === 'plan', ctx = TA.ctx, subs = previewOrCurrent();
+  const top = plan ? state.room.ceiling + 6 : null;
+  const addLabel = (text, pos, cls) => { const el = document.createElement('div'); const inner = document.createElement('div'); inner.className = cls; inner.textContent = text; el.append(inner); const o = new CSS2DObject(el); o.position.copy(pos); tuneGroup.add(o); return inner; };
+  // floor map: bass (overview, bass) or a mode shape (modes)
+  let vals = null, color = mapColor, contour = 3;
+  if (TV.tab === 'modes' && TV.modeSel != null) {
+    const md = S.modes3[TV.modeSel], psi = S.modes2[md.m].psi, mx = Math.max(...Array.from(psi, Math.abs));
+    vals = Float32Array.from(psi, (v) => v / mx); contour = 0;
+    color = (v) => (Math.abs(v) < 0.04 ? [240, 236, 226] : v > 0 ? mapColor(lerp(0, 10, v)) : mapColor(lerp(0, -15, -v)));
+  } else if (TV.tab === 'bass' || TV.tab === 'overview') vals = mapDb(S, ctx.damp, subs, AC.ear);
+  if (vals) {
+    const tex = new THREE.CanvasTexture(paintGrid(S, vals, color, contour)); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+    const w = g.nx * g.g, hh = g.ny * g.g;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: !plan, opacity: plan ? 0.82 : 0.85, toneMapped: false }));
+    mesh.rotation.x = -Math.PI / 2; mesh.position.copy(P(g.x0 + w / 2, g.y0 + hh / 2, plan ? state.room.ceiling + 2 : 0.7)); mesh.renderOrder = plan ? 30 : 2; mesh.userData.noShadow = true;
+    tuneGroup.add(mesh);
+    // seat values
+    if (TV.tab !== 'modes') {
+      const probe = (x, y) => { const pr = acProbe(g, x, y); let s = 0; for (const [k, w2] of pr) s += w2 * vals[k]; return s; };
+      ctx.seats.forEach((s) => { const v = probe(s.x, s.y), txt = sgn(v, 0) || '0'; addLabel(s.mlp ? `MLP ${txt}` : txt, P(s.x, s.y, plan ? top : AC.ear + 4), 'dim tseat' + (s.mlp ? ' mlp' : '') + (v < -6 ? ' null' : v > 4 ? ' peak' : '')).title = s.label; });
+    }
+  }
+  // subwoofers
+  if (TV.tab === 'bass' || TV.tab === 'overview' || TV.tab === 'modes') subs.forEach((s, i) => addLabel(`SW${i + 1}${TV.preview ? '?' : ''}`, P(s.x, s.y, plan ? top : 18), 'dim tsub'));
+  // planned treatment (outlines)
+  const t = state.tune, mat = new THREE.MeshBasicMaterial({ color: '#d6a463', transparent: true, opacity: 0.28, depthWrite: false });
+  const edge = new THREE.LineBasicMaterial({ color: '#d6a463', transparent: true, opacity: 0.9 });
+  const box = (x, y, z, w, d, hh, rotY = 0) => { const geo = new THREE.BoxGeometry(w, hh, d), m = new THREE.Mesh(geo, mat); m.position.copy(P(x, y, z)); m.rotation.y = rotY; m.userData.noShadow = true; const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edge); m.add(e); tuneGroup.add(m); };
+  if (TV.tab !== 'speakers') {
+    for (const s of acTrapSpots().slice(0, t.traps || 0)) box(s.x, s.y, state.room.ceiling / 2, 16, 16, state.room.ceiling - 2, Math.PI / 4);
+    const wallBox = (s, thick) => { const w = roomWalls().reduce((b, q) => { const d = Math.abs((s.x - q.a[0]) * q.n[0] + (s.y - q.a[1]) * q.n[1]); return d < b.d ? { d, q } : b; }, { d: Infinity }).q; if (!w) return; box(s.x + w.n[0] * thick / 2, s.y + w.n[1] * thick / 2, s.z, 24, thick, 48, Math.atan2(w.n[0], w.n[1])); };
+    if (t.reflPanels) for (const s of acReflectionPanelSpots()) wallBox(s, 2);
+    if (t.rearPanels) for (const s of acRearSpots()) wallBox(s, 4);
+    if (t.cloud) { const m = mainSeat(); if (m) box(m.x, m.y + 20, state.room.ceiling - 4, 72, 48, 4); }
+  }
+  // speakers
+  if (TV.tab === 'speakers' || TV.tab === 'refl') {
+    const disc = new THREE.MeshBasicMaterial({ color: '#7fb3d5', depthTest: false, transparent: true, opacity: 0.95 });
+    const mlp = TA.mlp, eye = P(mlp.x, mlp.y, plan ? top : AC.ear);
+    for (const ch of TA.lay) {
+      const pos = P(ch.p[0], ch.p[1], plan ? top : ch.z), sp = new THREE.Mesh(new THREE.SphereGeometry(3.2, 16, 12), disc); sp.position.copy(pos); sp.renderOrder = 31; tuneGroup.add(sp);
+      const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([eye, pos]), TUNE_LINE); ln.renderOrder = 30; tuneGroup.add(ln);
+      addLabel(ch.k, pos, 'dim spk' + (ch.ok ? '' : ' bad'));
+    }
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(2.4, 16, 12), new THREE.MeshBasicMaterial({ color: '#d6a463', depthTest: false })); dot.position.copy(eye); dot.renderOrder = 31; tuneGroup.add(dot);
+  }
+  // reflection points of the chosen speaker
+  if (TV.tab === 'refl') {
+    const ch = TA.lay.find((c) => c.k === TV.reflCh) || TA.lay[0], spk = P(ch.p[0], ch.p[1], plan ? top : ch.z), eye = P(TA.mlp.x, TA.mlp.y, plan ? top : AC.ear);
+    for (const q of firstReflections({ x: ch.p[0], y: ch.p[1], z: ch.z }, { x: TA.mlp.x, y: TA.mlp.y, z: AC.ear })) {
+      if (q.delay > 25) continue;
+      const bad = q.delay < 15 && q.level > -10, pt = P(q.x, q.y, plan ? top : q.z);
+      const lm = new THREE.LineDashedMaterial({ color: bad ? '#e07a62' : '#8fbf8a', dashSize: 3, gapSize: 2, transparent: true, opacity: 0.8, depthTest: false });
+      const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([spk, pt, eye]), lm); ln.computeLineDistances(); ln.renderOrder = 30; tuneGroup.add(ln);
+      addLabel(`${q.surface} ${q.level.toFixed(0)} dB`, pt, 'dim trefl' + (bad ? ' bad' : ''));
+    }
+  }
+}
+
+// ---- 67-tune-ui.js ----
+// ===================================================================
+// 67 · Cinema tuning studio: the panel, charts and the overlays in the room.
+//  Overview (scorecard, key figures, advice) · Bass (seat responses, bass map on the floor, subwoofer
+//  configurations and optimiser, per-sub DSP, room EQ, waterfall, decay, sofa position) · Modes ·
+//  Reverb (RT60 and treatment) · Reflections (ETC, points on the walls) · Speakers (layouts, angles,
+//  delays, trims, headroom) · Report (download / copy).
+// ===================================================================
+const TV = { open: false, tab: 'overview', f: 42, band: true, preview: null, opt: null, optN: 2, optKeep: false, busy: '',
+  modeSel: null, reflCh: 'L', smooth: 6, prev: null, timer: 0, playing: 0 };
+const tuneGroup = new THREE.Group(); helpersGroup.add(tuneGroup);
+const SEAT_COLORS = ['#7fb3d5', '#d6a463', '#8fbf8a', '#c89bd6', '#e07a62', '#6fc2b8', '#c9c27a', '#b9a58c'];
+const TABS = [['overview', 'Overview'], ['bass', 'Bass'], ['modes', 'Modes'], ['reverb', 'Reverb'], ['refl', 'Reflections'], ['speakers', 'Speakers'], ['report', 'Report']];
+const fmtF = (f) => (f >= 100 ? f.toFixed(0) : f.toFixed(1).replace(/\.0$/, '')) + ' Hz';
+const sgn = (v, d = 1) => { const r = Number(v.toFixed(d)); return `${r > 0 ? '+' : r < 0 ? '−' : ''}${Math.abs(r).toFixed(d)}`; };
+
+// ---------------- open / close ----------------
+function initTune() {
+  const panel = h('aside', { class: 'tune', id: 'tune', 'aria-label': 'Cinema tuning', hidden: true },
+    h('header', { class: 'tune-head' },
+      h('div', { class: 'tune-titles' }, h('span', { class: 'tune-kicker' }, 'Cinema tuning'), h('h2', {}, 'Acoustic model of the basement'), h('p', { id: 'tuneSub' }, '')),
+      h('button', { class: 'tune-x', 'aria-label': 'Close tuning', onclick: () => closeTune() }, '✕')),
+    h('nav', { class: 'tune-tabs', role: 'tablist' }, TABS.map(([k, label]) => h('button', { role: 'tab', 'data-tab': k, 'aria-selected': String(k === TV.tab), onclick: () => tuneTab(k) }, label))),
+    h('div', { class: 'tune-body', id: 'tuneBody' }));
+  $('#app').append(panel);
+  $('#tuneBtn').addEventListener('click', () => (TV.open ? closeTune() : openTune()));
+  window.addEventListener('keydown', (e) => {
+    if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === 't' || e.key === 'T') { if (TV.open) closeTune(); else openTune(); }
+    else if (e.key === 'Escape' && TV.open && !selected && !TV.preview) closeTune();
+  });
+}
+function openTune(tab) {
+  if (photo.on) return;
+  TV.open = true; if (tab) TV.tab = tab;
+  TV.prev = { left: !$('#leftPanel').classList.contains('collapsed'), right: !$('#rightPanel').classList.contains('collapsed'), mode };
+  $('#leftPanel').classList.add('collapsed'); $('#rightPanel').classList.add('collapsed');
+  $('#tune').hidden = false; $('#app').classList.add('tuning'); $('#tuneBtn').setAttribute('aria-pressed', 'true');
+  select(null);
+  if (mode === 'walk') setMode('orbit');
+  setMode('plan');
+  tuneTab(TV.tab, true);
+  ensureSolved();
+  setTimeout(() => { resize(); if (mode === 'plan') fitPlan(); }, 30);
+}
+function closeTune() {
+  TV.open = false; clearInterval(TV.playing); TV.playing = 0; TV.preview = null;
+  $('#tune').hidden = true; $('#app').classList.remove('tuning'); $('#tuneBtn').setAttribute('aria-pressed', 'false');
+  if (TV.prev) { $('#leftPanel').classList.toggle('collapsed', !TV.prev.left); $('#rightPanel').classList.toggle('collapsed', !TV.prev.right); }
+  disposeTune();
+  setTimeout(() => { resize(); if (mode === 'plan') fitPlan(); }, 30);
+}
+function tuneTab(k, quiet) {
+  TV.tab = k; TV.modeSel = k === 'modes' ? TV.modeSel : null;
+  $$('.tune-tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
+  renderTune(); if (!quiet) $('#tuneBody').scrollTop = 0;
+}
+/** Solve the room (once per room shape) and analyse, with progress in the panel. */
+function ensureSolved() {
+  if (ACS && ACS.grid.key === acKey()) { tuneAnalyse(); return; }
+  TV.busy = 'Building the room grid'; renderTune();
+  acSolve((p, msg) => { TV.busy = msg; const b = $('#tuneProgress'); if (b) { b.style.setProperty('--p', p); $('#tuneProgressMsg').textContent = msg; } })
+    .then(() => { TV.busy = ''; tuneAnalyse(); })
+    .catch((err) => { console.error(err); TV.busy = 'Could not solve the room'; renderTune(); });
+}
+function tuneAnalyse() {
+  if (!TV.open) return;
+  try { analyseRoom(); } catch (err) { console.error(err); }
+  renderTune();
+}
+/** Called after any edit to the layout. */
+function tuneChanged() {
+  if (!TV.open) return;
+  clearTimeout(TV.timer);
+  TV.timer = setTimeout(() => { if (ACS && ACS.grid.key !== acKey()) ensureSolved(); else tuneAnalyse(); }, 250);
+}
+/** Change a tuning setting (undoable) and re-analyse. */
+function setTune(patch, analyse = true) {
+  pushHistory(); Object.assign(state.tune, patch); save();
+  if (analyse) tuneAnalyse();
+}
+
+// ---------------- rendering the panel ----------------
+function renderTune() {
+  const body = $('#tuneBody'); if (!body || !TV.open) return;
+  const sub = $('#tuneSub');
+  if (ACS) sub.textContent = `${ACS.modes3.filter((m) => m.f <= 200).length} room modes below 200 Hz · ${ACS.grid.N.toLocaleString()} cells · ${state.tune.layout} · ${currentSubs().filter((s) => s.real).length || 'no'} sub${currentSubs().filter((s) => s.real).length === 1 ? '' : 's'}`;
+  const keep = body.scrollTop;
+  body.replaceChildren();
+  if (TV.busy || !TA) {
+    body.append(h('div', { class: 'tune-busy' }, h('div', { class: 'tprog', id: 'tuneProgress' }, h('i')), h('p', { id: 'tuneProgressMsg' }, TV.busy || 'Analysing…'),
+      h('p', { class: 'note' }, 'Solving the wave equation on the real floor plan: the room, the TV alcove, the fireplace lounge, the stairs and the hall. Once per room shape; furniture and speaker changes are instant after that.')));
+    drawTuneOverlay(); return;
+  }
+  const fn = { overview: tabOverview, bass: tabBass, modes: tabModes, reverb: tabReverb, refl: tabRefl, speakers: tabSpeakers, report: tabReport }[TV.tab];
+  body.append(fn());
+  body.scrollTop = keep;
+  requestAnimationFrame(() => { $$('canvas[data-chart]', body).forEach((cv) => cv._draw && cv._draw()); });
+  drawTuneOverlay();
+}
+const sect = (title, ...kids) => h('section', { class: 'tsec' }, title ? h('h3', {}, title) : null, ...kids);
+const tchips = (opts, cur, pick, cls = '') => h('div', { class: 'chips ' + cls }, opts.map(([v, label]) => h('button', { class: 'chip', 'aria-pressed': String(v === cur), onclick: () => pick(v) }, label)));
+const kv = (k, v, sub) => h('div', { class: 'kv' }, h('span', {}, k), h('b', {}, v), sub ? h('small', {}, sub) : null);
+const gradeChip = (g) => h('span', { class: 'grade g' + g }, g);
+
+// ---------------- Overview ----------------
+function tabOverview() {
+  const A = TA, sc = A.score, rt = A.rt, S = ACS;
+  const ring = h('div', { class: 'scoring', style: `--s:${sc.total}` }, h('b', {}, String(sc.total)), h('small', {}, 'of 100'));
+  const first = S.modes3.find((m) => m.f > 1);
+  const top = h('div', { class: 'tov' }, ring, h('div', { class: 'kvs' },
+    kv('Room volume', `${A.rt.V.toFixed(0)} m³`, `${(A.rt.V * 35.315).toFixed(0)} ft³, not counting the stairs and hall`),
+    kv('Reverberation', `${rt.rtMid.toFixed(2)} s`, 'mid-band RT60'),
+    kv('Schroeder frequency', fmtF(rt.schroeder), 'below it, room modes rule'),
+    kv('Lowest mode', fmtF(first ? first.f : 0), 'the whole basement breathing through the hall')));
+  const rows = h('div', { class: 'scorecard' }, sc.rows.map((r) => h('details', { class: 'srow' },
+    h('summary', {}, h('span', { class: 'sl' }, r.label), h('span', { class: 'sv' }, r.value), gradeChip(r.g)), h('p', {}, r.note))));
+  const adv = h('div', { class: 'advice' }, A.advice.slice(0, 7).map((a, i) => h('div', { class: 'adv' },
+    h('span', { class: 'adv-n' }, String(i + 1)), h('div', {}, h('b', {}, a.title), h('p', {}, a.detail)),
+    a.act ? h('button', { class: 'btn' + (i === 0 ? ' primary' : ''), onclick: () => doAdvice(a.act) }, a.act.label) : null)));
+  return h('div', {}, sect(null, top), sect('Scorecard', rows, h('p', { class: 'note' }, 'Grades use targets common in professional home-cinema design (seat-to-seat bass within ±3 dB, RT60 0.2–0.4 s, no reflection above −10 dB in the first 15 ms, Dolby speaker angles). They follow the spirit of the CEDIA/CTA RP22 levels; this is a model, not a certification.')),
+    sect('What to do, in order', adv));
+}
+function doAdvice(act) {
+  if (act.kind === 'subs') { applySubConfig(act.subs); snack(`${act.subs.length} subwoofer${act.subs.length > 1 ? 's' : ''} placed`); }
+  else if (act.kind === 'row') { const L = mainSeatLine(); if (L) { pushHistory(); L.it.x += L.ez[0] * act.off; L.it.y += L.ez[1] * act.off; placeItem(itemObjects.get(L.it.id).group, L.it); commit(false); snack(`Sofa moved ${Math.abs(act.off)}″`); } }
+  else if (act.kind === 'traps') { setTune({ traps: act.n }); snack(`${act.n} corner bass traps added`); }
+  else if (act.kind === 'refl') { setTune({ reflPanels: true }); snack('Panels added at the reflection points'); }
+  else if (act.kind === 'cloud') { setTune({ cloud: true }); snack('Ceiling cloud added'); }
+  else if (act.kind === 'rear') { setTune({ rearPanels: true }); snack('Rear-wall panels added'); }
+  else if (act.kind === 'eq') { setTune({ eqOn: true }); }
+  else if (act.kind === 'door') { setTune({ door: true }); snack('Door at the stairs planned'); }
+  tuneChanged();
+}
+
+// ---------------- Bass ----------------
+function previewOrCurrent() { return TV.preview ? TV.preview.subs : currentSubs(); }
+function bassView() {
+  const ctx = TA.ctx, subs = previewOrCurrent(), t = state.tune;
+  const eq = t.eqOn ? (TV.preview ? autoEQ(ctx, subs) : TA.eq) : [];
+  const resp = bassResponses(ctx, subs, { eq: eq.length ? eq : null }), m = bassMetrics(resp, ctx.F);
+  return { ctx, subs, eq, resp, m };
+}
+function tabBass() {
+  const t = state.tune, V = bassView(), { ctx, m } = V, F = ctx.F;
+  const wrap = h('div', {});
+  if (TV.preview) wrap.append(h('div', { class: 'preview-bar' }, h('span', {}, `Previewing: ${TV.preview.label}`),
+    h('button', { class: 'btn primary', onclick: () => { applySubConfig(TV.preview.subs); TV.preview = null; snack('Subwoofers placed'); tuneChanged(); } }, 'Place them'),
+    h('button', { class: 'btn', onclick: () => { TV.preview = null; renderTune(); } }, 'Cancel')));
+  // controls
+  wrap.append(sect(null,
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Signal'), tchips([['lfe', 'LFE (subs only)'], ['managed', 'Bass-managed L/R + subs']], t.signal, (v) => setTune({ signal: v }))),
+    t.signal === 'managed' ? h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Crossover'), tchips([[60, '60'], [80, '80'], [100, '100'], [120, '120 Hz']], t.xo, (v) => setTune({ xo: v }))) : null,
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Subwoofer'), tchips(Object.entries(SUB_MODELS).map(([k, s]) => [k, s.label]), t.sub, (v) => setTune({ sub: v }))),
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Target'), tchips(Object.entries(TARGETS).map(([k, s]) => [k, s.label]), t.target, (v) => setTune({ target: v, eq: [] }))),
+    h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Show'), tchips([[0, 'Raw'], [24, '1/24'], [6, '1/6 oct'], [3, '1/3 oct']], TV.smooth, (v) => { TV.smooth = v; renderTune(); }),
+      h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: t.eqOn, onchange: (e) => setTune({ eqOn: e.target.checked }) }), 'Room EQ'),
+      h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: t.allSeats, onchange: (e) => setTune({ allSeats: e.target.checked }) }), 'Chairs too'))));
+  // metrics strip
+  wrap.append(h('div', { class: 'metrics' },
+    metric('Seat to seat', `±${m.ssv.toFixed(1)}`, 'dB', grade(m.ssv, [2.5, 3.5, 5])),
+    metric('Smoothness', `±${m.flat.toFixed(1)}`, 'dB', grade(m.flat, [2, 3, 4.5])),
+    metric('Main seat', `±${m.flatMlp.toFixed(1)}`, 'dB', grade(m.flatMlp, [2.5, 3.5, 5])),
+    metric('Extension', m.ext < 17 ? '<16' : m.ext.toFixed(0), 'Hz', grade(m.ext, [20, 25, 32]))));
+  // frequency response chart
+  const cv = h('canvas', { class: 'chart', 'data-chart': 1 }), tip = h('div', { class: 'ctip' });
+  cv._draw = () => drawResponse(cv, tip, V);
+  attachHover(cv, tip, (x) => { TV.f = x; TV.band = false; drawTuneOverlay(); renderMapControls(); });
+  wrap.append(sect('Frequency response at the seats', h('div', { class: 'chartwrap' }, cv, tip),
+    h('div', { class: 'legend' }, V.resp.map((r, i) => h('span', { class: 'lg' + (r.seat.main || t.allSeats ? '' : ' off') }, h('i', { style: `background:${seatColor(r.seat, i)}` }), r.seat.label)),
+      h('span', { class: 'lg' }, h('i', { class: 'dash' }), 'Average'), h('span', { class: 'lg' }, h('i', { class: 'band' }), 'Target')),
+    h('p', { class: 'note' }, `dB relative to the subwoofer's own output at 1 m outdoors: the room's gain and its peaks and nulls. Click the chart to see that frequency on the floor.`)));
+  // the map
+  wrap.append(sect('Bass map', h('div', { id: 'mapControls' }), h('p', { class: 'note' }, 'Colours on the floor show how loud each spot is compared with the room average at ear height (38″): blue are nulls, amber are peaks. The seats show their own value.')));
+  // subwoofers
+  wrap.append(subSection(V));
+  // EQ
+  if (V.eq.length) wrap.append(sect('Room EQ (all subs)', h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, '#'), h('th', {}, 'Frequency'), h('th', {}, 'Gain'), h('th', {}, 'Q'))),
+    h('tbody', {}, V.eq.map((q, i) => h('tr', {}, h('td', {}, String(i + 1)), h('td', {}, fmtF(q.f)), h('td', {}, `${sgn(q.g)} dB`), h('td', {}, q.q.toFixed(2)))))),
+    h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: () => copyText(eqText(V.eq), 'EQ filters copied') }, 'Copy filters'),
+      h('span', { class: 'note' }, `Fitted to the seating area's average with the ${TARGETS[t.target].label.toLowerCase()}. Cuts only, plus at most one broad +3 dB boost; nulls are left alone: EQ can't fill them.`))));
+  // waterfall
+  const wf = h('canvas', { class: 'chart tall', 'data-chart': 1 });
+  wf._draw = () => drawWaterfall(wf, V);
+  wrap.append(sect('Waterfall at the main seat', wf, h('p', { class: 'note' }, 'How the bass dies away after the sound stops, every 25 ms: long ridges are ringing modes (boomy, one-note bass).')));
+  // decay
+  const dc = h('canvas', { class: 'chart', 'data-chart': 1 });
+  dc._draw = () => drawDecay(dc);
+  wrap.append(sect('Low-frequency decay (T30) per third octave', dc, h('p', { class: 'note' }, `From the modelled impulse response at the main seat. Target: about the mid-band reverb time + 0.1 s (${(TA.rt.rtMid + 0.1).toFixed(2)} s), allowed to rise below 63 Hz.`)));
+  // sofa position
+  if (TA.sweep) {
+    const sw = h('canvas', { class: 'chart short', 'data-chart': 1 });
+    sw._draw = () => drawSweep(sw);
+    const b = TA.sweep.best;
+    wrap.append(sect('Where the sofa sits', sw, h('div', { class: 'btnrow' },
+      b && b.off !== 0 ? h('button', { class: 'btn', onclick: () => doAdvice({ kind: 'row', off: b.off }) }, `Move it ${Math.abs(b.off)}″ ${b.off > 0 ? 'forward' : 'back'}`) : h('span', { class: 'note' }, 'The sofa is already at the best spot it can reach.'),
+      h('span', { class: 'note' }, 'Main-seat smoothness (brass) and seat-to-seat variation (blue) as the whole sofa slides toward or away from the TV, subs fixed. Grey: it would hit a wall or the stairs.'))));
+  }
+  requestAnimationFrame(renderMapControls);
+  return wrap;
+}
+function metric(label, v, unit, g) { return h('div', { class: 'metric' }, h('small', {}, label), h('b', {}, v, h('i', {}, unit)), gradeChip(g)); }
+const seatColor = (s, i) => (s.mlp ? '#d6a463' : SEAT_COLORS[(i + 3) % SEAT_COLORS.length]);
+function renderMapControls() {
+  const box = $('#mapControls'); if (!box) return;
+  const lf = Math.log2(TV.f / 15) / Math.log2(200 / 15);
+  const sl = h('input', { type: 'range', min: 0, max: 1000, value: String(Math.round(lf * 1000)), 'aria-label': 'Map frequency' });
+  sl.addEventListener('input', () => { TV.f = 15 * (200 / 15) ** (sl.value / 1000); TV.band = false; out.textContent = TV.band ? '20–80 Hz' : fmtF(TV.f); drawTuneOverlay(); bandBtn.setAttribute('aria-pressed', 'false'); });
+  const out = h('b', { class: 'mapf' }, TV.band ? '20–80 Hz average' : fmtF(TV.f));
+  const bandBtn = h('button', { class: 'chip', 'aria-pressed': String(TV.band), onclick: () => { TV.band = !TV.band; renderMapControls(); drawTuneOverlay(); } }, '20–80 Hz average');
+  const play = h('button', { class: 'chip', 'aria-pressed': String(!!TV.playing), onclick: () => {
+    if (TV.playing) { clearInterval(TV.playing); TV.playing = 0; renderMapControls(); return; }
+    TV.band = false; TV.f = 15;
+    TV.playing = setInterval(() => { TV.f *= 2 ** (1 / 24); if (TV.f > 200) TV.f = 15; drawTuneOverlay(); const o = $('.mapf'); if (o) o.textContent = fmtF(TV.f); const s2 = $('#mapControls input'); if (s2) s2.value = String(Math.round(Math.log2(TV.f / 15) / Math.log2(200 / 15) * 1000)); }, 120);
+    renderMapControls();
+  } }, TV.playing ? 'Stop sweep' : 'Play sweep');
+  box.replaceChildren(h('div', { class: 'maprow' }, out, sl), h('div', { class: 'chips' }, bandBtn, play,
+    ...[30, 45, 60, 90].map((f) => h('button', { class: 'chip', onclick: () => { TV.f = f; TV.band = false; renderMapControls(); drawTuneOverlay(); } }, `${f} Hz`))),
+    h('div', { class: 'cbar' }, h('span', {}, '−15 dB'), h('i'), h('span', {}, '+10 dB')));
+}
+function subSection(V) {
+  const t = state.tune, subs = currentSubs(), real = subs.filter((s) => s.real);
+  const list = h('div', { class: 'sublist' }, (real.length ? real : subs).map((s, i) => {
+    const d = state.tune.dsp[s.id] || { g: 0, d: 0, pol: 1 };
+    const set = (patch) => { pushHistory(); state.tune.dsp[s.id] = { ...d, ...patch }; save(); tuneAnalyse(); };
+    return h('div', { class: 'subrow' }, h('b', {}, `SW${i + 1}`), h('span', { class: 'sname' }, s.real ? spotName({ ...s, n: wallNormalAt(s.x, s.y) }) : 'pre-wire spot (no sub placed yet)'),
+      s.real ? h('div', { class: 'dsp' },
+        stepper('Gain', `${sgn(d.g || 0)} dB`, () => set({ g: clamp((d.g || 0) - 0.5, -12, 0) }), () => set({ g: clamp((d.g || 0) + 0.5, -12, 0) })),
+        stepper('Delay', `${(d.d || 0).toFixed(1)} ms`, () => set({ d: clamp((d.d || 0) - 0.5, 0, 20) }), () => set({ d: clamp((d.d || 0) + 0.5, 0, 20) })),
+        h('button', { class: 'chip', 'aria-pressed': String(d.pol === -1), onclick: () => set({ pol: d.pol === -1 ? 1 : -1 }) }, d.pol === -1 ? 'Polarity −' : 'Polarity +')) : null);
+  }));
+  // presets
+  const cmp = compareConfigs(subPresets()).sort((a, b) => a.score - b.score);
+  const cur = { label: 'Current', ssv: TA.mRaw.ssv, flat: TA.mRaw.flat, level: TA.mRaw.level };
+  const row = (c, i, opt) => h('tr', { class: TV.preview && TV.preview.label === c.label ? 'on' : '' },
+    h('td', {}, c.label, opt ? h('small', {}, c.subs.map((s) => `${s.label}${s.g ? ` ${sgn(s.g)} dB` : ''}${s.d ? ` ${s.d} ms` : ''}${s.pol === -1 ? ' inv.' : ''}`).join(' · ')) : null),
+    h('td', {}, `±${c.ssv.toFixed(1)}`), h('td', {}, `±${c.flat.toFixed(1)}`), h('td', {}, sgn(c.level - cur.level)),
+    h('td', {}, c.subs ? h('button', { class: 'btn', onclick: () => { TV.preview = { label: c.label, subs: c.subs }; renderTune(); } }, 'Preview') : null));
+  const table = h('table', { class: 'ttable cfg' }, h('thead', {}, h('tr', {}, h('th', {}, 'Layout'), h('th', {}, 'Seat to seat'), h('th', {}, 'Smooth'), h('th', {}, 'Output'), h('th', {}))),
+    h('tbody', {}, h('tr', { class: 'cur' }, h('td', {}, real.length ? `Now: ${real.length} sub${real.length > 1 ? 's' : ''}` : 'Now: pre-wire spot'), h('td', {}, `±${cur.ssv.toFixed(1)}`), h('td', {}, `±${cur.flat.toFixed(1)}`), h('td', {}, '0'), h('td', {})),
+      ...(TV.opt || []).map((c, i) => row({ ...c, label: `Optimised ${c.subs.length} · #${i + 1}` }, i, true)),
+      ...cmp.map((c, i) => row(c, i))));
+  const optCtl = h('div', { class: 'optctl' },
+    h('span', { class: 'tl' }, 'Optimise'), tchips([[1, '1 sub'], [2, '2'], [3, '3'], [4, '4 subs']], TV.optN, (v) => { TV.optN = v; renderTune(); }),
+    h('label', { class: 'mini-toggle' }, h('input', { type: 'checkbox', checked: TV.optKeep, disabled: !real.length, onchange: (e) => { TV.optKeep = e.target.checked; } }), 'Keep positions, tune DSP only'),
+    h('button', { class: 'btn primary', disabled: !!TV.optRunning, onclick: runOptimiser }, TV.optRunning ? TV.optRunning : 'Run'));
+  return sect('Subwoofers', list, optCtl, table, h('p', { class: 'note' }, 'Spots are along the walls (every foot, corners first) and behind the seats, clear of the sofa, chairs, console and towers. The optimiser compares every pair, grows the best to 3 or 4, moves each sub to wherever it helps most, then tunes gain, delay and polarity: lowest seat-to-seat variation first, then a smooth average, without giving up much output.'));
+}
+function stepper(label, val, dec, inc) { return h('span', { class: 'step' }, h('small', {}, label), h('button', { onclick: dec, 'aria-label': `${label} down` }, '−'), h('b', {}, val), h('button', { onclick: inc, 'aria-label': `${label} up` }, '+')); }
+function wallNormalAt(x, y) { const r = state.room, G = geom(); return [x < 30 ? 1 : x > r.width - 30 ? -1 : 0, y > G.mainY - 30 && y <= G.mainY ? -1 : y < 30 ? 1 : 0]; }
+async function runOptimiser() {
+  TV.optRunning = 'Starting…'; renderTune();
+  const res = await optimiseSubs({ n: TV.optN, keep: TV.optKeep, onProgress: (p, msg) => { TV.optRunning = msg; const b = $('.optctl .btn.primary'); if (b) b.textContent = `${Math.round(p * 100)}% · ${msg}`; } });
+  TV.optRunning = null; TV.opt = res ? res.slice(0, 3) : null;
+  if (res && res[0]) TV.preview = { label: `Optimised ${res[0].subs.length} · #1`, subs: res[0].subs };
+  renderTune();
+}
+const eqText = (eq) => ['Filter Settings file', '', 'Room EQ from Basement Cinema planner', '', ...eq.map((q, i) => `Filter ${i + 1}: ON PK Fc ${q.f.toFixed(1)} Hz Gain ${q.g.toFixed(1)} dB Q ${q.q.toFixed(2)}`)].join('\n');
+async function copyText(txt, msg) { try { await navigator.clipboard.writeText(txt); toast(msg); } catch (e) { downloadBlob(new Blob([txt], { type: 'text/plain' }), 'cinema-tuning.txt'); } }
+
+// ---------------- Modes ----------------
+function tabModes() {
+  const S = ACS, ctx = TA.ctx, subs = currentSubs(), mlp = TA.mlp;
+  const cs = subs.map((s) => acCoef(S, s.x, s.y, AC.subZ)), cr = acCoef(S, mlp.x, mlp.y, AC.ear);
+  const list = S.modes3.map((m, i) => ({ m, i })).filter(({ m }) => m.f > 1 && m.f <= 200);
+  const r = state.room, G = geom(), c = 343, inM = (v) => v * AC.IN;
+  const ax = [['Length (fireplace wall to exterior wall)', r.width], ['Width (stairs to the alcove front)', G.mainY], ['Height', r.ceiling]];
+  const exc = list.map(({ m, i }) => { let a = 0; for (const q of cs) a += q[i]; return a * cr[i]; });
+  const emax = Math.max(...exc.map(Math.abs), 1e-9);
+  const rows = list.map(({ m, i }, j) => {
+    const md = S.modes2[m.m], lb = md.label, T60 = 6.91 / TA.ctx.damp[i], Q = Math.PI * m.f * T60 / 6.91;
+    const shape = lb.c > 0.55 ? `${lb.p}·${lb.q}·${m.nz}` : `basement · ${m.nz}`;
+    const nn = [lb.p, lb.q, m.nz].filter((x) => x).length;
+    const kind = lb.c > 0.55 ? (nn === 0 ? 'room breathing against the hall and stairs' : nn === 1 ? 'axial' : nn === 2 ? 'tangential' : 'oblique') : (md.roomFrac < 0.6 ? 'mostly in the hall and stairs' : 'whole floor');
+    const e = 20 * Math.log10(Math.abs(exc[j]) / emax + 1e-6);
+    return h('tr', { class: TV.modeSel === i ? 'on' : '', onclick: () => { TV.modeSel = TV.modeSel === i ? null : i; renderTune(); } },
+      h('td', {}, fmtF(m.f)), h('td', {}, shape, h('small', {}, kind)), h('td', {}, `${T60.toFixed(2)} s`), h('td', {}, Q.toFixed(0)),
+      h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(2, 100 + e * 2.5)}%` }), `${e.toFixed(0)} dB`));
+  });
+  return h('div', {},
+    sect('Room modes', h('p', { class: 'note' }, `${list.length} modes below 200 Hz from the wave solution. Shape = half-waves along the length · width · height of the main room (when the mode looks like one), or a mode that spreads into the hall and stairs. Click one to see its pressure on the floor (white lines are its nodes, where it vanishes). Excitation: how hard your subs drive it at the main seat.`),
+      h('div', { class: 'tscroll' }, h('table', { class: 'ttable modes' }, h('thead', {}, h('tr', {}, h('th', {}, 'Freq.'), h('th', {}, 'Shape'), h('th', {}, 'Decay'), h('th', {}, 'Q'), h('th', {}, 'Excitation at the MLP'))), h('tbody', {}, rows)))),
+    sect('Reference: a plain box this size', h('div', { class: 'kvs three' }, ax.map(([k, L]) => kv(k, fmtF(c / (2 * inM(L))), `${ftin(L)} · axial 1st order`))),
+      h('p', { class: 'note' }, `The real room isn't a box: the TV alcove, the fireplace lounge and the open stairs and hall shift and split these. Schroeder frequency ${fmtF(TA.rt.schroeder)}: above it, modes overlap and the room behaves statistically.`)));
+}
+
+// ---------------- Reverb ----------------
+function tabReverb() {
+  const t = state.tune, rt = TA.rt;
+  const cv = h('canvas', { class: 'chart', 'data-chart': 1 }); cv._draw = () => drawRT(cv, rt);
+  const surf = rt.surf.slice().sort((a, b) => b.area * b.a[3] - a.area * a.a[3]);
+  const A500 = rt.bands[3].A;
+  return h('div', {},
+    sect('Reverberation time (RT60)', cv, h('div', { class: 'legend' }, h('span', { class: 'lg' }, h('i', { style: 'background:#d6a463' }), 'Eyring'), h('span', { class: 'lg' }, h('i', { class: 'dot' }), 'Sabine'), h('span', { class: 'lg' }, h('i', { class: 'band' }), 'Target')),
+      h('p', { class: 'note' }, `Statistical model of the room and alcove (${rt.V.toFixed(0)} m³, ${rt.S.toFixed(0)} m² of surfaces), with the opening to the stairs and hall counted as absorption. Below about ${fmtF(rt.schroeder)} the Bass tab's decay is the real answer.`)),
+    sect('Treatment', h('div', { class: 'treat' },
+      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Corner bass traps'), tchips([[0, 'None'], [2, '2 front'], [4, '4 corners']], t.traps, (v) => setTune({ traps: v }))),
+      toggleRow('2″ panels at the side-wall reflection points', t.reflPanels, (v) => setTune({ reflPanels: v }), `${acReflectionPanelSpots().length} panels, 2 × 4 ft`),
+      toggleRow('4″ panels on the wall behind the seats', t.rearPanels, (v) => setTune({ rearPanels: v }), 'two, 2 × 4 ft, on the solid wall beside the stairs'),
+      toggleRow('Ceiling cloud over the seats', t.cloud, (v) => setTune({ cloud: v }), '4″, 4 × 6 ft, hung 2″ down'),
+      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'People watching'), tchips([[0, 'Empty room'], [2, '2'], [4, '4'], [6, '6']], t.people, (v) => setTune({ people: v }))),
+      toggleRow('Solid-core door at the stairs', t.door, (v) => setTune({ door: v }), 'keeps sound downstairs (not part of RT60)'),
+      h('p', { class: 'note' }, 'Panels you hang from Furnish › Wall décor (Acoustic panel) count too, where they are. Treatments here appear in the room as outlines.'))),
+    sect('What absorbs the sound', h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, 'Surface'), h('th', {}, 'Area'), h('th', {}, 'α 125'), h('th', {}, 'α 500'), h('th', {}, 'Share at 500 Hz'))),
+      h('tbody', {}, surf.map((s) => h('tr', {}, h('td', {}, s.label), h('td', {}, `${s.area.toFixed(1)} m²`), h('td', {}, s.a[1].toFixed(2)), h('td', {}, s.a[3].toFixed(2)),
+        h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(1, s.area * s.a[3] / A500 * 100)}%` }), `${(s.area * s.a[3] / A500 * 100).toFixed(0)}%`))),
+        rt.units.map((u) => h('tr', {}, h('td', {}, u.label), h('td', {}, '—'), h('td', {}, (u.a[1] * u.n).toFixed(1) + ' m²'), h('td', {}, (u.a[3] * u.n).toFixed(1) + ' m²'),
+          h('td', {}, h('span', { class: 'bar', style: `--w:${Math.max(1, u.n * u.a[3] / A500 * 100)}%` }), `${(u.n * u.a[3] / A500 * 100).toFixed(0)}%`)))))));
+}
+function toggleRow(label, on, fn, sub) {
+  const input = h('input', { type: 'checkbox', role: 'switch', checked: !!on }); input.addEventListener('change', () => fn(input.checked));
+  return h('label', { class: 'toggle trow2' }, h('span', {}, label, sub ? h('small', {}, sub) : null), input);
+}
+
+// ---------------- Reflections ----------------
+function tabRefl() {
+  const lay = TA.lay.filter((c) => !c.k.startsWith('T')), ch = lay.find((c) => c.k === TV.reflCh) || lay[0];
+  const spk = { x: ch.p[0], y: ch.p[1], z: ch.z }, list = firstReflections(spk, { x: TA.mlp.x, y: TA.mlp.y, z: AC.ear });
+  const cv = h('canvas', { class: 'chart', 'data-chart': 1 }); cv._draw = () => drawETC(cv, list);
+  const spots = acReflectionPanelSpots();
+  return h('div', {},
+    sect(null, h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Speaker'), tchips(lay.map((c) => [c.k, c.k]), ch.k, (v) => { TV.reflCh = v; renderTune(); }))),
+    sect(`${ch.name} → main seat: first reflections`, cv,
+      h('p', { class: 'note' }, 'Energy-time view: the direct sound at 0 ms and each first reflection (level after the surface\'s absorption at 2 kHz and the speaker\'s directivity). Inside the shaded box (louder than −10 dB in the first 15 ms) a reflection smears dialogue and imaging.'),
+      h('table', { class: 'ttable' }, h('thead', {}, h('tr', {}, h('th', {}, 'Surface'), h('th', {}, 'Lands at'), h('th', {}, 'Delay'), h('th', {}, 'Level'), h('th', {}, 'Material'))),
+        h('tbody', {}, list.map((q) => h('tr', { class: q.delay < 15 && q.level > -10 ? 'warn' : '' }, h('td', {}, q.surface), h('td', {}, `${ftin(q.z)} up`), h('td', {}, `${q.delay.toFixed(1)} ms`), h('td', {}, `${q.level.toFixed(1)} dB`), h('td', {}, MAT_NAME[q.mat] || q.mat)))))),
+    sect('Treat them', h('p', { class: 'note' }, `${spots.length} side-wall points catch the first reflections of the left, centre and right speakers at the main seat. Mirror trick: where a friend's mirror on the wall shows you the speaker from your seat.`),
+      h('div', { class: 'btnrow' },
+        h('button', { class: 'btn primary', onclick: () => hangPanels(spots) }, `Hang ${spots.length} acoustic panels there`),
+        h('button', { class: 'btn', onclick: () => setTune({ reflPanels: !state.tune.reflPanels }) }, state.tune.reflPanels ? 'Remove the planned panels' : 'Plan them (outline only)'),
+        h('button', { class: 'btn', onclick: () => setTune({ cloud: !state.tune.cloud }) }, state.tune.cloud ? 'Remove the ceiling cloud' : 'Add a ceiling cloud'))));
+}
+function hangPanels(spots) {
+  pushHistory();
+  for (const s of spots) {
+    const it = { id: uid('acousticPanel'), type: 'acousticPanel', x: s.x, y: s.y, rot: 0, p: { ...CATALOG.acousticPanel.defaults, h: Math.round(s.z) } };
+    state.items.push(it); buildItem(it); placeOnWall(it, s.x, s.y, it.p.h); placeItem(itemObjects.get(it.id).group, it);
+  }
+  state.tune.reflPanels = false;
+  updateLighting(); commit(false); snack(`${spots.length} acoustic panels hung`); tuneChanged();
+}
+
+// ---------------- Speakers ----------------
+function tabSpeakers() {
+  const t = state.tune, lay = TA.lay;
+  return h('div', {},
+    sect(null,
+      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Layout'), tchips(Object.keys(LAYOUTS).map((k) => [k, k]), t.layout, (v) => setTune({ layout: v }))),
+      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Speakers'), tchips(Object.entries(SPK_CLASSES).map(([k, s]) => [k, s.label]), t.spk, (v) => setTune({ spk: v }))),
+      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Amplifier'), tchips([[50, '50 W'], [100, '100 W'], [200, '200 W'], [400, '400 W']], t.amp, (v) => setTune({ amp: v }))),
+      h('div', { class: 'trow' }, h('span', { class: 'tl' }, 'Loudest level'), tchips([[0, 'Reference'], [-5, '−5 dB'], [-10, '−10 dB']], t.refLvl ?? -5, (v) => setTune({ refLvl: v })))),
+    sect(`${t.layout} from the main seat`, spkTable(lay),
+      h('p', { class: 'note' }, `Angles after Dolby's home-theatre guidelines (tops by their elevation seen from the side). Delay and trim are what an AV receiver sets so every channel arrives together and equally loud at the main seat. Headroom: peaks of ${105 + (t.refLvl ?? -5)} dB at the main seat (${refName()}).`),
+      showSpkToggle()));
+}
+function spkTable(lay) {
+  const head = h('thead', {}, h('tr', {}, ...['Ch.', 'Where', 'Angle', 'Distance', 'Delay · trim', 'Headroom'].map((x) => h('th', {}, x))));
+  const rows = lay.map((c) => h('tr', { class: c.ok ? '' : 'warn' },
+    h('td', {}, h('b', {}, c.k), h('small', {}, c.name)), h('td', {}, c.how), h('td', {}, `${c.actual}${c.ok ? ' ✓' : ' ✕'}`, h('small', {}, `Dolby ${c.target}`)),
+    h('td', {}, ftin(c.dist)), h('td', {}, `${c.delay.toFixed(1)} ms`, h('small', {}, `${sgn(c.trim)} dB`)), h('td', { class: c.headroom < 0 ? 'bad' : '' }, `${sgn(c.headroom)} dB`)));
+  return h('div', { class: 'tscroll' }, h('table', { class: 'ttable spk' }, head, h('tbody', {}, rows)));
+}
+function showSpkToggle() {
+  const i = h('input', { type: 'checkbox', role: 'switch', checked: state.showSpeakers });
+  i.addEventListener('change', () => { pushHistory(); state.showSpeakers = i.checked; commit(false); });
+  return h('label', { class: 'toggle' }, h('span', {}, 'Show the speakers in the room after closing'), i);
+}
+
+// ---------------- Report ----------------
+function tabReport() {
+  return h('div', {},
+    sect('Report', h('p', { class: 'note' }, 'Everything on one page for an installer or calibrator: the scorecard, the subwoofer positions and settings, the room EQ, speaker distances, delays and trims, treatment, and the charts.'),
+      h('div', { class: 'btnrow' }, h('button', { class: 'btn primary', onclick: downloadReport }, 'Download report (HTML)'), h('button', { class: 'btn', onclick: () => copyText(reportText(), 'Settings copied') }, 'Copy settings as text'))),
+    sect('How the model works', h('ul', { class: 'method' },
+      h('li', {}, h('b', {}, 'Bass (below ~200 Hz): '), 'the floor plan is cut into 5″ cells and the room\'s modes are solved from the wave equation (shift-invert Lanczos), including the alcove, the fireplace lounge, the pilaster and the open stairs and hall. The 9′ ceiling adds the vertical modes. Each mode is damped by what its pressure meets: drywall walls and ceiling, the floor, the openings, the seats and any traps or panels, so corner traps help more than mid-wall ones, as in real rooms.'),
+      h('li', {}, h('b', {}, 'Responses: '), 'every seat\'s response, the bass map, the impulse response, waterfall and decay all come from the same modal sum, with each sub\'s roll-off, the crossover, gain, delay, polarity and EQ.'),
+      h('li', {}, h('b', {}, 'Reverberation: '), 'Sabine and Eyring per octave from the surfaces, furniture, people and treatment, with typical published absorption coefficients.'),
+      h('li', {}, h('b', {}, 'Reflections: '), 'image sources on the real walls, ceiling and floor, with the speaker\'s directivity and the absorption where each lands.'),
+      h('li', {}, h('b', {}, 'Limits: '), 'walls are modelled as rigid with an absorption-based loss (no transmission into the framing), furniture doesn\'t block bass, and absorption figures are typical rather than measured. Measure with a microphone (REW) to confirm, then use the same EQ and DSP workflow.'))));
+}
+function reportText() {
+  const A = TA, t = state.tune, subs = currentSubs();
+  const L = [`Basement Cinema · acoustic plan`, `Score ${A.score.total}/100`, '', ...A.score.rows.map((r) => `${r.label}: ${r.value} (${r.g})`), '',
+    'Subwoofers:', ...subs.map((s, i) => `  SW${i + 1}: ${ftin(s.x)} from the fireplace wall, ${ftin(s.y)} from the stair wall · gain ${sgn(s.g || 0)} dB · delay ${(s.d || 0).toFixed(1)} ms · polarity ${s.pol === -1 ? 'inverted' : 'normal'}`),
+    `  Model: ${SUB_MODELS[t.sub].label} · ${t.signal === 'managed' ? `crossover ${t.xo} Hz` : 'LFE'}`, '',
+    'Room EQ:', ...(A.eq.length ? A.eq.map((q, i) => `  ${i + 1}. PK ${q.f.toFixed(1)} Hz ${sgn(q.g)} dB Q ${q.q.toFixed(2)}`) : ['  none']), '',
+    `Speakers (${t.layout}):`, ...A.lay.map((c) => `  ${c.k.padEnd(4)} ${c.name.padEnd(22)} ${c.actual.padEnd(10)} target ${c.target.padEnd(12)} ${ftin(c.dist).padEnd(9)} delay ${c.delay.toFixed(1)} ms trim ${sgn(c.trim)} dB · ${c.how}`), '',
+    `Reverberation (Eyring): ${A.rt.bands.map((b, i) => `${OCT_LABEL[i]} ${b.eyring.toFixed(2)} s`).join(' · ')}`,
+    `Treatment: traps ${t.traps} · reflection panels ${t.reflPanels ? 'yes' : 'no'} · rear panels ${t.rearPanels ? 'yes' : 'no'} · cloud ${t.cloud ? 'yes' : 'no'}`, '',
+    'Advice:', ...A.advice.map((a, i) => `  ${i + 1}. ${a.title}: ${a.detail}`)];
+  return L.join('\n');
+}
+function downloadReport() {
+  // render the charts off-screen at a fixed size and inline them
+  const shot = (fn) => { const cv = document.createElement('canvas'); cv.style.width = '720px'; cv.style.height = '260px'; document.body.append(cv); fn(cv); const url = cv.toDataURL('image/png'); cv.remove(); return url; };
+  const V = bassView();
+  const imgs = [['Frequency response at the seats', shot((cv) => drawResponse(cv, null, V))], ['Waterfall at the main seat', shot((cv) => drawWaterfall(cv, V))],
+    ['Low-frequency decay', shot((cv) => drawDecay(cv))], ['Reverberation time', shot((cv) => drawRT(cv, TA.rt))]];
+  const plan = (() => { try { return window.__cinema.capture('image/jpeg', 0.85); } catch (e) { return ''; } })();
+  const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Basement Cinema · acoustic plan</title><style>
+body{font:14px/1.5 system-ui,sans-serif;max-width:800px;margin:32px auto;padding:0 16px;color:#1c1814;background:#fff}h1{font-weight:400;font-size:28px;margin:0}h2{font-size:15px;text-transform:uppercase;letter-spacing:.08em;margin:28px 0 8px;color:#7a5a2e}
+img{width:100%;border-radius:8px;background:#151210}pre{background:#f6f2ea;padding:12px;border-radius:8px;white-space:pre-wrap;font-size:12px}.s{font-size:44px;color:#b07a33}</style></head><body>
+<h1>Basement Cinema · acoustic plan</h1><p>${new Date().toLocaleDateString()} · <span class="s">${TA.score.total}</span>/100</p>
+${plan ? `<h2>Bass map and layout</h2><img src="${plan}">` : ''}
+${imgs.map(([t, u]) => `<h2>${esc(t)}</h2><img src="${u}">`).join('')}
+<h2>Settings and advice</h2><pre>${esc(reportText())}</pre></body></html>`;
+  downloadBlob(new Blob([html], { type: 'text/html' }), 'basement-cinema-acoustics.html');
+  toast('Report downloaded');
 }
 
 // ---- 68-photo.js ----
@@ -7014,7 +9074,7 @@ initControls();
 initPipeline();                                       // composers: quick frames while moving, full frames when still (52-render)
 
 rebuildAll();
-initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initDirect(); initPhoto(); refreshPanels();
+initTabs(); initCodeDialog(); initPanels(); initStyleUI(); initSheet(); initDirect(); initPhoto(); initTune(); refreshPanels();
 
 $('#mode-orbit').addEventListener('click', () => setMode('orbit'));
 $('#mode-plan').addEventListener('click', () => setMode('plan'));
@@ -7175,6 +9235,8 @@ window.__cinema = {
     if (!o) return null; activeCam.updateMatrixWorld(); const v = o.project(activeCam);
     return { x: ((v.x + 1) / 2) * stage.clientWidth, y: (1 - (v.y + 1) / 2) * stage.clientHeight };
   },
+  tune: { solve: (cb) => acSolve(cb), analyse: () => analyseRoom(), optimise: (o) => optimiseSubs(o), presets: () => subPresets(), compare: (c) => compareConfigs(c),
+    layout: (k) => tuneLayout(k), rt: () => rtModel(), seats: () => acSeats(), cands: () => subCandidates(), apply: (s) => applySubConfig(s), ctx: () => bassCtx(), S: () => ACS },
   idle: () => dirty <= 0 && !envDirty, frames: () => renderer.info.render.frame,
   perf: () => ({ moveScale, movePR: movePR(), stillPR: stillPR(), slowScore, fastFrames, stillSlow, rafGap: performance.now() - lastRaf }), fireInView: () => !!FX.fire && fireInView(), camera: () => activeCam,
   view(px, py, pz, tx, ty, tz, fov = 50) { tween = null; camera.fov = fov; camera.updateProjectionMatrix(); camera.position.copy(P(px, py, pz)); controls.target.copy(P(tx, ty, tz)); controls.update(); invalidate(3); },

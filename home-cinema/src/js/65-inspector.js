@@ -123,6 +123,7 @@ function renderFurnishSelection() { if (!$('#tab-furnish').hidden) renderFurnish
 function commit() {
   save(); updateLabels(); renderInspector(); updateRoomSub(); markEnvDirty(); markShadowsDirty();
   if (sheet && sheet.kind === 'item') renderSheet();
+  tuneChanged();
 }
 
 // ---------------- layout code dialog ----------------

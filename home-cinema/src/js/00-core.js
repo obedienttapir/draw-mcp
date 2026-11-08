@@ -112,6 +112,12 @@ const DEFAULT_STATE = {
   option: 'original',
   showSightline: true,
   showSpeakers: false,
+  // Cinema tuning: analysis choices and acoustic treatment (the subwoofers themselves are items)
+  tune: {
+    layout: '5.1.2', sub: '15p', signal: 'lfe', xo: 80, target: 'gentle', eq: [], eqOn: true, allSeats: false,
+    dsp: {}, gdelay: 0, subPol: 1, traps: 0, reflPanels: false, rearPanels: false, cloud: false, people: 0,
+    spk: 'bookshelf', amp: 100, door: false, refLvl: -5,
+  },
   items: [
     { id: 'sectional', type: 'sectional', x: 160, y: 52, rot: 0,
       p: { back: 136, ret: 104, depth: 38, side: 'right' } },
@@ -240,6 +246,7 @@ function applyState(obj, record = true) {
     light: { ...d.light, ...(obj.light || {}) },
     items: obj.items.filter((it) => it && it.type).map((it) => ({ id: it.id || uid(), rot: 0, p: {}, ...it })),
     style: { ...d.style, ...(obj.style || {}) },
+    tune: { ...d.tune, ...(obj.tune || {}), dsp: { ...((obj.tune || {}).dsp || {}) } },
     study: { ...d.study, ...(obj.study || {}), weights: { ...d.study.weights, ...((obj.study || {}).weights || {}) } },
   };
   if (!obj.style) migrateLegacyStyle();
